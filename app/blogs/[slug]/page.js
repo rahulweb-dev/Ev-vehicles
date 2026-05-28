@@ -1,0 +1,194 @@
+import { notFound } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import { Clock3, Calendar, ChevronRight } from "lucide-react";
+import { getBlogBySlug, getRelatedBlogs, blogsData } from "@/data/blogsData";
+import { AdBannerInArticle, AdBannerHorizontal } from "@/components/ads/AdBanner";
+import { SITE_URL, SITE_NAME } from "@/app/layout";
+
+export async function generateStaticParams() {
+  return blogsData.map((blog) => ({ slug: blog.slug }));
+}
+
+export async function generateMetadata({ params }) {
+  const { slug } = await params;
+  const blog = getBlogBySlug(slug);
+
+  if (!blog) return { title: "Blog Not Found" };
+
+  return {
+    title: blog.title,
+    description: blog.excerpt,
+    keywords: blog.tags,
+    authors: [{ name: blog.author }],
+    alternates: { canonical: `${SITE_URL}/blogs/${blog.slug}` },
+    openGraph: {
+      title: blog.title,
+      description: blog.excerpt,
+      url: `${SITE_URL}/blogs/${blog.slug}`,
+      type: "article",
+      publishedTime: blog.publishedAt,
+      images: [{ url: blog.image, width: 1200, height: 630, alt: blog.title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: blog.title,
+      description: blog.excerpt,
+      images: [blog.image],
+    },
+  };
+}
+
+export default async function BlogPostPage({ params }) {
+  const { slug } = await params;
+  const blog = getBlogBySlug(slug);
+
+  if (!blog) notFound();
+
+  const related = getRelatedBlogs(slug, 3);
+
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: blog.title,
+    description: blog.excerpt,
+    image: [blog.image],
+    datePublished: blog.publishedAt,
+    dateModified: blog.publishedAt,
+    author: { "@type": "Person", name: blog.author },
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      logo: { "@type": "ImageObject", url: `${SITE_URL}/images/logo.png` },
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${SITE_URL}/blogs/${blog.slug}`,
+    },
+    keywords: blog.tags?.join(", "),
+    url: `${SITE_URL}/blogs/${blog.slug}`,
+  };
+
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+
+      <div className="bg-white">
+        <div className="mx-auto max-w-4xl px-4 py-10">
+          {/* Breadcrumb */}
+          <nav className="mb-6 flex items-center gap-1 text-sm text-gray-500">
+            <Link href="/" className="hover:text-green-600">Home</Link>
+            <ChevronRight size={14} />
+            <Link href="/blogs" className="hover:text-green-600">Blogs</Link>
+            <ChevronRight size={14} />
+            <span className="capitalize text-green-600">{blog.category}</span>
+          </nav>
+
+          {/* Header */}
+          <header>
+            <div className="mb-4">
+              <span className="rounded-full bg-green-100 px-3 py-1.5 text-sm font-bold capitalize text-green-700">
+                {blog.category}
+              </span>
+            </div>
+            <h1 className="text-3xl font-black leading-tight text-gray-900 md:text-4xl lg:text-5xl">
+              {blog.title}
+            </h1>
+            <p className="mt-4 text-lg text-gray-500 leading-relaxed">{blog.excerpt}</p>
+
+            <div className="mt-6 flex flex-wrap items-center gap-4 border-y border-gray-100 py-4 text-sm text-gray-500">
+              <div className="flex items-center gap-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-600 text-xs font-bold text-white">
+                  {blog.author.charAt(0)}
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">{blog.author}</p>
+                  <p className="text-xs text-gray-400">EV News India</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Calendar size={15} />
+                {new Date(blog.publishedAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Clock3 size={15} />
+                {blog.readTime} read
+              </div>
+            </div>
+          </header>
+
+          {/* Hero Image */}
+          <div className="relative my-8 h-[250px] overflow-hidden rounded-2xl sm:h-[400px]">
+            <Image
+              src={blog.image}
+              alt={blog.title}
+              fill
+              className="object-cover"
+              priority
+              sizes="(max-width: 768px) 100vw, 800px"
+            />
+          </div>
+
+          {/* In-article Ad */}
+          <AdBannerInArticle slot="3579124680" />
+
+          {/* Blog Content */}
+          <div
+            className="prose prose-lg max-w-none prose-headings:font-black prose-headings:text-gray-900 prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-p:text-gray-700 prose-p:leading-relaxed prose-strong:text-gray-900 prose-ul:text-gray-700 prose-li:my-1 prose-table:text-sm"
+            dangerouslySetInnerHTML={{ __html: blog.content }}
+          />
+
+          {/* Second Ad */}
+          <AdBannerInArticle slot="4680235791" />
+
+          {/* Tags */}
+          {blog.tags && (
+            <div className="mt-8 flex flex-wrap gap-2 border-t border-gray-100 pt-6">
+              {blog.tags.map((tag) => (
+                <span key={tag} className="rounded-lg bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-600">
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Related Blogs */}
+        {related.length > 0 && (
+          <div className="border-t border-gray-100 bg-gray-50 py-12">
+            <div className="mx-auto max-w-7xl px-4">
+              <AdBannerHorizontal slot="5791346802" />
+              <h2 className="mt-8 mb-6 text-2xl font-black text-gray-900">More Articles You&apos;ll Love</h2>
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {related.map((b) => (
+                  <Link key={b.id} href={`/blogs/${b.slug}`} className="group block">
+                    <article className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition hover:shadow-lg">
+                      <div className="relative h-44 overflow-hidden">
+                        <Image
+                          src={b.image}
+                          alt={b.title}
+                          fill
+                          className="object-cover transition duration-500 group-hover:scale-105"
+                          sizes="33vw"
+                        />
+                      </div>
+                      <div className="p-4">
+                        <h3 className="line-clamp-2 text-sm font-bold text-gray-900 group-hover:text-green-600">
+                          {b.title}
+                        </h3>
+                        <div className="mt-2 flex items-center gap-1 text-xs text-gray-400">
+                          <Clock3 size={12} />
+                          {b.readTime}
+                        </div>
+                      </div>
+                    </article>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}

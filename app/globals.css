@@ -1,26 +1,38 @@
 @import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+@plugin "@tailwindcss/typography";
 
 body {
-  background: var(--background);
-  color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar { width: 6px; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #22c55e; border-radius: 999px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+
+/* Vehicle swiper arrows */
+.vehicle-swiper .swiper-button-prev,
+.vehicle-swiper .swiper-button-next {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  color: #16a34a;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+.vehicle-swiper .swiper-button-prev::after,
+.vehicle-swiper .swiper-button-next::after {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* Prose styles for article content */
+.prose h2 { border-left: 4px solid #16a34a; padding-left: 1rem; }
+.prose table { width: 100%; border-collapse: collapse; }
+.prose table th, .prose table td { border: 1px solid #e5e7eb; padding: 0.5rem 1rem; }
+.prose table th { background: #f9fafb; font-weight: 700; }
+.prose table tr:nth-child(even) td { background: #f9fafb; }
+
+/* AdSense container */
+.adsbygoogle { display: block; }
