@@ -3,6 +3,7 @@ const nextConfig = {
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
+        { protocol: "https", hostname: "stimg.cardekho.com" },
       { protocol: "https", hostname: "ik.imagekit.io" },      // ImageKit CDN
       { protocol: "https", hostname: "**.imagekit.io" },
     ],
