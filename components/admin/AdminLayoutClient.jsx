@@ -40,19 +40,19 @@ export default function AdminLayoutClient({ children }) {
   }, [pathname, isLogin, router]);
 
   if (isLogin) {
-    return <div className="min-h-screen bg-gray-950">{children}</div>;
+    return <div className="min-h-screen bg-gray-50">{children}</div>;
   }
 
   if (!checked) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-950">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-green-500 border-t-transparent" />
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-green-600 border-t-transparent" />
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-950">
+    <div className="flex min-h-screen bg-gray-50">
       <AdminSidebar />
       <main className="flex-1 overflow-auto">{children}</main>
     </div>

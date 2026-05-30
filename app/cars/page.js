@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Star, BatteryCharging, Gauge, Zap, ChevronRight } from "lucide-react";
-import NewsCard from "@/components/news/NewsCard";
 import { AdBannerHorizontal } from "@/components/ads/AdBanner";
 import { electricCars } from "@/data/vehiclesData";
+import ArticlesFeed from "@/components/skeletons/ArticlesFeed";
 import { SITE_URL } from "../layout";
 
 export const revalidate = 60;
@@ -15,23 +15,8 @@ export const metadata = {
   alternates: { canonical: `${SITE_URL}/cars` },
 };
 
-async function getArticles(category) {
-  const BASE = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-  try {
-    const res = await fetch(`${BASE}/api/articles?status=published&category=${category}&limit=8`, {
-      next: { revalidate: 60 },
-    });
-    const data = await res.json();
-    return data.articles || [];
-  } catch {
-    const { getArticlesByCategory } = await import("@/data/newsArticles");
-    return getArticlesByCategory(category);
-  }
-}
 
-export default async function CarsPage() {
-  const articles = await getArticles("cars");
-
+export default function CarsPage() {
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -45,8 +30,8 @@ export default async function CarsPage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <div className="min-h-screen bg-gray-50">
-        {/* Hero */}
-        <div className="bg-gradient-to-br from-green-900 to-green-950 py-14">
+        {/* Header — instant */}
+        <div className="bg-linear-to-br from-green-900 to-green-950 py-14">
           <div className="mx-auto max-w-7xl px-4">
             <nav className="mb-4 flex items-center gap-2 text-sm text-green-300">
               <Link href="/" className="hover:text-white">Home</Link>
@@ -61,7 +46,7 @@ export default async function CarsPage() {
         <div className="mx-auto max-w-7xl px-4 py-10">
           <AdBannerHorizontal slot="7890123456" />
 
-          {/* Vehicle Grid */}
+          {/* Vehicle grid — static data, instant */}
           <section className="mt-8">
             <h2 className="mb-6 text-2xl font-black text-gray-900">All Electric Cars</h2>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -71,17 +56,11 @@ export default async function CarsPage() {
 
           <div className="my-10"><AdBannerHorizontal slot="7890123457" /></div>
 
-          {/* Latest News */}
-          {articles.length > 0 && (
-            <section>
-              <h2 className="mb-6 text-2xl font-black text-gray-900">Latest Electric Car News</h2>
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                {articles.map((article) => (
-                  <NewsCard key={article._id || article.id} article={article} />
-                ))}
-              </div>
-            </section>
-          )}
+          {/* News — skeleton on mount, real data after fetch */}
+          <section>
+            <h2 className="mb-6 text-2xl font-black text-gray-900">Latest Electric Car News</h2>
+            <ArticlesFeed category="cars" limit={8} cols="sm:grid-cols-2 lg:grid-cols-4" skeletonCount={4} />
+          </section>
         </div>
       </div>
     </>
@@ -92,7 +71,7 @@ function CarCard({ car }) {
   return (
     <Link href={`/cars/${car.slug}`} className="group block">
       <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-        <div className="relative h-[200px] overflow-hidden bg-gray-100">
+        <div className="relative h-50 overflow-hidden bg-gray-100">
           <Image
             src={car.image}
             alt={car.name}

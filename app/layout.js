@@ -1,11 +1,13 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
+import "react-loading-skeleton/dist/skeleton.css";
 import ConditionalShell from "@/components/ConditionalShell";
+import CookieConsent from "@/components/CookieConsent";
+import PushNotificationPrompt from "@/components/PushNotificationPrompt";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 
-// IMPORTANT: Replace 'ca-pub-XXXXXXXXXXXXXXXXX' with your actual Google AdSense Publisher ID
-// Get yours at: https://adsense.google.com
-const ADSENSE_PUBLISHER_ID = "ca-pub-XXXXXXXXXXXXXXXXX";
+const ADSENSE_PUBLISHER_ID = process.env.NEXT_PUBLIC_ADSENSE_ID || "ca-pub-XXXXXXXXXXXXXXXXX";
 
 // IMPORTANT: Replace with your actual website URL when you go live
 export const SITE_URL = "https://evnewsindia.com";
@@ -87,9 +89,7 @@ export const metadata = {
     canonical: SITE_URL,
   },
   verification: {
-    // IMPORTANT: Replace with your actual Google Search Console verification token
-    // Get yours at: https://search.google.com/search-console
-    google: "YOUR_GOOGLE_SEARCH_CONSOLE_VERIFICATION_TOKEN",
+    google: process.env.GOOGLE_SEARCH_CONSOLE_TOKEN,
   },
 };
 
@@ -151,7 +151,10 @@ export default function RootLayout({ children }) {
           crossOrigin="anonymous"
           strategy="afterInteractive"
         />
+        <GoogleAnalytics />
         <ConditionalShell>{children}</ConditionalShell>
+        <CookieConsent />
+        <PushNotificationPrompt />
       </body>
     </html>
   );

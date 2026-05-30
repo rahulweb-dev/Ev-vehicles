@@ -1,9 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Star, BatteryCharging, Gauge, Zap, ChevronRight } from "lucide-react";
-import NewsCard from "@/components/news/NewsCard";
 import { AdBannerHorizontal } from "@/components/ads/AdBanner";
 import { electricBikes } from "@/data/vehiclesData";
+import ArticlesFeed from "@/components/skeletons/ArticlesFeed";
 import { SITE_URL } from "../layout";
 
 export const revalidate = 60;
@@ -15,23 +15,8 @@ export const metadata = {
   alternates: { canonical: `${SITE_URL}/bikes` },
 };
 
-async function getArticles(category) {
-  const BASE = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-  try {
-    const res = await fetch(`${BASE}/api/articles?status=published&category=${category}&limit=8`, {
-      next: { revalidate: 60 },
-    });
-    const data = await res.json();
-    return data.articles || [];
-  } catch {
-    const { getArticlesByCategory } = await import("@/data/newsArticles");
-    return getArticlesByCategory(category);
-  }
-}
 
-export default async function BikesPage() {
-  const articles = await getArticles("bikes");
-
+export default function BikesPage() {
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -45,6 +30,7 @@ export default async function BikesPage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <div className="min-h-screen bg-gray-50">
+        {/* Header — instant */}
         <div className="bg-linear-to-br from-green-900 to-green-950 py-14">
           <div className="mx-auto max-w-7xl px-4">
             <nav className="mb-4 flex items-center gap-2 text-sm text-green-300">
@@ -60,8 +46,9 @@ export default async function BikesPage() {
         <div className="mx-auto max-w-7xl px-4 py-10">
           <AdBannerHorizontal slot="8901234567" />
 
+          {/* Vehicle grid — static, instant */}
           <section className="mt-8">
-            <h2 className="mb-6 text-2xl font-black text-gray-900">All Electric Bikes & Scooters</h2>
+            <h2 className="mb-6 text-2xl font-black text-gray-900">All Electric Bikes &amp; Scooters</h2>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {electricBikes.map((bike) => <BikeCard key={bike.slug} bike={bike} />)}
             </div>
@@ -69,16 +56,11 @@ export default async function BikesPage() {
 
           <div className="my-10"><AdBannerHorizontal slot="9012345678" /></div>
 
-          {articles.length > 0 && (
-            <section>
-              <h2 className="mb-6 text-2xl font-black text-gray-900">Latest Electric Bike News</h2>
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                {articles.map((article) => (
-                  <NewsCard key={article._id || article.id} article={article} />
-                ))}
-              </div>
-            </section>
-          )}
+          {/* News — skeleton on mount, real data after fetch */}
+          <section>
+            <h2 className="mb-6 text-2xl font-black text-gray-900">Latest Electric Bike News</h2>
+            <ArticlesFeed category="bikes" limit={8} cols="sm:grid-cols-2 lg:grid-cols-4" skeletonCount={4} />
+          </section>
         </div>
       </div>
     </>

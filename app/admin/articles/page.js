@@ -1,36 +1,166 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { Plus, Pencil, Trash2, Eye, Search, ExternalLink } from "lucide-react";
+import {
+  Plus, Pencil, Trash2, Eye, Search, ExternalLink,
+  Newspaper, CheckCircle2, FileText, LayoutGrid, List,
+  Star, Calendar, TrendingUp,
+} from "lucide-react";
 
-const STATUS_COLORS = {
-  published: "bg-green-900/50 text-green-400 border-green-800",
-  draft: "bg-yellow-900/50 text-yellow-400 border-yellow-800",
+const CAT_STYLE = {
+  cars:       { label: "Cars",       dot: "bg-blue-500",   badge: "bg-blue-50 text-blue-700 border-blue-200" },
+  bikes:      { label: "Bikes",      dot: "bg-orange-500", badge: "bg-orange-50 text-orange-700 border-orange-200" },
+  commercial: { label: "Commercial", dot: "bg-purple-500", badge: "bg-purple-50 text-purple-700 border-purple-200" },
+  charging:   { label: "Charging",   dot: "bg-teal-500",   badge: "bg-teal-50 text-teal-700 border-teal-200" },
 };
 
-const CATEGORY_COLORS = {
-  cars: "bg-blue-900/40 text-blue-400",
-  bikes: "bg-orange-900/40 text-orange-400",
-  commercial: "bg-purple-900/40 text-purple-400",
-  charging: "bg-teal-900/40 text-teal-400",
+const STATUS_STYLE = {
+  published: "bg-green-100 text-green-700 border border-green-200",
+  draft:     "bg-yellow-100 text-yellow-700 border border-yellow-200",
 };
 
+/* ── Grid card ──────────────────────────────────────────────── */
+function ArticleGridCard({ article, onDelete, deleting }) {
+  const cat = CAT_STYLE[article.category] || { label: article.category, dot: "bg-gray-400", badge: "bg-gray-100 text-gray-600 border-gray-200" };
+  return (
+    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm hover:border-green-200 hover:shadow-md transition">
+      {/* Thumbnail */}
+      <div className="relative h-44 w-full shrink-0 bg-gray-100">
+        {article.image ? (
+          <Image src={article.image} alt={article.imageAlt || article.title} fill
+            className="object-cover transition duration-300 group-hover:scale-105"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+        ) : (
+          <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-gray-50">
+            <Newspaper size={28} className="text-gray-300" />
+            <span className="text-xs text-gray-300">No image</span>
+          </div>
+        )}
+        <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent" />
+
+        {/* Badges */}
+        <div className="absolute left-3 top-3 flex items-center gap-1.5">
+          <span className={`rounded-lg border px-2 py-0.5 text-[10px] font-bold ${cat.badge}`}>
+            {cat.label}
+          </span>
+          {article.featured && (
+            <span className="flex items-center gap-0.5 rounded-lg bg-yellow-400/90 px-1.5 py-0.5 text-[9px] font-black text-yellow-900">
+              <Star size={8} fill="currentColor" /> Featured
+            </span>
+          )}
+        </div>
+        <span className={`absolute right-3 top-3 rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase ${STATUS_STYLE[article.status]}`}>
+          {article.status}
+        </span>
+
+        {/* Hover actions */}
+        <div className="absolute bottom-3 right-3 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition">
+          {article.status === "published" && (
+            <a href={`/news/${article.slug}`} target="_blank"
+              className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/90 text-gray-600 shadow hover:bg-green-600 hover:text-white transition" title="View live">
+              <ExternalLink size={14} />
+            </a>
+          )}
+          <Link href={`/admin/articles/${article._id}/edit`}
+            className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/90 text-gray-600 shadow hover:bg-blue-600 hover:text-white transition" title="Edit">
+            <Pencil size={14} />
+          </Link>
+          <button onClick={() => onDelete(article._id, article.title)} disabled={deleting === article._id}
+            className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/90 text-gray-600 shadow hover:bg-red-600 hover:text-white transition disabled:opacity-40" title="Delete">
+            <Trash2 size={14} />
+          </button>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="flex flex-1 flex-col p-4">
+        <h3 className="line-clamp-2 text-sm font-bold text-gray-900 leading-snug mb-2">{article.title}</h3>
+        {article.excerpt && (
+          <p className="line-clamp-2 text-xs text-gray-400 leading-relaxed mb-3">{article.excerpt}</p>
+        )}
+        <div className="mt-auto flex items-center gap-3 text-xs text-gray-400">
+          <span className="flex items-center gap-1"><Eye size={11} /> {(article.views || 0).toLocaleString("en-IN")}</span>
+          <span className="flex items-center gap-1">
+            <Calendar size={11} />
+            {new Date(article.publishedAt || article.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "2-digit" })}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── List row ───────────────────────────────────────────────── */
+function ArticleListRow({ article, onDelete, deleting }) {
+  const cat = CAT_STYLE[article.category] || { label: article.category, dot: "bg-gray-400", badge: "bg-gray-100 text-gray-600 border-gray-200" };
+  return (
+    <div className="group flex items-center gap-4 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm hover:border-green-200 hover:shadow-md transition">
+      <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded-lg bg-gray-100">
+        {article.image ? (
+          <Image src={article.image} alt={article.imageAlt || article.title} fill className="object-cover" sizes="80px" />
+        ) : (
+          <div className="flex h-full items-center justify-center"><Newspaper size={16} className="text-gray-300" /></div>
+        )}
+        <span className={`absolute bottom-0 left-0 right-0 py-0.5 text-center text-[8px] font-black uppercase text-white ${cat.dot}`}>
+          {cat.label}
+        </span>
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <p className="truncate text-sm font-semibold text-gray-900">{article.title}</p>
+        <p className="truncate text-xs text-gray-400">/news/{article.slug}</p>
+      </div>
+
+      <span className={`hidden sm:inline-block shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase ${STATUS_STYLE[article.status]}`}>
+        {article.status}
+      </span>
+
+      <span className="hidden md:flex shrink-0 items-center gap-1 text-xs text-gray-400 min-w-16">
+        <Eye size={11} /> {(article.views || 0).toLocaleString("en-IN")}
+      </span>
+
+      <span className="hidden lg:block shrink-0 text-xs text-gray-400 min-w-20 text-right">
+        {new Date(article.publishedAt || article.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "2-digit" })}
+      </span>
+
+      <div className="flex shrink-0 items-center gap-1">
+        {article.status === "published" && (
+          <a href={`/news/${article.slug}`} target="_blank"
+            className="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition" title="View live">
+            <ExternalLink size={14} />
+          </a>
+        )}
+        <Link href={`/admin/articles/${article._id}/edit`}
+          className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition" title="Edit">
+          <Pencil size={14} />
+        </Link>
+        <button onClick={() => onDelete(article._id, article.title)} disabled={deleting === article._id}
+          className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition disabled:opacity-40" title="Delete">
+          <Trash2 size={14} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ── Main page ──────────────────────────────────────────────── */
 export default function AdminArticlesPage() {
-  const [articles, setArticles] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const [articles, setArticles]         = useState([]);
+  const [loading, setLoading]           = useState(true);
+  const [search, setSearch]             = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [deleting, setDeleting] = useState(null);
+  const [catFilter, setCatFilter]       = useState("all");
+  const [view, setView]                 = useState("grid");
+  const [deleting, setDeleting]         = useState(null);
 
   async function loadArticles() {
     setLoading(true);
     try {
-      const params = new URLSearchParams({ limit: "100" });
-      if (statusFilter !== "all") params.set("status", statusFilter);
       const [pubRes, draftRes] = await Promise.all([
-        fetch("/api/articles?status=published&limit=100"),
-        fetch("/api/articles?status=draft&limit=100"),
+        fetch("/api/articles?status=published&limit=200"),
+        fetch("/api/articles?status=draft&limit=200"),
       ]);
       const [pub, draft] = await Promise.all([pubRes.json(), draftRes.json()]);
       const all = [...(pub.articles || []), ...(draft.articles || [])].sort(
@@ -47,7 +177,7 @@ export default function AdminArticlesPage() {
   useEffect(() => { loadArticles(); }, []);
 
   async function handleDelete(id, title) {
-    if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
+    if (!confirm(`Delete "${title}"?\nThis cannot be undone.`)) return;
     setDeleting(id);
     await fetch(`/api/articles/${id}`, { method: "DELETE" });
     setDeleting(null);
@@ -55,147 +185,151 @@ export default function AdminArticlesPage() {
   }
 
   const filtered = articles.filter((a) => {
-    const matchesSearch = a.title.toLowerCase().includes(search.toLowerCase());
-    const matchesStatus = statusFilter === "all" || a.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchSearch = a.title.toLowerCase().includes(search.toLowerCase()) || a.slug.toLowerCase().includes(search.toLowerCase());
+    const matchStatus = statusFilter === "all" || a.status === statusFilter;
+    const matchCat    = catFilter === "all" || a.category === catFilter;
+    return matchSearch && matchStatus && matchCat;
   });
 
+  const published  = articles.filter((a) => a.status === "published").length;
+  const drafts     = articles.filter((a) => a.status === "draft").length;
+  const totalViews = articles.reduce((s, a) => s + (a.views || 0), 0);
+
   return (
-    <div className="p-6 lg:p-8 pt-20 lg:pt-6">
+    <div className="min-h-screen bg-gray-50 p-4 pt-20 lg:p-6 lg:pt-6">
+
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-black text-white">Articles</h1>
-          <p className="text-sm text-gray-400">{articles.length} total articles</p>
+          <h1 className="text-2xl font-black text-gray-900">Articles</h1>
+          <p className="mt-0.5 text-sm text-gray-500">{articles.length} articles total</p>
         </div>
-        <Link
-          href="/admin/articles/new"
-          className="flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-green-500 transition"
-        >
-          <Plus size={16} />
-          New Article
+        <Link href="/admin/articles/new"
+          className="flex items-center gap-2 rounded-xl bg-green-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-green-800 transition shadow-sm">
+          <Plus size={16} /> New Article
         </Link>
       </div>
 
-      {/* Filters */}
-      <div className="mb-5 flex flex-wrap gap-3">
-        <div className="relative flex-1 min-w-48">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-          <input
-            type="text"
-            placeholder="Search articles..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-xl border border-gray-700 bg-gray-800 pl-9 pr-4 py-2.5 text-sm text-white placeholder-gray-500 outline-none focus:border-green-500"
-          />
-        </div>
-        {["all", "published", "draft"].map((s) => (
-          <button
-            key={s}
-            onClick={() => setStatusFilter(s)}
-            className={`rounded-xl px-4 py-2.5 text-sm font-semibold capitalize transition ${
-              statusFilter === s
-                ? "bg-green-600 text-white"
-                : "bg-gray-800 text-gray-400 hover:bg-gray-700"
-            }`}
-          >
-            {s}
-          </button>
+      {/* Quick stats */}
+      <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {[
+          { label: "Total",       value: articles.length,                    icon: Newspaper,    color: "text-blue-600",   bg: "bg-blue-50",   border: "border-blue-200" },
+          { label: "Published",   value: published,                          icon: CheckCircle2, color: "text-green-700",  bg: "bg-green-50",  border: "border-green-200" },
+          { label: "Drafts",      value: drafts,                             icon: FileText,     color: "text-yellow-600", bg: "bg-yellow-50", border: "border-yellow-200" },
+          { label: "Total Views", value: totalViews.toLocaleString("en-IN"), icon: TrendingUp,   color: "text-purple-600", bg: "bg-purple-50", border: "border-purple-200" },
+        ].map(({ label, value, icon: Icon, color, bg, border }) => (
+          <div key={label} className={`flex items-center gap-3 rounded-xl border ${border} ${bg} px-4 py-3 shadow-sm`}>
+            <Icon size={18} className={color} />
+            <div>
+              <p className="text-lg font-black text-gray-900">{value}</p>
+              <p className="text-xs text-gray-500">{label}</p>
+            </div>
+          </div>
         ))}
       </div>
 
-      {/* Table */}
-      <div className="rounded-2xl border border-gray-800 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-gray-900 border-b border-gray-800">
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Title</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Category</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Views</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">Date</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold uppercase text-gray-500">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-800 bg-gray-900">
-              {loading ? (
-                Array(8).fill(0).map((_, i) => (
-                  <tr key={i}>
-                    <td colSpan={6} className="px-4 py-3">
-                      <div className="animate-pulse h-4 w-full rounded bg-gray-800" />
-                    </td>
-                  </tr>
-                ))
-              ) : filtered.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="py-12 text-center text-gray-500 text-sm">
-                    No articles found.
-                  </td>
-                </tr>
-              ) : (
-                filtered.map((article) => (
-                  <tr key={article._id} className="hover:bg-gray-800/50 transition">
-                    <td className="px-4 py-3">
-                      <p className="text-sm font-medium text-white line-clamp-1 max-w-xs">
-                        {article.title}
-                      </p>
-                      <p className="text-xs text-gray-500 truncate max-w-xs">/news/{article.slug}</p>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`rounded-lg px-2.5 py-1 text-xs font-bold capitalize ${CATEGORY_COLORS[article.category] || "bg-gray-800 text-gray-400"}`}>
-                        {article.category}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`rounded-full border px-2.5 py-0.5 text-[11px] font-bold capitalize ${STATUS_COLORS[article.status]}`}>
-                        {article.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-400">
-                      {(article.views || 0).toLocaleString("en-IN")}
-                    </td>
-                    <td className="px-4 py-3 text-xs text-gray-500">
-                      {new Date(article.publishedAt || article.createdAt).toLocaleDateString("en-IN", {
-                        day: "numeric", month: "short", year: "2-digit",
-                      })}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center justify-end gap-1">
-                        {article.status === "published" && (
-                          <a
-                            href={`/news/${article.slug}`}
-                            target="_blank"
-                            className="p-1.5 rounded-lg text-gray-500 hover:text-green-400 hover:bg-gray-800 transition"
-                            title="View live"
-                          >
-                            <ExternalLink size={15} />
-                          </a>
-                        )}
-                        <Link
-                          href={`/admin/articles/${article._id}/edit`}
-                          className="p-1.5 rounded-lg text-gray-500 hover:text-blue-400 hover:bg-gray-800 transition"
-                          title="Edit"
-                        >
-                          <Pencil size={15} />
-                        </Link>
-                        <button
-                          onClick={() => handleDelete(article._id, article.title)}
-                          disabled={deleting === article._id}
-                          className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-gray-800 transition disabled:opacity-50"
-                          title="Delete"
-                        >
-                          <Trash2 size={15} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+      {/* Filters + view toggle */}
+      <div className="mb-5 flex flex-wrap items-center gap-3">
+        {/* Search */}
+        <div className="relative min-w-52 flex-1">
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input type="text" placeholder="Search by title or slug…" value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-9 pr-4 text-sm text-gray-900 placeholder-gray-400 shadow-sm outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20 transition" />
+        </div>
+
+        {/* Status filter */}
+        <div className="flex rounded-xl border border-gray-200 bg-white shadow-sm p-0.5">
+          {["all", "published", "draft"].map((s) => (
+            <button key={s} onClick={() => setStatusFilter(s)}
+              className={`rounded-lg px-3 py-1.5 text-xs font-semibold capitalize transition ${
+                statusFilter === s ? "bg-green-700 text-white" : "text-gray-500 hover:text-gray-900"
+              }`}>
+              {s}
+            </button>
+          ))}
+        </div>
+
+        {/* Category filter */}
+        <div className="flex rounded-xl border border-gray-200 bg-white shadow-sm p-0.5">
+          {["all", "cars", "bikes", "commercial", "charging"].map((c) => (
+            <button key={c} onClick={() => setCatFilter(c)}
+              className={`rounded-lg px-3 py-1.5 text-xs font-semibold capitalize transition ${
+                catFilter === c ? "bg-green-700 text-white" : "text-gray-500 hover:text-gray-900"
+              }`}>
+              {c === "all" ? "All" : CAT_STYLE[c]?.label}
+            </button>
+          ))}
+        </div>
+
+        {/* View toggle */}
+        <div className="ml-auto flex rounded-xl border border-gray-200 bg-white shadow-sm p-0.5">
+          <button onClick={() => setView("grid")}
+            className={`rounded-lg p-1.5 transition ${view === "grid" ? "bg-green-700 text-white" : "text-gray-400 hover:text-gray-700"}`}
+            title="Grid view"><LayoutGrid size={16} /></button>
+          <button onClick={() => setView("list")}
+            className={`rounded-lg p-1.5 transition ${view === "list" ? "bg-green-700 text-white" : "text-gray-400 hover:text-gray-700"}`}
+            title="List view"><List size={16} /></button>
         </div>
       </div>
+
+      {/* Result count */}
+      {!loading && (search || statusFilter !== "all" || catFilter !== "all") && (
+        <p className="mb-3 text-xs text-gray-500">
+          Showing <span className="font-semibold text-gray-900">{filtered.length}</span> of {articles.length} articles
+        </p>
+      )}
+
+      {/* Content */}
+      {loading ? (
+        view === "grid" ? (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {Array(6).fill(0).map((_, i) => (
+              <div key={i} className="animate-pulse rounded-2xl bg-white border border-gray-200 shadow-sm">
+                <div className="h-44 rounded-t-2xl bg-gray-100" />
+                <div className="p-4 space-y-2">
+                  <div className="h-3.5 w-3/4 rounded bg-gray-100" />
+                  <div className="h-3 w-1/2 rounded bg-gray-100" />
+                  <div className="h-2.5 w-full rounded bg-gray-100" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {Array(8).fill(0).map((_, i) => (
+              <div key={i} className="animate-pulse rounded-xl bg-white border border-gray-200 h-20 shadow-sm" />
+            ))}
+          </div>
+        )
+      ) : filtered.length === 0 ? (
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-gray-300 bg-white py-20 shadow-sm">
+          <Newspaper size={40} className="mb-3 text-gray-300" />
+          <p className="text-sm font-medium text-gray-400">
+            {search || statusFilter !== "all" || catFilter !== "all"
+              ? "No articles match your filters"
+              : "No articles yet"}
+          </p>
+          {!search && statusFilter === "all" && catFilter === "all" && (
+            <Link href="/admin/articles/new"
+              className="mt-4 flex items-center gap-2 rounded-xl bg-green-700 px-4 py-2 text-sm font-bold text-white hover:bg-green-800 transition">
+              <Plus size={14} /> Write your first article
+            </Link>
+          )}
+        </div>
+      ) : view === "grid" ? (
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((a) => (
+            <ArticleGridCard key={a._id} article={a} onDelete={handleDelete} deleting={deleting} />
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {filtered.map((a) => (
+            <ArticleListRow key={a._id} article={a} onDelete={handleDelete} deleting={deleting} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

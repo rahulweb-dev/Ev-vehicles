@@ -19,22 +19,26 @@ function LoginForm() {
     setLoading(true);
     setError("");
 
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
 
-    const data = await res.json();
-    setLoading(false);
+      const data = await res.json();
 
-    if (!res.ok) {
-      setError(data.error || "Login failed");
-      return;
+      if (!res.ok) {
+        setError(data.error || "Login failed");
+        return;
+      }
+
+      window.location.href = redirectTo;
+    } catch {
+      setError("Connection error. Please try again.");
+    } finally {
+      setLoading(false);
     }
-
-    router.push(redirectTo);
-    router.refresh();
   }
 
   return (

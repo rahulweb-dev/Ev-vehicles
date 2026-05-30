@@ -1,30 +1,30 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
   LayoutDashboard, Newspaper, BookOpen, LogOut,
-  BatteryCharging, Menu, X, ExternalLink, Settings,
+  Menu, X, ExternalLink, Settings,
   Users, Building2, MapPin, ShieldCheck,
 } from "lucide-react";
 
 const ADMIN_NAV = [
-  { href: "/admin",         label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { href: "/admin/articles",label: "Articles",  icon: Newspaper },
-  { href: "/admin/blogs",   label: "Blogs",     icon: BookOpen },
-  { href: "/admin/leads",   label: "Leads",     icon: Users },
-  { href: "/admin/dealers", label: "Dealers",   icon: Building2 },
-  { href: "/admin/settings",label: "Settings",  icon: Settings },
+  { href: "/admin",          label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { href: "/admin/articles", label: "Articles",  icon: Newspaper },
+  { href: "/admin/blogs",    label: "Blogs",      icon: BookOpen },
+  { href: "/admin/leads",    label: "Leads",      icon: Users },
+  { href: "/admin/dealers",  label: "Dealers",    icon: Building2 },
+  { href: "/admin/settings", label: "Settings",   icon: Settings },
 ];
 
 const DEALER_NAV = [
-  { href: "/admin/leads",   label: "My Leads",  icon: Users },
+  { href: "/admin/leads", label: "My Leads", icon: Users },
 ];
 
 export default function AdminSidebar() {
   const pathname    = usePathname();
-  const router      = useRouter();
   const [collapsed, setCollapsed]   = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
@@ -38,7 +38,7 @@ export default function AdminSidebar() {
   async function handleLogout() {
     setLoggingOut(true);
     await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/admin/login");
+    window.location.href = "/admin/login";
   }
 
   const isAdmin  = currentUser?.role === "admin";
@@ -51,19 +51,39 @@ export default function AdminSidebar() {
 
   return (
     <>
-      {/* Desktop Sidebar */}
-      <aside className={`hidden lg:flex flex-col ${collapsed ? "w-16" : "w-64"} shrink-0 bg-gray-900 border-r border-gray-800 transition-all duration-200`}>
+      {/* ── Desktop Sidebar ──────────────────────────────────── */}
+      <aside className={`hidden lg:flex flex-col ${collapsed ? "w-16" : "w-64"} shrink-0 sticky top-0 h-screen bg-white border-r border-gray-200 transition-all duration-200`}>
 
-        {/* Logo */}
-        <div className="flex h-16 items-center justify-between px-4 border-b border-gray-800">
+        {/* Logo area */}
+        <div className="flex h-16 items-center justify-between border-b border-gray-200 px-3">
           {!collapsed && (
-            <div className="flex items-center gap-2">
-              <BatteryCharging size={20} className="text-green-400" />
-              <span className="font-black text-white text-sm">EV News Admin</span>
-            </div>
+            <Link href="/admin" className="flex items-center gap-2 min-w-0">
+              <Image
+                src="/images/logo.png"
+                alt="EVBharat India"
+                width={120}
+                height={36}
+                className="object-contain h-9 w-auto"
+                priority
+              />
+            </Link>
           )}
-          <button onClick={() => setCollapsed(!collapsed)}
-            className="p-1.5 rounded-lg hover:bg-gray-800 text-gray-400 hover:text-white transition">
+          {collapsed && (
+            <Link href="/admin" className="mx-auto">
+              <Image
+                src="/images/logo.png"
+                alt="EVBharat India"
+                width={32}
+                height={32}
+                className="object-contain h-8 w-8"
+                priority
+              />
+            </Link>
+          )}
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className={`${collapsed ? "mx-auto" : ""} shrink-0 rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition`}
+          >
             <Menu size={18} />
           </button>
         </div>
@@ -72,47 +92,53 @@ export default function AdminSidebar() {
         {!collapsed && currentUser && (
           <div className={`mx-3 mt-3 rounded-xl border p-3 ${
             isAdmin
-              ? "border-green-800/40 bg-green-900/10"
-              : "border-blue-800/40 bg-blue-900/10"
+              ? "border-green-200 bg-green-50"
+              : "border-blue-200 bg-blue-50"
           }`}>
             <div className="flex items-center gap-2.5">
               <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-black ${
-                isAdmin ? "bg-green-600/30 text-green-400" : "bg-blue-600/30 text-blue-400"
+                isAdmin ? "bg-green-700 text-white" : "bg-blue-600 text-white"
               }`}>
                 {currentUser.name?.[0]?.toUpperCase()}
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-bold text-white truncate">{currentUser.name}</p>
+                <p className="text-xs font-bold text-gray-800 truncate">{currentUser.name}</p>
                 <div className="flex items-center gap-1 mt-0.5">
                   {isAdmin
-                    ? <><ShieldCheck size={10} className="text-green-400" /><span className="text-[10px] text-green-400 font-semibold">Super Admin</span></>
-                    : <><MapPin size={10} className="text-blue-400" /><span className="text-[10px] text-blue-400 font-semibold">{currentUser.city || "Dealer"}</span></>
+                    ? <><ShieldCheck size={10} className="text-green-700" /><span className="text-[10px] text-green-700 font-semibold">Super Admin</span></>
+                    : <><MapPin size={10} className="text-blue-600" /><span className="text-[10px] text-blue-600 font-semibold">{currentUser.city || "Dealer"}</span></>
                   }
                 </div>
               </div>
             </div>
             {!isAdmin && currentUser.city && (
-              <p className="mt-2 text-[10px] text-blue-400/70 leading-tight">
-                You see leads from <strong className="text-blue-300">{currentUser.city}, {currentUser.state}</strong> only
+              <p className="mt-2 text-[10px] text-blue-500 leading-tight">
+                Leads from <strong className="text-blue-700">{currentUser.city}, {currentUser.state}</strong> only
               </p>
             )}
           </div>
         )}
 
         {/* Navigation */}
-        <nav className="flex-1 p-3 space-y-0.5 mt-2">
+        <nav className="flex-1 overflow-y-auto p-3 space-y-0.5 mt-2">
           {navItems.map((item) => {
             const Icon   = item.icon;
             const active = isActive(item);
             return (
-              <Link key={item.href} href={item.href} title={item.label}
+              <Link
+                key={item.href}
+                href={item.href}
+                title={item.label}
                 className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
-                  active ? "bg-green-600 text-white" : "text-gray-400 hover:bg-gray-800 hover:text-white"
-                }`}>
+                  active
+                    ? "bg-green-700 text-white shadow-sm"
+                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                }`}
+              >
                 <Icon size={18} className="shrink-0" />
                 {!collapsed && <span>{item.label}</span>}
                 {!collapsed && item.label === "Leads" && !isAdmin && currentUser?.city && (
-                  <span className="ml-auto rounded-lg bg-blue-600/30 px-1.5 py-0.5 text-[10px] font-bold text-blue-300">
+                  <span className="ml-auto rounded-lg bg-blue-100 px-1.5 py-0.5 text-[10px] font-bold text-blue-700">
                     {currentUser.city}
                   </span>
                 )}
@@ -121,25 +147,39 @@ export default function AdminSidebar() {
           })}
         </nav>
 
-        {/* Bottom */}
-        <div className="p-3 border-t border-gray-800 space-y-1">
+        {/* Bottom — always visible */}
+        <div className="p-3 border-t border-gray-200 space-y-1">
           {isAdmin && (
-            <a href="/" target="_blank" title="View Site"
-              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-400 hover:bg-gray-800 hover:text-white transition">
+            <a
+              href="/"
+              target="_blank"
+              title="View Site"
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition"
+            >
               <ExternalLink size={18} className="shrink-0" />
               {!collapsed && <span>View Site</span>}
             </a>
           )}
-          <button onClick={handleLogout} disabled={loggingOut} title="Logout"
-            className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-400 hover:bg-red-900/40 hover:text-red-400 transition">
+          <button
+            onClick={handleLogout}
+            disabled={loggingOut}
+            title="Logout"
+            className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 transition disabled:opacity-50"
+          >
             <LogOut size={18} className="shrink-0" />
             {!collapsed && <span>{loggingOut ? "Logging out…" : "Logout"}</span>}
           </button>
         </div>
       </aside>
 
-      {/* Mobile Top Bar */}
-      <MobileTopBar navItems={navItems} pathname={pathname} onLogout={handleLogout} currentUser={currentUser} isAdmin={isAdmin} />
+      {/* ── Mobile Top Bar ───────────────────────────────────── */}
+      <MobileTopBar
+        navItems={navItems}
+        pathname={pathname}
+        onLogout={handleLogout}
+        currentUser={currentUser}
+        isAdmin={isAdmin}
+      />
     </>
   );
 }
@@ -147,24 +187,29 @@ export default function AdminSidebar() {
 function MobileTopBar({ navItems, pathname, onLogout, currentUser, isAdmin }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-gray-900 border-b border-gray-800">
+    <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
       <div className="flex h-14 items-center justify-between px-4">
-        <div className="flex items-center gap-2">
-          <BatteryCharging size={20} className="text-green-400" />
-          <span className="font-black text-white text-sm">
-            {isAdmin ? "EV News Admin" : `Dealer · ${currentUser?.city || ""}`}
-          </span>
-        </div>
-        <button onClick={() => setOpen(!open)} className="text-gray-400">
+        <Link href="/admin">
+          <Image
+            src="/images/logo.png"
+            alt="EVBharat India"
+            width={100}
+            height={30}
+            className="object-contain h-8 w-auto"
+            priority
+          />
+        </Link>
+        <button onClick={() => setOpen(!open)} className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 transition">
           {open ? <X size={22} /> : <Menu size={22} />}
         </button>
       </div>
+
       {open && (
-        <nav className="p-3 space-y-1 bg-gray-900 border-t border-gray-800">
+        <nav className="p-3 space-y-1 bg-white border-t border-gray-100">
           {currentUser && (
-            <div className={`mb-2 rounded-xl border p-3 ${isAdmin ? "border-green-800/40 bg-green-900/10" : "border-blue-800/40 bg-blue-900/10"}`}>
-              <p className="text-xs font-bold text-white">{currentUser.name}</p>
-              <p className={`text-[10px] font-semibold ${isAdmin ? "text-green-400" : "text-blue-400"}`}>
+            <div className={`mb-2 rounded-xl border p-3 ${isAdmin ? "border-green-200 bg-green-50" : "border-blue-200 bg-blue-50"}`}>
+              <p className="text-xs font-bold text-gray-800">{currentUser.name}</p>
+              <p className={`text-[10px] font-semibold ${isAdmin ? "text-green-700" : "text-blue-600"}`}>
                 {isAdmin ? "Super Admin · All locations" : `Dealer · ${currentUser.city}, ${currentUser.state}`}
               </p>
             </div>
@@ -173,16 +218,22 @@ function MobileTopBar({ navItems, pathname, onLogout, currentUser, isAdmin }) {
             const Icon   = item.icon;
             const active = item.exact ? pathname === item.href : pathname.startsWith(item.href);
             return (
-              <Link key={item.href} href={item.href} onClick={() => setOpen(false)}
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setOpen(false)}
                 className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium ${
-                  active ? "bg-green-600 text-white" : "text-gray-400"
-                }`}>
+                  active ? "bg-green-700 text-white" : "text-gray-600 hover:bg-gray-100"
+                }`}
+              >
                 <Icon size={18} /> {item.label}
               </Link>
             );
           })}
-          <button onClick={onLogout}
-            className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-red-400">
+          <button
+            onClick={onLogout}
+            className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 transition"
+          >
             <LogOut size={18} /> Logout
           </button>
         </nav>

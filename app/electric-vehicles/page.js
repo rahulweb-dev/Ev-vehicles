@@ -1,5 +1,5 @@
-import NewsCard from "@/components/news/NewsCard";
 import { AdBannerHorizontal } from "@/components/ads/AdBanner";
+import ArticlesFeed from "@/components/skeletons/ArticlesFeed";
 import { SITE_URL } from "../layout";
 
 export const revalidate = 60;
@@ -11,25 +11,10 @@ export const metadata = {
   alternates: { canonical: `${SITE_URL}/electric-vehicles` },
 };
 
-async function getArticles(category) {
-  const BASE = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-  try {
-    const res = await fetch(`${BASE}/api/articles?status=published&category=${category}&limit=20`, {
-      next: { revalidate: 60 },
-    });
-    const data = await res.json();
-    return data.articles || [];
-  } catch {
-    const { getArticlesByCategory } = await import("@/data/newsArticles");
-    return getArticlesByCategory(category);
-  }
-}
-
-export default async function EVChargingPage() {
-  const articles = await getArticles("charging");
-
+export default function EVChargingPage() {
   return (
     <div className="bg-white">
+      {/* Header — instant */}
       <div className="bg-linear-to-br from-green-900 to-green-950 py-14">
         <div className="mx-auto max-w-7xl px-4">
           <nav className="mb-4 text-sm text-green-300">
@@ -41,12 +26,12 @@ export default async function EVChargingPage() {
           <p className="mt-2 text-green-300">India&apos;s growing EV charging ecosystem — news, guides, and updates</p>
         </div>
       </div>
+
+      {/* Articles — skeleton on mount, real data after fetch */}
       <div className="mx-auto max-w-7xl px-4 py-10">
         <AdBannerHorizontal slot="1357924680" />
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {articles.map((article) => (
-            <NewsCard key={article._id || article.id} article={article} />
-          ))}
+        <div className="mt-8">
+          <ArticlesFeed category="charging" skeletonCount={6} />
         </div>
       </div>
     </div>

@@ -3,6 +3,7 @@ import dbConnect from "@/lib/mongodb";
 import Article from "@/lib/models/Article";
 import { requireAuth } from "@/lib/auth";
 import { pingIndexNow, buildArticleUrl } from "@/lib/indexnow";
+import { sendPushToAll } from "@/lib/pushNotify";
 
 // GET /api/articles — public, supports ?category=&status=&featured=&limit=&page=
 export async function GET(request) {
@@ -71,9 +72,17 @@ export async function POST(request) {
       publishedAt: status === "published" ? new Date() : undefined,
     });
 
-    // Ping search engines immediately if publishing
+    // Ping search engines and push browser notifications when publishing
     if (status === "published") {
       pingIndexNow(buildArticleUrl(slug)).catch(console.error);
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://evnewsindia.com";
+      sendPushToAll({
+        title: "EV News India – New Article",
+        body: title,
+        icon: "/images/logo.png",
+        image: image || undefined,
+        url: `${siteUrl}/news/${slug}`,
+      }).catch(console.error);
     }
 
     return NextResponse.json({ success: true, article }, { status: 201 });
