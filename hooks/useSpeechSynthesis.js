@@ -2,9 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 
-/* ── split text into ~250-char chunks at sentence boundaries ──
-   Chrome has a ~15 s bug where speech stops on long utterances.
-   Speaking chunk-by-chunk is the standard workaround.            */
+/* split text into ~250-char chunks at sentence boundaries —
+   Chrome silently stops on long utterances; chunks work around it */
 function toChunks(text, max = 250) {
   const sentences = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [text]
   const chunks = []
@@ -18,29 +17,29 @@ function toChunks(text, max = 250) {
 }
 
 export function useSpeechSynthesis(text) {
-  const [status,  setStatus]  = useState('idle')   // idle | playing | paused | ended
-  const [voices,  setVoices]  = useState([])
-  const [selVoice, setSelVoice] = useState(null)
-  const [rate,    setRateState] = useState(1)
-  const [progress, setProgress] = useState(0)
+  const [status,    setStatus]    = useState('idle')   // idle | playing | paused | ended
+  const [voices,    setVoices]    = useState([])
+  const [selVoice,  setSelVoice]  = useState(null)
+  const [rate,      setRateState] = useState(1)
+  const [progress,  setProgress]  = useState(0)
   const [supported, setSupported] = useState(false)
 
-  const chunks     = useRef([])
-  const chunkIdx   = useRef(0)
-  const rateRef    = useRef(1)
-  const voiceRef   = useRef(null)
-  const pingTimer  = useRef(null)
-  const statusRef  = useRef('idle')
+  const chunks    = useRef([])
+  const chunkIdx  = useRef(0)
+  const rateRef   = useRef(1)
+  const voiceRef  = useRef(null)
+  const pingTimer = useRef(null)
+  const statusRef = useRef('idle')
+  /* generation counter: incremented before every cancel() so that
+     stale onend callbacks from the previous utterance are ignored   */
+  const genRef    = useRef(0)
 
-  /* ── keep statusRef in sync ──────────────────────────────── */
   const syncStatus = (s) => { statusRef.current = s; setStatus(s) }
 
-  /* ── browser support check ───────────────────────────────── */
   useEffect(() => {
     setSupported(typeof window !== 'undefined' && 'speechSynthesis' in window)
   }, [])
 
-  /* ── load voices (Chrome fires voiceschanged async) ─────── */
   useEffect(() => {
     if (!supported) return
     const load = () => {
@@ -48,7 +47,10 @@ export function useSpeechSynthesis(text) {
       const en  = all.filter(v => v.lang.startsWith('en'))
       setVoices(en)
       if (!voiceRef.current && en.length) {
+        /* priority: Siri → Enhanced/Premium → en-IN → local en-US → any en-US → first */
         const pick =
+          en.find(v => /siri/i.test(v.name)) ||
+          en.find(v => /enhanced|premium|natural/i.test(v.name)) ||
           en.find(v => v.lang === 'en-IN') ||
           en.find(v => v.lang === 'en-US' && v.localService) ||
           en.find(v => v.lang === 'en-US') ||
@@ -62,10 +64,9 @@ export function useSpeechSynthesis(text) {
     return () => window.speechSynthesis.removeEventListener('voiceschanged', load)
   }, [supported])
 
-  /* ── prepare chunks whenever text changes ────────────────── */
   useEffect(() => { chunks.current = toChunks(text || '') }, [text])
 
-  /* ── Chrome resume ping every 12 s to prevent silent stop ── */
+  /* Chrome resume ping every 12 s to prevent silent stop */
   const startPing = useCallback(() => {
     clearInterval(pingTimer.current)
     pingTimer.current = setInterval(() => {
@@ -76,11 +77,12 @@ export function useSpeechSynthesis(text) {
     }, 12000)
   }, [])
 
-  /* ── speak one chunk ─────────────────────────────────────── */
   const speakAt = useCallback((idx) => {
     if (idx >= chunks.current.length) {
       syncStatus('ended'); setProgress(100); clearInterval(pingTimer.current); return
     }
+    /* capture generation so this utterance's callbacks are tied to the current run */
+    const gen   = genRef.current
     const total = chunks.current.join('').length
     const done  = chunks.current.slice(0, idx).join('').length
 
@@ -89,26 +91,32 @@ export function useSpeechSynthesis(text) {
     if (voiceRef.current) u.voice = voiceRef.current
 
     u.onboundary = (e) => {
-      if (e.name === 'word') {
+      if (e.name === 'word' && gen === genRef.current) {
         setProgress(Math.min(99, ((done + e.charIndex) / total) * 100))
       }
     }
     u.onend = () => {
-      if (statusRef.current === 'playing') { chunkIdx.current = idx + 1; speakAt(idx + 1) }
+      /* only advance if this utterance belongs to the current generation */
+      if (gen === genRef.current && statusRef.current === 'playing') {
+        chunkIdx.current = idx + 1
+        speakAt(idx + 1)
+      }
     }
     u.onerror = (e) => {
-      if (e.error !== 'interrupted') { syncStatus('idle'); clearInterval(pingTimer.current) }
+      if (e.error !== 'interrupted' && gen === genRef.current) {
+        syncStatus('idle'); clearInterval(pingTimer.current)
+      }
     }
     window.speechSynthesis.speak(u)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  /* ── controls ────────────────────────────────────────────── */
   const play = useCallback(() => {
     if (!supported) return
     if (statusRef.current === 'paused') {
       window.speechSynthesis.resume(); syncStatus('playing'); startPing(); return
     }
+    genRef.current++
     window.speechSynthesis.cancel()
     chunkIdx.current = 0; setProgress(0)
     syncStatus('playing'); startPing(); speakAt(0)
@@ -121,6 +129,7 @@ export function useSpeechSynthesis(text) {
 
   const stop = useCallback(() => {
     if (!supported) return
+    genRef.current++
     window.speechSynthesis.cancel()
     syncStatus('idle'); setProgress(0); chunkIdx.current = 0; clearInterval(pingTimer.current)
   }, [supported])
@@ -129,8 +138,9 @@ export function useSpeechSynthesis(text) {
     rateRef.current = r; setRateState(r)
     if (statusRef.current === 'playing') {
       const idx = chunkIdx.current
+      genRef.current++                  /* invalidate the old utterance's onend */
       window.speechSynthesis.cancel()
-      speakAt(idx)
+      speakAt(idx)                      /* resume from same chunk at new speed  */
     }
   }, [speakAt])
 
@@ -138,12 +148,12 @@ export function useSpeechSynthesis(text) {
     voiceRef.current = v; setSelVoice(v)
     if (statusRef.current === 'playing') {
       const idx = chunkIdx.current
+      genRef.current++
       window.speechSynthesis.cancel()
       speakAt(idx)
     }
   }, [speakAt])
 
-  /* ── cleanup ─────────────────────────────────────────────── */
   useEffect(() => () => {
     if (typeof window !== 'undefined') window.speechSynthesis.cancel()
     clearInterval(pingTimer.current)

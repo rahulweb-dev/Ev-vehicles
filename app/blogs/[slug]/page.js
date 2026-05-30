@@ -5,6 +5,7 @@ import { Clock3, Calendar, ChevronRight } from "lucide-react";
 import { getBlogBySlug, getRelatedBlogs, blogsData } from "@/data/blogsData";
 import { AdBannerInArticle, AdBannerHorizontal } from "@/components/ads/AdBanner";
 import { SITE_URL, SITE_NAME } from "@/app/layout";
+import ArticleAudioPlayer from "@/components/audio/ArticleAudioPlayer";
 
 export async function generateStaticParams() {
   return blogsData.map((blog) => ({ slug: blog.slug }));
@@ -116,6 +117,9 @@ export default async function BlogPostPage({ params }) {
               </div>
             </div>
           </header>
+
+          {/* Audio Player */}
+          <ArticleAudioPlayer title={blog.title} content={blog.content} />
 
           {/* Hero Image */}
           <div className="relative my-8 h-[250px] overflow-hidden rounded-2xl sm:h-[400px]">

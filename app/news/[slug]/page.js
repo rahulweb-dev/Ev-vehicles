@@ -5,6 +5,7 @@ import { Clock3, Calendar, ChevronRight, Tag } from "lucide-react";
 import NewsCard from "@/components/news/NewsCard";
 import { AdBannerInArticle, AdBannerHorizontal } from "@/components/ads/AdBanner";
 import { SITE_URL, SITE_NAME } from "@/app/layout";
+import ArticleAudioPlayer from "@/components/audio/ArticleAudioPlayer";
 
 export const revalidate = 300;
 
@@ -150,6 +151,9 @@ export default async function ArticlePage({ params }) {
                   </div>
                 </div>
               </header>
+
+              {/* Audio Player */}
+              <ArticleAudioPlayer title={article.title} content={article.content} />
 
               <div className="relative my-8 h-[250px] overflow-hidden rounded-2xl sm:h-[350px] md:h-[450px]">
                 <Image src={article.image} alt={article.imageAlt || article.title} fill className="object-cover" priority sizes="800px" />

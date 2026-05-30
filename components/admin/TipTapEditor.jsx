@@ -258,9 +258,11 @@ function TBtn({ onPress, active, title, disabled, children }) {
   );
 }
 
-function Popover({ title, onClose, children }) {
+function Popover({ title, onClose, children, width = "w-72" }) {
   return (
-    <div className="absolute left-0 top-full z-50 mt-1 w-72 rounded-xl border border-gray-200 bg-white p-4 shadow-xl ring-1 ring-black/5">
+    <div className={`absolute left-0 top-[calc(100%+6px)] z-100 ${width} rounded-xl border border-gray-200 bg-white p-4 shadow-2xl ring-1 ring-black/5`}
+      onMouseDown={(e) => e.stopPropagation()}
+    >
       <div className="mb-3 flex items-center justify-between">
         <p className="text-xs font-bold text-gray-800">{title}</p>
         <button type="button" onMouseDown={(e) => { e.preventDefault(); onClose(); }}
@@ -412,7 +414,7 @@ export default function TipTapEditor({ content = "", onChange }) {
       )}
 
       {/* ══════════ Toolbar ══════════ */}
-      <div className="sticky top-0 z-30 flex items-center gap-0.5 flex-wrap overflow-x-auto border-b border-gray-100 bg-white/95 px-2 py-1.5 backdrop-blur-sm shadow-sm rounded-t-xl">
+      <div className="sticky top-0 z-30 flex items-center gap-0.5 flex-wrap border-b border-gray-100 bg-white/95 px-2 py-1.5 backdrop-blur-sm shadow-sm rounded-t-xl">
 
         {/* Undo / Redo */}
         <TBtn onPress={() => editor.chain().focus().undo().run()} disabled={!editor.can().undo()} title="Undo (Ctrl+Z)"><Undo2 size={14} /></TBtn>
@@ -505,22 +507,46 @@ export default function TipTapEditor({ content = "", onChange }) {
         <div className="relative shrink-0">
           <TBtn onPress={() => togglePopover("img")} active={openPopover === "img"} title="Insert Image"><ImageLucide size={14} /></TBtn>
           {openPopover === "img" && (
-            <Popover title="Insert Image" onClose={closePopover}>
+            <Popover title="Insert Image" onClose={closePopover} width="w-80">
+              {/* Upload zone */}
               <button type="button"
                 onMouseDown={(e) => { e.preventDefault(); fileRef.current?.click(); }}
                 disabled={uploading}
-                className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-200 py-3 text-xs text-gray-500 hover:border-green-400 hover:text-green-700 transition disabled:opacity-50">
-                {uploading ? <><Loader2 size={14} className="animate-spin" /> Uploading…</> : <><Upload size={14} /> Upload from device</>}
+                className="flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-200 py-4 text-xs text-gray-500 hover:border-green-400 hover:bg-green-50 hover:text-green-700 transition disabled:opacity-50">
+                {uploading
+                  ? <><Loader2 size={14} className="animate-spin text-green-600" /> Uploading to ImageKit…</>
+                  : <><Upload size={14} /> <span><span className="font-semibold text-gray-700">Click to upload</span> or drag &amp; drop</span></>}
               </button>
-              <p className="my-2 text-center text-[10px] text-gray-400">— or paste image URL —</p>
-              <input type="url" placeholder="https://…" value={imgUrl}
+
+              {/* Divider */}
+              <div className="my-3 flex items-center gap-2">
+                <div className="flex-1 h-px bg-gray-100" />
+                <span className="text-[10px] text-gray-400 shrink-0">or paste image URL</span>
+                <div className="flex-1 h-px bg-gray-100" />
+              </div>
+
+              {/* URL input */}
+              <input autoFocus type="url" placeholder="https://example.com/image.jpg" value={imgUrl}
                 onChange={(e) => setImgUrl(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && insertImgUrl()}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-green-500" />
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-green-500 focus:ring-1 focus:ring-green-200" />
+
+              {/* Live preview */}
+              {imgUrl && (
+                <div className="mt-2 overflow-hidden rounded-lg border border-gray-100 bg-gray-50">
+                  <img src={imgUrl} alt="preview" className="max-h-32 w-full object-contain"
+                    onError={(e) => { e.currentTarget.style.display = "none"; }} />
+                </div>
+              )}
+
+              {/* Insert button */}
               {imgUrl && (
                 <button type="button" onMouseDown={(e) => { e.preventDefault(); insertImgUrl(); }}
-                  className="mt-2 w-full rounded-lg bg-green-600 py-1.5 text-xs font-bold text-white hover:bg-green-500">Insert Image</button>
+                  className="mt-2 w-full rounded-lg bg-green-600 py-2 text-xs font-bold text-white hover:bg-green-500 transition">
+                  Insert Image
+                </button>
               )}
+
               <input ref={fileRef} type="file" accept="image/*" className="hidden"
                 onChange={(e) => { uploadFile(e.target.files?.[0]); closePopover(); }} />
             </Popover>
@@ -531,13 +557,17 @@ export default function TipTapEditor({ content = "", onChange }) {
         <div className="relative shrink-0">
           <TBtn onPress={() => togglePopover("yt")} active={openPopover === "yt"} title="Embed YouTube"><Video size={14} /></TBtn>
           {openPopover === "yt" && (
-            <Popover title="Embed YouTube Video" onClose={closePopover}>
+            <Popover title="Embed YouTube / Video" onClose={closePopover} width="w-80">
+              <p className="mb-2 text-[10px] text-gray-400">Paste a YouTube, Vimeo, or direct video URL</p>
               <input autoFocus type="url" placeholder="https://youtube.com/watch?v=…" value={ytUrl}
                 onChange={(e) => setYtUrl(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && insertYoutube()}
-                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-green-500" />
+                className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-red-400 focus:ring-1 focus:ring-red-100" />
               <button type="button" onMouseDown={(e) => { e.preventDefault(); insertYoutube(); }}
-                className="mt-2 w-full rounded-lg bg-red-600 py-1.5 text-xs font-bold text-white hover:bg-red-500">Embed Video</button>
+                disabled={!ytUrl}
+                className="mt-2 w-full rounded-lg bg-red-600 py-2 text-xs font-bold text-white hover:bg-red-500 transition disabled:opacity-40 disabled:pointer-events-none">
+                Embed Video
+              </button>
             </Popover>
           )}
         </div>
