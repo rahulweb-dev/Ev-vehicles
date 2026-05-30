@@ -4,8 +4,8 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  BatteryCharging, Gauge, Zap, Clock3, Star, CheckCircle,
-  ChevronRight, ArrowLeft, Share2, Shield, Award
+  BatteryCharging, Gauge, Zap, Star, CheckCircle,
+  ChevronRight, Share2, Shield, Award
 } from "lucide-react";
 import LeadForm from "./LeadForm";
 
@@ -23,7 +23,7 @@ export default function VehicleDetailPage({ vehicle, relatedVehicles, vehicleTyp
     acceleration: <Zap size={16} className="text-orange-500" />,
   };
 
-  const highlightSpecs = vehicle.vehicleType === "bike"
+  const highlightSpecs = vehicleType === "bike"
     ? [
         { key: "range_certified", label: "Range", value: vehicle.specs?.range_certified },
         { key: "motor", label: "Motor", value: vehicle.specs?.motor },
@@ -63,7 +63,7 @@ export default function VehicleDetailPage({ vehicle, relatedVehicles, vehicleTyp
             {/* Main Hero Card */}
             <div className="overflow-hidden rounded-3xl bg-white shadow-sm border border-gray-100">
               {/* Image Gallery */}
-              <div className="relative h-[280px] sm:h-[380px] overflow-hidden bg-gray-100">
+              <div className="relative h-70 sm:h-95 overflow-hidden bg-gray-100">
                 <Image
                   src={vehicle.gallery?.[activeImage] || vehicle.image}
                   alt={vehicle.name}
@@ -112,7 +112,7 @@ export default function VehicleDetailPage({ vehicle, relatedVehicles, vehicleTyp
                       </span>
                     </div>
                   </div>
-                  <div className="text-right flex-shrink-0">
+                  <div className="text-right shrink-0">
                     <p className="text-[11px] text-gray-400">Ex-showroom Delhi</p>
                     <p className="text-xl font-black text-green-600">{vehicle.priceDisplay}</p>
                     {vehicle.emiMin && (
@@ -207,7 +207,7 @@ export default function VehicleDetailPage({ vehicle, relatedVehicles, vehicleTyp
                   <div className="grid gap-2 sm:grid-cols-2">
                     {vehicle.features?.map((f, i) => (
                       <div key={i} className="flex items-start gap-2.5 rounded-xl bg-green-50 px-3 py-2">
-                        <CheckCircle size={15} className="mt-0.5 flex-shrink-0 text-green-600" />
+                        <CheckCircle size={15} className="mt-0.5 shrink-0 text-green-600" />
                         <span className="text-sm text-gray-700">{f}</span>
                       </div>
                     ))}
