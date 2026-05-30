@@ -47,7 +47,7 @@ export async function POST(request) {
     const {
       title, slug, excerpt, content, image, imageAlt,
       category, author, tags, readTime, featured, status,
-      metaTitle, metaDescription,
+      metaTitle, metaDescription, metaKeywords,
     } = body;
 
     if (!title || !slug || !excerpt || !content || !image || !category) {
@@ -69,6 +69,7 @@ export async function POST(request) {
       status: status || "draft",
       metaTitle: metaTitle || title,
       metaDescription: metaDescription || excerpt,
+      metaKeywords: metaKeywords || "",
       publishedAt: status === "published" ? new Date() : undefined,
     });
 

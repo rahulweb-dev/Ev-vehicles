@@ -10,24 +10,30 @@ import {
 
 /* ─── Constants ─────────────────────────────────────────────────────── */
 const TABS = [
-  { key: "all",        label: "All Leads",    icon: Users,  color: "text-white",      bg: "bg-gray-700" },
-  { key: "car",        label: "Cars",         icon: Car,    color: "text-blue-400",   bg: "bg-blue-900/50" },
-  { key: "bike",       label: "Bikes",        icon: Bike,   color: "text-orange-400", bg: "bg-orange-900/50" },
-  { key: "commercial", label: "Commercial",   icon: Truck,  color: "text-purple-400", bg: "bg-purple-900/50" },
+  { key: "all",        label: "All Leads",  icon: Users },
+  { key: "car",        label: "Cars",       icon: Car   },
+  { key: "bike",       label: "Bikes",      icon: Bike  },
+  { key: "commercial", label: "Commercial", icon: Truck },
 ];
 
 const STATUS_OPTIONS = [
-  { value: "new",       label: "New",       color: "bg-blue-500/20 text-blue-400 border-blue-500/30" },
-  { value: "contacted", label: "Contacted", color: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30" },
-  { value: "converted", label: "Converted", color: "bg-green-500/20 text-green-400 border-green-500/30" },
-  { value: "lost",      label: "Lost",      color: "bg-red-500/20 text-red-400 border-red-500/30" },
+  { value: "new",       label: "New",       color: "bg-blue-50 text-blue-700 border-blue-200" },
+  { value: "contacted", label: "Contacted", color: "bg-amber-50 text-amber-700 border-amber-200" },
+  { value: "converted", label: "Converted", color: "bg-green-50 text-green-700 border-green-200" },
+  { value: "lost",      label: "Lost",      color: "bg-red-50 text-red-700 border-red-200" },
 ];
 
 const INTENT_LABELS = {
-  test_drive:  { label: "Test Drive",    color: "bg-indigo-500/20 text-indigo-300" },
-  price_quote: { label: "Price Quote",   color: "bg-cyan-500/20 text-cyan-300" },
-  finance:     { label: "EMI / Finance", color: "bg-amber-500/20 text-amber-300" },
-  general:     { label: "General",       color: "bg-gray-500/20 text-gray-400" },
+  test_drive:  { label: "Test Drive",    color: "bg-indigo-50 text-indigo-700" },
+  price_quote: { label: "Price Quote",   color: "bg-sky-50 text-sky-700" },
+  finance:     { label: "EMI / Finance", color: "bg-amber-50 text-amber-700" },
+  general:     { label: "General",       color: "bg-gray-100 text-gray-600" },
+};
+
+const TYPE_STYLE = {
+  car:        "bg-blue-50 text-blue-700 border-blue-200",
+  bike:       "bg-orange-50 text-orange-700 border-orange-200",
+  commercial: "bg-purple-50 text-purple-700 border-purple-200",
 };
 
 function statusConfig(s) {
@@ -35,15 +41,16 @@ function statusConfig(s) {
 }
 
 /* ─── Stat Card ─────────────────────────────────────────────────────── */
-function StatCard({ icon: Icon, label, value, color, sub }) {
+function StatCard({ icon: Icon, label, value, iconBg }) {
   return (
-    <div className="rounded-2xl border border-gray-800 bg-gray-900 p-5">
-      <div className={`mb-3 inline-flex h-11 w-11 items-center justify-center rounded-xl ${color}`}>
+    <div className="flex items-center gap-4 rounded-2xl border border-gray-200 bg-white px-5 py-4 shadow-sm">
+      <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${iconBg}`}>
         <Icon size={20} className="text-white" />
       </div>
-      <p className="text-2xl font-black text-white">{value ?? "—"}</p>
-      <p className="mt-0.5 text-sm font-medium text-gray-400">{label}</p>
-      {sub && <p className="mt-0.5 text-xs text-gray-600">{sub}</p>}
+      <div>
+        <p className="text-2xl font-black text-gray-900">{value ?? "—"}</p>
+        <p className="text-xs font-medium text-gray-500">{label}</p>
+      </div>
     </div>
   );
 }
@@ -53,6 +60,7 @@ function LeadCard({ lead, onStatusChange, onDelete }) {
   const [updating, setUpdating] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const sc = statusConfig(lead.status);
+  const TypeIcon = lead.vehicleType === "car" ? Car : lead.vehicleType === "bike" ? Bike : Truck;
 
   async function handleStatus(newStatus) {
     setUpdating(true);
@@ -63,9 +71,7 @@ function LeadCard({ lead, onStatusChange, onDelete }) {
         body: JSON.stringify({ status: newStatus }),
       });
       onStatusChange(lead._id, newStatus);
-    } finally {
-      setUpdating(false);
-    }
+    } finally { setUpdating(false); }
   }
 
   async function handleDelete() {
@@ -74,117 +80,100 @@ function LeadCard({ lead, onStatusChange, onDelete }) {
     try {
       await fetch(`/api/leads/${lead._id}`, { method: "DELETE" });
       onDelete(lead._id);
-    } finally {
-      setDeleting(false);
-    }
+    } finally { setDeleting(false); }
   }
 
-  const typeColors = {
-    car:        "bg-blue-900/50 text-blue-400 border-blue-800",
-    bike:       "bg-orange-900/50 text-orange-400 border-orange-800",
-    commercial: "bg-purple-900/50 text-purple-400 border-purple-800",
-  };
-  const TypeIcon = lead.vehicleType === "car" ? Car : lead.vehicleType === "bike" ? Bike : Truck;
-
   return (
-    <div className="group relative rounded-2xl border border-gray-800 bg-gray-900 p-5 transition hover:border-gray-700">
+    <div className="group relative rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition hover:border-green-300 hover:shadow-md">
 
-      {/* Top row: vehicle info + status */}
+      {/* Top row */}
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div className="flex items-center gap-2.5">
-          <span className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1 text-xs font-bold ${typeColors[lead.vehicleType] || typeColors.car}`}>
+          <span className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1 text-xs font-bold ${TYPE_STYLE[lead.vehicleType] || TYPE_STYLE.car}`}>
             <TypeIcon size={13} />
             {lead.vehicleType === "car" ? "Car" : lead.vehicleType === "bike" ? "Bike" : "Commercial"}
           </span>
           <div>
-            <p className="text-sm font-black text-white leading-tight">{lead.vehicleName}</p>
-            <p className="text-[11px] text-gray-500">{lead.vehicleSlug}</p>
+            <p className="text-sm font-black text-gray-900 leading-tight">{lead.vehicleName}</p>
+            <p className="text-[11px] text-gray-400">{lead.vehicleSlug}</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Status Selector */}
           <div className="relative">
             <select
               value={lead.status}
               onChange={(e) => handleStatus(e.target.value)}
               disabled={updating}
-              className={`appearance-none cursor-pointer rounded-xl border px-3 py-1.5 pr-7 text-xs font-bold outline-none transition ${sc.color} bg-transparent`}
+              className={`appearance-none cursor-pointer rounded-xl border px-3 py-1.5 pr-7 text-xs font-bold outline-none transition bg-white ${sc.color}`}
             >
               {STATUS_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value} className="bg-gray-900 text-white">
-                  {o.label}
-                </option>
+                <option key={o.value} value={o.value}>{o.label}</option>
               ))}
             </select>
-            <ChevronDown size={11} className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 opacity-60" />
+            <ChevronDown size={11} className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-500" />
           </div>
-
           <button
             onClick={handleDelete}
             disabled={deleting}
-            className="rounded-xl p-1.5 text-gray-600 hover:bg-red-900/30 hover:text-red-400 transition"
+            className="rounded-xl p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600 transition disabled:opacity-40"
           >
             <Trash2 size={14} />
           </button>
         </div>
       </div>
 
-      {/* Customer info grid */}
+      {/* Customer info */}
       <div className="grid gap-4 sm:grid-cols-2">
-        {/* Left: Contact details */}
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gray-800">
-              <Users size={13} className="text-gray-400" />
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gray-100">
+              <Users size={13} className="text-gray-500" />
             </div>
-            <p className="text-sm font-bold text-white">{lead.name}</p>
+            <p className="text-sm font-bold text-gray-900">{lead.name}</p>
           </div>
           <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gray-800">
-              <Phone size={13} className="text-green-400" />
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-green-50">
+              <Phone size={13} className="text-green-600" />
             </div>
-            <a href={`tel:${lead.phone}`} className="text-sm font-semibold text-green-400 hover:underline">
+            <a href={`tel:${lead.phone}`} className="text-sm font-semibold text-green-700 hover:underline">
               {lead.phone}
             </a>
           </div>
           {lead.email && (
             <div className="flex items-center gap-2">
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gray-800">
-                <Mail size={13} className="text-blue-400" />
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-blue-50">
+                <Mail size={13} className="text-blue-600" />
               </div>
-              <a href={`mailto:${lead.email}`} className="text-xs text-blue-400 hover:underline truncate">
+              <a href={`mailto:${lead.email}`} className="text-xs text-blue-700 hover:underline truncate">
                 {lead.email}
               </a>
             </div>
           )}
         </div>
 
-        {/* Right: Location + Intent + Date */}
         <div className="space-y-2">
           {(lead.city || lead.state) && (
             <div className="flex items-center gap-2">
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gray-800">
-                <MapPin size={13} className="text-gray-400" />
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gray-100">
+                <MapPin size={13} className="text-gray-500" />
               </div>
-              <p className="text-xs text-gray-400">
-                {[lead.city, lead.state].filter(Boolean).join(", ")}
-              </p>
+              <p className="text-xs text-gray-600">{[lead.city, lead.state].filter(Boolean).join(", ")}</p>
+            </div>
+          )}
+          {lead.intent && (
+            <div className="flex items-center gap-2">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gray-100">
+                <MessageSquare size={13} className="text-gray-500" />
+              </div>
+              <span className={`rounded-lg px-2 py-0.5 text-[11px] font-semibold ${INTENT_LABELS[lead.intent]?.color || "bg-gray-100 text-gray-600"}`}>
+                {INTENT_LABELS[lead.intent]?.label || lead.intent}
+              </span>
             </div>
           )}
           <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gray-800">
-              <MessageSquare size={13} className="text-gray-400" />
-            </div>
-            {lead.intent && (
-              <span className={`rounded-lg px-2 py-0.5 text-[11px] font-semibold ${INTENT_LABELS[lead.intent]?.color || "text-gray-400"}`}>
-                {INTENT_LABELS[lead.intent]?.label || lead.intent}
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gray-800">
-              <Calendar size={13} className="text-gray-400" />
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gray-100">
+              <Calendar size={13} className="text-gray-500" />
             </div>
             <p className="text-xs text-gray-500">
               {new Date(lead.createdAt).toLocaleString("en-IN", {
@@ -196,18 +185,18 @@ function LeadCard({ lead, onStatusChange, onDelete }) {
         </div>
       </div>
 
-      {/* Quick CTA */}
-      <div className="mt-4 flex gap-2 border-t border-gray-800 pt-4">
+      {/* CTAs */}
+      <div className="mt-4 flex gap-2 border-t border-gray-100 pt-4">
         <a
           href={`tel:${lead.phone}`}
-          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-green-600/20 border border-green-600/30 py-2 text-xs font-bold text-green-400 hover:bg-green-600/30 transition"
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-green-50 border border-green-200 py-2 text-xs font-bold text-green-700 hover:bg-green-100 transition"
         >
           <Phone size={13} /> Call Now
         </a>
         {lead.email && (
           <a
             href={`mailto:${lead.email}?subject=Enquiry for ${lead.vehicleName}`}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-blue-600/20 border border-blue-600/30 py-2 text-xs font-bold text-blue-400 hover:bg-blue-600/30 transition"
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-blue-50 border border-blue-200 py-2 text-xs font-bold text-blue-700 hover:bg-blue-100 transition"
           >
             <Mail size={13} /> Send Email
           </a>
@@ -216,7 +205,7 @@ function LeadCard({ lead, onStatusChange, onDelete }) {
           <button
             onClick={() => handleStatus("contacted")}
             disabled={updating}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-yellow-600/20 border border-yellow-600/30 py-2 text-xs font-bold text-yellow-400 hover:bg-yellow-600/30 transition disabled:opacity-50"
+            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-amber-50 border border-amber-200 py-2 text-xs font-bold text-amber-700 hover:bg-amber-100 transition disabled:opacity-50"
           >
             <CheckCircle2 size={13} /> Mark Contacted
           </button>
@@ -232,13 +221,11 @@ function EmptyState({ tab }) {
   const Icon = icons[tab] || Users;
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center">
-      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-800">
-        <Icon size={28} className="text-gray-600" />
+      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-100">
+        <Icon size={28} className="text-gray-400" />
       </div>
-      <p className="text-lg font-bold text-gray-400">No leads yet</p>
-      <p className="mt-1 text-sm text-gray-600">
-        Leads will appear here when customers submit enquiry forms
-      </p>
+      <p className="text-lg font-bold text-gray-500">No leads yet</p>
+      <p className="mt-1 text-sm text-gray-400">Leads will appear here when customers submit enquiry forms</p>
     </div>
   );
 }
@@ -268,16 +255,12 @@ export default function LeadsPage() {
       const data = await res.json();
       const all = data.leads || [];
       setAllLeads(all);
-
-      // Counts by type
       setCounts({
         all:        all.length,
         car:        all.filter((l) => l.vehicleType === "car").length,
         bike:       all.filter((l) => l.vehicleType === "bike").length,
         commercial: all.filter((l) => l.vehicleType === "commercial").length,
       });
-
-      // Status stats
       setStats({
         new:       all.filter((l) => l.status === "new").length,
         contacted: all.filter((l) => l.status === "contacted").length,
@@ -293,7 +276,6 @@ export default function LeadsPage() {
 
   useEffect(() => { fetchLeads(); }, [fetchLeads]);
 
-  // Filter by tab, search, status
   useEffect(() => {
     let filtered = activeTab === "all" ? allLeads : allLeads.filter((l) => l.vehicleType === activeTab);
     if (statusFilter !== "all") filtered = filtered.filter((l) => l.status === statusFilter);
@@ -311,66 +293,59 @@ export default function LeadsPage() {
   }, [allLeads, activeTab, statusFilter, search]);
 
   function handleStatusChange(id, newStatus) {
-    setAllLeads((prev) =>
-      prev.map((l) => (l._id === id ? { ...l, status: newStatus } : l))
-    );
+    setAllLeads((prev) => prev.map((l) => (l._id === id ? { ...l, status: newStatus } : l)));
   }
-
   function handleDelete(id) {
     setAllLeads((prev) => prev.filter((l) => l._id !== id));
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 p-6 pt-20 lg:p-8 lg:pt-8">
+    <div className="min-h-screen bg-slate-50 p-4 pt-20 lg:p-6 lg:pt-6">
 
       {/* Header */}
-      <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-white">Customer Leads</h1>
-          <p className="mt-1 text-sm text-gray-400">
-            All vehicle enquiries from customers across the website
-          </p>
+          <h1 className="text-2xl font-black text-gray-900">Customer Leads</h1>
+          <p className="mt-0.5 text-sm text-gray-500">All vehicle enquiries from across the website</p>
         </div>
         <button
           onClick={fetchLeads}
-          className="flex items-center gap-2 rounded-xl border border-gray-700 bg-gray-800 px-4 py-2.5 text-sm font-semibold text-gray-300 hover:bg-gray-700 transition"
+          className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-600 shadow-sm hover:bg-gray-50 transition"
         >
           <RefreshCw size={15} /> Refresh
         </button>
       </div>
 
-      {/* Location Banner */}
+      {/* Location banners */}
       {currentUser?.role === "dealer" ? (
-        <div className="mb-6 flex items-center gap-3 rounded-2xl border border-blue-800/40 bg-blue-900/10 px-5 py-4">
-          <MapPin size={20} className="text-blue-400 shrink-0" />
+        <div className="mb-5 flex items-center gap-3 rounded-2xl border border-blue-200 bg-blue-50 px-5 py-4">
+          <MapPin size={20} className="text-blue-600 shrink-0" />
           <div>
-            <p className="text-sm font-bold text-blue-300">
-              Showing leads for <span className="text-white">{currentUser.city}, {currentUser.state}</span>
+            <p className="text-sm font-bold text-blue-800">
+              Showing leads for <span className="text-blue-900">{currentUser.city}, {currentUser.state}</span>
             </p>
-            <p className="text-xs text-blue-400/70 mt-0.5">
-              You are logged in as a location dealer — you can only view and manage leads from your assigned city
-            </p>
+            <p className="text-xs text-blue-500 mt-0.5">Dealer view — only your city's leads are shown</p>
           </div>
         </div>
       ) : currentUser?.role === "admin" ? (
-        <div className="mb-6 flex items-center gap-3 rounded-2xl border border-green-800/40 bg-green-900/10 px-5 py-4">
-          <ShieldCheck size={20} className="text-green-400 shrink-0" />
-          <p className="text-sm font-bold text-green-300">
-            Super Admin — viewing <span className="text-white">all leads from all locations</span>
+        <div className="mb-5 flex items-center gap-3 rounded-2xl border border-green-200 bg-green-50 px-5 py-4">
+          <ShieldCheck size={20} className="text-green-600 shrink-0" />
+          <p className="text-sm font-bold text-green-800">
+            Super Admin — viewing <span className="text-green-900">all leads from all locations</span>
           </p>
         </div>
       ) : null}
 
-      {/* Stats Row */}
-      <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <StatCard icon={Zap}         label="New Leads"   value={stats.new}       color="bg-blue-600"    />
-        <StatCard icon={Clock}       label="Contacted"   value={stats.contacted} color="bg-yellow-600"  />
-        <StatCard icon={CheckCircle2}label="Converted"   value={stats.converted} color="bg-green-600"   />
-        <StatCard icon={XCircle}     label="Lost"        value={stats.lost}      color="bg-red-600"     />
+      {/* Stats */}
+      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <StatCard icon={Zap}          label="New Leads"  value={stats.new}       iconBg="bg-blue-600"   />
+        <StatCard icon={Clock}        label="Contacted"  value={stats.contacted} iconBg="bg-amber-500"  />
+        <StatCard icon={CheckCircle2} label="Converted"  value={stats.converted} iconBg="bg-green-600"  />
+        <StatCard icon={XCircle}      label="Lost"       value={stats.lost}      iconBg="bg-red-500"    />
       </div>
 
-      {/* Type Tabs */}
-      <div className="mb-6 flex flex-wrap gap-2">
+      {/* Tabs */}
+      <div className="mb-5 flex flex-wrap gap-2">
         {TABS.map((tab) => {
           const Icon = tab.icon;
           const active = activeTab === tab.key;
@@ -380,14 +355,14 @@ export default function LeadsPage() {
               onClick={() => setActiveTab(tab.key)}
               className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition ${
                 active
-                  ? "bg-green-600 text-white shadow-lg shadow-green-600/20"
-                  : "border border-gray-800 bg-gray-900 text-gray-400 hover:border-gray-700 hover:text-white"
+                  ? "bg-green-700 text-white shadow-sm"
+                  : "border border-gray-200 bg-white text-gray-600 hover:border-green-200 hover:text-green-700"
               }`}
             >
               <Icon size={15} />
               {tab.label}
               <span className={`rounded-lg px-2 py-0.5 text-xs font-black ${
-                active ? "bg-white/20 text-white" : "bg-gray-800 text-gray-500"
+                active ? "bg-white/20 text-white" : "bg-gray-100 text-gray-500"
               }`}>
                 {counts[tab.key]}
               </span>
@@ -396,48 +371,47 @@ export default function LeadsPage() {
         })}
       </div>
 
-      {/* Search + Status Filter */}
-      <div className="mb-6 flex flex-wrap gap-3">
-        <div className="flex flex-1 min-w-[220px] items-center gap-2 rounded-xl border border-gray-800 bg-gray-900 px-4 py-2.5">
-          <Search size={16} className="shrink-0 text-gray-500" />
+      {/* Search + filter */}
+      <div className="mb-5 flex flex-wrap gap-3">
+        <div className="flex flex-1 min-w-55 items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 shadow-sm">
+          <Search size={16} className="shrink-0 text-gray-400" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name, phone, vehicle, city…"
-            className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-gray-600"
+            className="flex-1 bg-transparent text-sm text-gray-900 outline-none placeholder:text-gray-400"
           />
         </div>
         <div className="relative">
-          <Filter size={14} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" />
+          <Filter size={14} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
           <select
             value={statusFilter}
             onChange={(e) => setStatus(e.target.value)}
-            className="appearance-none cursor-pointer rounded-xl border border-gray-800 bg-gray-900 pl-9 pr-8 py-2.5 text-sm font-semibold text-gray-300 outline-none hover:border-gray-700 transition"
+            className="appearance-none cursor-pointer rounded-xl border border-gray-200 bg-white pl-9 pr-8 py-2.5 text-sm font-semibold text-gray-700 shadow-sm outline-none hover:border-green-300 transition"
           >
             <option value="all">All Status</option>
             {STATUS_OPTIONS.map((o) => (
               <option key={o.value} value={o.value}>{o.label}</option>
             ))}
           </select>
-          <ChevronDown size={13} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" />
+          <ChevronDown size={13} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
         </div>
       </div>
 
-      {/* Results Count */}
       {!loading && (
-        <p className="mb-4 text-xs text-gray-600">
-          Showing {leads.length} {leads.length === 1 ? "lead" : "leads"}
+        <p className="mb-4 text-xs text-gray-500">
+          Showing <span className="font-semibold text-gray-900">{leads.length}</span> {leads.length === 1 ? "lead" : "leads"}
           {statusFilter !== "all" && ` · Status: ${statusFilter}`}
-          {search && ` · Search: "${search}"`}
+          {search && ` · "${search}"`}
         </p>
       )}
 
-      {/* Lead Cards */}
+      {/* Cards */}
       {loading ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {Array(6).fill(0).map((_, i) => (
-            <div key={i} className="animate-pulse rounded-2xl border border-gray-800 bg-gray-900 p-5 h-52" />
+            <div key={i} className="animate-pulse rounded-2xl border border-gray-200 bg-white h-52 shadow-sm" />
           ))}
         </div>
       ) : leads.length === 0 ? (
