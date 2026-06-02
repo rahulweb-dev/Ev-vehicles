@@ -95,8 +95,8 @@ export default function Footer() {
             <div className="mt-6 space-y-2 text-sm">
               <div className="flex items-center gap-2">
                 <Mail size={16} className="text-green-500" />
-                <a href="mailto:contact@evnewsindia.com" className="hover:text-white">
-                  contact@evnewsindia.com
+                <a href="mailto:contact@evradar.in" className="hover:text-white">
+                  contact@evradar.in
                 </a>
               </div>
               <div className="flex items-center gap-2">

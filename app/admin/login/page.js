@@ -71,7 +71,7 @@ function LoginForm() {
                 type="email"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
-                placeholder="admin@evnewsindia.com"
+                placeholder="admin@evradar.in"
                 required
                 autoComplete="email"
                 className="w-full rounded-xl border border-gray-700 bg-gray-800 px-4 py-3 text-sm text-white placeholder-gray-500 outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-500/20"

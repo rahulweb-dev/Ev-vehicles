@@ -27,7 +27,7 @@ export default function PrivacyPolicyPage() {
           <p>
             EV News India (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;) is committed to protecting your privacy. This Privacy Policy explains how we
             collect, use, disclose, and safeguard your information when you visit our website
-            evnewsindia.com.
+            evradar.in.
           </p>
 
           <h2>1. Information We Collect</h2>
@@ -130,7 +130,7 @@ export default function PrivacyPolicyPage() {
           <h2>11. Contact Us</h2>
           <p>
             If you have questions or concerns about this Privacy Policy, please contact us at:{" "}
-            <a href="mailto:privacy@evnewsindia.com">privacy@evnewsindia.com</a>
+            <a href="mailto:privacy@evradar.in">privacy@evradar.in</a>
           </p>
         </div>
       </div>

@@ -43,19 +43,19 @@ export default function ContactPage() {
                 {
                   icon: Mail,
                   title: "Editorial",
-                  detail: "editorial@evnewsindia.com",
+                  detail: "editorial@evradar.in",
                   sub: "For press releases and story pitches",
                 },
                 {
                   icon: Mail,
                   title: "Advertising",
-                  detail: "advertise@evnewsindia.com",
+                  detail: "advertise@evradar.in",
                   sub: "For advertising and sponsorship inquiries",
                 },
                 {
                   icon: Mail,
                   title: "General",
-                  detail: "contact@evnewsindia.com",
+                  detail: "contact@evradar.in",
                   sub: "For all other inquiries",
                 },
                 {
@@ -95,7 +95,7 @@ export default function ContactPage() {
                 content, and newsletter placements.
               </p>
               <a
-                href="mailto:advertise@evnewsindia.com"
+                href="mailto:advertise@evradar.in"
                 className="mt-4 inline-block rounded-xl bg-white px-5 py-2.5 text-sm font-bold text-green-700 transition hover:bg-green-50"
               >
                 Get Media Kit

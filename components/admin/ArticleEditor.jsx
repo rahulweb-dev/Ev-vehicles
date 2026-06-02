@@ -61,32 +61,32 @@ const SELECT = "w-full rounded-lg border border-gray-200 bg-white px-3 py-2.5 te
 
 /* ─────────────────────── Main Editor ─────────────────────────── */
 export default function ArticleEditor({ initialData = null }) {
-  const router   = useRouter();
-  const isEdit   = !!initialData;
+  const router = useRouter();
+  const isEdit = !!initialData;
 
   const [form, setForm] = useState({
-    title:           initialData?.title           || "",
-    slug:            initialData?.slug            || "",
-    excerpt:         initialData?.excerpt         || "",
-    content:         initialData?.content         || "",
-    image:           initialData?.image           || "",
-    imageAlt:        initialData?.imageAlt        || "",
-    category:        initialData?.category        || "cars",
-    author:          initialData?.author          || "EV News India Team",
-    tags:            initialData?.tags            || [],
-    readTime:        initialData?.readTime        || "5 min",
-    featured:        initialData?.featured        || false,
-    status:          initialData?.status          || "draft",
-    metaTitle:       initialData?.metaTitle       || "",
+    title: initialData?.title || "",
+    slug: initialData?.slug || "",
+    excerpt: initialData?.excerpt || "",
+    content: initialData?.content || "",
+    image: initialData?.image || "",
+    imageAlt: initialData?.imageAlt || "",
+    category: initialData?.category || "cars",
+    author: initialData?.author || "EV News India Team",
+    tags: initialData?.tags || [],
+    readTime: initialData?.readTime || "5 min",
+    featured: initialData?.featured || false,
+    status: initialData?.status || "draft",
+    metaTitle: initialData?.metaTitle || "",
     metaDescription: initialData?.metaDescription || "",
-    metaKeywords:    initialData?.metaKeywords    || "",
+    metaKeywords: initialData?.metaKeywords || "",
   });
 
-  const [tagInput, setTagInput]   = useState("");
+  const [tagInput, setTagInput] = useState("");
   const [uploading, setUploading] = useState(false);
-  const [saving, setSaving]       = useState(false);
-  const [toast, setToast]         = useState(null);
-  const [preview, setPreview]     = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState(null);
+  const [preview, setPreview] = useState(false);
 
   const words = useMemo(() => wordCount(form.content), [form.content]);
   const readMinutes = Math.max(1, Math.ceil(words / 200));
@@ -127,7 +127,7 @@ export default function ArticleEditor({ initialData = null }) {
       const fd = new FormData();
       fd.append("file", file);
       fd.append("folder", "/ev-news");
-      const res  = await fetch("/api/upload", { method: "POST", body: fd });
+      const res = await fetch("/api/upload", { method: "POST", body: fd });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Upload failed");
       setForm((f) => ({ ...f, image: data.url, imageAlt: f.imageAlt || f.title }));
@@ -147,9 +147,9 @@ export default function ArticleEditor({ initialData = null }) {
     setSaving(true);
     try {
       const payload = { ...form, status: publishStatus };
-      const url     = isEdit ? `/api/articles/${initialData._id}` : "/api/articles";
-      const method  = isEdit ? "PUT" : "POST";
-      const res     = await fetch(url, {
+      const url = isEdit ? `/api/articles/${initialData._id}` : "/api/articles";
+      const method = isEdit ? "PUT" : "POST";
+      const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -193,9 +193,8 @@ export default function ArticleEditor({ initialData = null }) {
 
       {/* ── Toast ── */}
       {toast && (
-        <div className={`fixed right-4 top-4 z-100 flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium shadow-xl ${
-          toast.type === "error" ? "bg-red-600 text-white" : "bg-green-600 text-white"
-        }`}>
+        <div className={`fixed right-4 top-4 z-100 flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium shadow-xl ${toast.type === "error" ? "bg-red-600 text-white" : "bg-green-600 text-white"
+          }`}>
           {toast.type === "error" ? <AlertCircle size={16} /> : <CheckCircle2 size={16} />}
           {toast.message}
         </div>
@@ -226,11 +225,10 @@ export default function ArticleEditor({ initialData = null }) {
           {/* Preview toggle */}
           <button
             onClick={() => setPreview(!preview)}
-            className={`hidden sm:flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${
-              preview
+            className={`hidden sm:flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${preview
                 ? "border-green-300 bg-green-50 text-green-700"
                 : "border-gray-200 text-gray-600 hover:border-gray-300 hover:text-gray-900"
-            }`}
+              }`}
           >
             {preview ? <EyeOff size={13} /> : <Eye size={13} />}
             {preview ? "Edit" : "Preview"}
@@ -504,7 +502,7 @@ export default function ArticleEditor({ initialData = null }) {
                 <p className="text-sm font-medium text-blue-700 leading-tight line-clamp-1">
                   {form.metaTitle || form.title}
                 </p>
-                <p className="text-[10px] text-green-700">evnewsindia.com › news › {form.slug || "article-slug"}</p>
+                <p className="text-[10px] text-green-700">evradar.in › news › {form.slug || "article-slug"}</p>
                 <p className="mt-0.5 text-[11px] text-gray-600 line-clamp-2">
                   {form.metaDescription || form.excerpt || "No meta description."}
                 </p>

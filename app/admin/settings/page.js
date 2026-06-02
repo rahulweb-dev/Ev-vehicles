@@ -36,9 +36,8 @@ export default function AdminSettingsPage() {
         </p>
 
         {result && (
-          <div className={`mb-4 flex items-center gap-2 rounded-xl px-4 py-3 text-sm ${
-            result.ok ? "bg-green-900/30 text-green-400" : "bg-red-900/30 text-red-400"
-          }`}>
+          <div className={`mb-4 flex items-center gap-2 rounded-xl px-4 py-3 text-sm ${result.ok ? "bg-green-900/30 text-green-400" : "bg-red-900/30 text-red-400"
+            }`}>
             {result.ok ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
             {result.message}
           </div>
@@ -63,7 +62,7 @@ export default function AdminSettingsPage() {
               required
               value={setup.email}
               onChange={(e) => setSetup((s) => ({ ...s, email: e.target.value }))}
-              placeholder="admin@evnewsindia.com"
+              placeholder="admin@evradar.in"
               className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3 py-2.5 text-sm text-white outline-none focus:border-green-500"
             />
           </div>

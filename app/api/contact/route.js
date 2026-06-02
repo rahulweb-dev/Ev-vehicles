@@ -48,7 +48,7 @@ export async function POST(request) {
             <p style="font-weight:bold;color:#374151;margin:0 0 8px">Message</p>
             <p style="color:#111827;white-space:pre-line;margin:0">${message}</p>
           </div>
-          <p style="margin-top:16px;font-size:12px;color:#9ca3af">Sent from evnewsindia.com contact form</p>
+          <p style="margin-top:16px;font-size:12px;color:#9ca3af">Sent from evradar.in contact form</p>
         </div>
       `,
     });

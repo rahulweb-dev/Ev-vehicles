@@ -1,7 +1,7 @@
 import { newsArticles } from "@/data/newsArticles";
 import { blogsData } from "@/data/blogsData";
 
-const SITE_URL = "https://www.evradar.in/";
+const SITE_URL = "https://www.evradar.in";
 
 export default function sitemap() {
   const newsUrls = newsArticles.map((article) => ({
