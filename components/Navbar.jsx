@@ -179,8 +179,8 @@ export default function Navbar() {
             <Image
               src="/images/logo.png"
               alt="EV News India"
-              height={100}
-              width={160}
+              height={44}
+              width={140}
               className="object-contain"
               priority
             />
@@ -279,8 +279,8 @@ export default function Navbar() {
                 <Image
                   src="/images/logo.png"
                   alt="EV News India"
-                  height={70}
-                  width={130}
+                  height={36}
+                  width={115}
                   className="object-contain"
                 />
               </Link>
