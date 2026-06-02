@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Clock3, ArrowRight } from "lucide-react";
+import ShareLikeButtons from "./ShareLikeButtons";
 
 const categoryColors = {
   cars: "bg-blue-100 text-blue-700",
@@ -25,8 +26,8 @@ function DefaultNewsCard({ article }) {
   const colorClass = categoryColors[article.category] || "bg-gray-100 text-gray-700";
 
   return (
-    <Link href={`/news/${article.slug}`} className="group block">
-      <article className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+    <article className="group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+      <Link href={`/news/${article.slug}`} className="block">
         <div className="relative h-48 overflow-hidden">
           <Image
             src={article.image}
@@ -42,30 +43,38 @@ function DefaultNewsCard({ article }) {
           </div>
         </div>
 
-        <div className="p-5">
+        <div className="px-5 pt-5">
           <h3 className="line-clamp-2 text-[15px] font-bold leading-snug text-gray-900 transition group-hover:text-green-600">
             {article.title}
           </h3>
-
           <p className="mt-2 line-clamp-2 text-sm text-gray-500">{article.excerpt}</p>
-
-          <div className="mt-4 flex items-center justify-between text-xs text-gray-400">
-            <div className="flex items-center gap-1">
-              <Clock3 size={13} />
-              <span>{article.readTime} read</span>
-            </div>
-            <span>{new Date(article.publishedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}</span>
-          </div>
         </div>
-      </article>
-    </Link>
+      </Link>
+
+      <div className="px-5 pb-5 pt-4">
+        <div className="flex items-center justify-between text-xs text-gray-400">
+          <div className="flex items-center gap-1">
+            <Clock3 size={13} />
+            <span>{article.readTime} read</span>
+          </div>
+          <span>
+            {new Date(article.publishedAt).toLocaleDateString("en-IN", {
+              day: "numeric", month: "short", year: "numeric",
+            })}
+          </span>
+        </div>
+        <div className="mt-3 border-t border-gray-50 pt-3">
+          <ShareLikeButtons slug={article.slug} title={article.title} />
+        </div>
+      </div>
+    </article>
   );
 }
 
 function FeaturedNewsCard({ article }) {
   return (
-    <Link href={`/news/${article.slug}`} className="group block">
-      <article className="relative overflow-hidden rounded-3xl">
+    <article className="group relative overflow-hidden rounded-3xl">
+      <Link href={`/news/${article.slug}`} className="block">
         <div className="relative h-[400px] md:h-[500px]">
           <Image
             src={article.image}
@@ -100,7 +109,11 @@ function FeaturedNewsCard({ article }) {
                 {article.readTime}
               </div>
               <span>·</span>
-              <span>{new Date(article.publishedAt).toLocaleDateString("en-IN", { day: "numeric", month: "long" })}</span>
+              <span>
+                {new Date(article.publishedAt).toLocaleDateString("en-IN", {
+                  day: "numeric", month: "long",
+                })}
+              </span>
             </div>
 
             <div className="mt-5 flex items-center gap-2 text-sm font-semibold text-green-400 transition group-hover:gap-4">
@@ -108,8 +121,13 @@ function FeaturedNewsCard({ article }) {
             </div>
           </div>
         </div>
-      </article>
-    </Link>
+      </Link>
+
+      {/* Share & Like outside the link to avoid nested interactive elements */}
+      <div className="absolute bottom-6 right-6 md:bottom-8 md:right-8 z-10">
+        <ShareLikeButtons slug={article.slug} title={article.title} compact />
+      </div>
+    </article>
   );
 }
 
@@ -117,8 +135,8 @@ function HorizontalNewsCard({ article }) {
   const colorClass = categoryColors[article.category] || "bg-gray-100 text-gray-700";
 
   return (
-    <Link href={`/news/${article.slug}`} className="group block">
-      <article className="flex gap-4 rounded-2xl border border-gray-100 bg-white p-3 shadow-sm transition hover:shadow-md">
+    <article className="group rounded-2xl border border-gray-100 bg-white p-3 shadow-sm transition hover:shadow-md">
+      <Link href={`/news/${article.slug}`} className="flex gap-4">
         <div className="relative h-24 w-32 flex-shrink-0 overflow-hidden rounded-xl">
           <Image
             src={article.image}
@@ -140,10 +158,18 @@ function HorizontalNewsCard({ article }) {
             <Clock3 size={11} />
             <span>{article.readTime}</span>
             <span>·</span>
-            <span>{new Date(article.publishedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</span>
+            <span>
+              {new Date(article.publishedAt).toLocaleDateString("en-IN", {
+                day: "numeric", month: "short",
+              })}
+            </span>
           </div>
         </div>
-      </article>
-    </Link>
+      </Link>
+
+      <div className="mt-2 border-t border-gray-50 pt-2 pl-3">
+        <ShareLikeButtons slug={article.slug} title={article.title} compact />
+      </div>
+    </article>
   );
 }

@@ -5,8 +5,9 @@ import Image from "next/image";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { Car, Bike, Truck, BatteryCharging, Clock3, ArrowRight, Bookmark } from "lucide-react";
+import { Car, Bike, Truck, BatteryCharging, Clock3, ArrowRight } from "lucide-react";
 import { LatestNewsSectionSkeleton } from "@/components/skeletons/Skeletons";
+import ShareLikeButtons from "@/components/news/ShareLikeButtons";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -204,10 +205,15 @@ export default function LatestNews() {
                 <div className="mt-6 flex items-center gap-5 text-sm text-gray-400">
                   <span className="flex items-center gap-2"><Clock3 size={15} />{feat?.readTime || "5 min"} read</span>
                 </div>
-                <Link href={featHref}
-                  className="mt-8 inline-flex items-center gap-2 rounded-full bg-linear-to-r from-green-400 to-blue-500 px-7 py-4 font-semibold text-black transition hover:scale-105">
-                  Read Full Story <ArrowRight size={18} />
-                </Link>
+                <div className="mt-8 flex flex-wrap items-center gap-4">
+                  <Link href={featHref}
+                    className="inline-flex items-center gap-2 rounded-full bg-linear-to-r from-green-400 to-blue-500 px-7 py-4 font-semibold text-black transition hover:scale-105">
+                    Read Full Story <ArrowRight size={18} />
+                  </Link>
+                  {feat?.slug && (
+                    <ShareLikeButtons slug={feat.slug} title={feat.title} compact />
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -235,7 +241,9 @@ export default function LatestNews() {
                     </div>
                     <div className="mt-4 flex items-center justify-between text-sm text-gray-400">
                       <span className="flex items-center gap-2"><Clock3 size={14} />4 min read</span>
-                      <Bookmark size={18} className="cursor-pointer transition hover:text-green-400" />
+                    </div>
+                    <div className="mt-2">
+                      <ShareLikeButtons slug={item.slug} title={item.title} compact />
                     </div>
                   </div>
                 </Link>

@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Clock3, Calendar, ChevronRight, Tag } from "lucide-react";
 import NewsCard from "@/components/news/NewsCard";
+import ShareLikeButtons from "@/components/news/ShareLikeButtons";
 import { AdBannerInArticle } from "@/components/ads/AdBanner";
 import { SITE_URL, SITE_NAME } from "@/app/layout";
 import ArticleAudioPlayer from "@/components/audio/ArticleAudioPlayer";
@@ -156,6 +157,12 @@ export default async function ArticlePage({ params }) {
                   </div>
                 </div>
               </header>
+
+              {/* Share & Like bar */}
+              <div className="my-6 flex items-center justify-between rounded-2xl bg-gray-50 px-5 py-4">
+                <p className="text-sm font-semibold text-gray-600">Enjoyed this article?</p>
+                <ShareLikeButtons slug={article.slug} title={article.title} url={`${SITE_URL.replace(/\/$/, "")}/news/${article.slug}`} />
+              </div>
 
               {/* Audio Player */}
               <ArticleAudioPlayer title={article.title} content={article.content} />
