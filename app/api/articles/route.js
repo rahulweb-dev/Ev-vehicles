@@ -76,7 +76,7 @@ export async function POST(request) {
     // Ping search engines and push browser notifications when publishing
     if (status === "published") {
       pingIndexNow(buildArticleUrl(slug)).catch(console.error);
-      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://evnewsindia.com";
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.evradar.in/";
       sendPushToAll({
         title: "EV News India – New Article",
         body: title,

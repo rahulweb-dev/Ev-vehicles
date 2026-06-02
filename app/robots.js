@@ -7,7 +7,7 @@ export default function robots() {
         disallow: ["/api/", "/_next/", "/admin/"],
       },
     ],
-    sitemap: "https://evnewsindia.com/sitemap.xml",
-    host: "https://evnewsindia.com",
+    sitemap: "https://www.evradar.in//sitemap.xml",
+    host: "https://www.evradar.in/",
   };
 }
