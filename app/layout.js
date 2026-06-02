@@ -5,8 +5,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 import ConditionalShell from "@/components/ConditionalShell";
 import CookieConsent from "@/components/CookieConsent";
 import PushNotificationPrompt from "@/components/PushNotificationPrompt";
-import GoogleAnalytics from "@/components/GoogleAnalytics";
-
+import { GoogleAnalytics } from "@next/third-parties/google";
 const ADSENSE_PUBLISHER_ID = process.env.NEXT_PUBLIC_ADSENSE_ID || "ca-pub-XXXXXXXXXXXXXXXXX";
 
 // IMPORTANT: Replace with your actual website URL when you go live
@@ -151,10 +150,11 @@ export default function RootLayout({ children }) {
           crossOrigin="anonymous"
           strategy="afterInteractive"
         />
-        <GoogleAnalytics />
+
         <ConditionalShell>{children}</ConditionalShell>
         <CookieConsent />
         <PushNotificationPrompt />
+          <GoogleAnalytics gaId="G-2QJL966SVB" />
       </body>
     </html>
   );
