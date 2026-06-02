@@ -179,8 +179,8 @@ export default function Navbar() {
             <Image
               src="/images/logo.png"
               alt="EV News India"
-              height={44}
-              width={140}
+              height={34}
+              width={129}
               className="object-contain"
               priority
             />
