@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay, Pagination } from 'swiper/modules'
 import {
@@ -13,7 +13,7 @@ import {
 import 'swiper/css'
 import 'swiper/css/pagination'
 
-/* ─── Data ────────────────────────────────────────────────────────── */
+/* ─── Static fallback slides — desktop ───────────────────────────── */
 const SLIDES = [
   {
     image: 'https://images.unsplash.com/photo-1617788138017-80ad40651399?q=80&w=1600&auto=format&fit=crop',
@@ -37,6 +37,34 @@ const SLIDES = [
     tagColor: 'bg-purple-500',
     title: 'Best Electric Scooters of 2026',
     subtitle: 'Ather, Ola, TVS — compare range, price & features in seconds.',
+    cta: { label: 'Browse Bikes', href: '/bikes' },
+  },
+]
+
+/* ─── Static fallback slides — mobile ────────────────────────────── */
+const MOBILE_SLIDES = [
+  {
+    image: 'https://images.unsplash.com/photo-1617788138017-80ad40651399?q=80&w=800&auto=format&fit=crop',
+    tag: 'Best Seller 2026',
+    tagColor: 'bg-green-500',
+    title: "Find Your Perfect Electric Vehicle",
+    subtitle: '50+ EV models · Live prices · Expert reviews',
+    cta: { label: 'Explore Cars', href: '/cars' },
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1619767886558-efdc259cde1a?q=80&w=800&auto=format&fit=crop',
+    tag: 'New Launch',
+    tagColor: 'bg-blue-500',
+    title: 'Mahindra BE 6 — 682 km Range',
+    subtitle: 'Starting ₹18.90 Lakh.',
+    cta: { label: 'View Details', href: '/cars/mahindra-be6' },
+  },
+  {
+    image: 'https://images.unsplash.com/photo-1620891549027-942fdc95d3f5?q=80&w=800&auto=format&fit=crop',
+    tag: "Editor's Pick",
+    tagColor: 'bg-purple-500',
+    title: 'Best Electric Scooters of 2026',
+    subtitle: 'Ather, Ola, TVS — compare now.',
     cta: { label: 'Browse Bikes', href: '/bikes' },
   },
 ]
@@ -70,7 +98,7 @@ const BRANDS = [
 ]
 
 /* ─── Desktop Hero ────────────────────────────────────────────────── */
-function DesktopHero() {
+function DesktopHero({ slides }) {
   const [vehicleType, setVehicleType] = useState('cars')
 
   return (
@@ -85,7 +113,7 @@ function DesktopHero() {
           loop
           className="h-105 lg:h-125"
         >
-          {SLIDES.map((slide, i) => (
+          {slides.map((slide, i) => (
             <SwiperSlide key={i}>
               <div className="relative h-full w-full overflow-hidden">
                 <Image
@@ -241,36 +269,59 @@ function DesktopHero() {
 }
 
 /* ─── Mobile Hero ─────────────────────────────────────────────────── */
-function MobileHero() {
+function MobileHero({ mobileSlides }) {
   const [vehicleType, setVehicleType] = useState('cars')
 
   return (
     <div className="md:hidden bg-white">
 
-      {/* Compact banner */}
-      <div className="relative h-52 sm:h-64">
-        <Image
-          src="https://images.unsplash.com/photo-1617788138017-80ad40651399?q=80&w=800&auto=format&fit=crop"
-          alt="Electric Vehicles India"
-          fill
-          priority
-          className="object-cover"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-linear-to-r from-black/85 via-black/55 to-black/20" />
-        <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
+      {/* Full-screen mobile banner swiper */}
+      <div className="relative">
+        <Swiper
+          modules={[Autoplay, Pagination]}
+          autoplay={{ delay: 4000, disableOnInteraction: false }}
+          pagination={{ clickable: true }}
+          loop
+          className="h-72 sm:h-80"
+        >
+          {mobileSlides.map((slide, i) => (
+            <SwiperSlide key={i}>
+              <div className="relative h-full w-full overflow-hidden">
+                <Image
+                  src={slide.image}
+                  alt={slide.title}
+                  fill
+                  priority={i === 0}
+                  className="object-cover"
+                  sizes="100vw"
+                />
+                {/* Gradient — strong bottom fade for text legibility */}
+                <div className="absolute inset-0 bg-linear-to-b from-black/30 via-black/40 to-black/85" />
 
-        <div className="absolute inset-0 flex flex-col justify-end px-4 pb-5">
-          <span className="inline-flex items-center gap-1.5 w-fit rounded-full bg-green-500/20 border border-green-400/40 px-3 py-1 text-[10px] font-bold text-green-300 mb-2">
-            <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-            India&apos;s #1 EV Platform
-          </span>
-          <h1 className="text-2xl font-black text-white leading-tight">
-            Find Your Perfect<br />
-            <span className="text-green-400">Electric Vehicle</span>
-          </h1>
-          <p className="mt-1 text-xs text-white/60">50+ EV models · Live prices · Expert reviews</p>
-        </div>
+                {/* Slide content — centered */}
+                <div className="absolute inset-0 flex flex-col items-center justify-end px-5 pb-12 text-center">
+                  {slide.tag && (
+                    <span className={`mb-3 inline-block rounded-full px-3 py-1 text-[11px] font-black text-white shadow ${slide.tagColor}`}>
+                      {slide.tag}
+                    </span>
+                  )}
+                  <h2 className="text-xl font-black leading-tight text-white sm:text-2xl">
+                    {slide.title}
+                  </h2>
+                  {slide.subtitle && (
+                    <p className="mt-1.5 text-xs text-white/70 max-w-xs">{slide.subtitle}</p>
+                  )}
+                  <Link
+                    href={slide.cta.href}
+                    className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-[#00a651] px-5 py-2.5 text-sm font-black text-white shadow-lg shadow-green-900/30 hover:bg-[#009245] active:scale-95 transition-all"
+                  >
+                    {slide.cta.label} <ChevronRight size={14} />
+                  </Link>
+                </div>
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
       </div>
 
       {/* Search bar */}
@@ -365,12 +416,47 @@ function MobileHero() {
   )
 }
 
-/* ─── Export ──────────────────────────────────────────────────────── */
+/* ─── Shared banner mapper ────────────────────────────────────────── */
+function mapBanner(b) {
+  return {
+    image:    b.image,
+    tag:      b.tag,
+    tagColor: b.tagColor || 'bg-green-500',
+    title:    b.title,
+    subtitle: b.subtitle,
+    cta:      { label: b.ctaLabel || 'Explore', href: b.ctaHref || '/' },
+  }
+}
+
+/* ─── Export — fetches desktop & mobile banners separately ───────── */
 export default function HeroSwiper() {
+  const [desktopSlides, setDesktopSlides] = useState(SLIDES)
+  const [mobileSlides,  setMobileSlides]  = useState(MOBILE_SLIDES)
+
+  useEffect(() => {
+    // Desktop banners
+    fetch('/api/banners?status=active&platform=desktop')
+      .then((r) => r.json())
+      .then((data) => {
+        const banners = data.banners || []
+        if (banners.length > 0) setDesktopSlides(banners.map(mapBanner))
+      })
+      .catch(() => {})
+
+    // Mobile banners — fetched independently
+    fetch('/api/banners?status=active&platform=mobile')
+      .then((r) => r.json())
+      .then((data) => {
+        const banners = data.banners || []
+        if (banners.length > 0) setMobileSlides(banners.map(mapBanner))
+      })
+      .catch(() => {})
+  }, [])
+
   return (
     <>
-      <MobileHero />
-      <DesktopHero />
+      <MobileHero mobileSlides={mobileSlides} />
+      <DesktopHero slides={desktopSlides} />
     </>
   )
 }

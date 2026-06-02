@@ -6,7 +6,7 @@ import Link from "next/link";
 import {
   Newspaper, Eye, Plus, CheckCircle2, FileText,
   BarChart2, Zap, Users, Car, Bike, Truck, ArrowRight,
-  TrendingUp, Clock, Star,
+  Clock, Star,
 } from "lucide-react";
 
 function StatCard({ icon: Icon, label, value, sub, gradient }) {
@@ -73,24 +73,26 @@ function ArticleCard({ article }) {
 }
 
 export default function AdminDashboard() {
-  const [stats, setStats]       = useState(null);
-  const [recent, setRecent]     = useState([]);
-  const [featured, setFeatured] = useState([]);
-  const [leads, setLeads]       = useState(null);
-  const [loading, setLoading]   = useState(true);
+  const [stats, setStats]         = useState(null);
+  const [recent, setRecent]       = useState([]);
+  const [featured, setFeatured]   = useState([]);
+  const [leads, setLeads]         = useState(null);
+  const [vehicles, setVehicles]   = useState(null);
+  const [loading, setLoading]     = useState(true);
 
   useEffect(() => {
     async function load() {
       try {
-        const [pubRes, draftRes, latestRes, leadsRes, featRes] = await Promise.all([
+        const [pubRes, draftRes, latestRes, leadsRes, featRes, vehRes] = await Promise.all([
           fetch("/api/articles?status=published&limit=100"),
           fetch("/api/articles?status=draft&limit=100"),
           fetch("/api/articles?status=published&limit=6"),
           fetch("/api/leads?limit=200"),
           fetch("/api/articles?status=published&featured=true&limit=3"),
+          fetch("/api/vehicles?limit=200"),
         ]);
-        const [pub, draft, latest, leadsData, feat] = await Promise.all([
-          pubRes.json(), draftRes.json(), latestRes.json(), leadsRes.json(), featRes.json(),
+        const [pub, draft, latest, leadsData, feat, vehData] = await Promise.all([
+          pubRes.json(), draftRes.json(), latestRes.json(), leadsRes.json(), featRes.json(), vehRes.json(),
         ]);
         const totalViews = (pub.articles || []).reduce((s, a) => s + (a.views || 0), 0);
         setStats({ published: pub.total || 0, drafts: draft.total || 0, total: (pub.total || 0) + (draft.total || 0), views: totalViews });
@@ -105,9 +107,19 @@ export default function AdminDashboard() {
           commercial: allLeads.filter((l) => l.vehicleType === "commercial").length,
           recent: allLeads.slice(0, 4),
         });
+        const allV = vehData.vehicles || [];
+        setVehicles({
+          total:        allV.length,
+          upcomingCars: allV.filter((v) => v.category === "upcoming" && v.vehicleType === "car").length,
+          upcomingBikes:allV.filter((v) => v.category === "upcoming" && v.vehicleType === "bike").length,
+          popularCars:  allV.filter((v) => v.category === "popular"  && v.vehicleType === "car").length,
+          popularBikes: allV.filter((v) => v.category === "popular"  && v.vehicleType === "bike").length,
+          published:    allV.filter((v) => v.status === "published").length,
+        });
       } catch {
         setStats({ published: 0, drafts: 0, total: 0, views: 0 });
         setLeads({ total: 0, newLeads: 0, cars: 0, bikes: 0, commercial: 0, recent: [] });
+        setVehicles({ total: 0, upcomingCars: 0, upcomingBikes: 0, popularCars: 0, popularBikes: 0, published: 0 });
       } finally {
         setLoading(false);
       }
@@ -141,6 +153,57 @@ export default function AdminDashboard() {
           sub="Awaiting publish" gradient="bg-gradient-to-br from-amber-500 to-orange-600" />
         <StatCard icon={Eye}          label="Total Views"    value={stats?.views?.toLocaleString("en-IN")}
           sub="Across all articles" gradient="bg-gradient-to-br from-purple-500 to-purple-700" />
+      </div>
+
+      {/* Vehicle stats */}
+      <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Car size={18} className="text-green-700" />
+            <h2 className="font-bold text-gray-800">Vehicle CMS</h2>
+            {loading
+              ? <div className="h-4 w-20 animate-pulse rounded bg-gray-100" />
+              : <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-bold text-green-700">{vehicles?.total ?? 0} total</span>
+            }
+          </div>
+          <div className="flex items-center gap-2">
+            <Link href="/admin/vehicles/new"
+              className="flex items-center gap-1.5 rounded-xl bg-green-700 px-3 py-1.5 text-xs font-bold text-white hover:bg-green-800 transition">
+              <Plus size={12} /> Add Vehicle
+            </Link>
+            <Link href="/admin/vehicles"
+              className="flex items-center gap-1 text-xs font-semibold text-green-700 hover:text-green-900 transition">
+              Manage all <ArrowRight size={12} />
+            </Link>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {[
+            { label: "Upcoming Cars",   value: vehicles?.upcomingCars,  icon: Car,  color: "text-blue-600",   bg: "bg-blue-50",   border: "border-blue-100",   href: "/admin/vehicles?category=upcoming&type=car" },
+            { label: "Upcoming Bikes",  value: vehicles?.upcomingBikes, icon: Bike, color: "text-orange-500", bg: "bg-orange-50", border: "border-orange-100", href: "/admin/vehicles?category=upcoming&type=bike" },
+            { label: "Popular Cars",    value: vehicles?.popularCars,   icon: Car,  color: "text-green-700",  bg: "bg-green-50",  border: "border-green-100",  href: "/admin/vehicles?category=popular&type=car" },
+            { label: "Popular Bikes",   value: vehicles?.popularBikes,  icon: Bike, color: "text-purple-600", bg: "bg-purple-50", border: "border-purple-100", href: "/admin/vehicles?category=popular&type=bike" },
+          ].map(({ label, value, icon: Icon, color, bg, border, href }) => (
+            <Link key={label} href={href}
+              className={`flex items-center gap-3 rounded-xl border ${border} ${bg} px-4 py-3 transition hover:shadow-sm`}>
+              <Icon size={18} className={color} />
+              <div>
+                {loading
+                  ? <div className="h-5 w-8 animate-pulse rounded bg-gray-200 mb-1" />
+                  : <p className="text-xl font-black text-gray-900">{value ?? 0}</p>
+                }
+                <p className="text-[11px] text-gray-500">{label}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {!loading && vehicles?.published !== undefined && (
+          <p className="mt-3 text-[11px] text-gray-400">
+            {vehicles.published} published · {(vehicles.total - vehicles.published)} drafts
+          </p>
+        )}
       </div>
 
       {/* Main grid */}
@@ -319,8 +382,10 @@ export default function AdminDashboard() {
               {[
                 { href: "/admin/articles/new", label: "Write New Article", icon: Newspaper, color: "text-blue-600",   bg: "bg-blue-50" },
                 { href: "/admin/articles",     label: "Manage Articles",   icon: BarChart2, color: "text-green-700",  bg: "bg-green-50" },
+                { href: "/admin/vehicles/new", label: "Add New Vehicle",   icon: Car,       color: "text-orange-600", bg: "bg-orange-50" },
+                { href: "/admin/vehicles",     label: "Manage Vehicles",   icon: Bike,      color: "text-purple-600", bg: "bg-purple-50" },
                 { href: "/admin/leads",        label: "View All Leads",    icon: Users,     color: "text-yellow-600", bg: "bg-yellow-50" },
-                { href: "/",                   label: "View Live Site",    icon: Eye,       color: "text-purple-600", bg: "bg-purple-50", external: true },
+                { href: "/",                   label: "View Live Site",    icon: Eye,       color: "text-teal-600",   bg: "bg-teal-50", external: true },
               ].map((action) => (
                 <Link key={action.href} href={action.href}
                   target={action.external ? "_blank" : undefined}
