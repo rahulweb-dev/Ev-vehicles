@@ -154,7 +154,7 @@ export default function RootLayout({ children }) {
         <ConditionalShell>{children}</ConditionalShell>
         <CookieConsent />
         <PushNotificationPrompt />
-          <GoogleAnalytics gaId="G-2QJL966SVB" />
+        <GoogleAnalytics gaId="G-2QJL966SVB" />
       </body>
     </html>
   );
