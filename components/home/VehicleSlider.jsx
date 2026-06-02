@@ -48,13 +48,13 @@ export default function VehicleSlider({ title, vehicles = [], vehicleType = "car
   }
 
   return (
-    <section ref={sectionRef} className="bg-white py-10">
-      <div className="mx-auto max-w-325 px-4 lg:px-6">
+    <section ref={sectionRef} className="bg-white py-8 lg:py-10">
+      <div className="mx-auto max-w-7xl px-4 lg:px-6">
 
         <div ref={headerRef} className="mb-6 flex items-center justify-between border-b border-gray-200 pb-4">
-          <h2 className="text-[22px] font-bold text-[#1a1a1a] lg:text-[32px]">{title}</h2>
-          <Link href={viewAllHref} className="text-[18px] font-semibold text-[#1a1a1a] transition hover:text-[#00a651]">
-            View All
+          <h2 className="text-lg sm:text-[22px] font-bold text-[#1a1a1a] lg:text-[28px]">{title}</h2>
+          <Link href={viewAllHref} className="text-sm sm:text-base font-semibold text-[#00a651] flex items-center gap-1 transition hover:text-[#009245]">
+            View All <ArrowRight size={15} />
           </Link>
         </div>
 

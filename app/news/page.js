@@ -1,6 +1,7 @@
 import { AdBannerHorizontal } from "@/components/ads/AdBanner";
 import ArticlesFeed from "@/components/skeletons/ArticlesFeed";
 import { SITE_URL } from "../layout";
+import Link from "next/link";
 
 export const revalidate = 60;
 
@@ -36,7 +37,7 @@ export default function NewsPage() {
         <div className="bg-gray-950 py-12">
           <div className="mx-auto max-w-7xl px-4">
             <nav className="mb-4 text-sm text-gray-400">
-              <a href="/" className="hover:text-white">Home</a>
+              <Link href="/" className="hover:text-white">Home</Link>
               <span className="mx-2">/</span>
               <span className="text-white">News</span>
             </nav>

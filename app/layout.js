@@ -10,7 +10,7 @@ import GoogleAnalytics from "@/components/GoogleAnalytics";
 const ADSENSE_PUBLISHER_ID = process.env.NEXT_PUBLIC_ADSENSE_ID || "ca-pub-XXXXXXXXXXXXXXXXX";
 
 // IMPORTANT: Replace with your actual website URL when you go live
-export const SITE_URL = "https://evnewsindia.com";
+export const SITE_URL = "https://www.evradar.in/";
 export const SITE_NAME = "EV News India";
 export const SITE_TAGLINE = "India's #1 Electric Vehicle News Platform";
 
