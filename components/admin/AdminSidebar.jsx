@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
-  LayoutDashboard, Newspaper, BookOpen, LogOut,
+  LayoutDashboard, Newspaper, LogOut,
   Menu, X, ExternalLink, Settings,
   Users, Building2, MapPin, ShieldCheck, Car, LayoutTemplate,
 } from "lucide-react";
@@ -13,7 +13,6 @@ import {
 const ADMIN_NAV = [
   { href: "/admin",           label: "Dashboard", icon: LayoutDashboard, exact: true },
   { href: "/admin/articles",  label: "Articles",  icon: Newspaper },
-  { href: "/admin/blogs",     label: "Blogs",     icon: BookOpen },
   { href: "/admin/vehicles",  label: "Vehicles",  icon: Car },
   { href: "/admin/banners",   label: "Banners",   icon: LayoutTemplate },
   { href: "/admin/leads",     label: "Leads",     icon: Users },

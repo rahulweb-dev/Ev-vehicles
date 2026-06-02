@@ -1,54 +1,86 @@
 import { notFound } from "next/navigation";
 import VehicleDetailPage from "@/components/vehicles/VehicleDetailPage";
-import { getCarBySlug, getRelatedCars, electricCars } from "@/data/vehiclesData";
 import { SITE_URL } from "@/app/layout";
 
-export async function generateStaticParams() {
-  return electricCars.map((c) => ({ slug: c.slug }));
+export const dynamic = "force-dynamic";
+
+async function getVehicle(slug) {
+  try {
+    const dbConnect = (await import("@/lib/mongodb")).default;
+    const Vehicle   = (await import("@/lib/models/Vehicle")).default;
+    await dbConnect();
+    return await Vehicle.findOne({ slug, vehicleType: "car", status: "published" }).lean();
+  } catch {
+    return null;
+  }
+}
+
+async function getRelated(slug, brand) {
+  try {
+    const dbConnect = (await import("@/lib/mongodb")).default;
+    const Vehicle   = (await import("@/lib/models/Vehicle")).default;
+    await dbConnect();
+    return await Vehicle.find({
+      slug: { $ne: slug },
+      vehicleType: "car",
+      status: "published",
+      $or: [{ brand }, { category: "popular" }],
+    })
+      .sort({ featured: -1, createdAt: -1 })
+      .limit(3)
+      .lean();
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const car = getCarBySlug(slug);
+  const car = await getVehicle(slug);
   if (!car) return { title: "Car Not Found" };
 
+  const price = car.variants?.[0]?.exShowroomPrice || "";
+  const range = car.performance?.drivingRange || "";
+  const year  = new Date().getFullYear();
+
   return {
-    title: `${car.name} Price in India ${new Date().getFullYear()} – Range, Specs & Colors`,
-    description: `${car.name} price starts at ${car.priceDisplay} ex-showroom. Check range (${car.specs?.range_certified}), motor (${car.specs?.motor}), colors, variants, and full specifications. Get best price in your city.`,
-    alternates: { canonical: `${SITE_URL}/cars/${slug}` },
+    title:       car.metaTitle       || `${car.name} Price in India ${year} – Range, Specs & Colors`,
+    description: car.metaDescription || `${car.name} electric car${price ? ` price starts at ${price} ex-showroom` : ""}${range ? `. ARAI range: ${range}` : ""}. Full specs, colors, and variants.`,
+    keywords:    car.keywords?.join(", "),
+    alternates:  { canonical: car.canonicalUrl || `${SITE_URL}/cars/${slug}` },
     openGraph: {
-      title: `${car.name} – Price, Range & Specs`,
-      description: `${car.name} starts at ${car.priceDisplay}. Range: ${car.specs?.range_certified}`,
-      images: [{ url: car.image, width: 1200, height: 630 }],
+      title:       car.ogTitle       || car.metaTitle       || `${car.name} – Price, Range & Specs`,
+      description: car.ogDescription || car.metaDescription || `${car.name}${price ? ` starts at ${price}` : ""}${range ? `. Range: ${range}` : ""}.`,
+      images:      [{ url: car.ogImage || car.featuredImage || "", width: 1200, height: 630 }],
     },
   };
 }
 
 export default async function CarDetailPage({ params }) {
   const { slug } = await params;
-  const car = getCarBySlug(slug);
+  const car = await getVehicle(slug);
   if (!car) notFound();
 
-  const related = getRelatedCars(slug, 3);
+  const related = await getRelated(slug, car.brand);
 
+  const firstVariant = car.variants?.[0];
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
-    name: car.name,
-    brand: { "@type": "Brand", name: car.brand },
-    description: `${car.name} electric car. Range: ${car.specs?.range_certified}. Motor: ${car.specs?.motor}.`,
-    image: car.image,
-    offers: {
-      "@type": "AggregateOffer",
-      priceCurrency: "INR",
-      lowPrice: car.priceMin * 100000,
-      highPrice: car.priceMax * 100000,
-    },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: car.rating,
-      reviewCount: car.reviewCount,
-    },
+    name:   car.name,
+    brand:  { "@type": "Brand", name: car.brand },
+    description: car.shortDescription || car.metaDescription || `${car.name} electric car`,
+    image:  car.featuredImage || "",
+    ...(firstVariant && {
+      offers: {
+        "@type":       "Offer",
+        priceCurrency: "INR",
+        price:         (firstVariant.exShowroomPrice || "").replace(/[^0-9]/g, "") || "0",
+        availability:  car.availability === "available"
+          ? "https://schema.org/InStock"
+          : "https://schema.org/PreOrder",
+      },
+    }),
   };
 
   return (

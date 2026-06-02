@@ -12,20 +12,27 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
 
     const filter = {};
-    const vehicleType = searchParams.get("vehicleType");
-    const category    = searchParams.get("category");
-    const status      = searchParams.get("status");
-    const featured    = searchParams.get("featured");
-    const search      = searchParams.get("search");
-    const sort        = searchParams.get("sort") || "createdAt";
-    const limit       = parseInt(searchParams.get("limit") || "50");
-    const page        = parseInt(searchParams.get("page") || "1");
+    const vehicleType    = searchParams.get("vehicleType");
+    const category       = searchParams.get("category");
+    const status         = searchParams.get("status");
+    const featured       = searchParams.get("featured");
+    const availability   = searchParams.get("availability");
+    const search         = searchParams.get("search");
+    const brand          = searchParams.get("brand");
+    const sort           = searchParams.get("sort") || "createdAt";
+    const limit          = parseInt(searchParams.get("limit") || "50");
+    const page           = parseInt(searchParams.get("page") || "1");
 
-    if (vehicleType) filter.vehicleType = vehicleType;
-    if (category)    filter.category    = category;
-    if (status)      filter.status      = status;
-    if (featured === "true") filter.featured = true;
-    if (search)      filter.name = { $regex: search, $options: "i" };
+    if (vehicleType)          filter.vehicleType  = vehicleType;
+    if (category)             filter.category     = category;
+    if (status)               filter.status       = status;
+    if (featured === "true")  filter.featured     = true;
+    if (availability)         filter.availability = availability;
+    if (brand)                filter.brand        = { $regex: brand, $options: "i" };
+    if (search)               filter.$or = [
+      { name:  { $regex: search, $options: "i" } },
+      { brand: { $regex: search, $options: "i" } },
+    ];
 
     const sortMap = {
       launchDate: { launchDate: -1 },

@@ -91,9 +91,17 @@ function VehicleCard({ vehicle, vehicleType }) {
     <div className="group flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
 
       {/* Image */}
-      <Link href={href} className="relative block h-52 overflow-hidden">
-        <Image src={vehicle.image} alt={vehicle.name} fill
-          className="object-cover transition duration-500 group-hover:scale-105" />
+      <Link href={href} className="relative block h-52 overflow-hidden bg-gray-100">
+        {vehicle.image ? (
+          <Image src={vehicle.image} alt={vehicle.name} fill
+            className="object-cover transition duration-500 group-hover:scale-105"
+            sizes="(max-width: 640px) 100vw, (max-width: 1200px) 50vw, 25vw"
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center">
+            <span className="text-4xl text-gray-200">⚡</span>
+          </div>
+        )}
         <span className="absolute top-3 left-3 rounded-full bg-[#00a651] px-3 py-1 text-xs font-semibold text-white shadow">
           {vehicle.tag}
         </span>

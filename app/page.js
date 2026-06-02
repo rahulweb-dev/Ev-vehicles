@@ -24,6 +24,10 @@ export const metadata = {
 function mapVehicle(v) {
   const firstVariant = v.variants?.[0];
   const lastVariant  = v.variants?.[v.variants.length - 1];
+  // Map DB colors (objects with hexCode) to hex strings for the slider swatches
+  const colors = (v.colors || []).map((c) =>
+    typeof c === "string" ? c : (c.hexCode || "#888888")
+  );
   return {
     id:          v._id?.toString() || v.slug,
     slug:        v.slug,
@@ -34,9 +38,9 @@ function mapVehicle(v) {
     emi:         "",
     image:       v.featuredImage || "",
     speed:       v.performance?.topSpeed    || "—",
-    range:       v.performance?.drivingRange || "—",
+    range:       v.performance?.drivingRange || v.variants?.[0]?.range || "—",
     motor:       v.performance?.power       || "—",
-    colors:      [],   // DB stores color names, not hex; skip swatches
+    colors,
     rating:      0,
     reviewCount: 0,
     tag:         v.featured ? "Featured" : v.category === "upcoming" ? "Coming Soon" : "Popular",
@@ -44,16 +48,18 @@ function mapVehicle(v) {
 }
 
 /* ── Fetch a section from MongoDB, fall back to staticFallback ───── */
-async function getVehicles(category, vehicleType, staticFallback) {
+async function getVehicles({ category, vehicleType, featured, staticFallback }) {
   try {
     const dbConnect = (await import("@/lib/mongodb")).default;
     const Vehicle   = (await import("@/lib/models/Vehicle")).default;
     await dbConnect();
-    const docs = await Vehicle.find({ category, vehicleType, status: "published" })
-      .sort({ featured: -1, createdAt: -1 })
+    const filter = { vehicleType, status: "published" };
+    if (category) filter.category = category;
+    if (featured) filter.featured = true;
+    const docs = await Vehicle.find(filter)
+      .sort({ createdAt: -1 })
       .limit(12)
       .lean();
-    // If admin hasn't added any yet, fall through to static data
     if (docs.length === 0) return staticFallback;
     return docs.map(mapVehicle);
   } catch {
@@ -62,11 +68,17 @@ async function getVehicles(category, vehicleType, staticFallback) {
 }
 
 export default async function Home() {
-  const [popularCars, popularBikes, upcomingCars, upcomingBikes] = await Promise.all([
-    getVehicles("popular",  "car",  carData),
-    getVehicles("popular",  "bike", bikeData),
-    getVehicles("upcoming", "car",  upcomingCarData),
-    getVehicles("upcoming", "bike", upcomingBikeData),
+  const [
+    featuredCars, featuredBikes,
+    popularCars, popularBikes,
+    upcomingCars, upcomingBikes,
+  ] = await Promise.all([
+    getVehicles({ vehicleType: "car",  featured: true,         staticFallback: [] }),
+    getVehicles({ vehicleType: "bike", featured: true,         staticFallback: [] }),
+    getVehicles({ vehicleType: "car",  category: "popular",    staticFallback: carData }),
+    getVehicles({ vehicleType: "bike", category: "popular",    staticFallback: bikeData }),
+    getVehicles({ vehicleType: "car",  category: "upcoming",   staticFallback: upcomingCarData }),
+    getVehicles({ vehicleType: "bike", category: "upcoming",   staticFallback: upcomingBikeData }),
   ]);
 
   return (
@@ -80,6 +92,24 @@ export default async function Home() {
       </div>
 
       <LatestNewsSection />
+
+      {featuredCars.length > 0 && (
+        <VehicleSlider
+          title="Featured Electric Cars"
+          subtitle="Editor's Top Picks"
+          vehicles={featuredCars}
+          vehicleType="cars"
+        />
+      )}
+
+      {featuredBikes.length > 0 && (
+        <VehicleSlider
+          title="Featured Electric Bikes"
+          subtitle="Editor's Top Picks"
+          vehicles={featuredBikes}
+          vehicleType="bikes"
+        />
+      )}
 
       <VehicleSlider
         title="Popular Electric Cars"
