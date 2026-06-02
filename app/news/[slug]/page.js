@@ -3,18 +3,19 @@ import Image from "next/image";
 import Link from "next/link";
 import { Clock3, Calendar, ChevronRight, Tag } from "lucide-react";
 import NewsCard from "@/components/news/NewsCard";
-import { AdBannerInArticle, AdBannerHorizontal } from "@/components/ads/AdBanner";
+import { AdBannerInArticle } from "@/components/ads/AdBanner";
 import { SITE_URL, SITE_NAME } from "@/app/layout";
 import ArticleAudioPlayer from "@/components/audio/ArticleAudioPlayer";
 
 export const revalidate = 300;
 
 async function getArticle(slug) {
-  const BASE = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
   try {
-    const res = await fetch(`${BASE}/api/articles?status=published&limit=100`, { cache: "no-store" });
-    const data = await res.json();
-    return (data.articles || []).find((a) => a.slug === slug) || null;
+    const dbConnect = (await import("@/lib/mongodb")).default;
+    const Article = (await import("@/lib/models/Article")).default;
+    await dbConnect();
+    const article = await Article.findOne({ slug, status: "published" }).lean();
+    return article || null;
   } catch {
     const { getArticleBySlug } = await import("@/data/newsArticles");
     return getArticleBySlug(slug);
@@ -22,11 +23,15 @@ async function getArticle(slug) {
 }
 
 async function getRelated(category, currentSlug) {
-  const BASE = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
   try {
-    const res = await fetch(`${BASE}/api/articles?status=published&category=${category}&limit=4`, { cache: "no-store" });
-    const data = await res.json();
-    return (data.articles || []).filter((a) => a.slug !== currentSlug).slice(0, 3);
+    const dbConnect = (await import("@/lib/mongodb")).default;
+    const Article = (await import("@/lib/models/Article")).default;
+    await dbConnect();
+    const articles = await Article.find({ category, status: "published", slug: { $ne: currentSlug } })
+      .sort({ publishedAt: -1 })
+      .limit(3)
+      .lean();
+    return articles;
   } catch {
     const { getRelatedArticles } = await import("@/data/newsArticles");
     return getRelatedArticles(currentSlug, category, 3);
