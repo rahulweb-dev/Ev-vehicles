@@ -68,7 +68,7 @@ export const metadata = {
       "Stay updated with the latest electric vehicle news, reviews, launches, and EV prices in India.",
     images: [
       {
-        url: `${SITE_URL}/images/og-default.jpg`,
+        url: `${SITE_URL.replace(/\/$/, "")}/images/og-default.jpg`,
         width: 1200,
         height: 630,
         alt: `${SITE_NAME} – India's #1 EV News Platform`,
@@ -82,7 +82,17 @@ export const metadata = {
     title: `${SITE_NAME} – ${SITE_TAGLINE}`,
     description:
       "Stay updated with the latest electric vehicle news, reviews, and launches in India.",
-    images: [`${SITE_URL}/images/og-default.jpg`],
+    images: [`${SITE_URL.replace(/\/$/, "")}/images/og-default.jpg`],
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: [
+      { url: "/images/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   },
   alternates: {
     canonical: SITE_URL,
@@ -134,7 +144,9 @@ export default function RootLayout({ children }) {
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
 
         {/* JSON-LD: Organization + WebSite Schema */}
         <script
