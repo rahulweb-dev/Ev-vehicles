@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Star, BatteryCharging, Gauge, Zap, ChevronRight } from "lucide-react";
 import { AdBannerHorizontal } from "@/components/ads/AdBanner";
 import ArticlesFeed from "@/components/skeletons/ArticlesFeed";
+import { electricCars } from "@/data/vehiclesData";
 import { SITE_URL } from "../layout";
 
 export const revalidate = 60;
