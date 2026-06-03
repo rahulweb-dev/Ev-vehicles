@@ -2,7 +2,6 @@ import EVHomepage from "@/components/home/HeroSection";
 import LatestNewsSection from "@/components/home/LatestNewsSection";
 import VehicleSlider from "@/components/home/VehicleSlider";
 import { AdBannerHorizontal } from "@/components/ads/AdBanner";
-import { bikeData, carData, upcomingCarData, upcomingBikeData } from "@/data/data";
 import { SITE_URL } from "./layout";
 
 export const revalidate = 120; // re-fetch from DB every 2 minutes
@@ -47,24 +46,19 @@ function mapVehicle(v) {
   };
 }
 
-/* ── Fetch a section from MongoDB, fall back to staticFallback ───── */
-async function getVehicles({ category, vehicleType, featured, staticFallback }) {
-  try {
-    const dbConnect = (await import("@/lib/mongodb")).default;
-    const Vehicle   = (await import("@/lib/models/Vehicle")).default;
-    await dbConnect();
-    const filter = { vehicleType, status: "published" };
-    if (category) filter.category = category;
-    if (featured) filter.featured = true;
-    const docs = await Vehicle.find(filter)
-      .sort({ createdAt: -1 })
-      .limit(12)
-      .lean();
-    if (docs.length === 0) return staticFallback;
-    return docs.map(mapVehicle);
-  } catch {
-    return staticFallback;
-  }
+/* ── Fetch a section from MongoDB ────────────────────────────────── */
+async function getVehicles({ category, vehicleType, featured }) {
+  const dbConnect = (await import("@/lib/mongodb")).default;
+  const Vehicle   = (await import("@/lib/models/Vehicle")).default;
+  await dbConnect();
+  const filter = { vehicleType, status: "published" };
+  if (category) filter.category = category;
+  if (featured) filter.featured = true;
+  const docs = await Vehicle.find(filter)
+    .sort({ createdAt: -1 })
+    .limit(12)
+    .lean();
+  return docs.map(mapVehicle);
 }
 
 export default async function Home() {
@@ -73,12 +67,12 @@ export default async function Home() {
     popularCars, popularBikes,
     upcomingCars, upcomingBikes,
   ] = await Promise.all([
-    getVehicles({ vehicleType: "car",  featured: true,         staticFallback: [] }),
-    getVehicles({ vehicleType: "bike", featured: true,         staticFallback: [] }),
-    getVehicles({ vehicleType: "car",  category: "popular",    staticFallback: carData }),
-    getVehicles({ vehicleType: "bike", category: "popular",    staticFallback: bikeData }),
-    getVehicles({ vehicleType: "car",  category: "upcoming",   staticFallback: upcomingCarData }),
-    getVehicles({ vehicleType: "bike", category: "upcoming",   staticFallback: upcomingBikeData }),
+    getVehicles({ vehicleType: "car",  featured: true }),
+    getVehicles({ vehicleType: "bike", featured: true }),
+    getVehicles({ vehicleType: "car",  category: "popular" }),
+    getVehicles({ vehicleType: "bike", category: "popular" }),
+    getVehicles({ vehicleType: "car",  category: "upcoming" }),
+    getVehicles({ vehicleType: "bike", category: "upcoming" }),
   ]);
 
   return (
@@ -111,12 +105,14 @@ export default async function Home() {
         />
       )}
 
-      <VehicleSlider
-        title="Popular Electric Cars"
-        subtitle="Trending EV Cars in India"
-        vehicles={popularCars}
-        vehicleType="cars"
-      />
+      {popularCars.length > 0 && (
+        <VehicleSlider
+          title="Popular Electric Cars"
+          subtitle="Trending EV Cars in India"
+          vehicles={popularCars}
+          vehicleType="cars"
+        />
+      )}
 
       <div className="bg-white py-2">
         <div className="mx-auto max-w-7xl px-4">
@@ -124,26 +120,32 @@ export default async function Home() {
         </div>
       </div>
 
-      <VehicleSlider
-        title="Popular Electric Bikes"
-        subtitle="Trending EV Bikes in India"
-        vehicles={popularBikes}
-        vehicleType="bikes"
-      />
+      {popularBikes.length > 0 && (
+        <VehicleSlider
+          title="Popular Electric Bikes"
+          subtitle="Trending EV Bikes in India"
+          vehicles={popularBikes}
+          vehicleType="bikes"
+        />
+      )}
 
-      <VehicleSlider
-        title="Upcoming Electric Cars"
-        subtitle="Launching Soon in India"
-        vehicles={upcomingCars}
-        vehicleType="cars"
-      />
+      {upcomingCars.length > 0 && (
+        <VehicleSlider
+          title="Upcoming Electric Cars"
+          subtitle="Launching Soon in India"
+          vehicles={upcomingCars}
+          vehicleType="cars"
+        />
+      )}
 
-      <VehicleSlider
-        title="Upcoming Electric Bikes"
-        subtitle="Launching Soon in India"
-        vehicles={upcomingBikes}
-        vehicleType="bikes"
-      />
+      {upcomingBikes.length > 0 && (
+        <VehicleSlider
+          title="Upcoming Electric Bikes"
+          subtitle="Launching Soon in India"
+          vehicles={upcomingBikes}
+          vehicleType="bikes"
+        />
+      )}
     </>
   );
 }

@@ -3,7 +3,6 @@ import Link from "next/link";
 import { Star, BatteryCharging, Gauge, Zap, ChevronRight } from "lucide-react";
 import { AdBannerHorizontal } from "@/components/ads/AdBanner";
 import ArticlesFeed from "@/components/skeletons/ArticlesFeed";
-import { electricCars } from "@/data/vehiclesData"; // fallback when DB is unavailable — do not remove
 import { SITE_URL } from "../layout";
 
 export const revalidate = 60;
@@ -46,20 +45,16 @@ function mapDbCar(v) {
   };
 }
 
-/* ── Fetch from DB, fall back to static ───────────────────────────── */
+/* ── Fetch from DB ────────────────────────────────────────────────── */
 async function getCars() {
-  try {
-    const dbConnect = (await import("@/lib/mongodb")).default;
-    const Vehicle   = (await import("@/lib/models/Vehicle")).default;
-    await dbConnect();
-    const docs = await Vehicle.find({ vehicleType: "car", status: "published" })
-      .sort({ featured: -1, category: 1, createdAt: -1 })
-      .limit(60)
-      .lean();
-    if (docs.length > 0) return { cars: docs.map(mapDbCar), total: docs.length };
-  } catch { /* fall through */ }
-  // fallback
-  return { cars: electricCars.map((c) => ({ ...c, image: c.image || "" })), total: electricCars.length };
+  const dbConnect = (await import("@/lib/mongodb")).default;
+  const Vehicle   = (await import("@/lib/models/Vehicle")).default;
+  await dbConnect();
+  const docs = await Vehicle.find({ vehicleType: "car", status: "published" })
+    .sort({ featured: -1, category: 1, createdAt: -1 })
+    .limit(60)
+    .lean();
+  return { cars: docs.map(mapDbCar), total: docs.length };
 }
 
 /* ══════════════════════════════════════════════════════════════════ */
