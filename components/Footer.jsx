@@ -43,6 +43,7 @@ const footerLinks = {
   "Company": [
     { name: "About Us", href: "/about" },
     { name: "Contact Us", href: "/contact" },
+    { name: "FAQ", href: "/faq" },
     { name: "Privacy Policy", href: "/privacy-policy" },
     { name: "Terms of Service", href: "/terms" },
     { name: "Advertise With Us", href: "/contact" },
@@ -149,12 +150,19 @@ export default function Footer() {
 
       {/* Bottom Bar */}
       <div className="border-t border-gray-800">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-4 py-5 text-sm text-gray-500 md:flex-row">
-          <p>© {currentYear} EV News India. All rights reserved.</p>
-          <div className="flex gap-6">
-            <Link href="/privacy-policy" className="hover:text-gray-300">Privacy Policy</Link>
-            <Link href="/terms" className="hover:text-gray-300">Terms of Service</Link>
-            <Link href="/sitemap.xml" className="hover:text-gray-300">Sitemap</Link>
+        <div className="mx-auto max-w-7xl px-4 py-5 text-sm text-gray-500">
+          <div className="flex flex-col items-center justify-between gap-3 md:flex-row">
+            <p>© {currentYear} EV News India. All rights reserved.</p>
+            <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
+              <a href="mailto:contact@evradar.in" className="flex items-center gap-1.5 hover:text-green-400 transition-colors">
+                <Mail size={13} />
+                contact@evradar.in
+              </a>
+              <Link href="/faq" className="hover:text-gray-300">FAQ</Link>
+              <Link href="/privacy-policy" className="hover:text-gray-300">Privacy Policy</Link>
+              <Link href="/terms" className="hover:text-gray-300">Terms of Service</Link>
+              <Link href="/sitemap.xml" className="hover:text-gray-300">Sitemap</Link>
+            </div>
           </div>
         </div>
       </div>

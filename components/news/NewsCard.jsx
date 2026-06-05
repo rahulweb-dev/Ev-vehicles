@@ -28,33 +28,33 @@ function DefaultNewsCard({ article }) {
   return (
     <article className="group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
       <Link href={`/news/${article.slug}`} className="block">
-        <div className="relative h-48 overflow-hidden">
+        <div className="relative h-44 overflow-hidden">
           <Image
             src={article.image}
             alt={article.title}
             fill
             className="object-cover transition duration-500 group-hover:scale-105"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
           />
           <div className="absolute left-3 top-3">
-            <span className={`rounded-full px-3 py-1 text-xs font-bold capitalize ${colorClass}`}>
+            <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold capitalize ${colorClass}`}>
               {article.category}
             </span>
           </div>
         </div>
 
-        <div className="px-5 pt-5">
-          <h3 className="line-clamp-2 text-[15px] font-bold leading-snug text-gray-900 transition group-hover:text-green-600">
+        <div className="px-4 pt-4">
+          <h3 className="line-clamp-2 text-sm font-bold leading-snug text-gray-900 transition group-hover:text-green-600">
             {article.title}
           </h3>
-          <p className="mt-2 line-clamp-2 text-sm text-gray-500">{article.excerpt}</p>
+          <p className="mt-1.5 line-clamp-2 text-xs text-gray-500">{article.excerpt}</p>
         </div>
       </Link>
 
-      <div className="px-5 pb-5 pt-4">
-        <div className="flex items-center justify-between text-xs text-gray-400">
+      <div className="px-4 pb-4 pt-3">
+        <div className="flex items-center justify-between text-[11px] text-gray-400">
           <div className="flex items-center gap-1">
-            <Clock3 size={13} />
+            <Clock3 size={12} />
             <span>{article.readTime} read</span>
           </div>
           <span>
@@ -63,8 +63,8 @@ function DefaultNewsCard({ article }) {
             })}
           </span>
         </div>
-        <div className="mt-3 border-t border-gray-50 pt-3">
-          <ShareLikeButtons slug={article.slug} title={article.title} />
+        <div className="mt-2.5 border-t border-gray-50 pt-2.5">
+          <ShareLikeButtons slug={article.slug} title={article.title} compact />
         </div>
       </div>
     </article>
