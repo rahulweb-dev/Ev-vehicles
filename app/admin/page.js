@@ -6,7 +6,7 @@ import Link from "next/link";
 import {
   Newspaper, Eye, Plus, CheckCircle2, FileText,
   BarChart2, Zap, Users, Car, Bike, Truck, ArrowRight,
-  Clock, Star,
+  Clock, Star, Mail,
 } from "lucide-react";
 
 function StatCard({ icon: Icon, label, value, sub, gradient }) {
@@ -73,12 +73,13 @@ function ArticleCard({ article }) {
 }
 
 export default function AdminDashboard() {
-  const [stats, setStats]         = useState(null);
-  const [recent, setRecent]       = useState([]);
-  const [featured, setFeatured]   = useState([]);
-  const [leads, setLeads]         = useState(null);
-  const [vehicles, setVehicles]   = useState(null);
-  const [loading, setLoading]     = useState(true);
+  const [stats, setStats]           = useState(null);
+  const [recent, setRecent]         = useState([]);
+  const [featured, setFeatured]     = useState([]);
+  const [leads, setLeads]           = useState(null);
+  const [vehicles, setVehicles]     = useState(null);
+  const [subscribers, setSubscribers] = useState(null);
+  const [loading, setLoading]       = useState(true);
 
   useEffect(() => {
     async function load() {
@@ -91,8 +92,9 @@ export default function AdminDashboard() {
           fetch("/api/articles?status=published&featured=true&limit=3"),
           fetch("/api/vehicles?limit=200"),
         ]);
-        const [pub, draft, latest, leadsData, feat, vehData] = await Promise.all([
-          pubRes.json(), draftRes.json(), latestRes.json(), leadsRes.json(), featRes.json(), vehRes.json(),
+        const subRes = await fetch("/api/subscribe?limit=50");
+        const [pub, draft, latest, leadsData, feat, vehData, subData] = await Promise.all([
+          pubRes.json(), draftRes.json(), latestRes.json(), leadsRes.json(), featRes.json(), vehRes.json(), subRes.json(),
         ]);
         const totalViews = (pub.articles || []).reduce((s, a) => s + (a.views || 0), 0);
         setStats({ published: pub.total || 0, drafts: draft.total || 0, total: (pub.total || 0) + (draft.total || 0), views: totalViews });
@@ -116,10 +118,15 @@ export default function AdminDashboard() {
           popularBikes: allV.filter((v) => v.category === "popular"  && v.vehicleType === "bike").length,
           published:    allV.filter((v) => v.status === "published").length,
         });
+        setSubscribers({
+          total:   subData.total || 0,
+          recent:  (subData.subscribers || []).slice(0, 6),
+        });
       } catch {
         setStats({ published: 0, drafts: 0, total: 0, views: 0 });
         setLeads({ total: 0, newLeads: 0, cars: 0, bikes: 0, commercial: 0, recent: [] });
         setVehicles({ total: 0, upcomingCars: 0, upcomingBikes: 0, popularCars: 0, popularBikes: 0, published: 0 });
+        setSubscribers({ total: 0, recent: [] });
       } finally {
         setLoading(false);
       }
@@ -371,6 +378,44 @@ export default function AdminDashboard() {
                     </div>
                   );
                 })
+              }
+            </div>
+          </div>
+
+          {/* Email Subscribers */}
+          <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-sm">
+            <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
+              <div className="flex items-center gap-2">
+                <Mail size={16} className="text-green-700" />
+                <span className="font-bold text-gray-800 text-sm">Email Subscribers</span>
+                {!loading && (
+                  <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-bold text-green-700">
+                    {subscribers?.total ?? 0}
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="divide-y divide-gray-50 max-h-52 overflow-y-auto">
+              {loading
+                ? Array(3).fill(0).map((_, i) => (
+                  <div key={i} className="animate-pulse flex items-center gap-3 px-4 py-3">
+                    <div className="h-7 w-7 rounded-full bg-gray-100" />
+                    <div className="h-2.5 w-2/3 rounded bg-gray-100" />
+                  </div>
+                ))
+                : subscribers?.recent?.length === 0
+                ? <p className="py-8 text-center text-xs text-gray-400">No subscribers yet</p>
+                : subscribers?.recent?.map((sub) => (
+                  <div key={sub._id} className="flex items-center gap-3 px-4 py-2.5">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green-100 text-xs font-black text-green-700">
+                      {sub.email[0].toUpperCase()}
+                    </div>
+                    <p className="flex-1 truncate text-xs text-gray-700">{sub.email}</p>
+                    <span className="text-[10px] text-gray-400">
+                      {new Date(sub.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                    </span>
+                  </div>
+                ))
               }
             </div>
           </div>

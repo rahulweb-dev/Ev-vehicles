@@ -19,6 +19,7 @@ export default function ArticlesFeed({
   const [loading, setLoading]   = useState(true)
 
   useEffect(() => {
+    setLoading(true)
     const qs = new URLSearchParams({
       status: 'published',
       limit: String(limit),
@@ -28,7 +29,7 @@ export default function ArticlesFeed({
     fetch(`/api/articles?${qs}`)
       .then((r) => r.json())
       .then((data) => setArticles(data.articles || []))
-      .catch(() => {})
+      .catch(() => setArticles([]))
       .finally(() => setLoading(false))
   }, [category, limit])
 

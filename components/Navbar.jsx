@@ -261,113 +261,102 @@ export default function Navbar() {
         </nav>
       </header>
 
-      {/* ── Mobile Drawer Overlay ─────────────────────────────────────── */}
+      {/* ── Mobile Drawer ────────────────────────────────────────────── */}
       {mobileOpen && (
         <div className="fixed inset-0 z-150 lg:hidden">
           {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={closeMenu}
-          />
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={closeMenu} />
 
-          {/* Drawer */}
-          <div className="absolute inset-y-0 right-0 flex w-full max-w-sm flex-col bg-white shadow-2xl">
+          {/* Drawer panel */}
+          <div className="absolute inset-y-0 right-0 flex w-full max-w-85 flex-col bg-white shadow-2xl">
 
-            {/* Drawer Header */}
-            <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-              <Link href="/" onClick={closeMenu}>
-                <Image
-                  src="/images/logo.png"
-                  alt="EV News India"
-                  height={36}
-                  width={115}
-                  className="object-contain"
-                />
-              </Link>
-              <button
-                onClick={closeMenu}
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-gray-100 text-gray-500 hover:bg-gray-200 transition"
-              >
-                <X size={20} />
-              </button>
+            {/* ── Green gradient header ────────────────────────────── */}
+            <div className="bg-linear-to-br from-green-900 via-green-800 to-green-700 px-5 py-5 shrink-0">
+              <div className="flex items-center justify-between mb-3">
+                <Link href="/" onClick={closeMenu} className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/20">
+                    <Zap size={16} className="text-white" />
+                  </div>
+                  <span className="text-base font-black text-white">EV News India</span>
+                </Link>
+                <button onClick={closeMenu}
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 active:scale-95 transition">
+                  <X size={17} />
+                </button>
+              </div>
+              <p className="text-[11px] text-green-200 flex items-center gap-1.5">
+                <span className="inline-block h-1.5 w-1.5 rounded-full bg-red-400 animate-pulse" />
+                India's #1 Electric Vehicle Platform
+              </p>
             </div>
 
-            {/* Scrollable Body */}
+            {/* ── Scrollable body ──────────────────────────────────── */}
             <div className="flex-1 overflow-y-auto">
 
-              {/* Inline Search */}
-              <div className="border-b border-gray-100 py-3">
-                <MobileSearch onClose={closeMenu} />
+              {/* Search */}
+              <div className="border-b border-gray-100 py-2">
+                {mobileSearch
+                  ? <MobileSearch onClose={closeMenu} />
+                  : (
+                    <button
+                      onClick={() => setMobileSearch(true)}
+                      className="mx-4 my-2 flex w-[calc(100%-2rem)] items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-400 hover:border-green-400 hover:bg-white transition"
+                    >
+                      <Search size={15} className="shrink-0" />
+                      Search EV cars, bikes, brands…
+                    </button>
+                  )
+                }
               </div>
 
-              {/* Quick Category Pills */}
-              <div className="border-b border-gray-100 px-5 py-4">
-                <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-gray-400">
-                  Browse by Category
-                </p>
+              {/* Quick access — 4 icon tiles */}
+              <div className="px-4 py-4 border-b border-gray-100">
+                <p className="mb-3 text-[10px] font-black uppercase tracking-widest text-gray-400">Quick Access</p>
                 <div className="grid grid-cols-4 gap-2">
                   {MOBILE_QUICK.map(({ label, href, icon: Icon, color }) => (
-                    <Link
-                      key={label}
-                      href={href}
-                      onClick={closeMenu}
-                      className={`flex flex-col items-center gap-1.5 rounded-2xl ${color} py-3 text-center transition hover:opacity-80`}
-                    >
+                    <Link key={label} href={href} onClick={closeMenu}
+                      className={`flex flex-col items-center gap-2 rounded-2xl ${color} py-3.5 transition active:scale-95 hover:opacity-90`}>
                       <Icon size={20} />
-                      <span className="text-[11px] font-bold">{label}</span>
+                      <span className="text-[11px] font-bold leading-none">{label}</span>
                     </Link>
                   ))}
                 </div>
               </div>
 
-              {/* Navigation Links */}
+              {/* Navigation links */}
               <div className="px-4 py-3">
-                <p className="mb-2 px-2 text-[11px] font-bold uppercase tracking-widest text-gray-400">
-                  Navigation
-                </p>
+                <p className="mb-2 px-1 text-[10px] font-black uppercase tracking-widest text-gray-400">Navigation</p>
                 <nav className="space-y-0.5">
-                  {MOBILE_NAV.map(({ title, href, icon: Icon }) => (
-                    <Link
-                      key={href}
-                      href={href}
-                      onClick={closeMenu}
-                      className={`group flex items-center gap-3.5 rounded-2xl px-4 py-3.5 text-sm font-semibold transition
-                        ${href === '/compare'
-                          ? 'bg-green-50 text-green-700 hover:bg-green-100'
-                          : 'text-gray-700 hover:bg-gray-50 hover:text-green-600'
-                        }`}
-                    >
-                      <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl
-                        ${href === '/compare'
-                          ? 'bg-green-100 text-green-600'
-                          : 'bg-gray-100 text-gray-500 group-hover:bg-green-50 group-hover:text-green-500'
-                        } transition`}
-                      >
-                        <Icon size={16} />
-                      </span>
-                      {title}
-                      <ChevronRight size={15} className="ml-auto text-gray-300 group-hover:text-green-400 transition" />
-                    </Link>
-                  ))}
+                  {MOBILE_NAV.map(({ title, href, icon: Icon }) => {
+                    const isCompare = href === '/compare'
+                    return (
+                      <Link key={href} href={href} onClick={closeMenu}
+                        className={`group flex items-center gap-3 rounded-xl px-3 py-3 text-[13.5px] font-semibold transition active:scale-[0.98] ${
+                          isCompare ? 'bg-green-50 text-green-700 hover:bg-green-100' : 'text-gray-700 hover:bg-gray-50 hover:text-green-600'
+                        }`}>
+                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition ${
+                          isCompare ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500 group-hover:bg-green-50 group-hover:text-green-500'
+                        }`}>
+                          <Icon size={15} />
+                        </span>
+                        <span className="flex-1">{title}</span>
+                        <ChevronRight size={13} className="text-gray-300 group-hover:text-green-400 transition" />
+                      </Link>
+                    )
+                  })}
                 </nav>
               </div>
             </div>
 
-            {/* Drawer Footer CTAs */}
-            <div className="border-t border-gray-100 px-5 py-4 space-y-2.5 bg-gray-50">
-              <Link
-                href="/compare"
-                onClick={closeMenu}
-                className="flex items-center justify-center gap-2 w-full rounded-2xl border-2 border-green-600 py-3 text-sm font-bold text-green-700 transition hover:bg-green-50"
-              >
-                <BarChart2 size={17} /> Compare Vehicles
+            {/* ── Footer CTAs ──────────────────────────────────────── */}
+            <div className="shrink-0 border-t border-gray-100 bg-gray-50/80 px-4 py-4 space-y-2">
+              <Link href="/compare" onClick={closeMenu}
+                className="flex items-center justify-center gap-2 w-full rounded-2xl border-2 border-green-600 py-3 text-sm font-bold text-green-700 hover:bg-green-50 active:scale-[0.98] transition">
+                <BarChart2 size={16} /> Compare EVs
               </Link>
-              <Link
-                href="/news"
-                onClick={closeMenu}
-                className="flex items-center justify-center gap-2 w-full rounded-2xl bg-green-600 py-3.5 text-sm font-bold text-white shadow-md transition hover:bg-green-700"
-              >
-                <Newspaper size={17} /> Latest EV News <ArrowRight size={15} />
+              <Link href="/news" onClick={closeMenu}
+                className="flex items-center justify-center gap-2 w-full rounded-2xl bg-green-600 py-3.5 text-sm font-black text-white shadow-md hover:bg-green-700 active:scale-[0.98] transition">
+                <Newspaper size={16} /> Latest EV News <ArrowRight size={14} />
               </Link>
             </div>
           </div>

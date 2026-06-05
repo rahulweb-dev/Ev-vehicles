@@ -13,14 +13,20 @@ export async function GET(request) {
 
     const filter = {};
     const category = searchParams.get("category");
-    const status = searchParams.get("status") || "published";
+    const status   = searchParams.get("status") || "published";
     const featured = searchParams.get("featured");
-    const limit = parseInt(searchParams.get("limit") || "20");
-    const page = parseInt(searchParams.get("page") || "1");
+    const search   = searchParams.get("search");
+    const limit    = parseInt(searchParams.get("limit") || "20");
+    const page     = parseInt(searchParams.get("page")  || "1");
 
     if (category) filter.category = category;
     filter.status = status;
     if (featured === "true") filter.featured = true;
+    if (search) filter.$or = [
+      { title:   { $regex: search, $options: "i" } },
+      { excerpt: { $regex: search, $options: "i" } },
+      { tags:    { $elemMatch: { $regex: search, $options: "i" } } },
+    ];
 
     const skip = (page - 1) * limit;
     const [articles, total] = await Promise.all([

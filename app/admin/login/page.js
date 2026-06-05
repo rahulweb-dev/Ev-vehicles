@@ -109,10 +109,7 @@ function LoginForm() {
             </button>
           </form>
 
-          <div className="mt-6 rounded-xl bg-gray-800 px-4 py-3 text-xs text-gray-400">
-            <p className="font-semibold text-gray-300 mb-1">First time? Run setup:</p>
-            <code className="text-green-400">POST /api/setup</code> with your name, email &amp; password
-          </div>
+         
         </div>
       </div>
     </div>
