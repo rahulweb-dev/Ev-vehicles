@@ -2,20 +2,13 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   Menu, X, ChevronDown, Search, Car, Bike,
   BarChart2, Newspaper, Home, BookOpen, Mail,
   Info, ArrowRight, Zap, ChevronRight,
 } from 'lucide-react'
 import SearchModal from './SearchModal'
-import { electricCars } from '@/data/vehiclesData'
-import { electricBikes } from '@/data/vehiclesData'
-
-const ALL_VEHICLES = [
-  ...electricCars.map((v) => ({ ...v, vehicleType: 'cars' })),
-  ...electricBikes.map((v) => ({ ...v, vehicleType: 'bikes' })),
-]
 
 const DESKTOP_NAV = [
   { title: 'Home', link: '/' },
@@ -23,25 +16,25 @@ const DESKTOP_NAV = [
     title: 'News',
     link: '/news',
     dropdown: [
-      { name: 'All EV News', href: '/news' },
-      { name: 'Electric Cars News', href: '/cars' },
-      { name: 'Electric Bikes & Scooters', href: '/bikes' },
-      { name: 'Commercial EVs', href: '/commercial' },
-      { name: 'EV Charging', href: '/electric-vehicles' },
+      { name: 'All EV News',             href: '/news'                      },
+      { name: 'Electric Cars News',      href: '/news?category=cars'        },
+      { name: 'Electric Bikes News',     href: '/news?category=bikes'       },
+      { name: 'Commercial EVs News',     href: '/news?category=commercial'  },
+      { name: 'EV Charging News',        href: '/news?category=charging'    },
     ],
   },
   {
     title: 'Vehicles',
     link: '/cars',
     dropdown: [
-      { name: 'Popular Electric Cars', href: '/cars', icon: Car },
-      { name: 'Popular Electric Bikes', href: '/bikes', icon: Bike },
-      { name: 'Commercial EVs', href: '/commercial', icon: Zap },
+      { name: 'Popular Electric Cars',  href: '/cars',       icon: Car  },
+      { name: 'Popular Electric Bikes', href: '/bikes',      icon: Bike },
+      { name: 'Commercial EVs',         href: '/commercial', icon: Zap  },
     ],
   },
   { title: 'Compare', link: '/compare' },
-  { title: 'Blogs', link: '/blogs' },
-  { title: 'About', link: '/about' },
+  { title: 'Blogs',   link: '/blogs'   },
+  { title: 'About',   link: '/about'   },
   { title: 'Contact', link: '/contact' },
 ]
 
@@ -63,73 +56,88 @@ const MOBILE_NAV = [
   { title: 'Contact', href: '/contact', icon: Mail },
 ]
 
-/* ─── Mobile Inline Search ─────────────────────────────────────────── */
+/* ─── Mobile Inline Search — queries live API ───────────────────── */
 function MobileSearch({ onClose }) {
-  const [query, setQuery] = useState('')
+  const [query,   setQuery]   = useState('')
+  const [results, setResults] = useState([])
+  const [busy,    setBusy]    = useState(false)
   const inputRef = useRef(null)
+  const timerRef = useRef(null)
 
   useEffect(() => { inputRef.current?.focus() }, [])
 
-  const results = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    if (!q) return []
-    return ALL_VEHICLES
-      .filter((v) => v.name.toLowerCase().includes(q) || v.brand.toLowerCase().includes(q))
-      .slice(0, 6)
-  }, [query])
+  function handleChange(e) {
+    const val = e.target.value
+    setQuery(val)
+    clearTimeout(timerRef.current)
+    if (!val.trim()) { setResults([]); return }
+    timerRef.current = setTimeout(async () => {
+      setBusy(true)
+      try {
+        const enc = encodeURIComponent(val)
+        const [vRes, aRes] = await Promise.all([
+          fetch(`/api/vehicles?search=${enc}&status=published&limit=5`).then(r => r.json()),
+          fetch(`/api/articles?search=${enc}&status=published&limit=3`).then(r => r.json()),
+        ])
+        const vehicles = (vRes.vehicles || []).map(v => ({
+          kind: 'vehicle', id: v._id, slug: v.slug,
+          vehicleType: v.vehicleType === 'car' ? 'cars' : 'bikes',
+          name: v.name, brand: v.brand, image: v.featuredImage || '',
+          price: v.variants?.[0]?.exShowroomPrice || 'Price TBA',
+        }))
+        const articles = (aRes.articles || []).map(a => ({
+          kind: 'article', id: a._id, slug: a.slug,
+          name: a.title, brand: a.category, image: a.image || '',
+          vehicleType: 'news',
+        }))
+        setResults([...vehicles, ...articles].slice(0, 7))
+      } catch { setResults([]) }
+      setBusy(false)
+    }, 320)
+  }
 
   return (
     <div className="px-4 pb-3 pt-1">
-      {/* Input */}
       <div className="flex items-center gap-2 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 focus-within:border-green-400 focus-within:bg-white transition">
         <Search size={18} className="text-gray-400 shrink-0" />
-        <input
-          ref={inputRef}
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search EV cars, bikes, brands…"
-          className="flex-1 bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-400"
-        />
-        {query && (
-          <button onClick={() => setQuery('')} className="shrink-0 text-gray-400">
-            <X size={15} />
-          </button>
-        )}
+        <input ref={inputRef} type="text" value={query} onChange={handleChange}
+          placeholder="Search EV cars, bikes, news…"
+          className="flex-1 bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-400" />
+        {query && <button onClick={() => { setQuery(''); setResults([]) }} className="shrink-0 text-gray-400"><X size={15} /></button>}
       </div>
 
-      {/* Results */}
-      {results.length > 0 && (
+      {busy && <p className="mt-2 text-center text-xs text-gray-400">Searching…</p>}
+
+      {!busy && results.length > 0 && (
         <div className="mt-2 rounded-2xl border border-gray-100 bg-white shadow-lg overflow-hidden">
           {results.map((v) => (
-            <Link
-              key={`${v.vehicleType}-${v.id}`}
-              href={`/${v.vehicleType}/${v.slug}`}
+            <Link key={`${v.kind}-${v.id}`}
+              href={v.kind === 'article' ? `/news/${v.slug}` : `/${v.vehicleType}/${v.slug}`}
               onClick={onClose}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-50 last:border-0 transition"
-            >
+              className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-50 last:border-0 transition">
               <div className="relative h-11 w-16 shrink-0 overflow-hidden rounded-xl bg-gray-100">
-                <Image src={v.image} alt={v.name} fill className="object-cover" sizes="64px" />
+                {v.image
+                  ? <Image src={v.image} alt={v.name} fill className="object-cover" sizes="64px" />
+                  : <div className="flex h-full items-center justify-center text-xl text-gray-300">⚡</div>}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-green-600">{v.brand}</p>
+                <p className="text-xs font-semibold text-green-600 capitalize">{v.brand}</p>
                 <p className="text-sm font-bold text-gray-800 truncate">{v.name}</p>
-                <p className="text-xs text-gray-400">{v.priceDisplay}</p>
+                {v.price && <p className="text-xs text-gray-400">{v.price}</p>}
               </div>
               <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                v.vehicleType === 'cars' ? 'bg-blue-50 text-blue-600' : 'bg-orange-50 text-orange-600'
+                v.kind === 'article' ? 'bg-yellow-50 text-yellow-700'
+                : v.vehicleType === 'cars' ? 'bg-blue-50 text-blue-600' : 'bg-orange-50 text-orange-600'
               }`}>
-                {v.vehicleType === 'cars' ? 'Car' : 'Bike'}
+                {v.kind === 'article' ? 'News' : v.vehicleType === 'cars' ? 'Car' : 'Bike'}
               </span>
             </Link>
           ))}
         </div>
       )}
 
-      {query && results.length === 0 && (
-        <p className="mt-3 text-center text-sm text-gray-400">
-          No results for &quot;{query}&quot;
-        </p>
+      {!busy && query && results.length === 0 && (
+        <p className="mt-3 text-center text-sm text-gray-400">No results for &quot;{query}&quot;</p>
       )}
     </div>
   )
@@ -137,10 +145,22 @@ function MobileSearch({ onClose }) {
 
 /* ─── Main Navbar ──────────────────────────────────────────────────── */
 export default function Navbar() {
-  const [mobileOpen, setMobileOpen] = useState(false)
+  const [mobileOpen,   setMobileOpen]   = useState(false)
   const [mobileSearch, setMobileSearch] = useState(false)
+  const [trending,     setTrending]     = useState([])
 
   const closeMenu = () => { setMobileOpen(false); setMobileSearch(false) }
+
+  // Fetch 3 latest published articles for trending bar
+  useEffect(() => {
+    fetch('/api/articles?status=published&limit=3')
+      .then(r => r.json())
+      .then(data => {
+        const arts = data.articles || []
+        if (arts.length > 0) setTrending(arts.map(a => ({ title: a.title, slug: a.slug })))
+      })
+      .catch(() => {})
+  }, [])
 
   // Lock scroll when mobile menu is open
   useEffect(() => {
@@ -157,13 +177,21 @@ export default function Navbar() {
             <p className="flex items-center gap-2 text-gray-300">
               <span className="text-yellow-400">⚡</span>
               <span className="hidden sm:inline">Trending: </span>
-              <span className="hidden sm:inline">
-                <Link href="/news/tata-harrier-ev-launched-india-price-range-features-2026" className="hover:text-green-400 transition">Tata Harrier EV</Link>
-                {' • '}
-                <Link href="/news/mahindra-be6-electric-suv-review-range-performance-2026" className="hover:text-green-400 transition">Mahindra BE 6</Link>
-                {' • '}
-                <Link href="/news/tesla-model-3-highland-india-launch-price-2026" className="hover:text-green-400 transition">Tesla Model 3</Link>
-              </span>
+              {trending.length > 0 ? (
+                <span className="hidden sm:inline">
+                  {trending.map((a, i) => (
+                    <span key={a.slug}>
+                      {i > 0 && ' • '}
+                      <Link href={`/news/${a.slug}`}
+                        className="hover:text-green-400 transition line-clamp-1 max-w-48 inline-block align-bottom truncate">
+                        {a.title.length > 30 ? a.title.slice(0, 30) + '…' : a.title}
+                      </Link>
+                    </span>
+                  ))}
+                </span>
+              ) : (
+                <span className="hidden sm:inline text-gray-500">Latest EV News &amp; Launches</span>
+              )}
               <span className="sm:hidden text-gray-400">EV News India</span>
             </p>
             <span className="animate-pulse rounded-full bg-red-500 px-2.5 py-0.5 text-[10px] font-bold tracking-wide">
@@ -286,7 +314,7 @@ export default function Navbar() {
               </div>
               <p className="text-[11px] text-green-200 flex items-center gap-1.5">
                 <span className="inline-block h-1.5 w-1.5 rounded-full bg-red-400 animate-pulse" />
-                India's #1 Electric Vehicle Platform
+                India&apos;s #1 Electric Vehicle Platform
               </p>
             </div>
 

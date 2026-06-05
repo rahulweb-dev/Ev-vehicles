@@ -27,11 +27,11 @@ const YoutubeIcon = () => (
 
 const footerLinks = {
   "News Categories": [
-    { name: "Electric Cars", href: "/cars" },
-    { name: "Electric Bikes & Scooters", href: "/bikes" },
-    { name: "Commercial EVs", href: "/commercial" },
-    { name: "EV Charging", href: "/electric-vehicles" },
-    { name: "Latest News", href: "/news" },
+    { name: "Electric Cars News",       href: "/news?category=cars"       },
+    { name: "Electric Bikes News",      href: "/news?category=bikes"      },
+    { name: "Commercial EVs News",      href: "/news?category=commercial" },
+    { name: "EV Charging News",         href: "/news?category=charging"   },
+    { name: "All Latest News",          href: "/news"                     },
   ],
   "Resources": [
     { name: "EV Buying Guide", href: "/blogs/complete-guide-buying-electric-vehicle-india-2026" },
@@ -50,10 +50,10 @@ const footerLinks = {
 };
 
 const socialLinks = [
-  { icon: FacebookIcon, href: "https://facebook.com/EVNewsIndia", label: "Facebook" },
-  { icon: TwitterIcon, href: "https://twitter.com/EVNewsIndia", label: "Twitter" },
-  { icon: InstagramIcon, href: "https://instagram.com/evnewsindia", label: "Instagram" },
-  { icon: YoutubeIcon, href: "https://youtube.com/@EVNewsIndia", label: "YouTube" },
+  { icon: FacebookIcon,  href: "https://www.facebook.com/profile.php?id=61588864517346",   label: "Facebook"  },
+  { icon: TwitterIcon,   href: "https://twitter.com/evradar_in",         label: "Twitter"   },
+  { icon: InstagramIcon, href: "https://www.instagram.com/evradar.in",   label: "Instagram" },
+  { icon: YoutubeIcon,   href: "https://www.youtube.com/@evradar",        label: "YouTube"   },
 ];
 
 export default function Footer() {
@@ -67,7 +67,7 @@ export default function Footer() {
           <div className="flex flex-col items-center gap-4 text-center md:flex-row md:justify-between md:text-left">
             <div>
               <h3 className="text-xl font-bold text-white">Get Daily EV News In Your Inbox</h3>
-              <p className="mt-1 text-green-100 text-sm">Join 50,000+ EV enthusiasts who read us daily</p>
+              <p className="mt-1 text-green-100 text-sm">Be the first to know about EV launches, prices &amp; reviews in India</p>
             </div>
             <NewsletterForm />
           </div>

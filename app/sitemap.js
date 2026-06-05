@@ -1,85 +1,61 @@
-import { newsArticles } from "@/data/newsArticles";
-import { blogsData } from "@/data/blogsData";
-
 const SITE_URL = "https://www.evradar.in";
 
-export default function sitemap() {
-  const newsUrls = newsArticles.map((article) => ({
-    url: `${SITE_URL}/news/${article.slug}`,
-    lastModified: new Date(article.publishedAt),
-    changeFrequency: "weekly",
-    priority: 0.8,
-  }));
+const STATIC_PAGES = [
+  { url: SITE_URL,                        priority: 1.0, freq: "daily"   },
+  { url: `${SITE_URL}/news`,              priority: 0.95, freq: "hourly" },
+  { url: `${SITE_URL}/cars`,              priority: 0.9,  freq: "daily"  },
+  { url: `${SITE_URL}/bikes`,             priority: 0.9,  freq: "daily"  },
+  { url: `${SITE_URL}/compare`,           priority: 0.85, freq: "weekly" },
+  { url: `${SITE_URL}/commercial`,        priority: 0.75, freq: "daily"  },
+  { url: `${SITE_URL}/electric-vehicles`, priority: 0.75, freq: "daily"  },
+  { url: `${SITE_URL}/blogs`,             priority: 0.8,  freq: "weekly" },
+  { url: `${SITE_URL}/about`,             priority: 0.5,  freq: "monthly"},
+  { url: `${SITE_URL}/contact`,           priority: 0.5,  freq: "monthly"},
+  { url: `${SITE_URL}/privacy-policy`,    priority: 0.3,  freq: "yearly" },
+  { url: `${SITE_URL}/terms`,             priority: 0.3,  freq: "yearly" },
+];
 
-  const blogUrls = blogsData.map((blog) => ({
-    url: `${SITE_URL}/blogs/${blog.slug}`,
-    lastModified: new Date(blog.publishedAt),
-    changeFrequency: "monthly",
-    priority: 0.7,
-  }));
+async function getDbEntries() {
+  try {
+    const dbConnect = (await import("@/lib/mongodb")).default;
+    const Article   = (await import("@/lib/models/Article")).default;
+    const Vehicle   = (await import("@/lib/models/Vehicle")).default;
+    await dbConnect();
 
-  return [
-    {
-      url: SITE_URL,
-      lastModified: new Date(),
-      changeFrequency: "daily",
-      priority: 1,
-    },
-    {
-      url: `${SITE_URL}/news`,
-      lastModified: new Date(),
-      changeFrequency: "hourly",
-      priority: 0.95,
-    },
-    {
-      url: `${SITE_URL}/cars`,
-      lastModified: new Date(),
-      changeFrequency: "daily",
-      priority: 0.85,
-    },
-    {
-      url: `${SITE_URL}/bikes`,
-      lastModified: new Date(),
-      changeFrequency: "daily",
-      priority: 0.85,
-    },
-    {
-      url: `${SITE_URL}/commercial`,
-      lastModified: new Date(),
-      changeFrequency: "daily",
-      priority: 0.75,
-    },
-    {
-      url: `${SITE_URL}/electric-vehicles`,
-      lastModified: new Date(),
-      changeFrequency: "daily",
-      priority: 0.75,
-    },
-    {
-      url: `${SITE_URL}/blogs`,
-      lastModified: new Date(),
+    const [articles, vehicles] = await Promise.all([
+      Article.find({ status: "published" }).select("slug publishedAt updatedAt").lean(),
+      Vehicle.find({ status: "published" }).select("slug vehicleType updatedAt").lean(),
+    ]);
+
+    const articleUrls = articles.map(a => ({
+      url:             `${SITE_URL}/news/${a.slug}`,
+      lastModified:    a.publishedAt || a.updatedAt || new Date(),
       changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: `${SITE_URL}/about`,
-      lastModified: new Date(),
+      priority:        0.8,
+    }));
+
+    const vehicleUrls = vehicles.map(v => ({
+      url:             `${SITE_URL}/${v.vehicleType === "car" ? "cars" : "bikes"}/${v.slug}`,
+      lastModified:    v.updatedAt || new Date(),
       changeFrequency: "monthly",
-      priority: 0.5,
-    },
-    {
-      url: `${SITE_URL}/contact`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.5,
-    },
-    {
-      url: `${SITE_URL}/privacy-policy`,
-      lastModified: new Date(),
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
-    ...newsUrls,
-    ...blogUrls,
-  ];
+      priority:        0.75,
+    }));
+
+    return [...articleUrls, ...vehicleUrls];
+  } catch {
+    return [];
+  }
+}
+
+export default async function sitemap() {
+  const dbEntries = await getDbEntries();
+
+  const staticEntries = STATIC_PAGES.map(p => ({
+    url:             p.url,
+    lastModified:    new Date(),
+    changeFrequency: p.freq,
+    priority:        p.priority,
+  }));
+
+  return [...staticEntries, ...dbEntries];
 }
