@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -278,12 +278,13 @@ function PickerModal({ type, available, loading, onSelect, onClose }) {
 }
 
 /* ─── Main component ─────────────────────────────────────────────── */
-export default function CompareClient() {
+export default function CompareClient({ initialV0 = null, initialV1 = null }) {
   const [type,        setType]        = useState("cars");
   const [selected,    setSelected]    = useState([]);
   const [pickerOpen,  setPickerOpen]  = useState(false);
   const [allVehicles, setAllVehicles] = useState({ cars: [], bikes: [] });
   const [loading,     setLoading]     = useState({ cars: true, bikes: true });
+  const preApplied                    = useRef(false);
 
   /* Fetch cars + bikes in parallel on mount */
   useEffect(() => {
@@ -300,6 +301,27 @@ export default function CompareClient() {
     fetchType("car");
     fetchType("bike");
   }, []);
+
+  /* Pre-populate selected vehicles from URL params (v0, v1) once both lists load */
+  useEffect(() => {
+    if (preApplied.current) return;
+    if (loading.cars || loading.bikes) return;
+
+    const slugs = [initialV0, initialV1].filter(Boolean);
+    if (slugs.length === 0) { preApplied.current = true; return; }
+
+    const all = [...allVehicles.cars, ...allVehicles.bikes];
+    const toSelect = slugs.map((slug) => all.find((v) => v.slug === slug)).filter(Boolean);
+
+    if (toSelect.length > 0) {
+      setSelected(toSelect);
+      /* switch to "bikes" tab if the first vehicle is a bike */
+      const firstInCars = allVehicles.cars.some((v) => v.slug === slugs[0]);
+      setType(firstInCars ? "cars" : "bikes");
+    }
+
+    preApplied.current = true;
+  }, [loading.cars, loading.bikes, allVehicles, initialV0, initialV1]);
 
   const specs     = type === "cars" ? CAR_SPECS : BIKE_SPECS;
   const isLoading = type === "cars" ? loading.cars : loading.bikes;

@@ -1,5 +1,6 @@
 import EVHomepage from "@/components/home/HeroSection";
 import LatestNewsSection from "@/components/home/LatestNewsSection";
+import HomeCompareWidget from "@/components/home/HomeCompareWidget";
 import VehicleSlider from "@/components/home/VehicleSlider";
 import { AdBannerHorizontal } from "@/components/ads/AdBanner";
 import { SITE_URL } from "./layout";
@@ -86,6 +87,8 @@ export default async function Home() {
       </div>
 
       <LatestNewsSection />
+
+      <HomeCompareWidget />
 
       {featuredCars.length > 0 && (
         <VehicleSlider

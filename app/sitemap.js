@@ -6,6 +6,7 @@ const STATIC_PAGES = [
   { url: `${SITE_URL}/cars`,              priority: 0.9,  freq: "daily"  },
   { url: `${SITE_URL}/bikes`,             priority: 0.9,  freq: "daily"  },
   { url: `${SITE_URL}/compare`,           priority: 0.85, freq: "weekly" },
+  { url: `${SITE_URL}/faq`,              priority: 0.7,  freq: "monthly"},
   { url: `${SITE_URL}/commercial`,        priority: 0.75, freq: "daily"  },
   { url: `${SITE_URL}/electric-vehicles`, priority: 0.75, freq: "daily"  },
   { url: `${SITE_URL}/blogs`,             priority: 0.8,  freq: "weekly" },
@@ -41,7 +42,20 @@ async function getDbEntries() {
       priority:        0.75,
     }));
 
-    return [...articleUrls, ...vehicleUrls];
+    /* generate all pairwise comparison URLs */
+    const comparePairs = [];
+    for (let i = 0; i < vehicles.length; i++) {
+      for (let j = i + 1; j < vehicles.length; j++) {
+        comparePairs.push({
+          url:             `${SITE_URL}/compare/${vehicles[i].slug}-vs-${vehicles[j].slug}`,
+          lastModified:    new Date(),
+          changeFrequency: "monthly",
+          priority:        0.65,
+        });
+      }
+    }
+
+    return [...articleUrls, ...vehicleUrls, ...comparePairs];
   } catch {
     return [];
   }

@@ -388,7 +388,7 @@ export default function VehicleDetailPage({ vehicle, relatedVehicles = [], vehic
                   <div className="space-y-6">
 
                     {/* Key feature checkboxes */}
-                    {vehicle.keyFeatures && Object.values(vehicle.keyFeatures).some(Boolean !== undefined) && (
+                    {vehicle.keyFeatures && Object.values(vehicle.keyFeatures).some(Boolean) && (
                       <div>
                         <h3 className="mb-3 text-sm font-black text-gray-800 uppercase tracking-wide">Key Features</h3>
                         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -513,10 +513,21 @@ export default function VehicleDetailPage({ vehicle, relatedVehicles = [], vehic
               </div>
             </SectionCard>
 
+            {/* Full description */}
+            {vehicle.description && (
+              <SectionCard className="p-5 sm:p-6">
+                <h2 className="mb-4 text-lg font-black text-gray-900">About {vehicle.name}</h2>
+                <div
+                  className="prose prose-sm max-w-none text-gray-700 leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: vehicle.description }}
+                />
+              </SectionCard>
+            )}
+
             {/* Pros & Cons */}
             {(vehicle.pros?.length > 0 || vehicle.cons?.length > 0) && (
               <SectionCard className="p-5 sm:p-6">
-                <h2 className="mb-4 text-lg font-black text-gray-900">Pros & Cons</h2>
+                <h2 className="mb-4 text-lg font-black text-gray-900">Pros &amp; Cons</h2>
                 <div className="grid gap-4 sm:grid-cols-2">
                   {vehicle.pros?.length > 0 && (
                     <div>
@@ -549,17 +560,6 @@ export default function VehicleDetailPage({ vehicle, relatedVehicles = [], vehic
                     </div>
                   )}
                 </div>
-              </SectionCard>
-            )}
-
-            {/* Full description */}
-            {vehicle.description && (
-              <SectionCard className="p-5 sm:p-6">
-                <h2 className="mb-4 text-lg font-black text-gray-900">About {vehicle.name}</h2>
-                <div
-                  className="prose prose-sm max-w-none text-gray-700 leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: vehicle.description }}
-                />
               </SectionCard>
             )}
 

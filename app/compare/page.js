@@ -8,6 +8,7 @@ export const metadata = {
   alternates: { canonical: `${SITE_URL}/compare` },
 };
 
-export default function ComparePage() {
-  return <CompareClient />;
+export default async function ComparePage({ searchParams }) {
+  const sp = await searchParams;
+  return <CompareClient initialV0={sp?.v0 || null} initialV1={sp?.v1 || null} />;
 }
