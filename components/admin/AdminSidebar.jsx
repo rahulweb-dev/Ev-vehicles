@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import {
   LayoutDashboard, Newspaper, LogOut,
   Menu, X, ExternalLink, Settings,
-  Users, Building2, MapPin, ShieldCheck, Car, LayoutTemplate,
+  Users, Building2, MapPin, ShieldCheck, Car, LayoutTemplate, MessageSquare,
 } from "lucide-react";
 
 const ADMIN_NAV = [
@@ -15,8 +15,9 @@ const ADMIN_NAV = [
   { href: "/admin/articles",  label: "Articles",  icon: Newspaper },
   { href: "/admin/vehicles",  label: "Vehicles",  icon: Car },
   { href: "/admin/banners",   label: "Banners",   icon: LayoutTemplate },
-  { href: "/admin/leads",     label: "Leads",     icon: Users },
-  { href: "/admin/dealers",   label: "Dealers",   icon: Building2 },
+  { href: "/admin/leads",          label: "Leads",         icon: Users },
+  { href: "/admin/chatbot-leads",  label: "Chatbot Leads", icon: MessageSquare },
+  { href: "/admin/dealers",        label: "Dealers",       icon: Building2 },
   { href: "/admin/settings",  label: "Settings",  icon: Settings },
 ];
 

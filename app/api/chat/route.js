@@ -1,0 +1,220 @@
+import OpenAI from "openai";
+
+export const runtime = "nodejs";
+
+/* ─── Build system prompt with DB context ──────────────────────── */
+function buildSystemPrompt(context) {
+  return `You are EVRadar AI, India's premier electric vehicle assistant on EVRadar.in — India's #1 EV news platform.
+
+You help users with:
+• EV recommendations (cars, bikes, scooters) based on budget and needs
+• EV comparisons and spec analysis
+• Charging infrastructure, costs, and time
+• Battery technology, BMS, range, degradation
+• Government subsidies (FAME II, state EV policies, road tax exemptions)
+• Upcoming EV launches in India
+• Latest EV news and reviews
+
+Guidelines:
+- Be friendly, concise, and expert. Max 180 words per response.
+- Always use Indian context: ₹ currency, lakh notation (e.g. ₹12.5 lakh), Indian cities.
+- When recommending vehicles, mention price, certified range, and 1-2 standout features.
+- When users mention budget, always respond with 2-3 specific EV options.
+- Reference EVRadar pages using markdown links: [Vehicle Name](/cars/slug) or [Article Title](/news/slug)
+- Format lists with • bullets. Use **bold** for vehicle names and prices.
+- For charging cost: assume ₹8/unit average, then calculate based on battery size.
+- If asked about news, summarize the EVRadar articles below.
+- When you detect purchase intent, acknowledge it warmly and say an EV expert can help with a test drive.
+- End responses with a brief follow-up question to keep conversation going.
+- Never make up prices or specs — only use what's in the EVRadar database below.
+
+EVRadar Database (prioritize this over general knowledge):
+${context || "No specific EVRadar content matched this query — use general EV knowledge."}
+
+Today: ${new Date().toLocaleDateString("en-IN", { dateStyle: "long" })}`;
+}
+
+/* ─── Fetch relevant content from MongoDB ───────────────────────── */
+async function getDbContext(query) {
+  try {
+    const dbConnect = (await import("@/lib/mongodb")).default;
+    const Article   = (await import("@/lib/models/Article")).default;
+    const Vehicle   = (await import("@/lib/models/Vehicle")).default;
+    await dbConnect();
+
+    /* keyword extraction — words > 3 chars */
+    const stopWords = new Set(["what","which","best","good","tell","about","give","some","with","that","this","have","from","they","will","would","could"]);
+    const words = query
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(w => w.length > 3 && !stopWords.has(w));
+
+    const regexSource = words.length > 0
+      ? words.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")
+      : ".";
+    const regex = new RegExp(regexSource, "i");
+
+    const [articles, vehicles] = await Promise.all([
+      Article.find({
+        status: "published",
+        $or: [{ title: regex }, { excerpt: regex }, { tags: regex }],
+      })
+        .select("title excerpt slug publishedAt")
+        .sort({ publishedAt: -1 })
+        .limit(4)
+        .lean(),
+
+      Vehicle.find({
+        status: "published",
+        $or: [{ name: regex }, { brand: regex }, { shortDescription: regex }],
+      })
+        .select("name brand slug vehicleType variants performance charging")
+        .limit(4)
+        .lean(),
+    ]);
+
+    let ctx = "";
+
+    if (articles.length > 0) {
+      ctx += "### Recent EVRadar Articles\n";
+      for (const a of articles) {
+        ctx += `- **${a.title}**: ${a.excerpt || ""} → /news/${a.slug}\n`;
+      }
+      ctx += "\n";
+    }
+
+    if (vehicles.length > 0) {
+      ctx += "### EVRadar Vehicle Database\n";
+      for (const v of vehicles) {
+        const price     = v.variants?.[0]?.exShowroomPrice || "TBA";
+        const priceMax  = v.variants?.[v.variants.length - 1]?.exShowroomPrice;
+        const priceStr  = priceMax && priceMax !== price ? `${price} – ${priceMax}` : price;
+        const range     = v.performance?.drivingRange || v.variants?.[0]?.range || "—";
+        const power     = v.performance?.power || "—";
+        const fastChg   = v.charging?.fastCharging ? "Fast charging: Yes" : "";
+        const type      = v.vehicleType === "car" ? "cars" : "bikes";
+        ctx += `- **${v.brand} ${v.name}** (${v.vehicleType}): ${priceStr} ex-showroom | Range: ${range} | Power: ${power} ${fastChg} → /${type}/${v.slug}\n`;
+      }
+    }
+
+    /* always fetch latest 3 articles for news queries */
+    if (/news|latest|today|recent|update/i.test(query)) {
+      const latest = await Article.find({ status: "published" })
+        .select("title excerpt slug publishedAt")
+        .sort({ publishedAt: -1 })
+        .limit(3)
+        .lean();
+      if (latest.length > 0 && !ctx.includes("Recent EVRadar Articles")) {
+        ctx += "\n### Latest EVRadar News\n";
+        for (const a of latest) {
+          ctx += `- **${a.title}** → /news/${a.slug}\n`;
+        }
+      }
+    }
+
+    return ctx || "";
+  } catch (err) {
+    console.error("[chat] DB context error:", err.message);
+    return "";
+  }
+}
+
+/* ─── POST /api/chat ────────────────────────────────────────────── */
+export async function POST(req) {
+  if (!process.env.OPENAI_API_KEY) {
+    return Response.json(
+      { error: "OpenAI API key not configured. Add OPENAI_API_KEY to .env.local" },
+      { status: 500 }
+    );
+  }
+
+  let body;
+  try {
+    body = await req.json();
+  } catch {
+    return Response.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+
+  const { message, history = [], sessionId } = body;
+  if (!message?.trim()) {
+    return Response.json({ error: "Message is required" }, { status: 400 });
+  }
+
+  /* fetch DB context in parallel with OpenAI call setup */
+  const context = await getDbContext(message);
+
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+  const MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
+
+  /* build messages array — last 10 turns to keep context window small */
+  const chatMessages = [
+    { role: "system", content: buildSystemPrompt(context) },
+    ...history
+      .filter(m => m.role === "user" || m.role === "assistant")
+      .slice(-10),
+    { role: "user", content: message.trim() },
+  ];
+
+  try {
+    const stream = await openai.chat.completions.create({
+      model:       MODEL,
+      messages:    chatMessages,
+      stream:      true,
+      max_tokens:  400,
+      temperature: 0.7,
+    });
+
+    const encoder = new TextEncoder();
+    const readable = new ReadableStream({
+      async start(controller) {
+        try {
+          for await (const chunk of stream) {
+            const text = chunk.choices[0]?.delta?.content || "";
+            if (text) controller.enqueue(encoder.encode(text));
+          }
+        } finally {
+          controller.close();
+        }
+      },
+      cancel() {
+        stream.controller.abort();
+      },
+    });
+
+    /* optionally persist to ChatHistory (fire-and-forget) */
+    if (sessionId) {
+      persistHistory(sessionId, message, req).catch(() => {});
+    }
+
+    return new Response(readable, {
+      headers: {
+        "Content-Type":  "text/plain; charset=utf-8",
+        "Cache-Control": "no-cache, no-store",
+        "X-Accel-Buffering": "no",
+      },
+    });
+  } catch (err) {
+    console.error("[chat] OpenAI error:", err.message);
+    return Response.json(
+      { error: "AI service temporarily unavailable. Please try again." },
+      { status: 503 }
+    );
+  }
+}
+
+async function persistHistory(sessionId, message, req) {
+  try {
+    const dbConnect  = (await import("@/lib/mongodb")).default;
+    const ChatHistory = (await import("@/lib/models/ChatHistory")).default;
+    await dbConnect();
+    await ChatHistory.findOneAndUpdate(
+      { sessionId },
+      {
+        $push: { messages: { role: "user", content: message } },
+        $setOnInsert: { userAgent: req.headers.get("user-agent") || "" },
+      },
+      { upsert: true }
+    );
+  } catch {}
+}

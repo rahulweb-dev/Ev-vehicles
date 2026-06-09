@@ -6,6 +6,7 @@ import ConditionalShell from "@/components/ConditionalShell";
 import CookieConsent from "@/components/CookieConsent";
 import PushNotificationPrompt from "@/components/PushNotificationPrompt";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import ChatWidgetLoader from "@/components/chatbot/ChatWidgetLoader";
 const ADSENSE_PUBLISHER_ID = process.env.NEXT_PUBLIC_ADSENSE_ID || "ca-pub-XXXXXXXXXXXXXXXXX";
 
 export const SITE_URL = "https://www.evradar.in";
@@ -165,6 +166,7 @@ export default function RootLayout({ children }) {
         <ConditionalShell>{children}</ConditionalShell>
         <CookieConsent />
         <PushNotificationPrompt />
+        <ChatWidgetLoader />
         <GoogleAnalytics gaId="G-2QJL966SVB" />
       </body>
     </html>
