@@ -2,8 +2,36 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Minus, ChevronRight, Zap, ExternalLink, RotateCcw } from "lucide-react";
+import {
+  X, Minus, ChevronRight, Zap, ExternalLink,
+  RotateCcw, BatteryCharging, FileText,
+} from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
+
+/* ─── Price parser: converts "₹8.49 Lakh", "₹8,49,000", "849000" → lakh number ── */
+function parsePriceLakh(priceStr) {
+  if (!priceStr) return null;
+  const s = priceStr.toString().replace(/[₹,\s]/g, "").toLowerCase();
+  const lakhMatch = s.match(/^([\d.]+)\s*l/);        // "8.49lakh" / "8.49l"
+  if (lakhMatch) return parseFloat(lakhMatch[1]);
+  const numMatch = s.match(/^([\d.]+)$/);             // raw digits
+  if (numMatch) {
+    const n = parseFloat(numMatch[1]);
+    return n >= 100000 ? n / 100000 : n;              // assume rupees if >= 1 lakh
+  }
+  return null;
+}
+
+function filterByPrice(vehicles, priceRange) {
+  if (!priceRange) return vehicles;
+  const { min, max } = priceRange;
+  return vehicles.filter(v => {
+    const price = parsePriceLakh(v.variants?.[0]?.exShowroomPrice);
+    if (price === null) return false;
+    return price >= min && price <= max;
+  });
+}
 
 /* ─── Conversation Flow Tree ─────────────────────────────────────── */
 const FLOW = {
@@ -35,49 +63,49 @@ const FLOW = {
   },
 
   car_u10: {
-    bot: [
-      "🚗 **Best EVs under ₹10 lakh:**\n\n• **Tata Tiago EV** — from ₹8.49 lakh | Range: 315 km\n• **MG Comet EV** — from ₹6.99 lakh | Range: 230 km\n• **Citroen eC3** — from ₹9.7 lakh | Range: 316 km\n\nAll prices are approximate ex-showroom. Subsidy applicable.",
-    ],
+    bot: ["🚗 Here are the best Electric Cars under ₹10 lakh from EVRadar:"],
+    fetchVehicles: "car",
+    priceRange: { min: 0, max: 10 },
     link: { label: "Browse All Electric Cars →", href: "/cars" },
     options: [
       { label: "📞 Book Test Drive",  next: "lead" },
-      { label: "⚡ Compare These",    next: "compare_info" },
+      { label: "⚡ Compare EVs",      next: "compare_info" },
       { label: "⬅ Change Budget",    next: "buy_car" },
     ],
   },
 
   car_10_15: {
-    bot: [
-      "🚗 **Best EVs in ₹10–15 lakh range:**\n\n• **Tata Punch EV** — from ₹10.99 lakh | Range: 421 km\n• **MG Windsor EV** — from ₹13.5 lakh | Range: 331 km\n• **Tata Nexon EV** — from ₹14.49 lakh | Range: 465 km",
-    ],
+    bot: ["🚗 Here are the top Electric Cars in ₹10–15 lakh range:"],
+    fetchVehicles: "car",
+    priceRange: { min: 10, max: 15 },
     link: { label: "Browse All Electric Cars →", href: "/cars" },
     options: [
       { label: "📞 Book Test Drive",  next: "lead" },
-      { label: "⚡ Compare These",    next: "compare_info" },
+      { label: "⚡ Compare EVs",      next: "compare_info" },
       { label: "⬅ Change Budget",    next: "buy_car" },
     ],
   },
 
   car_15_25: {
-    bot: [
-      "🚗 **Top EVs in ₹15–25 lakh range:**\n\n• **Tata Harrier EV** — from ₹21.49 lakh | Range: 538 km\n• **Hyundai Creta EV** — from ₹17.99 lakh | Range: 473 km\n• **Mahindra BE6** — from ₹18.9 lakh | Range: 682 km\n• **Nexon EV (top trim)** — ₹19.99 lakh | Range: 465 km",
-    ],
+    bot: ["🚗 Top Electric Cars in ₹15–25 lakh from EVRadar:"],
+    fetchVehicles: "car",
+    priceRange: { min: 15, max: 25 },
     link: { label: "Browse All Electric Cars →", href: "/cars" },
     options: [
       { label: "📞 Book Test Drive",  next: "lead" },
-      { label: "⚡ Compare These",    next: "compare_info" },
+      { label: "⚡ Compare EVs",      next: "compare_info" },
       { label: "⬅ Change Budget",    next: "buy_car" },
     ],
   },
 
   car_above25: {
-    bot: [
-      "🚗 **Premium EVs above ₹25 lakh:**\n\n• **Tata Curvv EV** — from ₹17.49 lakh | Range: 502 km\n• **Hyundai IONIQ 5** — from ₹46.05 lakh | Range: 631 km\n• **Kia EV6** — from ₹60.95 lakh | Range: 708 km\n• **BMW iX1** — from ₹66.9 lakh | Range: 440 km\n• **Mercedes EQS** — from ₹1.55 crore | Range: 857 km",
-    ],
+    bot: ["🚗 Premium Electric Cars above ₹25 lakh — browse from EVRadar:"],
+    fetchVehicles: "car",
+    priceRange: { min: 25, max: Infinity },
     link: { label: "Browse All Electric Cars →", href: "/cars" },
     options: [
       { label: "📞 Book Test Drive",  next: "lead" },
-      { label: "⚡ Compare These",    next: "compare_info" },
+      { label: "⚡ Compare EVs",      next: "compare_info" },
       { label: "⬅ Change Budget",    next: "buy_car" },
     ],
   },
@@ -93,9 +121,9 @@ const FLOW = {
   },
 
   bike_u1: {
-    bot: [
-      "🏍 **Best Electric Scooters under ₹1 lakh:**\n\n• **Ola S1 Air** — ₹84,999 | Range: 101 km\n• **Bajaj Chetak** — ₹95,998 | Range: 126 km\n• **TVS iQube ST** — ₹94,434 | Range: 100 km\n• **Ather 450S** — ₹97,000 | Range: 115 km",
-    ],
+    bot: ["🏍 Best Electric Scooters under ₹1 lakh from EVRadar:"],
+    fetchVehicles: "bike",
+    priceRange: { min: 0, max: 1 },
     link: { label: "Browse All Electric Bikes →", href: "/bikes" },
     options: [
       { label: "📞 Book Test Ride",    next: "lead" },
@@ -104,9 +132,9 @@ const FLOW = {
   },
 
   bike_1_1_5: {
-    bot: [
-      "🏍 **Best Electric Bikes in ₹1–1.5 lakh:**\n\n• **Ola S1 Pro** — ₹1.29 lakh | Range: 195 km\n• **Ather 450X** — ₹1.2 lakh | Range: 150 km\n• **TVS iQube** — ₹1.06 lakh | Range: 140 km\n• **Vida V1** (Hero) — ₹1.09 lakh | Range: 143 km",
-    ],
+    bot: ["🏍 Best Electric Bikes in ₹1–1.5 lakh from EVRadar:"],
+    fetchVehicles: "bike",
+    priceRange: { min: 1, max: 1.5 },
     link: { label: "Browse All Electric Bikes →", href: "/bikes" },
     options: [
       { label: "📞 Book Test Ride",    next: "lead" },
@@ -115,9 +143,9 @@ const FLOW = {
   },
 
   bike_above1_5: {
-    bot: [
-      "🏍 **Premium Electric Bikes above ₹1.5 lakh:**\n\n• **Ultraviolette F77** — ₹3.8 lakh | Range: 323 km\n• **Tork Kratos R** — ₹1.84 lakh | Range: 180 km\n• **Revolt RV400** — ₹1.53 lakh | Range: 150 km\n• **Matter Aera** — ₹1.44 lakh | Range: 125 km",
-    ],
+    bot: ["🏍 Premium Electric Bikes above ₹1.5 lakh from EVRadar:"],
+    fetchVehicles: "bike",
+    priceRange: { min: 1.5, max: Infinity },
     link: { label: "Browse All Electric Bikes →", href: "/bikes" },
     options: [
       { label: "📞 Book Test Ride",    next: "lead" },
@@ -126,9 +154,7 @@ const FLOW = {
   },
 
   compare_info: {
-    bot: [
-      "⚡ Compare any two EVs side by side — price, range, battery, specs, features, pros & cons!",
-    ],
+    bot: ["⚡ Compare any two EVs side by side — price, range, battery, specs, features, pros & cons!"],
     link: { label: "Open EV Compare Tool →", href: "/compare" },
     options: [
       { label: "📞 Need Help Choosing?",  next: "lead" },
@@ -148,9 +174,7 @@ const FLOW = {
   },
 
   news_cars: {
-    bot: [
-      "🚗 **Latest EV Car News on EVRadar:**\n\nCovers Tata, Mahindra, Hyundai, Kia, BYD, BMW, Mercedes and more — launches, reviews, price updates and first drives.",
-    ],
+    bot: ["🚗 **Latest EV Car News on EVRadar:**\n\nCovers Tata, Mahindra, Hyundai, Kia, BYD, BMW, Mercedes — launches, reviews, price updates and first drives."],
     link: { label: "Read Latest Car News →", href: "/news" },
     options: [
       { label: "🏍 Bike News",      next: "news_bikes" },
@@ -159,9 +183,7 @@ const FLOW = {
   },
 
   news_bikes: {
-    bot: [
-      "🏍 **Latest EV Bike News on EVRadar:**\n\nCovers Ola, Ather, TVS, Bajaj, Ultraviolette, Tork and more — launches, comparisons, long-term reviews.",
-    ],
+    bot: ["🏍 **Latest EV Bike News on EVRadar:**\n\nCovers Ola, Ather, TVS, Bajaj, Ultraviolette, Tork — launches, comparisons, long-term reviews."],
     link: { label: "Read Latest Bike News →", href: "/news" },
     options: [
       { label: "🚗 Car News",       next: "news_cars" },
@@ -181,9 +203,7 @@ const FLOW = {
   },
 
   charging_home: {
-    bot: [
-      "🏠 **Home Charging Setup:**\n\n• **15A socket (slow)** — Comes with car, 8–10 hrs full charge. Cost: ₹0–5,000\n• **AC Wall Box (7.2 kW)** — 4–6 hrs full charge. Cost: ₹15,000–30,000\n• Most EVs include a portable charger in the box\n• A dedicated 15A line from MCB is recommended\n• Solar charging possible with 3–5 kW rooftop setup",
-    ],
+    bot: ["🏠 **Home Charging Setup:**\n\n• **15A socket (slow)** — Comes with car, 8–10 hrs full charge. Cost: ₹0–5,000\n• **AC Wall Box (7.2 kW)** — 4–6 hrs full charge. Cost: ₹15,000–30,000\n• Most EVs include a portable charger in the box\n• A dedicated 15A line from MCB is recommended\n• Solar charging possible with 3–5 kW rooftop setup"],
     options: [
       { label: "💰 Charging Cost",     next: "charging_cost" },
       { label: "⚡ Public Charging",   next: "charging_public" },
@@ -192,9 +212,7 @@ const FLOW = {
   },
 
   charging_public: {
-    bot: [
-      "⚡ **Public Charging Networks in India:**\n\n• **Tata Power** — 4,000+ chargers across India\n• **Ather Grid** — 1,800+ fast chargers (all brands)\n• **BPCL / HPCL** — At fuel stations nationwide\n• **Statiq, ChargeZone, Greenzo** — App-based networks\n\n🔌 DC Fast Charger (50 kW+): 0–80% in 40–60 mins\n📱 Find chargers: PlugShare app, EVATLASMAP",
-    ],
+    bot: ["⚡ **Public Charging Networks in India:**\n\n• **Tata Power** — 4,000+ chargers across India\n• **Ather Grid** — 1,800+ fast chargers (all brands)\n• **BPCL / HPCL** — At fuel stations nationwide\n• **Statiq, ChargeZone, Greenzo** — App-based networks\n\n🔌 DC Fast Charger (50 kW+): 0–80% in 40–60 mins\n📱 Find chargers: PlugShare app, EVATLASMAP"],
     options: [
       { label: "💰 Charging Cost",     next: "charging_cost" },
       { label: "🏠 Home Charging",     next: "charging_home" },
@@ -203,9 +221,7 @@ const FLOW = {
   },
 
   charging_cost: {
-    bot: [
-      "💰 **EV Charging Cost (avg. ₹8/unit):**\n\n• **MG Comet (17.3 kWh)** → ~₹138 full charge\n• **Tata Tiago EV (24 kWh)** → ~₹192\n• **Nexon EV (40.5 kWh)** → ~₹324\n• **Harrier EV (74 kWh)** → ~₹592\n\n⚡ Cost per km: ₹0.80–1.50 vs ₹7–10 for petrol\n💚 **Save up to 85% on fuel costs!**",
-    ],
+    bot: ["💰 **EV Charging Cost (avg. ₹8/unit):**\n\n• **MG Comet (17.3 kWh)** → ~₹138 full charge\n• **Tata Tiago EV (24 kWh)** → ~₹192\n• **Nexon EV (40.5 kWh)** → ~₹324\n• **Harrier EV (74 kWh)** → ~₹592\n\n⚡ Cost per km: ₹0.80–1.50 vs ₹7–10 for petrol\n💚 **Save up to 85% on fuel costs!**"],
     options: [
       { label: "🔋 Battery Life Tips",  next: "battery_tips" },
       { label: "⬅ Back",               next: "charging" },
@@ -213,9 +229,7 @@ const FLOW = {
   },
 
   battery_tips: {
-    bot: [
-      "🔋 **EV Battery Care Tips:**\n\n• Keep charge between **20–80%** for daily use\n• Avoid frequent DC fast charging (use for trips)\n• Park in shade — heat degrades battery faster\n• Use **scheduled charging** at night (cheaper tariff)\n• LFP batteries (Tata, MG) can be charged to 100% daily\n• Battery warranty: **8 years / 1.6 lakh km** on most brands",
-    ],
+    bot: ["🔋 **EV Battery Care Tips:**\n\n• Keep charge between **20–80%** for daily use\n• Avoid frequent DC fast charging (use for trips)\n• Park in shade — heat degrades battery faster\n• Use **scheduled charging** at night (cheaper tariff)\n• LFP batteries (Tata, MG) can be charged to 100% daily\n• Battery warranty: **8 years / 1.6 lakh km** on most brands"],
     options: [
       { label: "💰 Charging Cost",   next: "charging_cost" },
       { label: "⬅ Back",            next: "charging" },
@@ -233,9 +247,7 @@ const FLOW = {
   },
 
   fame2: {
-    bot: [
-      "🇮🇳 **Central Government EV Subsidies:**\n\n• **FAME II (ended 2024):** 2W up to ₹15,000, 3W up to ₹30,000\n• **PM e-DRIVE Scheme (2024–26):** ₹10,900 crore total allocation\n  — 2W subsidy: ₹10,000/vehicle\n  — Electric buses & commercial vehicles covered\n• Most EV prices shown online already include subsidy\n• Check eligibility with your dealer before booking",
-    ],
+    bot: ["🇮🇳 **Central Government EV Subsidies:**\n\n• **FAME II (ended 2024):** 2W up to ₹15,000, 3W up to ₹30,000\n• **PM e-DRIVE Scheme (2024–26):** ₹10,900 crore total\n  — 2W subsidy: ₹10,000/vehicle\n  — Electric buses & commercial vehicles covered\n• Most EV prices shown online already include subsidy\n• Check eligibility with your dealer before booking"],
     options: [
       { label: "🏙 State Subsidies",  next: "state_subsidy" },
       { label: "🏦 EV Loan & EMI",   next: "emi_info" },
@@ -244,9 +256,7 @@ const FLOW = {
   },
 
   state_subsidy: {
-    bot: [
-      "🏙 **State EV Subsidies (2025):**\n\n• **Delhi** — 2W: ₹5,000/kWh (up to ₹30,000) | 4W: ₹1.5 lakh\n• **Maharashtra** — 2W: ₹10,000 | 4W: ₹1 lakh + road tax waiver\n• **Gujarat** — 2W: ₹20,000 | 4W: ₹1.5 lakh\n• **Rajasthan** — Road tax & registration waiver\n• **Karnataka / Tamil Nadu** — Road tax exemption\n\n*Visit your state transport department for latest rates.*",
-    ],
+    bot: ["🏙 **State EV Subsidies (2025):**\n\n• **Delhi** — 2W: ₹5,000/kWh (up to ₹30,000) | 4W: ₹1.5 lakh\n• **Maharashtra** — 2W: ₹10,000 | 4W: ₹1 lakh + road tax waiver\n• **Gujarat** — 2W: ₹20,000 | 4W: ₹1.5 lakh\n• **Rajasthan** — Road tax & registration waiver\n• **Karnataka / Tamil Nadu** — Road tax exemption\n\n*Visit your state transport department for latest rates.*"],
     options: [
       { label: "🇮🇳 Central Subsidies",  next: "fame2" },
       { label: "🏦 EV Loan & EMI",       next: "emi_info" },
@@ -255,9 +265,7 @@ const FLOW = {
   },
 
   emi_info: {
-    bot: [
-      "🏦 **EV Loan & EMI Info:**\n\n• SBI, HDFC, ICICI, Kotak offer dedicated EV loans\n• Interest rates: **7.9%–9.5%** (lower than petrol car loans)\n• Zero processing fee on many EV models\n\n📊 **Example — Nexon EV at ₹15 lakh:**\n  48 months @ 8.5% = ~₹37,200/month\n\n• Many dealers offer **0% EMI** for 6–12 months\n• Fuel savings offset EMI cost significantly!",
-    ],
+    bot: ["🏦 **EV Loan & EMI Info:**\n\n• SBI, HDFC, ICICI, Kotak offer dedicated EV loans\n• Interest rates: **7.9%–9.5%** (lower than petrol car loans)\n• Zero processing fee on many EV models\n\n📊 **Example — Nexon EV at ₹15 lakh:**\n  48 months @ 8.5% = ~₹37,200/month\n\n• Many dealers offer **0% EMI** for 6–12 months\n• Fuel savings offset EMI cost significantly!"],
     options: [
       { label: "📞 Get Loan Quote",       next: "lead" },
       { label: "🏙 State Subsidies",     next: "state_subsidy" },
@@ -340,6 +348,80 @@ function Bubble({ msg }) {
   );
 }
 
+/* ─── Vehicle carousel ───────────────────────────────────────────── */
+function VehicleCarousel({ vehicles, onInterested, onBrochure }) {
+  if (!vehicles || vehicles.length === 0) return null;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="px-3 py-2"
+    >
+      <div
+        className="flex gap-3 overflow-x-auto pb-2"
+        style={{ scrollbarWidth: "none" }}
+      >
+        {vehicles.map(v => {
+          const price = v.variants?.[0]?.exShowroomPrice;
+          const range = v.performance?.drivingRange || v.variants?.[0]?.range;
+          const type  = v.vehicleType === "car" ? "cars" : "bikes";
+          return (
+            <div
+              key={v._id || v.slug}
+              className="min-w-36 shrink-0 overflow-hidden rounded-xl border border-gray-700 bg-gray-800/80"
+            >
+              {/* image */}
+              <Link href={`/${type}/${v.slug}`} target="_blank">
+                <div className="relative h-20 w-full bg-gray-700">
+                  {v.featuredImage ? (
+                    <Image
+                      src={v.featuredImage}
+                      alt={v.name}
+                      fill
+                      className="object-contain p-1.5"
+                      sizes="144px"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center text-2xl">⚡</div>
+                  )}
+                </div>
+              </Link>
+              {/* info */}
+              <div className="p-2.5">
+                <p className="text-[9px] font-semibold uppercase tracking-wide text-gray-400">{v.brand}</p>
+                <p className="mt-0.5 text-xs font-bold leading-tight text-white line-clamp-2">{v.name}</p>
+                {price && (
+                  <p className="mt-1 text-[11px] font-bold text-green-400">{price}</p>
+                )}
+                {range && (
+                  <div className="mt-0.5 flex items-center gap-1">
+                    <BatteryCharging size={9} className="text-gray-500" />
+                    <span className="text-[9px] text-gray-500">{range}</span>
+                  </div>
+                )}
+                {/* CTA buttons */}
+                <button
+                  onClick={() => onInterested(v)}
+                  className="mt-2 w-full rounded-lg bg-green-600 py-1.5 text-[10px] font-bold text-white hover:bg-green-700 transition active:scale-95"
+                >
+                  I'm Interested
+                </button>
+                <button
+                  onClick={() => onBrochure(v)}
+                  className="mt-1 w-full rounded-lg border border-gray-600 py-1.5 text-[10px] text-gray-400 hover:border-green-500 hover:text-green-400 transition active:scale-95"
+                >
+                  <FileText size={9} className="inline mr-0.5" />
+                  Brochure
+                </button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </motion.div>
+  );
+}
+
 /* ─── Link card ──────────────────────────────────────────────────── */
 function LinkCard({ link }) {
   return (
@@ -376,8 +458,16 @@ function OptionButtons({ options, onSelect }) {
 }
 
 /* ─── Lead form card ─────────────────────────────────────────────── */
-function LeadFormCard({ onBack }) {
-  const [form, setForm]   = useState({ name: "", phone: "", email: "", city: "", vehicleName: "", vehicleType: "any" });
+function LeadFormCard({ onBack, initialVehicle }) {
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    city: "",
+    vehicleName: initialVehicle?.name  || "",
+    vehicleType: initialVehicle?.vehicleType || "any",
+    intent:      initialVehicle?.intent || "general",
+  });
   const [busy, setBusy]   = useState(false);
   const [done, setDone]   = useState(false);
   const [err,  setErr]    = useState("");
@@ -409,10 +499,13 @@ function LeadFormCard({ onBack }) {
         body: JSON.stringify({
           name:              form.name.trim(),
           phone:             form.phone.trim(),
-          email:             form.email?.trim()             || "",
-          city:              form.city?.trim()              || "",
-          interestedVehicle: form.vehicleName?.trim()       || "",
-          vehicleType:       form.vehicleType               || "any",
+          email:             form.email?.trim()        || "",
+          city:              form.city?.trim()         || "",
+          interestedVehicle: form.vehicleName?.trim()  || "",
+          vehicleType:       form.vehicleType          || "any",
+          notes:             form.intent === "brochure"
+                               ? `Brochure request for ${form.vehicleName}`
+                               : "",
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -423,14 +516,21 @@ function LeadFormCard({ onBack }) {
   };
 
   const f = "w-full bg-gray-700 text-white text-sm rounded-lg px-3 py-2 border border-gray-600 focus:border-green-500 focus:outline-none placeholder:text-gray-500";
+  const isBrochure = form.intent === "brochure";
 
   return (
     <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }}
       className="mx-4 my-2 rounded-xl bg-gray-800 border border-gray-700 p-4">
       <div className="flex items-start justify-between mb-3">
         <div>
-          <p className="text-sm font-bold text-white">🎯 Talk to an EV Expert</p>
-          <p className="text-xs text-gray-400 mt-0.5">Test drive booking · Price quote · Finance</p>
+          <p className="text-sm font-bold text-white">
+            {isBrochure ? "📄 Request Brochure" : "🎯 Talk to an EV Expert"}
+          </p>
+          <p className="text-xs text-gray-400 mt-0.5">
+            {isBrochure
+              ? `Get brochure for ${form.vehicleName || "your chosen EV"} on WhatsApp`
+              : "Test drive booking · Price quote · Finance"}
+          </p>
         </div>
         <button onClick={onBack} className="text-xs text-gray-500 hover:text-gray-300 transition">Skip</button>
       </div>
@@ -453,7 +553,7 @@ function LeadFormCard({ onBack }) {
         {err && <p className="text-red-400 text-xs">{err}</p>}
         <button type="submit" disabled={busy}
           className="w-full rounded-lg bg-green-600 py-2.5 text-sm font-bold text-white hover:bg-green-700 disabled:opacity-50 transition">
-          {busy ? "Submitting…" : "Get Expert Callback →"}
+          {busy ? "Submitting…" : isBrochure ? "Send Brochure to My WhatsApp →" : "Get Expert Callback →"}
         </button>
       </form>
     </motion.div>
@@ -462,12 +562,15 @@ function LeadFormCard({ onBack }) {
 
 /* ─── Main ChatWindow ────────────────────────────────────────────── */
 export default function ChatWindow({ onClose }) {
-  const [messages,  setMessages]  = useState([]);
-  const [options,   setOptions]   = useState([]);
-  const [link,      setLink]      = useState(null);
-  const [showLead,  setShowLead]  = useState(false);
-  const [typing,    setTyping]    = useState(false);
-  const [minimized, setMinimized] = useState(false);
+  const [messages,         setMessages]         = useState([]);
+  const [options,          setOptions]          = useState([]);
+  const [link,             setLink]             = useState(null);
+  const [showLead,         setShowLead]         = useState(false);
+  const [typing,           setTyping]           = useState(false);
+  const [minimized,        setMinimized]        = useState(false);
+  const [vehicleCards,     setVehicleCards]     = useState([]);
+  const [interestedVehicle,setInterestedVehicle]= useState(null);
+
   const bottomRef      = useRef(null);
   const timerRef       = useRef([]);
   const currentNodeRef = useRef("welcome");
@@ -491,6 +594,8 @@ export default function ChatWindow({ onClose }) {
     setOptions([]);
     setLink(null);
     setShowLead(false);
+    setVehicleCards([]);
+    setInterestedVehicle(null);
     setTyping(true);
 
     /* show bot messages with staggered delay */
@@ -506,18 +611,25 @@ export default function ChatWindow({ onClose }) {
       timerRef.current.push(t);
     });
 
-    /* reveal options/link/lead after all messages, then persist node */
+    /* reveal options/link/lead/vehicles after all messages */
     const afterAll = setTimeout(() => {
       currentNodeRef.current = nodeId;
       try { localStorage.setItem(NODE_KEY, nodeId); } catch {}
-      if (node.link)          setLink(node.link);
-      if (node.showLead)      setShowLead(true);
-      else if (node.options)  setOptions(node.options);
+
+      if (node.fetchVehicles) {
+        fetch(`/api/vehicles?status=published&vehicleType=${node.fetchVehicles}&limit=50`)
+          .then(r => r.json())
+          .then(data => setVehicleCards(filterByPrice(data.vehicles || [], node.priceRange)))
+          .catch(() => {});
+      }
+      if (node.link)         setLink(node.link);
+      if (node.showLead)     setShowLead(true);
+      else if (node.options) setOptions(node.options);
     }, 700 + node.bot.length * 450 + 150);
     timerRef.current.push(afterAll);
   }, [clearTimers]);
 
-  /* keep navigateRef in sync so clearHistory can call it without a dep cycle */
+  /* keep navigateRef in sync */
   navigateRef.current = navigateTo;
 
   /* clear chat and restart */
@@ -528,6 +640,8 @@ export default function ChatWindow({ onClose }) {
     setOptions([]);
     setLink(null);
     setShowLead(false);
+    setVehicleCards([]);
+    setInterestedVehicle(null);
     navigateRef.current("welcome");
   }, [clearTimers]);
 
@@ -542,27 +656,33 @@ export default function ChatWindow({ onClose }) {
         if (Array.isArray(msgs) && msgs.length > 0 && node) {
           setMessages(msgs);
           currentNodeRef.current = savedNode;
-          /* restore the options/link/lead for the last node without re-showing messages */
           if (node.link)         setLink(node.link);
           if (node.showLead)     setShowLead(true);
           else if (node.options) setOptions(node.options);
+          /* re-fetch vehicle cards if needed */
+          if (node.fetchVehicles) {
+            fetch(`/api/vehicles?status=published&vehicleType=${node.fetchVehicles}&limit=50`)
+              .then(r => r.json())
+              .then(data => setVehicleCards(filterByPrice(data.vehicles || [], node.priceRange)))
+              .catch(() => {});
+          }
           return;
         }
       }
     } catch {}
-    /* fresh start */
     navigateTo("welcome");
     return clearTimers;
-  }, []); // intentionally empty — runs once on mount only
+  }, []); // eslint-disable-line
 
   /* auto-scroll */
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, typing, options, showLead, link]);
+  }, [messages, typing, options, showLead, link, vehicleCards]);
 
   const handleOption = useCallback((opt) => {
     setOptions([]);
     setLink(null);
+    setVehicleCards([]);
     setMessages(prev => {
       const next = [...prev, { role: "user", content: opt.label, id: `u-${Date.now()}` }];
       try { localStorage.setItem(MSGS_KEY, JSON.stringify(next.slice(-60))); } catch {}
@@ -571,8 +691,33 @@ export default function ChatWindow({ onClose }) {
     navigateTo(opt.next);
   }, [navigateTo]);
 
+  /* user clicks "I'm Interested" on a vehicle card */
+  const handleVehicleInterest = useCallback((vehicle) => {
+    setInterestedVehicle({
+      name:        vehicle.name,
+      vehicleType: vehicle.vehicleType || "car",
+      intent:      "general",
+    });
+    setOptions([]);
+    setVehicleCards([]);
+    setShowLead(true);
+  }, []);
+
+  /* user clicks "Brochure" on a vehicle card */
+  const handleBrochure = useCallback((vehicle) => {
+    setInterestedVehicle({
+      name:        vehicle.name,
+      vehicleType: vehicle.vehicleType || "car",
+      intent:      "brochure",
+    });
+    setOptions([]);
+    setVehicleCards([]);
+    setShowLead(true);
+  }, []);
+
   const handleLeadBack = useCallback(() => {
     setShowLead(false);
+    setInterestedVehicle(null);
     navigateTo("welcome");
   }, [navigateTo]);
 
@@ -583,7 +728,7 @@ export default function ChatWindow({ onClose }) {
   if (minimized) {
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-        className="fixed bottom-24 right-6 z-50">
+        style={{ position: "fixed", bottom: "84px", right: "16px", zIndex: 9999 }}>
         <button onClick={() => setMinimized(false)}
           className="flex items-center gap-2 rounded-full border border-gray-700 bg-gray-900 px-4 py-2.5 text-white shadow-2xl hover:border-green-500 transition">
           <Zap size={15} className="text-green-400" fill="currentColor" />
@@ -600,15 +745,18 @@ export default function ChatWindow({ onClose }) {
       animate={{ opacity: 1, y: 0,  scale: 1 }}
       exit={{   opacity: 0, y: 30, scale: 0.95 }}
       transition={{ type: "spring", damping: 28, stiffness: 320 }}
-      className={[
-        "fixed inset-0 z-50 flex flex-col bg-gray-950",
-        "sm:inset-auto sm:bottom-24 sm:right-6",
-        "sm:h-155 sm:w-97.5",
-        "sm:rounded-2xl sm:border sm:border-gray-800 sm:shadow-2xl sm:shadow-black/60",
-      ].join(" ")}
+      style={{
+        position: "fixed",
+        bottom: "84px",
+        right: "16px",
+        zIndex: 9999,
+        maxWidth: "calc(100vw - 32px)",
+        width: "390px",
+      }}
+      className="flex flex-col bg-gray-950 h-[72vh] sm:h-155 rounded-2xl border border-gray-800 shadow-2xl shadow-black/60"
     >
       {/* ── Header ── */}
-      <div className="flex shrink-0 items-center justify-between border-b border-gray-800 bg-gray-900 px-4 py-3 sm:rounded-t-2xl">
+      <div className="flex shrink-0 items-center justify-between border-b border-gray-800 bg-gray-900 px-4 py-3 rounded-t-2xl">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-full bg-linear-to-br from-green-500 to-green-700 shadow-md">
             <Zap size={17} className="text-white" fill="white" />
@@ -623,24 +771,20 @@ export default function ChatWindow({ onClose }) {
         </div>
 
         <div className="flex items-center gap-0.5">
-          {/* New Chat */}
           <button onClick={clearHistory} title="Start new chat"
             className="flex h-8 w-8 items-center justify-center rounded-full text-gray-600 hover:text-gray-300 transition">
             <RotateCcw size={13} />
           </button>
-          {/* WhatsApp */}
           <a href={waUrl} target="_blank" rel="noopener noreferrer" title="Chat on WhatsApp"
             className="flex h-8 w-8 items-center justify-center rounded-full text-green-400 hover:bg-green-900/30 transition">
             <svg viewBox="0 0 24 24" className="h-4.5 w-4.5" fill="currentColor">
               <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
             </svg>
           </a>
-          {/* Minimize */}
           <button onClick={() => setMinimized(true)} title="Minimise"
             className="flex h-8 w-8 items-center justify-center rounded-full text-gray-600 hover:text-gray-300 transition">
             <Minus size={14} />
           </button>
-          {/* Close */}
           <button onClick={onClose} title="Close"
             className="flex h-8 w-8 items-center justify-center rounded-full text-gray-600 hover:text-red-400 transition">
             <X size={14} />
@@ -658,10 +802,18 @@ export default function ChatWindow({ onClose }) {
 
         {typing && <TypingDots />}
 
+        {vehicleCards.length > 0 && !typing && (
+          <VehicleCarousel
+            vehicles={vehicleCards}
+            onInterested={handleVehicleInterest}
+            onBrochure={handleBrochure}
+          />
+        )}
+
         {link && !typing && <LinkCard link={link} />}
 
         {showLead && !typing && (
-          <LeadFormCard onBack={handleLeadBack} />
+          <LeadFormCard onBack={handleLeadBack} initialVehicle={interestedVehicle} />
         )}
 
         {options.length > 0 && !typing && (
@@ -672,7 +824,7 @@ export default function ChatWindow({ onClose }) {
       </div>
 
       {/* ── Footer ── */}
-      <div className="shrink-0 border-t border-gray-800 bg-gray-900 px-4 py-3 sm:rounded-b-2xl">
+      <div className="shrink-0 border-t border-gray-800 bg-gray-900 px-4 py-3 rounded-b-2xl">
         <div className="flex items-center justify-between">
           <p className="text-[10px] text-gray-600">
             Powered by <span className="text-green-700 font-semibold">EVRadar</span>
