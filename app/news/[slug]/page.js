@@ -203,11 +203,24 @@ export default async function ArticlePage({ params }) {
 
               <ArticleComments slug={article.slug} />
 
-              <div className="mt-8 flex flex-wrap gap-2 border-t border-gray-100 pt-6">
-                {article.tags?.map((tag) => (
-                  <Link key={tag} href={`/news/tags/${encodeURIComponent(tag)}`} className="rounded-lg bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-green-50 hover:text-green-700 transition">#{tag}</Link>
-                ))}
-              </div>
+              {article.tags?.length > 0 && (
+                <div className="mt-8 border-t border-gray-100 pt-6">
+                  <p className="mb-3 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-gray-400">
+                    <Tag size={13} /> Topics
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {article.tags.map((tag) => (
+                      <Link
+                        key={tag}
+                        href={`/news/tags/${encodeURIComponent(tag)}`}
+                        className="rounded-lg bg-green-50 px-3 py-1.5 text-sm font-semibold text-green-700 transition hover:bg-green-100"
+                      >
+                        #{tag}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
             </article>
 
             <aside className="space-y-8">
