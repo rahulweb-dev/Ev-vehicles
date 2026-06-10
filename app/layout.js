@@ -106,6 +106,9 @@ export const metadata = {
   verification: {
     google: process.env.GOOGLE_SEARCH_CONSOLE_TOKEN,
   },
+  other: {
+    "p:domain_verify": "07cbf55529a481771ddbbd2ddbbeae9f",
+  },
 };
 
 const websiteJsonLd = {
@@ -154,9 +157,7 @@ export default function RootLayout({ children }) {
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
 
-        {/* Pinterest domain verification */}
-        <meta name="p:domain_verify" content="07cbf55529a481771ddbbd2ddbbeae9f" />
-
+    
         {/* RSS feed — enables Google News discovery and feed readers */}
         <link rel="alternate" type="application/rss+xml" title="EV News India – Latest EV News Feed" href="/feed.xml" />
 
