@@ -4,10 +4,11 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X, Minus, ChevronRight, Zap, ExternalLink,
-  RotateCcw, BatteryCharging, FileText,
+  RotateCcw, BatteryCharging, FileText, Send, UserCheck,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { getPusherClient } from "@/lib/pusherClient";
 
 /* ─── Price parser: converts "₹8.49 Lakh", "₹8,49,000", "849000" → lakh number ── */
 function parsePriceLakh(priceStr) {
@@ -48,6 +49,7 @@ const FLOW = {
       { label: "🔋 Charging & Battery",   next: "charging" },
       { label: "🎁 EV Subsidies & EMI",   next: "subsidies" },
       { label: "📞 Talk to EV Expert",    next: "lead" },
+      { label: "🧑‍💼 Live Chat with Agent", next: "human_agent" },
     ],
   },
 
@@ -279,6 +281,14 @@ const FLOW = {
       "Please fill in your details and we'll get back to you within 24 hours:",
     ],
     showLead: true,
+  },
+
+  human_agent: {
+    bot: [
+      "Connecting you to a live EV expert 🧑‍💼",
+      "Please share your details so our agent can help you personally:",
+    ],
+    showLiveConnect: true,
   },
 };
 
@@ -560,6 +570,96 @@ function LeadFormCard({ onBack, initialVehicle }) {
   );
 }
 
+/* ─── Live connect form (shown before session is created) ────────── */
+function LiveConnectCard({ onConnect }) {
+  const [form, setForm] = useState({ name: "", phone: "", city: "", vehicle: "" });
+  const [busy, setBusy] = useState(false);
+  const [err,  setErr]  = useState("");
+  const set = f => e => setForm(p => ({ ...p, [f]: e.target.value }));
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setBusy(true);
+    setErr("");
+    try {
+      const res = await fetch("/api/live-chat/session", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userName:          form.name.trim(),
+          userPhone:         form.phone.trim(),
+          userCity:          form.city.trim(),
+          interestedVehicle: form.vehicle.trim(),
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) onConnect(data.sessionId, form.name.trim() || "You");
+      else setErr("Could not connect. Please try again.");
+    } catch { setErr("Network error. Please try again."); }
+    setBusy(false);
+  };
+
+  const f = "w-full bg-gray-700 text-white text-sm rounded-lg px-3 py-2 border border-gray-600 focus:border-green-500 focus:outline-none placeholder:text-gray-500";
+
+  return (
+    <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }}
+      className="mx-4 my-2 rounded-xl border border-gray-700 bg-gray-800 p-4">
+      <div className="mb-3 flex items-center gap-2">
+        <UserCheck size={15} className="text-green-400" />
+        <p className="text-sm font-bold text-white">Connect to Live Agent</p>
+      </div>
+      <form onSubmit={handleSubmit} className="space-y-2">
+        <input type="text"  placeholder="Your Name *"    required className={f} value={form.name}    onChange={set("name")} />
+        <input type="tel"   placeholder="Mobile No. *"   required className={f} value={form.phone}   onChange={set("phone")} />
+        <div className="grid grid-cols-2 gap-2">
+          <input type="text" placeholder="City"          className={f} value={form.city}    onChange={set("city")} />
+          <input type="text" placeholder="Interested EV" className={f} value={form.vehicle} onChange={set("vehicle")} />
+        </div>
+        {err && <p className="text-xs text-red-400">{err}</p>}
+        <button type="submit" disabled={busy}
+          className="w-full rounded-lg bg-green-600 py-2.5 text-sm font-bold text-white hover:bg-green-700 disabled:opacity-50 transition">
+          {busy ? "Connecting…" : "Start Live Chat →"}
+        </button>
+      </form>
+    </motion.div>
+  );
+}
+
+/* ─── Live chat input bar ─────────────────────────────────────────── */
+function LiveChatBar({ onSend, disabled, agentJoined }) {
+  const [text, setText] = useState("");
+  return (
+    <div className="shrink-0 border-t border-gray-800 bg-gray-900 px-3 py-2.5">
+      {!agentJoined && (
+        <p className="mb-2 flex items-center gap-1.5 text-xs text-orange-400">
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-orange-400" />
+          Waiting for an agent to join…
+        </p>
+      )}
+      <div className="flex items-end gap-2">
+        <input
+          type="text"
+          placeholder="Type your message…"
+          value={text}
+          disabled={disabled}
+          onChange={e => setText(e.target.value)}
+          onKeyDown={e => {
+            if (e.key === "Enter" && text.trim()) { onSend(text.trim()); setText(""); }
+          }}
+          className="flex-1 rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2.5 text-sm text-white placeholder:text-gray-600 focus:border-green-500 focus:outline-none disabled:opacity-40"
+        />
+        <button
+          onClick={() => { if (text.trim()) { onSend(text.trim()); setText(""); } }}
+          disabled={!text.trim() || disabled}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-green-600 text-white hover:bg-green-700 disabled:opacity-40 transition"
+        >
+          <Send size={15} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Main ChatWindow ────────────────────────────────────────────── */
 export default function ChatWindow({ onClose }) {
   const [messages,         setMessages]         = useState([]);
@@ -570,6 +670,13 @@ export default function ChatWindow({ onClose }) {
   const [minimized,        setMinimized]        = useState(false);
   const [vehicleCards,     setVehicleCards]     = useState([]);
   const [interestedVehicle,setInterestedVehicle]= useState(null);
+
+  /* live chat state */
+  const [showLiveConnect, setShowLiveConnect] = useState(false);
+  const [isLive,          setIsLive]          = useState(false);
+  const [liveSessionId,   setLiveSessionId]   = useState(null);
+  const [agentJoined,     setAgentJoined]     = useState(false);
+  const [liveClosed,      setLiveClosed]      = useState(false);
 
   const bottomRef      = useRef(null);
   const timerRef       = useRef([]);
@@ -594,6 +701,7 @@ export default function ChatWindow({ onClose }) {
     setOptions([]);
     setLink(null);
     setShowLead(false);
+    setShowLiveConnect(false);
     setVehicleCards([]);
     setInterestedVehicle(null);
     setTyping(true);
@@ -622,9 +730,10 @@ export default function ChatWindow({ onClose }) {
           .then(data => setVehicleCards(filterByPrice(data.vehicles || [], node.priceRange)))
           .catch(() => {});
       }
-      if (node.link)         setLink(node.link);
-      if (node.showLead)     setShowLead(true);
-      else if (node.options) setOptions(node.options);
+      if (node.link)            setLink(node.link);
+      if (node.showLiveConnect) setShowLiveConnect(true);
+      else if (node.showLead)   setShowLead(true);
+      else if (node.options)    setOptions(node.options);
     }, 700 + node.bot.length * 450 + 150);
     timerRef.current.push(afterAll);
   }, [clearTimers]);
@@ -642,6 +751,11 @@ export default function ChatWindow({ onClose }) {
     setShowLead(false);
     setVehicleCards([]);
     setInterestedVehicle(null);
+    setShowLiveConnect(false);
+    setIsLive(false);
+    setLiveSessionId(null);
+    setAgentJoined(false);
+    setLiveClosed(false);
     navigateRef.current("welcome");
   }, [clearTimers]);
 
@@ -656,9 +770,10 @@ export default function ChatWindow({ onClose }) {
         if (Array.isArray(msgs) && msgs.length > 0 && node) {
           setMessages(msgs);
           currentNodeRef.current = savedNode;
-          if (node.link)         setLink(node.link);
-          if (node.showLead)     setShowLead(true);
-          else if (node.options) setOptions(node.options);
+          if (node.link)            setLink(node.link);
+          if (node.showLiveConnect) setShowLiveConnect(true);
+          else if (node.showLead)   setShowLead(true);
+          else if (node.options)    setOptions(node.options);
           /* re-fetch vehicle cards if needed */
           if (node.fetchVehicles) {
             fetch(`/api/vehicles?status=published&vehicleType=${node.fetchVehicles}&limit=50`)
@@ -677,7 +792,51 @@ export default function ChatWindow({ onClose }) {
   /* auto-scroll */
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, typing, options, showLead, link, vehicleCards]);
+  }, [messages, typing, options, showLead, link, vehicleCards, showLiveConnect]);
+
+  /* Pusher: subscribe to live-chat-{sessionId} when in live mode */
+  useEffect(() => {
+    if (!isLive || !liveSessionId) return;
+    const pusher = getPusherClient();
+    if (!pusher) return;
+
+    const ch = pusher.subscribe(`live-chat-${liveSessionId}`);
+
+    ch.bind("new-message", (msg) => {
+      if (msg.role === "agent") {
+        setMessages(prev => [...prev, {
+          role:    "assistant",
+          content: msg.senderName ? `${msg.senderName}: ${msg.content}` : msg.content,
+          id:      `agent-${Date.now()}`,
+        }]);
+      }
+    });
+
+    ch.bind("agent-joined", (data) => {
+      setAgentJoined(true);
+      setMessages(prev => [...prev, {
+        role:    "assistant",
+        content: `✅ ${data.agentName || "EV Expert"} has joined the chat! Ask anything.`,
+        id:      `joined-${Date.now()}`,
+      }]);
+    });
+
+    ch.bind("session-updated", (data) => {
+      if (data.status === "closed") {
+        setLiveClosed(true);
+        setMessages(prev => [...prev, {
+          role:    "assistant",
+          content: "The chat has been closed. Thank you for reaching out! Our team will follow up shortly. 🙏",
+          id:      `closed-${Date.now()}`,
+        }]);
+      }
+    });
+
+    return () => {
+      ch.unbind_all();
+      pusher.unsubscribe(`live-chat-${liveSessionId}`);
+    };
+  }, [isLive, liveSessionId]);
 
   const handleOption = useCallback((opt) => {
     setOptions([]);
@@ -720,6 +879,32 @@ export default function ChatWindow({ onClose }) {
     setInterestedVehicle(null);
     navigateTo("welcome");
   }, [navigateTo]);
+
+  /* called from LiveConnectCard once session is created */
+  const handleLiveConnect = useCallback((sessionId, userName) => {
+    setLiveSessionId(sessionId);
+    setIsLive(true);
+    setShowLiveConnect(false);
+    setOptions([]);
+    setMessages(prev => [...prev, {
+      role:    "assistant",
+      content: `✅ You're connected! Waiting for an agent to join, **${userName}**.\n\nFeel free to type your question while you wait.`,
+      id:      `queued-${Date.now()}`,
+    }]);
+  }, []);
+
+  /* send a message as the user in live mode */
+  const handleLiveSend = useCallback(async (content) => {
+    if (!liveSessionId || liveClosed || !content.trim()) return;
+    setMessages(prev => [...prev, { role: "user", content, id: `live-u-${Date.now()}` }]);
+    try {
+      await fetch("/api/live-chat/message", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ sessionId: liveSessionId, role: "user", content }),
+      });
+    } catch {}
+  }, [liveSessionId, liveClosed]);
 
   const waNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "919999999999";
   const waUrl    = `https://wa.me/${waNumber}?text=${encodeURIComponent("Hi! I need help choosing an electric vehicle from EVRadar.")}`;
@@ -816,6 +1001,10 @@ export default function ChatWindow({ onClose }) {
           <LeadFormCard onBack={handleLeadBack} initialVehicle={interestedVehicle} />
         )}
 
+        {showLiveConnect && !isLive && !typing && (
+          <LiveConnectCard onConnect={handleLiveConnect} />
+        )}
+
         {options.length > 0 && !typing && (
           <OptionButtons options={options} onSelect={handleOption} />
         )}
@@ -823,7 +1012,13 @@ export default function ChatWindow({ onClose }) {
         <div ref={bottomRef} />
       </div>
 
-      {/* ── Footer ── */}
+      {/* ── Live chat bar (replaces footer when in live mode) ── */}
+      {isLive && (
+        <LiveChatBar onSend={handleLiveSend} disabled={liveClosed} agentJoined={agentJoined} />
+      )}
+
+      {/* ── Normal footer (hidden during live chat) ── */}
+      {!isLive && (
       <div className="shrink-0 border-t border-gray-800 bg-gray-900 px-4 py-3 rounded-b-2xl">
         <div className="flex items-center justify-between">
           <p className="text-[10px] text-gray-600">
@@ -838,6 +1033,7 @@ export default function ChatWindow({ onClose }) {
           </a>
         </div>
       </div>
+      )}
     </motion.div>
   );
 }

@@ -7,18 +7,21 @@ import { useState, useEffect } from "react";
 import {
   LayoutDashboard, Newspaper, LogOut,
   Menu, X, ExternalLink, Settings,
-  Users, Building2, MapPin, ShieldCheck, Car, LayoutTemplate, MessageSquare,
+  Users, Building2, MapPin, ShieldCheck, Car, LayoutTemplate, MessageSquare, Radio, MessagesSquare,
 } from "lucide-react";
+import { getPusherClient } from "@/lib/pusherClient";
 
 const ADMIN_NAV = [
-  { href: "/admin",           label: "Dashboard", icon: LayoutDashboard, exact: true },
-  { href: "/admin/articles",  label: "Articles",  icon: Newspaper },
-  { href: "/admin/vehicles",  label: "Vehicles",  icon: Car },
-  { href: "/admin/banners",   label: "Banners",   icon: LayoutTemplate },
-  { href: "/admin/leads",          label: "Leads",         icon: Users },
-  { href: "/admin/chatbot-leads",  label: "Chatbot Leads", icon: MessageSquare },
-  { href: "/admin/dealers",        label: "Dealers",       icon: Building2 },
-  { href: "/admin/settings",  label: "Settings",  icon: Settings },
+  { href: "/admin",                 label: "Dashboard",    icon: LayoutDashboard, exact: true },
+  { href: "/admin/articles",        label: "Articles",     icon: Newspaper },
+  { href: "/admin/vehicles",        label: "Vehicles",     icon: Car },
+  { href: "/admin/banners",         label: "Banners",      icon: LayoutTemplate },
+  { href: "/admin/leads",           label: "Leads",        icon: Users },
+  { href: "/admin/chatbot-leads",   label: "Chatbot Leads", icon: MessageSquare },
+  { href: "/admin/live-chat",       label: "Live Chat",    icon: Radio, badge: "liveChat" },
+  { href: "/admin/comments",        label: "Comments",     icon: MessagesSquare, badge: "comments" },
+  { href: "/admin/dealers",         label: "Dealers",      icon: Building2 },
+  { href: "/admin/settings",        label: "Settings",     icon: Settings },
 ];
 
 const DEALER_NAV = [
@@ -29,12 +32,42 @@ export default function AdminSidebar() {
   const pathname    = usePathname();
   const [collapsed, setCollapsed]   = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
+  const [waitingChats,   setWaitingChats]   = useState(0);
+  const [pendingComments,setPendingComments] = useState(0);
+  const [currentUser,    setCurrentUser]    = useState(null);
 
   useEffect(() => {
     fetch("/api/auth/me").then((r) => r.json()).then((d) => {
       if (d.user) setCurrentUser(d.user);
     }).catch(() => {});
+  }, []);
+
+  /* real-time waiting chat count via Pusher */
+  useEffect(() => {
+    /* initial count */
+    fetch("/api/live-chat/sessions?status=waiting")
+      .then(r => r.json())
+      .then(d => setWaitingChats(d.total || 0))
+      .catch(() => {});
+
+    const pusher = getPusherClient();
+    if (!pusher) return;
+
+    const ch = pusher.subscribe("admin-notifications");
+    ch.bind("new-session",  () => setWaitingChats(n => n + 1));
+    /* when session status changes to active/closed, decrement waiting */
+    return () => {
+      ch.unbind_all();
+      pusher.unsubscribe("admin-notifications");
+    };
+  }, []);
+
+  /* pending comments count */
+  useEffect(() => {
+    fetch("/api/admin/comments?status=pending&limit=1")
+      .then(r => r.json())
+      .then(d => setPendingComments(d.pendingCount || 0))
+      .catch(() => {});
   }, []);
 
   async function handleLogout() {
@@ -139,6 +172,16 @@ export default function AdminSidebar() {
               >
                 <Icon size={18} className="shrink-0" />
                 {!collapsed && <span>{item.label}</span>}
+                {!collapsed && item.badge === "liveChat" && waitingChats > 0 && (
+                  <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-black text-white">
+                    {waitingChats}
+                  </span>
+                )}
+                {!collapsed && item.badge === "comments" && pendingComments > 0 && (
+                  <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-500 px-1 text-[9px] font-black text-white">
+                    {pendingComments}
+                  </span>
+                )}
                 {!collapsed && item.label === "Leads" && !isAdmin && currentUser?.city && (
                   <span className="ml-auto rounded-lg bg-blue-100 px-1.5 py-0.5 text-[10px] font-bold text-blue-700">
                     {currentUser.city}
@@ -181,12 +224,14 @@ export default function AdminSidebar() {
         onLogout={handleLogout}
         currentUser={currentUser}
         isAdmin={isAdmin}
+        waitingChats={waitingChats}
+        pendingComments={pendingComments}
       />
     </>
   );
 }
 
-function MobileTopBar({ navItems, pathname, onLogout, currentUser, isAdmin }) {
+function MobileTopBar({ navItems, pathname, onLogout, currentUser, isAdmin, waitingChats = 0, pendingComments = 0 }) {
   const [open, setOpen] = useState(false);
   return (
     <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
@@ -229,6 +274,8 @@ function MobileTopBar({ navItems, pathname, onLogout, currentUser, isAdmin }) {
                 }`}
               >
                 <Icon size={18} /> {item.label}
+                {item.badge === "liveChat"  && waitingChats    > 0 && <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-black text-white">{waitingChats}</span>}
+                {item.badge === "comments"  && pendingComments > 0 && <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-500 px-1 text-[9px] font-black text-white">{pendingComments}</span>}
               </Link>
             );
           })}

@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import VehicleDetailPage from "@/components/vehicles/VehicleDetailPage";
 import { SITE_URL } from "@/app/layout";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 async function getVehicle(slug) {
   try {
@@ -71,6 +71,7 @@ export default async function CarDetailPage({ params }) {
     brand:  { "@type": "Brand", name: car.brand },
     description: car.shortDescription || car.metaDescription || `${car.name} electric car`,
     image:  car.featuredImage || "",
+    url: `${SITE_URL}/cars/${slug}`,
     ...(firstVariant && {
       offers: {
         "@type":       "Offer",
@@ -79,13 +80,25 @@ export default async function CarDetailPage({ params }) {
         availability:  car.availability === "available"
           ? "https://schema.org/InStock"
           : "https://schema.org/PreOrder",
+        url: `${SITE_URL}/cars/${slug}`,
       },
     }),
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home",         item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: "Electric Cars", item: `${SITE_URL}/cars` },
+      { "@type": "ListItem", position: 3, name: car.name,       item: `${SITE_URL}/cars/${slug}` },
+    ],
   };
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <VehicleDetailPage vehicle={car} relatedVehicles={related} vehicleType="car" />
     </>
   );

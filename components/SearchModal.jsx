@@ -5,9 +5,17 @@ import { Search, X, Car, Bike, ArrowRight, Newspaper } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
+const FILTERS = [
+  { id: "all",     label: "All" },
+  { id: "cars",    label: "Cars",    icon: <Car  size={12} /> },
+  { id: "bikes",   label: "Bikes",   icon: <Bike size={12} /> },
+  { id: "news",    label: "News",    icon: <Newspaper size={12} /> },
+];
+
 export default function SearchModal() {
   const [isOpen,   setIsOpen]   = useState(false);
   const [query,    setQuery]    = useState("");
+  const [filter,   setFilter]   = useState("all");
   const [results,  setResults]  = useState([]);
   const [popular,  setPopular]  = useState([]);
   const [busy,     setBusy]     = useState(false);
@@ -15,25 +23,21 @@ export default function SearchModal() {
   const timerRef = useRef(null);
 
   const open  = useCallback(() => setIsOpen(true), []);
-  const close = useCallback(() => { setIsOpen(false); setQuery(""); setResults([]); }, []);
+  const close = useCallback(() => { setIsOpen(false); setQuery(""); setResults([]); setFilter("all"); }, []);
 
-  // Focus on open
   useEffect(() => { if (isOpen) setTimeout(() => inputRef.current?.focus(), 50); }, [isOpen]);
 
-  // Escape to close
   useEffect(() => {
     const h = (e) => { if (e.key === "Escape") close(); };
     document.addEventListener("keydown", h);
     return () => document.removeEventListener("keydown", h);
   }, [close]);
 
-  // Lock scroll
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [isOpen]);
 
-  // Fetch popular vehicles once on mount
   useEffect(() => {
     fetch("/api/vehicles?status=published&limit=6&sort=createdAt")
       .then(r => r.json())
@@ -41,49 +45,52 @@ export default function SearchModal() {
       .catch(() => {});
   }, []);
 
-  // Debounced live search
-  function handleChange(e) {
-    const val = e.target.value;
-    setQuery(val);
+  const runSearch = useCallback((val, activeFilter) => {
     clearTimeout(timerRef.current);
     if (!val.trim()) { setResults([]); return; }
     timerRef.current = setTimeout(async () => {
       setBusy(true);
       try {
         const enc = encodeURIComponent(val);
-        const [vRes, aRes] = await Promise.all([
-          fetch(`/api/vehicles?search=${enc}&status=published&limit=5`).then(r => r.json()),
-          fetch(`/api/articles?search=${enc}&status=published&limit=3`).then(r => r.json()),
-        ]);
-        const vItems = (vRes.vehicles || []).map(v => ({
-          kind: "vehicle",
-          id:   v._id,
-          slug: v.slug,
-          type: v.vehicleType === "car" ? "cars" : "bikes",
-          name:  v.name,
-          brand: v.brand,
-          image: v.featuredImage || "",
-          price: v.variants?.[0]?.exShowroomPrice || "Price TBA",
-        }));
-        const aItems = (aRes.articles || []).map(a => ({
-          kind:  "article",
-          id:    a._id,
-          slug:  a.slug,
-          type:  "news",
-          name:  a.title,
-          brand: a.category,
-          image: a.image || "",
-          price: null,
+        const fetchCars  = (activeFilter === "all" || activeFilter === "cars")
+          ? fetch(`/api/vehicles?search=${enc}&vehicleType=car&status=published&limit=5`).then(r => r.json())
+          : Promise.resolve({ vehicles: [] });
+        const fetchBikes = (activeFilter === "all" || activeFilter === "bikes")
+          ? fetch(`/api/vehicles?search=${enc}&vehicleType=bike&status=published&limit=5`).then(r => r.json())
+          : Promise.resolve({ vehicles: [] });
+        const fetchNews  = (activeFilter === "all" || activeFilter === "news")
+          ? fetch(`/api/articles?search=${enc}&status=published&limit=4`).then(r => r.json())
+          : Promise.resolve({ articles: [] });
+
+        const [carsData, bikesData, newsData] = await Promise.all([fetchCars, fetchBikes, fetchNews]);
+
+        const vItems = [
+          ...(carsData.vehicles  || []).map(v => ({ kind: "vehicle", id: v._id, slug: v.slug, type: "cars",  name: v.name, brand: v.brand, image: v.featuredImage || "", price: v.variants?.[0]?.exShowroomPrice || "Price TBA" })),
+          ...(bikesData.vehicles || []).map(v => ({ kind: "vehicle", id: v._id, slug: v.slug, type: "bikes", name: v.name, brand: v.brand, image: v.featuredImage || "", price: v.variants?.[0]?.exShowroomPrice || "Price TBA" })),
+        ];
+        const aItems = (newsData.articles || []).map(a => ({
+          kind: "article", id: a._id, slug: a.slug, type: "news",
+          name: a.title, brand: a.category, image: a.image || "", price: null,
         }));
         setResults([...vItems, ...aItems]);
       } catch { setResults([]); }
       setBusy(false);
-    }, 300);
-  }
+    }, 280);
+  }, []);
+
+  const handleChange = (e) => {
+    const val = e.target.value;
+    setQuery(val);
+    runSearch(val, filter);
+  };
+
+  const handleFilter = (f) => {
+    setFilter(f);
+    if (query.trim()) runSearch(query, f);
+  };
 
   return (
     <>
-      {/* Trigger */}
       <button onClick={open}
         className="flex items-center gap-2 rounded-full bg-gray-100 px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-200">
         <Search size={17} /> Search
@@ -112,13 +119,28 @@ export default function SearchModal() {
               </button>
             </div>
 
-            <div className="max-h-[60vh] overflow-y-auto">
-              {/* Live results */}
+            {/* Filter chips */}
+            <div className="flex gap-2 px-5 py-2.5 border-b border-gray-50 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+              {FILTERS.map(f => (
+                <button key={f.id} onClick={() => handleFilter(f.id)}
+                  className={`flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition ${
+                    filter === f.id
+                      ? "bg-green-600 text-white shadow-sm"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}>
+                  {f.icon}{f.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="max-h-[55vh] overflow-y-auto">
               {busy ? (
                 <div className="py-10 text-center text-sm text-gray-400">Searching…</div>
               ) : results.length > 0 ? (
                 <div className="p-3">
-                  <p className="px-2 pb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">Results</p>
+                  <p className="px-2 pb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
+                    {results.length} result{results.length !== 1 ? "s" : ""}
+                  </p>
                   {results.map(r => (
                     <Link key={`${r.kind}-${r.id}`}
                       href={r.kind === "article" ? `/news/${r.slug}` : `/${r.type}/${r.slug}`}
@@ -136,8 +158,8 @@ export default function SearchModal() {
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
                         <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
-                          r.kind === "article"  ? "bg-yellow-50 text-yellow-700" :
-                          r.type  === "cars"    ? "bg-blue-50 text-blue-600"     : "bg-orange-50 text-orange-600"
+                          r.kind === "article" ? "bg-yellow-50 text-yellow-700" :
+                          r.type === "cars"    ? "bg-blue-50 text-blue-600"     : "bg-orange-50 text-orange-600"
                         }`}>
                           {r.kind === "article" ? "News" : r.type === "cars" ? "Car" : "Bike"}
                         </span>
@@ -150,10 +172,9 @@ export default function SearchModal() {
                 <div className="py-14 text-center text-gray-400">
                   <Search size={36} className="mx-auto mb-3 opacity-30" />
                   <p className="font-medium">No results for &quot;{query}&quot;</p>
-                  <p className="mt-1 text-sm">Try a brand name, model, or topic</p>
+                  <p className="mt-1 text-sm">Try a different keyword or filter</p>
                 </div>
               ) : (
-                /* Popular vehicles when no query */
                 <div className="p-4">
                   <p className="px-2 pb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">Popular Vehicles</p>
                   <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -176,7 +197,6 @@ export default function SearchModal() {
                 </div>
               )}
 
-              {/* Footer quick links */}
               <div className="border-t border-gray-100 px-5 py-3 flex items-center justify-between">
                 <div className="flex gap-4">
                   <Link href="/cars"  onClick={close} className="flex items-center gap-1.5 text-xs font-semibold text-gray-500 hover:text-green-600">

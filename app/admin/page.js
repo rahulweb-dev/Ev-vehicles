@@ -79,6 +79,7 @@ export default function AdminDashboard() {
   const [leads, setLeads]           = useState(null);
   const [vehicles, setVehicles]     = useState(null);
   const [subscribers, setSubscribers] = useState(null);
+  const [analytics, setAnalytics]   = useState(null);
   const [loading, setLoading]       = useState(true);
 
   useEffect(() => {
@@ -93,9 +94,11 @@ export default function AdminDashboard() {
           fetch("/api/vehicles?limit=200"),
         ]);
         const subRes = await fetch("/api/subscribe?limit=50");
-        const [pub, draft, latest, leadsData, feat, vehData, subData] = await Promise.all([
-          pubRes.json(), draftRes.json(), latestRes.json(), leadsRes.json(), featRes.json(), vehRes.json(), subRes.json(),
+        const analyticsRes = await fetch("/api/admin/analytics");
+        const [pub, draft, latest, leadsData, feat, vehData, subData, analyticsData] = await Promise.all([
+          pubRes.json(), draftRes.json(), latestRes.json(), leadsRes.json(), featRes.json(), vehRes.json(), subRes.json(), analyticsRes.json(),
         ]);
+        setAnalytics(analyticsData);
         const totalViews = (pub.articles || []).reduce((s, a) => s + (a.views || 0), 0);
         setStats({ published: pub.total || 0, drafts: draft.total || 0, total: (pub.total || 0) + (draft.total || 0), views: totalViews });
         setRecent(latest.articles || []);
@@ -419,6 +422,59 @@ export default function AdminDashboard() {
               }
             </div>
           </div>
+
+          {/* Top Articles by Views */}
+          <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-sm">
+            <div className="flex items-center gap-2 border-b border-gray-100 px-4 py-3">
+              <BarChart2 size={16} className="text-purple-600" />
+              <span className="font-bold text-gray-800 text-sm">Top Articles by Views</span>
+            </div>
+            <div className="divide-y divide-gray-50">
+              {loading
+                ? Array(5).fill(0).map((_, i) => <div key={i} className="animate-pulse h-10 mx-4 my-2 rounded bg-gray-100" />)
+                : (analytics?.topArticles || []).map((a, i) => (
+                  <div key={a._id} className="flex items-center gap-3 px-4 py-2.5">
+                    <span className="text-xs font-black text-gray-300 w-4 shrink-0">{i + 1}</span>
+                    <div className="flex-1 min-w-0">
+                      <p className="truncate text-xs font-semibold text-gray-800">{a.title}</p>
+                      <p className="text-[10px] capitalize text-gray-400">{a.category}</p>
+                    </div>
+                    <div className="flex items-center gap-1 text-xs font-bold text-purple-600 shrink-0">
+                      <Eye size={10} /> {(a.views || 0).toLocaleString("en-IN")}
+                    </div>
+                  </div>
+                ))
+              }
+              {!loading && !analytics?.topArticles?.length && (
+                <p className="py-6 text-center text-xs text-gray-400">No view data yet</p>
+              )}
+            </div>
+          </div>
+
+          {/* Category Breakdown */}
+          {(analytics?.articlesByCategory?.length > 0) && (
+            <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+              <h2 className="mb-3 font-bold text-gray-800 text-sm">Articles by Category</h2>
+              <div className="space-y-2">
+                {analytics.articlesByCategory.map(cat => {
+                  const colors = { cars: "bg-blue-500", bikes: "bg-orange-500", commercial: "bg-purple-500", charging: "bg-teal-500" };
+                  const max = analytics.articlesByCategory[0]?.count || 1;
+                  return (
+                    <div key={cat._id}>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="font-semibold capitalize text-gray-700">{cat._id}</span>
+                        <span className="text-gray-400">{cat.count} articles · {(cat.totalViews || 0).toLocaleString("en-IN")} views</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
+                        <div className={`h-full rounded-full ${colors[cat._id] || "bg-gray-400"} transition-all`}
+                          style={{ width: `${(cat.count / max) * 100}%` }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Quick Actions */}
           <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">

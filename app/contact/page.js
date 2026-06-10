@@ -9,8 +9,36 @@ export const metadata = {
   alternates: { canonical: `${SITE_URL}/contact` },
 };
 
+const contactJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "NewsMediaOrganization",
+  name: "EV News India",
+  alternateName: "EVRadar India",
+  url: SITE_URL,
+  logo: { "@type": "ImageObject", url: `${SITE_URL}/images/logo.png` },
+  email: "contact@evradar.in",
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Mumbai",
+    addressRegion: "Maharashtra",
+    addressCountry: "IN",
+  },
+  contactPoint: [
+    { "@type": "ContactPoint", contactType: "editorial",   email: "editorial@evradar.in" },
+    { "@type": "ContactPoint", contactType: "advertising", email: "advertise@evradar.in" },
+  ],
+  sameAs: [
+    "https://twitter.com/EVNewsIndia",
+    "https://www.facebook.com/EVNewsIndia",
+    "https://www.instagram.com/evnewsindia",
+    "https://www.youtube.com/@EVNewsIndia",
+  ],
+};
+
 export default function ContactPage() {
   return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(contactJsonLd) }} />
     <div className="bg-white">
       <div className="bg-gray-950 py-14">
         <div className="mx-auto max-w-7xl px-4">
@@ -74,7 +102,7 @@ export default function ContactPage() {
                 const Icon = item.icon;
                 return (
                   <div key={item.title} className="flex gap-4 rounded-2xl border border-gray-100 p-5">
-                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-green-50">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-green-50">
                       <Icon size={22} className="text-green-600" />
                     </div>
                     <div>
@@ -105,5 +133,6 @@ export default function ContactPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

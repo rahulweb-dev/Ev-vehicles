@@ -9,6 +9,8 @@ import {
   PlayCircle, Star,
 } from "lucide-react";
 import LeadForm from "./LeadForm";
+import EMICalculator from "./EMICalculator";
+import OnRoadPrice from "./OnRoadPrice";
 
 /* ── helpers ─────────────────────────────────────────────────── */
 function getYouTubeId(url) {
@@ -621,6 +623,9 @@ export default function VehicleDetailPage({ vehicle, relatedVehicles = [], vehic
               vehicleSlug={vehicle.slug}
               vehicleType={vehicleType}
             />
+
+            <EMICalculator basePrice={variant?.exShowroomPrice || ""} />
+            <OnRoadPrice   exShowroom={variant?.exShowroomPrice || ""} />
 
             {/* Warranty quick card */}
             {(vehicle.warranty?.battery || vehicle.warranty?.vehicle) && (

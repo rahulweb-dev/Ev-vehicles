@@ -9,6 +9,7 @@ import {
   Info, ArrowRight, Zap, ChevronRight,
 } from 'lucide-react'
 import SearchModal from './SearchModal'
+import DarkModeToggle from './DarkModeToggle'
 
 const DESKTOP_NAV = [
   { title: 'Home', link: '/' },
@@ -258,6 +259,7 @@ export default function Navbar() {
           {/* Desktop Right */}
           <div className="hidden items-center gap-2.5 lg:flex">
             <SearchModal />
+            <DarkModeToggle />
             <Link
               href="/news"
               className="rounded-full bg-green-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg transition hover:bg-green-700"
@@ -268,6 +270,7 @@ export default function Navbar() {
 
           {/* Mobile Right Buttons */}
           <div className="flex items-center gap-2 lg:hidden">
+            <DarkModeToggle />
             {/* Mobile Search Icon */}
             <button
               onClick={() => { setMobileSearch(!mobileSearch); setMobileOpen(true) }}

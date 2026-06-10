@@ -1,7 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Clock3, ArrowRight } from "lucide-react";
+import { Clock3, ArrowRight, Eye } from "lucide-react";
 import ShareLikeButtons from "./ShareLikeButtons";
+
+function fmtViews(n) {
+  if (!n || n < 100) return null;
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000)     return `${(n / 1_000).toFixed(1)}K`;
+  return String(n);
+}
 
 const categoryColors = {
   cars: "bg-blue-100 text-blue-700",
@@ -57,14 +64,22 @@ function DefaultNewsCard({ article }) {
             <Clock3 size={12} />
             <span>{article.readTime} read</span>
           </div>
-          <span>
-            {new Date(article.publishedAt).toLocaleDateString("en-IN", {
-              day: "numeric", month: "short", year: "numeric",
-            })}
-          </span>
+          <div className="flex items-center gap-2">
+            {fmtViews(article.views) && (
+              <span className="flex items-center gap-0.5 text-green-500 font-semibold">
+                <Eye size={11} />
+                {fmtViews(article.views)}
+              </span>
+            )}
+            <span>
+              {new Date(article.publishedAt).toLocaleDateString("en-IN", {
+                day: "numeric", month: "short", year: "numeric",
+              })}
+            </span>
+          </div>
         </div>
         <div className="mt-2.5 border-t border-gray-50 pt-2.5">
-          <ShareLikeButtons slug={article.slug} title={article.title} compact />
+          <ShareLikeButtons slug={article.slug} title={article.title} image={article.image} compact />
         </div>
       </div>
     </article>
@@ -125,7 +140,7 @@ function FeaturedNewsCard({ article }) {
 
       {/* Share & Like outside the link to avoid nested interactive elements */}
       <div className="absolute bottom-6 right-6 md:bottom-8 md:right-8 z-10">
-        <ShareLikeButtons slug={article.slug} title={article.title} compact />
+        <ShareLikeButtons slug={article.slug} title={article.title} image={article.image} compact />
       </div>
     </article>
   );
@@ -168,7 +183,7 @@ function HorizontalNewsCard({ article }) {
       </Link>
 
       <div className="mt-2 border-t border-gray-50 pt-2 pl-3">
-        <ShareLikeButtons slug={article.slug} title={article.title} compact />
+        <ShareLikeButtons slug={article.slug} title={article.title} image={article.image} compact />
       </div>
     </article>
   );

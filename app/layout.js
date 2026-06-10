@@ -7,6 +7,12 @@ import CookieConsent from "@/components/CookieConsent";
 import PushNotificationPrompt from "@/components/PushNotificationPrompt";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import ChatWidgetLoader from "@/components/chatbot/ChatWidgetLoader";
+import ScrollRestorer from "@/components/ScrollRestorer";
+import BackToTop from "@/components/BackToTop";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import ContentProtection from "@/components/ContentProtection";
+import ExitIntentPopup from "@/components/ExitIntentPopup";
+import WhatsAppChannelCTA from "@/components/WhatsAppChannelCTA";
 const ADSENSE_PUBLISHER_ID = process.env.NEXT_PUBLIC_ADSENSE_ID || "ca-pub-XXXXXXXXXXXXXXXXX";
 
 export const SITE_URL = "https://www.evradar.in";
@@ -148,6 +154,14 @@ export default function RootLayout({ children }) {
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
 
+        {/* RSS feed — enables Google News discovery and feed readers */}
+        <link rel="alternate" type="application/rss+xml" title="EV News India – Latest EV News Feed" href="/feed.xml" />
+
+        {/* Preconnect to speed up third-party resource loading */}
+        <link rel="preconnect" href="https://ik.imagekit.io" />
+        <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+
         {/* JSON-LD: Organization + WebSite Schema */}
         <script
           type="application/ld+json"
@@ -163,10 +177,17 @@ export default function RootLayout({ children }) {
           strategy="afterInteractive"
         />
 
+        <ThemeProvider>
+        <ContentProtection />
+        {/* <ExitIntentPopup />
+        <WhatsAppChannelCTA /> */}
+        <ScrollRestorer />
         <ConditionalShell>{children}</ConditionalShell>
         <CookieConsent />
         <PushNotificationPrompt />
         <ChatWidgetLoader />
+        <BackToTop />
+        </ThemeProvider>
         <GoogleAnalytics gaId="G-2QJL966SVB" />
       </body>
     </html>

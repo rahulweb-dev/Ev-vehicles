@@ -82,11 +82,40 @@ export default function ArticleEditor({ initialData = null }) {
     metaKeywords: initialData?.metaKeywords || "",
   });
 
-  const [tagInput, setTagInput] = useState("");
-  const [uploading, setUploading] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [toast, setToast] = useState(null);
-  const [preview, setPreview] = useState(false);
+  const [tagInput, setTagInput]     = useState("");
+  const [uploading, setUploading]   = useState(false);
+  const [saving, setSaving]         = useState(false);
+  const [toast, setToast]           = useState(null);
+  const [preview, setPreview]       = useState(false);
+  const [autoSavedAt, setAutoSavedAt] = useState(null);
+  const [scheduledAt, setScheduledAt] = useState(initialData?.scheduledAt ? new Date(initialData.scheduledAt).toISOString().slice(0, 16) : "");
+  const autoSaveKey = `ev-draft-${isEdit ? initialData._id : "new"}`;
+
+  /* Autosave to localStorage every 30 seconds if content changed */
+  useEffect(() => {
+    if (!form.title && !form.content) return;
+    const timer = setTimeout(() => {
+      localStorage.setItem(autoSaveKey, JSON.stringify({ ...form, savedAt: Date.now() }));
+      setAutoSavedAt(new Date());
+    }, 30000);
+    return () => clearTimeout(timer);
+  }, [form, autoSaveKey]);
+
+  /* Restore autosave for new articles */
+  useEffect(() => {
+    if (isEdit) return;
+    const saved = localStorage.getItem(autoSaveKey);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        const age = Date.now() - (parsed.savedAt || 0);
+        if (age < 24 * 3600000) {
+          setToast({ message: "Draft restored from autosave", type: "success" });
+          setTimeout(() => setToast(null), 4000);
+        }
+      } catch {}
+    }
+  }, []);
 
   const words = useMemo(() => wordCount(form.content), [form.content]);
   const readMinutes = Math.max(1, Math.ceil(words / 200));
@@ -146,7 +175,7 @@ export default function ArticleEditor({ initialData = null }) {
     }
     setSaving(true);
     try {
-      const payload = { ...form, status: publishStatus };
+      const payload = { ...form, status: publishStatus, scheduledAt: scheduledAt || null };
       const url = isEdit ? `/api/articles/${initialData._id}` : "/api/articles";
       const method = isEdit ? "PUT" : "POST";
       const res = await fetch(url, {
@@ -156,6 +185,7 @@ export default function ArticleEditor({ initialData = null }) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Save failed");
+      localStorage.removeItem(autoSaveKey);
       showToast(publishStatus === "published"
         ? "Published! Search engines notified ⚡"
         : "Draft saved ✓"
@@ -217,6 +247,14 @@ export default function ArticleEditor({ initialData = null }) {
 
         {/* Stats + Actions */}
         <div className="flex items-center gap-3">
+          {/* Autosave indicator */}
+          {autoSavedAt && (
+            <span className="hidden sm:flex items-center gap-1 text-xs text-gray-400">
+              <CheckCircle2 size={11} className="text-green-500" />
+              Autosaved {autoSavedAt.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
+            </span>
+          )}
+
           {/* Word count */}
           <span className="hidden sm:flex items-center gap-1 text-xs text-gray-400">
             <Hash size={11} /> {words} words · {readMinutes} min
@@ -421,6 +459,21 @@ export default function ArticleEditor({ initialData = null }) {
                 <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-all ${form.featured ? "left-4.5" : "left-0.5"}`} />
               </button>
             </div>
+
+            {/* Scheduled publish */}
+            <SideInput label="Schedule Publish (optional)">
+              <input
+                type="datetime-local"
+                value={scheduledAt}
+                onChange={(e) => setScheduledAt(e.target.value)}
+                className={INPUT}
+              />
+              {scheduledAt && (
+                <p className="mt-1 text-[10px] text-amber-600 flex items-center gap-1">
+                  <Clock size={10} /> Will publish on {new Date(scheduledAt).toLocaleString("en-IN")}
+                </p>
+              )}
+            </SideInput>
           </SideSection>
 
           {/* ── Tags ── */}

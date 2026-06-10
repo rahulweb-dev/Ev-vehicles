@@ -24,8 +24,8 @@ async function getDbEntries() {
     await dbConnect();
 
     const [articles, vehicles] = await Promise.all([
-      Article.find({ status: "published" }).select("slug publishedAt updatedAt").lean(),
-      Vehicle.find({ status: "published" }).select("slug vehicleType updatedAt").lean(),
+      Article.find({ status: "published" }).select("slug publishedAt updatedAt author tags").lean(),
+      Vehicle.find({ status: "published" }).select("slug vehicleType brand updatedAt").lean(),
     ]);
 
     const articleUrls = articles.map(a => ({
@@ -42,6 +42,33 @@ async function getDbEntries() {
       priority:        0.75,
     }));
 
+    /* author archive pages */
+    const uniqueAuthors = [...new Set(articles.map(a => a.author).filter(Boolean))];
+    const authorUrls = uniqueAuthors.map(author => ({
+      url:             `${SITE_URL}/authors/${encodeURIComponent(author.toLowerCase().replace(/\s+/g, "-"))}`,
+      lastModified:    new Date(),
+      changeFrequency: "weekly",
+      priority:        0.6,
+    }));
+
+    /* tag archive pages */
+    const uniqueTags = [...new Set(articles.flatMap(a => a.tags || []).filter(Boolean))];
+    const tagUrls = uniqueTags.map(tag => ({
+      url:             `${SITE_URL}/news/tags/${encodeURIComponent(tag)}`,
+      lastModified:    new Date(),
+      changeFrequency: "weekly",
+      priority:        0.55,
+    }));
+
+    /* brand pages */
+    const uniqueBrands = [...new Set(vehicles.map(v => v.brand).filter(Boolean))];
+    const brandUrls = uniqueBrands.map(brand => ({
+      url:             `${SITE_URL}/brands/${encodeURIComponent(brand.toLowerCase().replace(/\s+/g, "-"))}`,
+      lastModified:    new Date(),
+      changeFrequency: "monthly",
+      priority:        0.7,
+    }));
+
     /* generate all pairwise comparison URLs */
     const comparePairs = [];
     for (let i = 0; i < vehicles.length; i++) {
@@ -55,7 +82,7 @@ async function getDbEntries() {
       }
     }
 
-    return [...articleUrls, ...vehicleUrls, ...comparePairs];
+    return [...articleUrls, ...vehicleUrls, ...authorUrls, ...tagUrls, ...brandUrls, ...comparePairs];
   } catch {
     return [];
   }

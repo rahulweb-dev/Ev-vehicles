@@ -172,7 +172,7 @@ export default function LatestNews() {
               className={`flex shrink-0 items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-semibold transition-all duration-300 md:rounded-2xl md:px-5 md:py-2.5 md:text-sm ${
                 active === tab.id
                   ? "border-green-400 bg-green-500/20 text-green-400 shadow-lg shadow-green-500/20"
-                  : "border-white/10 bg-white/5 text-gray-300 hover:border-green-400/30 hover:bg-white/10"
+                  : "border-white/10 bg-white/5 text-gray-900 hover:border-green-400/30 hover:bg-white/10"
               }`}
             >
               {tab.icon}

@@ -7,6 +7,13 @@ import ShareLikeButtons from "@/components/news/ShareLikeButtons";
 import { AdBannerInArticle } from "@/components/ads/AdBanner";
 import { SITE_URL, SITE_NAME } from "@/app/layout";
 import ArticleAudioPlayer from "@/components/audio/ArticleAudioPlayer";
+import ReadingProgress from "@/components/ReadingProgress";
+import NewsletterSidebar from "@/components/NewsletterSidebar";
+import BookmarkButton from "@/components/BookmarkButton";
+import ArticleViewCounter from "@/components/ArticleViewCounter";
+import ArticleComments from "@/components/ArticleComments";
+import TrendingWidget from "@/components/TrendingWidget";
+import ArticleStickyBar from "@/components/ArticleStickyBar";
 
 export const revalidate = 300;
 
@@ -50,6 +57,9 @@ export async function generateMetadata({ params }) {
     keywords: article.tags,
     authors: [{ name: article.author }],
     alternates: { canonical: `${SITE_URL}/news/${article.slug}` },
+    other: {
+      "news_keywords": article.tags?.join(", ") || "",
+    },
     openGraph: {
       title: article.title,
       description: article.excerpt,
@@ -82,9 +92,15 @@ export default async function ArticlePage({ params }) {
     headline: article.title,
     description: article.excerpt,
     image: [article.image],
+    url: `${SITE_URL}/news/${slug}`,
     datePublished: article.publishedAt,
     dateModified: article.updatedAt || article.publishedAt,
-    author: { "@type": "Person", name: article.author },
+    isAccessibleForFree: true,
+    author: {
+      "@type": "Person",
+      name: article.author,
+      url: `${SITE_URL}/authors/${encodeURIComponent((article.author || "").toLowerCase().replace(/\s+/g, "-"))}`,
+    },
     publisher: {
       "@type": "Organization",
       name: SITE_NAME,
@@ -107,6 +123,7 @@ export default async function ArticlePage({ params }) {
 
   return (
     <>
+      <ReadingProgress />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
@@ -126,9 +143,9 @@ export default async function ArticlePage({ params }) {
               <header>
                 <div className="mb-4 flex flex-wrap gap-2">
                   {article.tags?.map((tag) => (
-                    <span key={tag} className="inline-flex items-center gap-1 rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-700">
+                    <Link key={tag} href={`/news/tags/${encodeURIComponent(tag)}`} className="inline-flex items-center gap-1 rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-700 hover:bg-green-100 transition">
                       <Tag size={11} />{tag}
-                    </span>
+                    </Link>
                   ))}
                 </div>
                 <h1 className="text-3xl font-black leading-tight text-gray-900 md:text-4xl lg:text-5xl">
@@ -136,7 +153,7 @@ export default async function ArticlePage({ params }) {
                 </h1>
                 <p className="mt-4 text-lg leading-relaxed text-gray-600">{article.excerpt}</p>
                 <div className="mt-6 flex flex-wrap items-center gap-4 border-y border-gray-100 py-4 text-sm text-gray-500">
-                  <div className="flex items-center gap-2">
+                  <Link href={`/authors/${encodeURIComponent(article.author?.toLowerCase().replace(/\s+/g, "-") || "")}`} className="flex items-center gap-2 hover:opacity-80 transition">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-600 text-xs font-bold text-white">
                       {article.author?.charAt(0)}
                     </div>
@@ -144,7 +161,7 @@ export default async function ArticlePage({ params }) {
                       <p className="font-semibold text-gray-900">{article.author}</p>
                       <p className="text-xs">EV News India</p>
                     </div>
-                  </div>
+                  </Link>
                   <div className="flex items-center gap-1.5">
                     <Calendar size={15} />
                     {new Date(article.publishedAt || article.createdAt).toLocaleDateString("en-IN", {
@@ -155,19 +172,23 @@ export default async function ArticlePage({ params }) {
                     <Clock3 size={15} />
                     {article.readTime} read
                   </div>
+                  <ArticleViewCounter slug={article.slug} initialViews={article.views || 0} />
                 </div>
               </header>
 
               {/* Share & Like bar */}
               <div className="my-6 flex items-center justify-between rounded-2xl bg-gray-50 px-5 py-4">
                 <p className="text-sm font-semibold text-gray-600">Enjoyed this article?</p>
-                <ShareLikeButtons slug={article.slug} title={article.title} url={`${SITE_URL.replace(/\/$/, "")}/news/${article.slug}`} />
+                <div className="flex items-center gap-2">
+                  <BookmarkButton slug={article.slug} title={article.title} image={article.image} excerpt={article.excerpt} />
+                  <ShareLikeButtons slug={article.slug} title={article.title} url={`${SITE_URL.replace(/\/$/, "")}/news/${article.slug}`} image={article.image} initialLikes={article.likes || 0} />
+                </div>
               </div>
 
               {/* Audio Player */}
               <ArticleAudioPlayer title={article.title} content={article.content} />
 
-              <div className="relative my-8 h-[250px] overflow-hidden rounded-2xl sm:h-[350px] md:h-[450px]">
+              <div className="relative my-8 h-62.5 overflow-hidden rounded-2xl sm:h-87.5 md:h-112.5">
                 <Image src={article.image} alt={article.imageAlt || article.title} fill className="object-cover" priority sizes="800px" />
               </div>
 
@@ -180,9 +201,11 @@ export default async function ArticlePage({ params }) {
 
               <AdBannerInArticle slot="5678901234" />
 
+              <ArticleComments slug={article.slug} />
+
               <div className="mt-8 flex flex-wrap gap-2 border-t border-gray-100 pt-6">
                 {article.tags?.map((tag) => (
-                  <span key={tag} className="rounded-lg bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-600">#{tag}</span>
+                  <Link key={tag} href={`/news/tags/${encodeURIComponent(tag)}`} className="rounded-lg bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-green-50 hover:text-green-700 transition">#{tag}</Link>
                 ))}
               </div>
             </article>
@@ -190,6 +213,7 @@ export default async function ArticlePage({ params }) {
             <aside className="space-y-8">
               <div className="sticky top-24 space-y-8">
                 <AdBannerInArticle slot="6789012345" />
+                <TrendingWidget />
                 {related.length > 0 && (
                   <div>
                     <h3 className="mb-4 text-lg font-black text-gray-900">Related Stories</h3>
@@ -200,12 +224,7 @@ export default async function ArticlePage({ params }) {
                     </div>
                   </div>
                 )}
-                <div className="rounded-2xl bg-green-600 p-5 text-white">
-                  <h3 className="font-bold text-lg">Get EV News Daily</h3>
-                  <p className="mt-1 text-sm text-green-100">Join 50,000+ readers who never miss an EV update.</p>
-                  <input type="email" placeholder="Your email" className="mt-4 w-full rounded-xl bg-white/20 px-4 py-2.5 text-sm text-white placeholder-green-200 outline-none" />
-                  <button className="mt-3 w-full rounded-xl bg-white py-2.5 text-sm font-bold text-green-700">Subscribe Free</button>
-                </div>
+                <NewsletterSidebar />
               </div>
             </aside>
           </div>
@@ -222,6 +241,7 @@ export default async function ArticlePage({ params }) {
           )}
         </div>
       </div>
+      <ArticleStickyBar />
     </>
   );
 }

@@ -29,17 +29,24 @@ export default function VehicleSlider({ title, vehicles = [], vehicleType = "car
   /* GSAP scroll-reveal for section header + slides */
   useEffect(() => {
     if (!mounted) return;
+    const section = sectionRef.current;
+    const header  = headerRef.current;
     const ctx = gsap.context(() => {
-      gsap.from(headerRef.current, {
+      gsap.from(header, {
         opacity: 0, y: 30, duration: 0.6, ease: "power3.out",
-        scrollTrigger: { trigger: headerRef.current, start: "top 90%" },
+        scrollTrigger: { trigger: header, start: "top 90%" },
       });
       gsap.from(".vehicle-swiper .swiper-slide", {
         opacity: 0, y: 30, stagger: 0.07, duration: 0.5, ease: "power2.out",
-        scrollTrigger: { trigger: sectionRef.current, start: "top 85%" },
+        scrollTrigger: { trigger: section, start: "top 85%" },
       });
-    }, sectionRef);
-    return () => ctx.revert();
+    }, section);
+    return () => {
+      ctx.revert();
+      ScrollTrigger.getAll()
+        .filter(t => t.trigger === section || t.trigger === header)
+        .forEach(t => t.kill());
+    };
   }, [mounted]);
 
   /* Skeleton — visible on SSR and first client render */
