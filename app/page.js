@@ -47,6 +47,22 @@ function mapVehicle(v) {
   };
 }
 
+/* ── Fetch latest articles for ItemList schema ───────────────────── */
+async function getLatestArticles() {
+  try {
+    const dbConnect = (await import("@/lib/mongodb")).default;
+    const Article = (await import("@/lib/models/Article")).default;
+    await dbConnect();
+    return await Article.find({ status: "published" })
+      .sort({ publishedAt: -1 })
+      .limit(10)
+      .select("slug title")
+      .lean();
+  } catch {
+    return [];
+  }
+}
+
 /* ── Fetch a section from MongoDB ────────────────────────────────── */
 async function getVehicles({ category, vehicleType, featured }) {
   const dbConnect = (await import("@/lib/mongodb")).default;
@@ -64,10 +80,12 @@ async function getVehicles({ category, vehicleType, featured }) {
 
 export default async function Home() {
   const [
+    latestArticles,
     featuredCars, featuredBikes,
     popularCars, popularBikes,
     upcomingCars, upcomingBikes,
   ] = await Promise.all([
+    getLatestArticles(),
     getVehicles({ vehicleType: "car",  featured: true }),
     getVehicles({ vehicleType: "bike", featured: true }),
     getVehicles({ vehicleType: "car",  category: "popular" }),
@@ -76,8 +94,26 @@ export default async function Home() {
     getVehicles({ vehicleType: "bike", category: "upcoming" }),
   ]);
 
+  const itemListJsonLd = latestArticles.length > 0
+    ? {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        name: "Latest EV News India",
+        url: `${SITE_URL}/news`,
+        itemListElement: latestArticles.map((article, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          url: `${SITE_URL}/news/${article.slug}`,
+          name: article.title,
+        })),
+      }
+    : null;
+
   return (
     <>
+      {itemListJsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
+      )}
       <EVHomepage />
 
       <div className="bg-white py-2">

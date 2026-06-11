@@ -417,6 +417,27 @@ export default function ArticleEditor({ initialData = null }) {
                 className={`mt-2 ${INPUT}`}
               />
             )}
+
+            {/* Image size guidelines */}
+            <div className="mt-3 rounded-xl bg-blue-50 border border-blue-100 p-3 space-y-1.5">
+              <p className="text-[11px] font-bold text-blue-700 uppercase tracking-wide">Recommended Size</p>
+              <div className="space-y-1">
+                {[
+                  { label: "Dimensions",  value: "1200 × 630 px" },
+                  { label: "Ratio",       value: "16:9 (landscape)" },
+                  { label: "Max size",    value: "2 MB" },
+                  { label: "Format",      value: "JPG or WebP" },
+                ].map(({ label, value }) => (
+                  <div key={label} className="flex items-center justify-between">
+                    <span className="text-[11px] text-blue-500">{label}</span>
+                    <span className="text-[11px] font-semibold text-blue-800">{value}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="text-[10px] text-blue-400 leading-tight pt-0.5">
+                1200×630 is optimal for Google Discover, Open Graph &amp; Twitter cards.
+              </p>
+            </div>
           </SideSection>
 
           {/* ── Publish settings ── */}

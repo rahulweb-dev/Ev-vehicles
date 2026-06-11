@@ -195,6 +195,27 @@ export default function RootLayout({ children }) {
         <BackToTop />
         </ThemeProvider>
         <GoogleAnalytics gaId="G-2QJL966SVB" />
+
+        {/* Subscribe with Google Basic — enables Google News free-access badge */}
+        <Script
+          async
+          src="https://news.google.com/swg/js/v1/swg-basic.js"
+          strategy="afterInteractive"
+        />
+        <Script
+          id="swg-basic-init"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `(self.SWG_BASIC = self.SWG_BASIC || []).push(basicSubscriptions => {
+              basicSubscriptions.init({
+                type: "NewsArticle",
+                isPartOfType: ["Product"],
+                isPartOfProductId: "CAowyvbGDA:openaccess",
+                clientOptions: { theme: "light", lang: "en" },
+              });
+            });`,
+          }}
+        />
       </body>
     </html>
   );

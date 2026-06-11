@@ -86,6 +86,12 @@ export default async function ArticlePage({ params }) {
 
   const related = await getRelated(article.category, slug);
 
+  const wordCount = (article.content || "")
+    .replace(/<[^>]+>/g, " ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean).length;
+
   const articleJsonLd = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
@@ -96,6 +102,11 @@ export default async function ArticlePage({ params }) {
     datePublished: article.publishedAt,
     dateModified: article.updatedAt || article.publishedAt,
     isAccessibleForFree: true,
+    wordCount,
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: ["h1", "p.mt-4"],
+    },
     author: {
       "@type": "Person",
       name: article.author,

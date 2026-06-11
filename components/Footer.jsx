@@ -45,7 +45,7 @@ const footerLinks = {
     { name: "Contact Us", href: "/contact" },
     { name: "FAQ", href: "/faq" },
     { name: "Privacy Policy", href: "/privacy-policy" },
-    { name: "Terms of Service", href: "/terms" },
+    { name: "Terms of Service", href: "/terms-and-conditions" },
     { name: "Advertise With Us", href: "/contact" },
   ],
 };
@@ -160,7 +160,7 @@ export default function Footer() {
               </a>
               <Link href="/faq" className="hover:text-gray-300">FAQ</Link>
               <Link href="/privacy-policy" className="hover:text-gray-300">Privacy Policy</Link>
-              <Link href="/terms" className="hover:text-gray-300">Terms of Service</Link>
+              <Link href="/terms-and-conditions" className="hover:text-gray-300">Terms of Service</Link>
               <Link href="/sitemap.xml" className="hover:text-gray-300">Sitemap</Link>
             </div>
           </div>

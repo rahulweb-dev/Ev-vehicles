@@ -95,10 +95,62 @@ export default async function CarDetailPage({ params }) {
     ],
   };
 
+  const price = firstVariant?.exShowroomPrice;
+  const range = car.performance?.drivingRange;
+  const charging = car.charging?.fastChargingTime;
+
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: `What is the price of ${car.name} in India?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: price
+            ? `The ${car.name} price starts at ${price} (ex-showroom). Price may vary by city and variant.`
+            : `The official price for ${car.name} in India has not been announced yet.`,
+        },
+      },
+      {
+        "@type": "Question",
+        name: `What is the range of ${car.name} on a single charge?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: range
+            ? `The ${car.name} offers a certified range of ${range} on a full charge under standard test conditions.`
+            : `Official range figures for the ${car.name} have not been confirmed yet.`,
+        },
+      },
+      {
+        "@type": "Question",
+        name: `How long does it take to charge the ${car.name}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: charging
+            ? `The ${car.name} supports DC fast charging and can charge to 80% in approximately ${charging}. Home AC charging times vary by charger capacity.`
+            : `The ${car.name} supports home AC charging and DC fast charging. Refer to the official specifications for exact charging times.`,
+        },
+      },
+      {
+        "@type": "Question",
+        name: `Is the ${car.name} available in India?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: car.availability === "available"
+            ? `Yes, the ${car.name} is currently available at authorised dealerships across India.`
+            : `The ${car.name} is expected to launch soon in India. You can register your interest at the official brand website.`,
+        },
+      },
+    ],
+  };
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <VehicleDetailPage vehicle={car} relatedVehicles={related} vehicleType="car" />
     </>
   );

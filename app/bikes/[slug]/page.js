@@ -95,10 +95,62 @@ export default async function BikeDetailPage({ params }) {
     ],
   };
 
+  const price = firstVariant?.exShowroomPrice;
+  const range = bike.performance?.drivingRange;
+  const charging = bike.charging?.fastChargingTime;
+
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: `What is the price of ${bike.name} in India?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: price
+            ? `The ${bike.name} price starts at ${price} (ex-showroom). Price may vary by city and variant.`
+            : `The official price for ${bike.name} in India has not been announced yet.`,
+        },
+      },
+      {
+        "@type": "Question",
+        name: `What is the range of ${bike.name} on a single charge?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: range
+            ? `The ${bike.name} offers a certified range of ${range} on a full charge under standard test conditions.`
+            : `Official range figures for the ${bike.name} have not been confirmed yet.`,
+        },
+      },
+      {
+        "@type": "Question",
+        name: `How long does it take to charge the ${bike.name}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: charging
+            ? `The ${bike.name} supports fast charging and can be charged to 80% in approximately ${charging}.`
+            : `The ${bike.name} supports standard home charging. Refer to the official specifications for exact charging times.`,
+        },
+      },
+      {
+        "@type": "Question",
+        name: `Is the ${bike.name} available in India?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: bike.availability === "available"
+            ? `Yes, the ${bike.name} is currently available at authorised dealerships across India.`
+            : `The ${bike.name} is expected to launch soon in India. You can register your interest at the official brand website.`,
+        },
+      },
+    ],
+  };
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <VehicleDetailPage vehicle={bike} relatedVehicles={related} vehicleType="bike" />
     </>
   );
