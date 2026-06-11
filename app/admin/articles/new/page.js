@@ -1,6 +1,6 @@
-import ArticleEditor from "@/components/admin/ArticleEditor";
+"use client";
 
-export const metadata = { title: "New Article" };
+import ArticleEditor from "@/components/admin/ArticleEditor";
 
 export default function NewArticlePage() {
   return <ArticleEditor />;
