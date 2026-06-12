@@ -81,17 +81,20 @@ async function getVehicles({ category, vehicleType, featured }) {
 export default async function Home() {
   const [
     latestArticles,
-    featuredCars, featuredBikes,
-    popularCars, popularBikes,
-    upcomingCars, upcomingBikes,
+    featuredCars, featuredBikes, featuredCommercial,
+    popularCars, popularBikes, popularCommercial,
+    upcomingCars, upcomingBikes, upcomingCommercial,
   ] = await Promise.all([
     getLatestArticles(),
-    getVehicles({ vehicleType: "car",  featured: true }),
-    getVehicles({ vehicleType: "bike", featured: true }),
-    getVehicles({ vehicleType: "car",  category: "popular" }),
-    getVehicles({ vehicleType: "bike", category: "popular" }),
-    getVehicles({ vehicleType: "car",  category: "upcoming" }),
-    getVehicles({ vehicleType: "bike", category: "upcoming" }),
+    getVehicles({ vehicleType: "car",        featured: true }),
+    getVehicles({ vehicleType: "bike",       featured: true }),
+    getVehicles({ vehicleType: "commercial", featured: true }),
+    getVehicles({ vehicleType: "car",        category: "popular" }),
+    getVehicles({ vehicleType: "bike",       category: "popular" }),
+    getVehicles({ vehicleType: "commercial", category: "popular" }),
+    getVehicles({ vehicleType: "car",        category: "upcoming" }),
+    getVehicles({ vehicleType: "bike",       category: "upcoming" }),
+    getVehicles({ vehicleType: "commercial", category: "upcoming" }),
   ]);
 
   const itemListJsonLd = latestArticles.length > 0
@@ -183,6 +186,33 @@ export default async function Home() {
           subtitle="Launching Soon in India"
           vehicles={upcomingBikes}
           vehicleType="bikes"
+        />
+      )}
+
+      {featuredCommercial.length > 0 && (
+        <VehicleSlider
+          title="Featured Commercial EVs"
+          subtitle="Electric Trucks, Buses & Vans"
+          vehicles={featuredCommercial}
+          vehicleType="commercial"
+        />
+      )}
+
+      {popularCommercial.length > 0 && (
+        <VehicleSlider
+          title="Popular Commercial EVs"
+          subtitle="Top Electric Trucks, Buses & Delivery Vans in India"
+          vehicles={popularCommercial}
+          vehicleType="commercial"
+        />
+      )}
+
+      {upcomingCommercial.length > 0 && (
+        <VehicleSlider
+          title="Upcoming Commercial EVs"
+          subtitle="Electric Commercial Vehicles Launching Soon"
+          vehicles={upcomingCommercial}
+          vehicleType="commercial"
         />
       )}
     </>

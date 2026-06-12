@@ -1,6 +1,7 @@
-import OpenAI from "openai";
-
 export const runtime = "nodejs";
+
+const GEMINI_API = "https://generativelanguage.googleapis.com/v1beta/models";
+const GEMINI_MODEL = "gemini-flash-latest";
 
 /* ─── Build system prompt with DB context ──────────────────────── */
 function buildSystemPrompt(context) {
@@ -121,9 +122,10 @@ async function getDbContext(query) {
 
 /* ─── POST /api/chat ────────────────────────────────────────────── */
 export async function POST(req) {
-  if (!process.env.OPENAI_API_KEY) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
     return Response.json(
-      { error: "OpenAI API key not configured. Add OPENAI_API_KEY to .env.local" },
+      { error: "GEMINI_API_KEY not set. Get a free key from aistudio.google.com/apikey" },
       { status: 500 }
     );
   }
@@ -140,62 +142,83 @@ export async function POST(req) {
     return Response.json({ error: "Message is required" }, { status: 400 });
   }
 
-  /* fetch DB context in parallel with OpenAI call setup */
   const context = await getDbContext(message);
 
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-  const MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
-
-  /* build messages array — last 10 turns to keep context window small */
-  const chatMessages = [
-    { role: "system", content: buildSystemPrompt(context) },
+  // Convert history to Gemini format (user/model roles)
+  const contents = [
     ...history
       .filter(m => m.role === "user" || m.role === "assistant")
-      .slice(-10),
-    { role: "user", content: message.trim() },
+      .slice(-10)
+      .map(m => ({
+        role: m.role === "assistant" ? "model" : "user",
+        parts: [{ text: m.content }],
+      })),
+    { role: "user", parts: [{ text: message.trim() }] },
   ];
 
   try {
-    const stream = await openai.chat.completions.create({
-      model:       MODEL,
-      messages:    chatMessages,
-      stream:      true,
-      max_tokens:  400,
-      temperature: 0.7,
-    });
+    const geminiRes = await fetch(
+      `${GEMINI_API}/${GEMINI_MODEL}:streamGenerateContent?key=${apiKey}&alt=sse`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: buildSystemPrompt(context) }] },
+          contents,
+          generationConfig: { temperature: 0.7, maxOutputTokens: 400 },
+        }),
+      }
+    );
+
+    if (!geminiRes.ok) {
+      const err = await geminiRes.json().catch(() => ({}));
+      const msg = err?.error?.message || `Gemini error ${geminiRes.status}`;
+      console.error("[chat] Gemini error:", msg);
+      return Response.json({ error: msg }, { status: geminiRes.status });
+    }
 
     const encoder = new TextEncoder();
     const readable = new ReadableStream({
       async start(controller) {
+        const reader = geminiRes.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
         try {
-          for await (const chunk of stream) {
-            const text = chunk.choices[0]?.delta?.content || "";
-            if (text) controller.enqueue(encoder.encode(text));
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split("\n");
+            buffer = lines.pop() || "";
+            for (const line of lines) {
+              if (!line.startsWith("data: ")) continue;
+              const raw = line.slice(6).trim();
+              if (!raw || raw === "[DONE]") continue;
+              try {
+                const chunk = JSON.parse(raw);
+                const text = chunk.candidates?.[0]?.content?.parts?.[0]?.text || "";
+                if (text) controller.enqueue(encoder.encode(text));
+              } catch {}
+            }
           }
         } finally {
           controller.close();
+          reader.releaseLock();
         }
-      },
-      cancel() {
-        stream.controller.abort();
       },
     });
 
-    /* optionally persist to ChatHistory (fire-and-forget) */
-    if (sessionId) {
-      persistHistory(sessionId, message, req).catch(() => {});
-    }
+    if (sessionId) persistHistory(sessionId, message, req).catch(() => {});
 
     return new Response(readable, {
       headers: {
-        "Content-Type":  "text/plain; charset=utf-8",
-        "Cache-Control": "no-cache, no-store",
+        "Content-Type":      "text/plain; charset=utf-8",
+        "Cache-Control":     "no-cache, no-store",
         "X-Accel-Buffering": "no",
       },
     });
   } catch (err) {
-    console.error("[chat] OpenAI error:", err.message);
+    console.error("[chat] AI error:", err.message);
     return Response.json(
       { error: "AI service temporarily unavailable. Please try again." },
       { status: 503 }

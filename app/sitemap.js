@@ -36,7 +36,7 @@ async function getDbEntries() {
     }));
 
     const vehicleUrls = vehicles.map(v => ({
-      url:             `${SITE_URL}/${v.vehicleType === "car" ? "cars" : "bikes"}/${v.slug}`,
+      url:             `${SITE_URL}/${v.vehicleType === "car" ? "cars" : v.vehicleType === "bike" ? "bikes" : "commercial"}/${v.slug}`,
       lastModified:    v.updatedAt || new Date(),
       changeFrequency: "monthly",
       priority:        0.75,

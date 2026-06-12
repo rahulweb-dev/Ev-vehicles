@@ -64,9 +64,20 @@ export async function POST(request) {
     await dbConnect();
     const body = await request.json();
 
-    const { name, brand, vehicleType, category, slug } = body;
-    if (!name || !brand || !vehicleType || !category || !slug) {
-      return NextResponse.json({ error: "name, brand, vehicleType, category and slug are required" }, { status: 400 });
+    const { name, brand, vehicleType, slug } = body;
+    if (!name || !brand || !vehicleType || !slug) {
+      return NextResponse.json({ error: "name, brand, vehicleType and slug are required" }, { status: 400 });
+    }
+
+    // Sanitize enums before saving
+    if (!["car", "bike", "commercial"].includes(body.vehicleType)) {
+      return NextResponse.json({ error: "Invalid vehicleType" }, { status: 400 });
+    }
+    if (!["upcoming", "popular"].includes(body.category)) {
+      body.category = "popular";
+    }
+    if (!["upcoming", "available", "discontinued"].includes(body.availability)) {
+      body.availability = "available";
     }
 
     const existing = await Vehicle.findOne({ slug });

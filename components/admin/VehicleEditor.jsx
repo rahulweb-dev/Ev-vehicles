@@ -7,7 +7,7 @@ import {
   Car, Save, Star, StarOff, Plus, Trash2, Upload, X,
   Zap, Settings, Shield, Award, ThumbsUp, ThumbsDown,
   DollarSign, Palette, BatteryCharging,
-  Image as ImageIcon, Globe, CheckSquare,
+  Image as ImageIcon, Globe, CheckSquare, Sparkles,
 } from "lucide-react";
 
 /* ── helpers ────────────────────────────────────────────────── */
@@ -465,6 +465,8 @@ export default function VehicleEditor({ initialData, vehicleId }) {
   const [activeTab, setActiveTab] = useState("basic");
   const [saving, setSaving]       = useState(false);
   const [error, setError]         = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiSuccess, setAiSuccess] = useState(false);
 
   /* ── setters ──────────────────────────────────────────────── */
   const set       = useCallback((key, value) => setForm((f) => ({ ...f, [key]: value })), []);
@@ -475,6 +477,63 @@ export default function VehicleEditor({ initialData, vehicleId }) {
     const name = e.target.value;
     set("name", name);
     if (!isEdit) set("slug", slugify(name));
+  }
+
+  /* ── AI auto-fill ────────────────────────────────────────── */
+  async function autoFill() {
+    if (!form.name.trim()) { setError("Enter a vehicle name first"); return; }
+    setAiLoading(true);
+    setAiSuccess(false);
+    setError("");
+    try {
+      const res = await fetch("/api/vehicles/autofill", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: form.name.trim(), vehicleType: form.vehicleType }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setError(data.error || "AI fill failed"); setAiLoading(false); return; }
+
+      setForm((f) => ({
+        ...f,
+        ...data,
+        // preserve manually uploaded images
+        featuredImage: f.featuredImage,
+        gallery:       f.gallery,
+        ogImage:       f.ogImage,
+        // preserve vehicleType — don't let AI override what admin selected
+        vehicleType: f.vehicleType,
+        // category must only be "upcoming" or "popular"
+        category: ["upcoming", "popular"].includes(data.category) ? data.category : "popular",
+        // availability must be valid
+        availability: ["upcoming", "available", "discontinued"].includes(data.availability) ? data.availability : "available",
+        // auto-generate slug from name
+        slug: f.slug || slugify(data.name || f.name),
+        // deep-merge nested objects
+        performance: { ...DEFAULT.performance, ...(data.performance || {}) },
+        charging:    { ...DEFAULT.charging,    ...(data.charging    || {}) },
+        specs:       { ...DEFAULT.specs,       ...(data.specs       || {}) },
+        keyFeatures: { ...DEFAULT.keyFeatures, ...(data.keyFeatures || {}) },
+        features:    { ...DEFAULT.features,    ...(data.features    || {}) },
+        safety:      { ...DEFAULT.safety,      ...(data.safety      || {}) },
+        warranty:    { ...DEFAULT.warranty,    ...(data.warranty    || {}) },
+        colors:      normalizeColors(data.colors || []),
+        pros:        data.pros  || [],
+        cons:        data.cons  || [],
+        variants:    (data.variants || []).map((v) => ({
+          name: v.name || "", exShowroomPrice: v.exShowroomPrice || "",
+          onRoadPrice: v.onRoadPrice || "", batteryCapacity: v.batteryCapacity || "",
+          range: v.range || "", availabilityStatus: v.availabilityStatus || "Available",
+          features: v.features || [],
+        })),
+        keywords: data.keywords || [],
+      }));
+      setAiSuccess(true);
+      setTimeout(() => setAiSuccess(false), 4000);
+    } catch {
+      setError("AI fill failed — please try again");
+    }
+    setAiLoading(false);
   }
 
   /* ── variants ─────────────────────────────────────────────── */
@@ -603,11 +662,40 @@ export default function VehicleEditor({ initialData, vehicleId }) {
                   </Field>
                 </div>
 
+                {/* AI Auto-Fill */}
+                <div className={`rounded-2xl border-2 p-4 transition-colors ${aiSuccess ? "border-green-300 bg-green-50" : "border-dashed border-purple-200 bg-purple-50"}`}>
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="flex items-center gap-1.5 text-sm font-bold text-purple-800">
+                        <Sparkles size={14} /> AI Auto-Fill
+                      </p>
+                      <p className="mt-0.5 text-xs text-purple-600">
+                        {aiSuccess
+                          ? "✓ All fields filled! Upload images manually, then publish."
+                          : "Enter vehicle name above → click to auto-fill all specs, features, pricing & SEO fields using AI"}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={autoFill}
+                      disabled={aiLoading || !form.name.trim()}
+                      className="shrink-0 flex items-center gap-2 rounded-xl bg-purple-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {aiLoading
+                        ? <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                        : <Sparkles size={15} />
+                      }
+                      {aiLoading ? "Filling fields…" : "Auto-Fill with AI"}
+                    </button>
+                  </div>
+                </div>
+
                 <div className="grid gap-4 sm:grid-cols-3">
                   <Field label="Vehicle Type" required>
                     <Select value={form.vehicleType} onChange={(e) => set("vehicleType", e.target.value)}>
                       <option value="car">Electric Car</option>
                       <option value="bike">Electric Bike / Scooter</option>
+                      <option value="commercial">Commercial Vehicle (Truck / Bus / Van)</option>
                     </Select>
                   </Field>
                   <Field label="Category" required>
