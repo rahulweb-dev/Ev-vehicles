@@ -1,3 +1,5 @@
+export const maxDuration = 60;
+
 const GEMINI_API = "https://generativelanguage.googleapis.com/v1beta/models";
 
 // Find the first complete JSON object in a string by matching braces

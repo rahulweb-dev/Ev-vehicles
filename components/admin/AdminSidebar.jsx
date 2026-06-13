@@ -137,7 +137,7 @@ export default function AdminSidebar() {
                 {currentUser.name?.[0]?.toUpperCase()}
               </div>
               <div className="min-w-0">
-                <p className="text-xs font-bold text-gray-800 truncate">{currentUser.name}</p>
+                <p className="text-xs font-black truncate bg-linear-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">{currentUser.name}</p>
                 <div className="flex items-center gap-1 mt-0.5">
                   {isAdmin
                     ? <><ShieldCheck size={10} className="text-green-700" /><span className="text-[10px] text-green-700 font-semibold">Super Admin</span></>
@@ -255,7 +255,7 @@ function MobileTopBar({ navItems, pathname, onLogout, currentUser, isAdmin, wait
         <nav className="p-3 space-y-1 bg-white border-t border-gray-100">
           {currentUser && (
             <div className={`mb-2 rounded-xl border p-3 ${isAdmin ? "border-green-200 bg-green-50" : "border-blue-200 bg-blue-50"}`}>
-              <p className="text-xs font-bold text-gray-800">{currentUser.name}</p>
+              <p className="text-xs font-black bg-linear-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">{currentUser.name}</p>
               <p className={`text-[10px] font-semibold ${isAdmin ? "text-green-700" : "text-blue-600"}`}>
                 {isAdmin ? "Super Admin · All locations" : `Dealer · ${currentUser.city}, ${currentUser.state}`}
               </p>

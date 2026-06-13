@@ -24,6 +24,35 @@ function timeAgo(date) {
   return new Date(date).toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
 }
 
+/* ── notification sound (Web Audio API — no file needed) ────────── */
+function playSound(type = "chat") {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    if (type === "new") {
+      // Two-tone chime for new visitor
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.12);
+      gain.gain.setValueAtTime(0.4, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.4);
+    } else {
+      // Soft single beep for new message
+      osc.frequency.setValueAtTime(660, ctx.currentTime);
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.25);
+    }
+    osc.type = "sine";
+  } catch {}
+}
+
 /* ── main component ────────────────────────────────────────────────── */
 export default function LiveChatAdminPage() {
   const [sessions,       setSessions]       = useState([]);
@@ -37,9 +66,12 @@ export default function LiveChatAdminPage() {
   const [mobileView,     setMobileView]     = useState("list");
   const [currentUser,    setCurrentUser]    = useState(null);
   const [unreadMap,      setUnreadMap]      = useState({});
+  const [soundOn,        setSoundOn]        = useState(true);
 
-  const bottomRef = useRef(null);
-  const inputRef  = useRef(null);
+  const bottomRef  = useRef(null);
+  const inputRef   = useRef(null);
+  const soundOnRef = useRef(true);
+  useEffect(() => { soundOnRef.current = soundOn; }, [soundOn]);
 
   /* load current admin user */
   useEffect(() => {
@@ -80,6 +112,7 @@ export default function LiveChatAdminPage() {
         if (prev.find(s => s.sessionId === data.sessionId)) return prev;
         return [data, ...prev];
       });
+      if (soundOnRef.current) playSound("new");
       /* browser notification if tab is in background */
       if (document.hidden && Notification.permission === "granted") {
         new Notification("EVRadar Live Chat", {
@@ -99,6 +132,7 @@ export default function LiveChatAdminPage() {
         ...prev,
         [data.sessionId]: (prev[data.sessionId] || 0) + 1,
       }));
+      if (soundOnRef.current) playSound("chat");
     });
 
     return () => {
@@ -258,10 +292,19 @@ export default function LiveChatAdminPage() {
               </span>
             )}
           </div>
-          <button onClick={fetchSessions} title="Refresh"
-            className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition">
-            <RefreshCw size={14} />
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setSoundOn(p => !p)}
+              title={soundOn ? "Mute notifications" : "Unmute notifications"}
+              className={`rounded-lg p-1.5 transition ${soundOn ? "text-green-600 hover:bg-green-50" : "text-gray-300 hover:bg-gray-100"}`}
+            >
+              <BellRing size={14} />
+            </button>
+            <button onClick={fetchSessions} title="Refresh"
+              className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition">
+              <RefreshCw size={14} />
+            </button>
+          </div>
         </div>
 
         {/* stats bar */}
