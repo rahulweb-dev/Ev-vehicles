@@ -7,21 +7,23 @@ import { useState, useEffect } from "react";
 import {
   LayoutDashboard, Newspaper, LogOut,
   Menu, X, ExternalLink, Settings,
-  Users, Building2, MapPin, ShieldCheck, Car, LayoutTemplate, MessageSquare, Radio, MessagesSquare,
+  Users, Building2, MapPin, ShieldCheck, Car, LayoutTemplate, MessageSquare, Radio, MessagesSquare, BookOpen, Bell,
 } from "lucide-react";
 import { getPusherClient } from "@/lib/pusherClient";
 
 const ADMIN_NAV = [
   { href: "/admin",                 label: "Dashboard",    icon: LayoutDashboard, exact: true },
   { href: "/admin/articles",        label: "Articles",     icon: Newspaper },
+  { href: "/admin/blogs",           label: "Blogs",        icon: BookOpen },
   { href: "/admin/vehicles",        label: "Vehicles",     icon: Car },
   { href: "/admin/banners",         label: "Banners",      icon: LayoutTemplate },
   { href: "/admin/leads",           label: "Leads",        icon: Users },
   { href: "/admin/chatbot-leads",   label: "Chatbot Leads", icon: MessageSquare },
   { href: "/admin/live-chat",       label: "Live Chat",    icon: Radio, badge: "liveChat" },
-  { href: "/admin/comments",        label: "Comments",     icon: MessagesSquare, badge: "comments" },
-  { href: "/admin/dealers",         label: "Dealers",      icon: Building2 },
-  { href: "/admin/settings",        label: "Settings",     icon: Settings },
+  { href: "/admin/comments",           label: "Comments",          icon: MessagesSquare, badge: "comments" },
+  { href: "/admin/push-notifications", label: "Push Notifications", icon: Bell },
+  { href: "/admin/dealers",            label: "Dealers",            icon: Building2 },
+  { href: "/admin/settings",           label: "Settings",           icon: Settings },
 ];
 
 const DEALER_NAV = [

@@ -1,13 +1,39 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
   Newspaper, Eye, Plus, CheckCircle2, FileText,
   BarChart2, Zap, Users, Car, Bike, Truck, ArrowRight,
-  Clock, Star, Mail,
+  Clock, Star, Mail, BellRing,
 } from "lucide-react";
+import { getPusherClient } from "@/lib/pusherClient";
+
+function playSound(type = "chat") {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = "sine";
+    if (type === "new") {
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.12);
+      gain.gain.setValueAtTime(0.4, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.4);
+    } else {
+      osc.frequency.setValueAtTime(660, ctx.currentTime);
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.25);
+    }
+  } catch {}
+}
 
 function StatCard({ icon: Icon, label, value, sub, gradient }) {
   return (
@@ -81,6 +107,31 @@ export default function AdminDashboard() {
   const [subscribers, setSubscribers] = useState(null);
   const [analytics, setAnalytics]   = useState(null);
   const [loading, setLoading]       = useState(true);
+  const [soundOn, setSoundOn]       = useState(true);
+  const [newChats, setNewChats]     = useState(0);
+  const soundOnRef                  = useRef(true);
+  useEffect(() => { soundOnRef.current = soundOn; }, [soundOn]);
+
+  /* Pusher: listen for new live-chat sessions from any page */
+  useEffect(() => {
+    const pusher = getPusherClient();
+    if (!pusher) return;
+    const ch = pusher.subscribe("admin-notifications");
+    ch.bind("new-session", (data) => {
+      if (soundOnRef.current) playSound("new");
+      setNewChats(p => p + 1);
+      if (document.hidden && Notification.permission === "granted") {
+        new Notification("EVRadar Live Chat", {
+          body: `New visitor: ${data.userName || "Visitor"} is waiting`,
+          icon: "/images/logo.png",
+        });
+      }
+    });
+    ch.bind("user-message", () => {
+      if (soundOnRef.current) playSound("chat");
+    });
+    return () => { ch.unbind_all(); pusher.unsubscribe("admin-notifications"); };
+  }, []);
 
   useEffect(() => {
     async function load() {
@@ -146,10 +197,33 @@ export default function AdminDashboard() {
           <h1 className="text-2xl font-black text-gray-900">Dashboard</h1>
           <p className="mt-0.5 text-sm text-gray-500">Welcome back — EVBharat India CMS</p>
         </div>
-        <Link href="/admin/articles/new"
-          className="flex items-center gap-2 rounded-xl bg-green-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-green-800 transition shadow-sm">
-          <Plus size={16} /> New Article
-        </Link>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setSoundOn(p => !p)}
+            title={soundOn ? "Mute notifications" : "Unmute notifications"}
+            className={`relative rounded-xl p-2.5 border transition ${
+              soundOn ? "border-green-200 bg-green-50 text-green-600 hover:bg-green-100" : "border-gray-200 bg-white text-gray-300 hover:bg-gray-50"
+            }`}
+          >
+            <BellRing size={16} />
+            {newChats > 0 && soundOn && (
+              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-black text-white">
+                {newChats}
+              </span>
+            )}
+          </button>
+          {newChats > 0 && (
+            <Link href="/admin/live-chat"
+              onClick={() => setNewChats(0)}
+              className="flex items-center gap-2 rounded-xl bg-orange-500 px-3 py-2.5 text-sm font-bold text-white hover:bg-orange-600 transition animate-pulse shadow-sm">
+              <BellRing size={14} /> {newChats} New Chat{newChats > 1 ? "s" : ""}
+            </Link>
+          )}
+          <Link href="/admin/articles/new"
+            className="flex items-center gap-2 rounded-xl bg-green-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-green-800 transition shadow-sm">
+            <Plus size={16} /> New Article
+          </Link>
+        </div>
       </div>
 
       {/* Stat cards */}

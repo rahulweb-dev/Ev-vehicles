@@ -53,6 +53,22 @@ function playSound(type = "chat") {
   } catch {}
 }
 
+/* ── quick reply templates ─────────────────────────────────────────── */
+const QUICK_REPLIES = [
+  "How may I help you? 😊",
+  "Welcome to EVRadar! I'm here to assist you.",
+  "Thank you for reaching out! 🙏",
+  "Sure! Let me check that for you.",
+  "Could you please share your phone number for a callback?",
+  "Would you like to book a test drive?",
+  "Please share the EV model you're interested in.",
+  "Our team will get back to you within 24 hours.",
+  "You can visit evradar.in for more details.",
+  "Is there anything else I can help you with? 😊",
+  "We have great EMI options available. Interested?",
+  "The on-road price includes registration, insurance & accessories.",
+];
+
 /* ── main component ────────────────────────────────────────────────── */
 export default function LiveChatAdminPage() {
   const [sessions,       setSessions]       = useState([]);
@@ -593,7 +609,19 @@ export default function LiveChatAdminPage() {
 
             {/* ── Input ── */}
             {activeSession.status !== "closed" ? (
-              <div className="shrink-0 border-t border-gray-200 bg-white px-4 py-3">
+              <div className="shrink-0 border-t border-gray-200 bg-white px-4 pt-2 pb-3">
+                {/* Quick reply chips */}
+                <div className="mb-2 flex gap-1.5 overflow-x-auto pb-1" style={{ scrollbarWidth: "none" }}>
+                  {QUICK_REPLIES.map((reply, i) => (
+                    <button
+                      key={i}
+                      onClick={() => { setMsgInput(reply); inputRef.current?.focus(); }}
+                      className="shrink-0 rounded-full border border-green-200 bg-green-50 px-3 py-1 text-[11px] font-medium text-green-700 hover:bg-green-100 hover:border-green-400 transition whitespace-nowrap"
+                    >
+                      {reply.length > 32 ? reply.slice(0, 32) + "…" : reply}
+                    </button>
+                  ))}
+                </div>
                 <div className="flex items-end gap-2">
                   <textarea
                     ref={inputRef}

@@ -3,6 +3,7 @@ import dbConnect from "@/lib/mongodb";
 import Article from "@/lib/models/Article";
 import { requireAuth } from "@/lib/auth";
 import { pingIndexNow, buildArticleUrl } from "@/lib/indexnow";
+import { notifyArticlePublished } from "@/lib/notifications";
 
 // GET /api/articles/[id] — public, by id or slug
 export async function GET(request, context) {
@@ -52,6 +53,11 @@ export async function PUT(request, context) {
     // Ping search engines if publishing or updating a published article
     if (isPublishingNow || existing.status === "published") {
       pingIndexNow(buildArticleUrl(updated.slug)).catch(console.error);
+    }
+
+    // Send email + WhatsApp notification on first publish
+    if (isPublishingNow) {
+      notifyArticlePublished(updated).catch(console.error);
     }
 
     return NextResponse.json({ success: true, article: updated });

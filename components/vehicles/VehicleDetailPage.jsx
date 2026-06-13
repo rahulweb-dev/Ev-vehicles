@@ -11,6 +11,7 @@ import {
 import LeadForm from "./LeadForm";
 import EMICalculator from "./EMICalculator";
 import OnRoadPrice from "./OnRoadPrice";
+import InsuranceQuoteWidget from "./InsuranceQuoteWidget";
 
 /* ── helpers ─────────────────────────────────────────────────── */
 function getYouTubeId(url) {
@@ -626,6 +627,7 @@ export default function VehicleDetailPage({ vehicle, relatedVehicles = [], vehic
 
             <EMICalculator basePrice={variant?.exShowroomPrice || ""} />
             <OnRoadPrice   exShowroom={variant?.exShowroomPrice || ""} />
+            <InsuranceQuoteWidget vehicleName={vehicle.name} exShowroom={variant?.exShowroomPrice || ""} />
 
             {/* Warranty quick card */}
             {(vehicle.warranty?.battery || vehicle.warranty?.vehicle) && (

@@ -6,7 +6,7 @@ import Link from "next/link";
 import {
   Plus, Pencil, Trash2, Eye, Search, ExternalLink,
   Newspaper, CheckCircle2, FileText, LayoutGrid, List,
-  Star, Calendar, TrendingUp,
+  Star, Calendar, TrendingUp, Upload,
 } from "lucide-react";
 
 const CAT_STYLE = {
@@ -204,10 +204,16 @@ export default function AdminArticlesPage() {
           <h1 className="text-2xl font-black text-gray-900">Articles</h1>
           <p className="mt-0.5 text-sm text-gray-500">{articles.length} articles total</p>
         </div>
-        <Link href="/admin/articles/new"
-          className="flex items-center gap-2 rounded-xl bg-green-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-green-800 transition shadow-sm">
-          <Plus size={16} /> New Article
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link href="/admin/articles/bulk-import"
+            className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-50 transition shadow-sm">
+            <Upload size={16} /> Bulk Import
+          </Link>
+          <Link href="/admin/articles/new"
+            className="flex items-center gap-2 rounded-xl bg-green-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-green-800 transition shadow-sm">
+            <Plus size={16} /> New Article
+          </Link>
+        </div>
       </div>
 
       {/* Quick stats */}

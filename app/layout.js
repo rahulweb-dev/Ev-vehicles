@@ -100,6 +100,7 @@ export const metadata = {
       { url: "/images/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
     ],
   },
+  manifest: "/manifest.json",
   alternates: {
     canonical: SITE_URL,
   },
@@ -108,6 +109,13 @@ export const metadata = {
   },
   other: {
     "p:domain_verify": "07cbf55529a481771ddbbd2ddbbeae9f",
+    "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "default",
+    "apple-mobile-web-app-title": "EVRadar",
+    "msapplication-TileColor": "#16a34a",
+    "msapplication-tap-highlight": "no",
+    "theme-color": "#16a34a",
   },
 };
 

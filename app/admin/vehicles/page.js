@@ -6,8 +6,9 @@ import Link from "next/link";
 import {
   Plus, Pencil, Trash2, Eye, Search, Star,
   Car, Bike, Calendar, LayoutGrid, List,
-  CheckCircle2, Clock, Filter,
+  CheckCircle2, Clock, Filter, Sparkles, Loader2,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const TYPE_STYLE = {
   car:  { label: "Car",  icon: Car,  badge: "bg-blue-50 text-blue-700 border-blue-200",   dot: "bg-blue-500" },
@@ -22,9 +23,10 @@ const STATUS_STYLE = {
   draft:     "bg-yellow-100 text-yellow-700 border border-yellow-200",
 };
 
-function VehicleGridCard({ vehicle, onDelete, deleting }) {
+function VehicleGridCard({ vehicle, onDelete, deleting, onGenerate, generating }) {
   const type = TYPE_STYLE[vehicle.vehicleType] || TYPE_STYLE.car;
   const Icon = type.icon;
+  const isGen = generating === vehicle._id;
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm hover:border-green-200 hover:shadow-md transition">
       {/* Image */}
@@ -61,6 +63,11 @@ function VehicleGridCard({ vehicle, onDelete, deleting }) {
 
         {/* Actions on hover */}
         <div className="absolute bottom-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition">
+          <button onClick={() => onGenerate(vehicle._id, vehicle.name)} disabled={isGen}
+            title="Auto-generate article"
+            className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/90 text-gray-600 shadow hover:bg-purple-600 hover:text-white transition disabled:opacity-40">
+            {isGen ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
+          </button>
           <Link href={`/admin/vehicles/${vehicle._id}/edit`}
             className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/90 text-gray-600 shadow hover:bg-blue-600 hover:text-white transition">
             <Pencil size={14} />
@@ -93,7 +100,8 @@ function VehicleGridCard({ vehicle, onDelete, deleting }) {
   );
 }
 
-function VehicleListRow({ vehicle, onDelete, deleting }) {
+function VehicleListRow({ vehicle, onDelete, deleting, onGenerate, generating }) {
+  const isGen = generating === vehicle._id;
   const type = TYPE_STYLE[vehicle.vehicleType] || TYPE_STYLE.car;
   const Icon = type.icon;
   return (
@@ -130,6 +138,11 @@ function VehicleListRow({ vehicle, onDelete, deleting }) {
       )}
 
       <div className="flex shrink-0 items-center gap-1">
+        <button onClick={() => onGenerate(vehicle._id, vehicle.name)} disabled={isGen}
+          title="Auto-generate article"
+          className="p-1.5 rounded-lg text-gray-400 hover:text-purple-600 hover:bg-purple-50 transition disabled:opacity-40">
+          {isGen ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
+        </button>
         <Link href={`/admin/vehicles/${vehicle._id}/edit`}
           className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition">
           <Pencil size={14} />
@@ -144,6 +157,7 @@ function VehicleListRow({ vehicle, onDelete, deleting }) {
 }
 
 export default function AdminVehiclesPage() {
+  const router = useRouter();
   const [vehicles, setVehicles]         = useState([]);
   const [loading, setLoading]           = useState(true);
   const [search, setSearch]             = useState("");
@@ -153,6 +167,7 @@ export default function AdminVehiclesPage() {
   const [sortBy, setSortBy]             = useState("createdAt");
   const [view, setView]                 = useState("grid");
   const [deleting, setDeleting]         = useState(null);
+  const [generating, setGenerating]     = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -179,6 +194,30 @@ export default function AdminVehiclesPage() {
     await fetch(`/api/vehicles/${id}`, { method: "DELETE" });
     setDeleting(null);
     load();
+  }
+
+  async function handleGenerate(id, name) {
+    if (!confirm(`Auto-generate a draft article for "${name}" using AI?\n\nThis will create a new draft in Articles.`)) return;
+    setGenerating(id);
+    try {
+      const res  = await fetch("/api/admin/generate-article", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ vehicleId: id, style: "review" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (confirm(`Article drafted: "${data.article.title}"\n\nOpen the editor now?`)) {
+          router.push(`/admin/articles/${data.article._id}/edit`);
+        }
+      } else {
+        alert("Failed to generate: " + (data.error || "Unknown error"));
+      }
+    } catch {
+      alert("Network error – please try again");
+    } finally {
+      setGenerating(null);
+    }
   }
 
   const filtered = vehicles.filter((v) =>
@@ -342,13 +381,13 @@ export default function AdminVehiclesPage() {
       ) : view === "grid" ? (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filtered.map((v) => (
-            <VehicleGridCard key={v._id} vehicle={v} onDelete={handleDelete} deleting={deleting} />
+            <VehicleGridCard key={v._id} vehicle={v} onDelete={handleDelete} deleting={deleting} onGenerate={handleGenerate} generating={generating} />
           ))}
         </div>
       ) : (
         <div className="space-y-2">
           {filtered.map((v) => (
-            <VehicleListRow key={v._id} vehicle={v} onDelete={handleDelete} deleting={deleting} />
+            <VehicleListRow key={v._id} vehicle={v} onDelete={handleDelete} deleting={deleting} onGenerate={handleGenerate} generating={generating} />
           ))}
         </div>
       )}
