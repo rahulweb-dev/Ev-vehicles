@@ -1,4 +1,4 @@
-import { requireAuth }    from "@/lib/requireAuth";
+import { requireAuth }    from "@/lib/auth";
 import dbConnect          from "@/lib/mongodb";
 import PushSubscription   from "@/lib/models/PushSubscription";
 import webpush            from "web-push";
@@ -14,8 +14,8 @@ function setupWebPush() {
 }
 
 export async function POST(request) {
-  const authErr = await requireAuth(request);
-  if (authErr) return authErr;
+  const auth = await requireAuth();
+  if (auth.error) return Response.json({ error: auth.error }, { status: auth.status });
 
   const { title, body, url, icon, image, badge } = await request.json();
   if (!title || !body) return Response.json({ error: "title and body required" }, { status: 400 });

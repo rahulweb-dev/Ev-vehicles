@@ -1,4 +1,4 @@
-import { requireAuth } from "@/lib/requireAuth";
+import { requireAuth } from "@/lib/auth";
 import dbConnect       from "@/lib/mongodb";
 import Vehicle         from "@/lib/models/Vehicle";
 import Article         from "@/lib/models/Article";
@@ -29,8 +29,8 @@ function extractJson(text) {
 }
 
 export async function POST(request) {
-  const authErr = await requireAuth(request);
-  if (authErr) return authErr;
+  const auth = await requireAuth();
+  if (auth.error) return Response.json({ error: auth.error }, { status: auth.status });
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return Response.json({ error: "GEMINI_API_KEY not configured" }, { status: 500 });

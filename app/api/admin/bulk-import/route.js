@@ -1,4 +1,4 @@
-import { requireAuth } from "@/lib/requireAuth";
+import { requireAuth } from "@/lib/auth";
 import dbConnect       from "@/lib/mongodb";
 import Article         from "@/lib/models/Article";
 
@@ -26,8 +26,8 @@ function parseCSV(text) {
 }
 
 export async function POST(request) {
-  const authErr = await requireAuth(request);
-  if (authErr) return authErr;
+  const auth = await requireAuth();
+  if (auth.error) return Response.json({ error: auth.error }, { status: auth.status });
 
   const formData = await request.formData();
   const file     = formData.get("file");
