@@ -7,8 +7,9 @@ import {
   Car, Save, Star, StarOff, Plus, Trash2, Upload, X,
   Zap, Settings, Shield, Award, ThumbsUp, ThumbsDown,
   DollarSign, Palette, BatteryCharging,
-  Image as ImageIcon, Globe, CheckSquare, Sparkles,
+  Image as ImageIcon, Globe, CheckSquare, Sparkles, Eye,
 } from "lucide-react";
+import Link from "next/link";
 
 /* ── helpers ────────────────────────────────────────────────── */
 function slugify(str) {
@@ -597,6 +598,15 @@ export default function VehicleEditor({ initialData, vehicleId }) {
 
           <div className="flex items-center gap-2">
             {error && <p className="text-xs text-red-600 max-w-48 truncate">{error}</p>}
+            {form.status === "published" && form.slug && (
+              <Link
+                href={`/${form.vehicleType === "car" ? "cars" : form.vehicleType === "bike" ? "bikes" : "commercial"}/${form.slug}`}
+                target="_blank"
+                className="flex items-center gap-1.5 rounded-xl border border-green-200 bg-green-50 px-3 py-2 text-xs font-semibold text-green-700 hover:bg-green-100 transition"
+              >
+                <Eye size={13} /> View Live
+              </Link>
+            )}
             <button
               onClick={() => set("featured", !form.featured)}
               className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold transition ${

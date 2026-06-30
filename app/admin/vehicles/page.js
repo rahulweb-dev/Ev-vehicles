@@ -14,6 +14,11 @@ const TYPE_STYLE = {
   car:  { label: "Car",  icon: Car,  badge: "bg-blue-50 text-blue-700 border-blue-200",   dot: "bg-blue-500" },
   bike: { label: "Bike", icon: Bike, badge: "bg-orange-50 text-orange-700 border-orange-200", dot: "bg-orange-500" },
 };
+
+function vehiclePublicUrl(vehicle) {
+  const base = vehicle.vehicleType === "car" ? "cars" : vehicle.vehicleType === "bike" ? "bikes" : "commercial";
+  return `/${base}/${vehicle.slug}`;
+}
 const CAT_STYLE = {
   upcoming: { badge: "bg-purple-50 text-purple-700 border-purple-200" },
   popular:  { badge: "bg-green-50 text-green-700 border-green-200" },
@@ -68,6 +73,13 @@ function VehicleGridCard({ vehicle, onDelete, deleting, onGenerate, generating }
             className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/90 text-gray-600 shadow hover:bg-purple-600 hover:text-white transition disabled:opacity-40">
             {isGen ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
           </button>
+          {vehicle.status === "published" && (
+            <Link href={vehiclePublicUrl(vehicle)} target="_blank"
+              title="View live page"
+              className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/90 text-gray-600 shadow hover:bg-green-600 hover:text-white transition">
+              <Eye size={14} />
+            </Link>
+          )}
           <Link href={`/admin/vehicles/${vehicle._id}/edit`}
             className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/90 text-gray-600 shadow hover:bg-blue-600 hover:text-white transition">
             <Pencil size={14} />
@@ -143,6 +155,13 @@ function VehicleListRow({ vehicle, onDelete, deleting, onGenerate, generating })
           className="p-1.5 rounded-lg text-gray-400 hover:text-purple-600 hover:bg-purple-50 transition disabled:opacity-40">
           {isGen ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
         </button>
+        {vehicle.status === "published" && (
+          <Link href={vehiclePublicUrl(vehicle)} target="_blank"
+            title="View live page"
+            className="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition">
+            <Eye size={14} />
+          </Link>
+        )}
         <Link href={`/admin/vehicles/${vehicle._id}/edit`}
           className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition">
           <Pencil size={14} />
