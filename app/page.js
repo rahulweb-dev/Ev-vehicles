@@ -65,6 +65,23 @@ function mapVehicle(v, brandLogoMap = {}) {
   };
 }
 
+/* ── Fetch latest blog posts for home section ────────────────────── */
+async function getLatestBlogs() {
+  try {
+    const dbConnect = (await import("@/lib/mongodb")).default;
+    const Blog      = (await import("@/lib/models/Blog")).default;
+    await dbConnect();
+    const docs = await Blog.find({ status: "published" })
+      .sort({ featured: -1, publishedAt: -1, createdAt: -1 })
+      .limit(3)
+      .select("slug title excerpt image category author readTime publishedAt featured")
+      .lean();
+    return docs;
+  } catch {
+    return [];
+  }
+}
+
 /* ── Fetch latest articles for ItemList schema ───────────────────── */
 async function getLatestArticles() {
   try {
@@ -105,6 +122,7 @@ async function getVehicles({ category, vehicleType, featured }) {
   const docs = await Vehicle.find(filter)
     .sort({ createdAt: -1 })
     .limit(12)
+    .select("slug name brand vehicleType category featured featuredImage performance variants colors")
     .lean();
   /* brandLogoMap is applied separately after all parallel fetches */
   return docs;
@@ -117,12 +135,14 @@ function applyLogos(docs, brandLogoMap) {
 export default async function Home() {
   const [
     latestArticles,
+    latestBlogs,
     brandLogoMap,
     featuredCars, featuredBikes, featuredCommercial,
     popularCars, popularBikes, popularCommercial,
     upcomingCars, upcomingBikes, upcomingCommercial,
   ] = await Promise.all([
     getLatestArticles(),
+    getLatestBlogs(),
     getBrandLogos(),
     getVehicles({ vehicleType: "car",        featured: true }),
     getVehicles({ vehicleType: "bike",       featured: true }),
@@ -191,6 +211,56 @@ export default async function Home() {
       </section>
 
       <LatestNewsSection />
+
+      {/* Latest Blog Posts */}
+      {latestBlogs.length > 0 && (
+        <section className="bg-gray-50 py-12">
+          <div className="mx-auto max-w-7xl px-4">
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-black text-gray-900">EV Guides & Blogs</h2>
+                <p className="mt-1 text-sm text-gray-500">In-depth tips and analysis for Indian EV buyers</p>
+              </div>
+              <Link href="/blogs" className="flex items-center gap-1 text-sm font-bold text-green-600 hover:text-green-700 transition">
+                View all →
+              </Link>
+            </div>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {latestBlogs.map(blog => (
+                <Link key={blog._id?.toString()} href={`/blogs/${blog.slug}`} className="group block">
+                  <article className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
+                    <div className="relative h-44 overflow-hidden bg-gray-100">
+                      {blog.image && (
+                        <img
+                          src={blog.image}
+                          alt={blog.title}
+                          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                          loading="lazy"
+                        />
+                      )}
+                      <div className="absolute left-3 top-3">
+                        <span className="rounded-full bg-green-100 px-2.5 py-1 text-[11px] font-bold capitalize text-green-700">
+                          {blog.category}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="p-4">
+                      <h3 className="line-clamp-2 text-sm font-bold leading-snug text-gray-900 group-hover:text-green-600">
+                        {blog.title}
+                      </h3>
+                      <p className="mt-1.5 line-clamp-2 text-xs text-gray-500">{blog.excerpt}</p>
+                      <div className="mt-3 flex items-center justify-between text-xs text-gray-400">
+                        <span>{blog.author}</span>
+                        <span>{blog.readTime}</span>
+                      </div>
+                    </div>
+                  </article>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <HomeCompareWidget />
 

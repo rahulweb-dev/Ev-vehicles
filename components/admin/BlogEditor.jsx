@@ -146,7 +146,7 @@ export default function BlogEditor({ mode = "new", blogId }) {
         </div>
         <div className="flex items-center gap-2">
           {form.status === "published" && form.slug && (
-            <Link href={`/blog/${form.slug}`} target="_blank"
+            <Link href={`/blogs/${form.slug}`} target="_blank"
               className="flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-600 hover:bg-gray-100 transition">
               <Eye size={14} /> Preview
             </Link>

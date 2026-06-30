@@ -45,12 +45,17 @@ async function getDbEntries() {
     const Vehicle   = (await import("@/lib/models/Vehicle")).default;
     await dbConnect();
 
-    const [articles, vehicles] = await Promise.all([
+    const Blog = (await import("@/lib/models/Blog")).default;
+
+    const [articles, vehicles, blogs] = await Promise.all([
       Article.find({ status: "published" })
         .select("slug publishedAt updatedAt author tags")
         .lean(),
       Vehicle.find({ status: "published" })
         .select("slug vehicleType brand updatedAt featured")
+        .lean(),
+      Blog.find({ status: "published" })
+        .select("slug publishedAt updatedAt featured")
         .lean(),
     ]);
 
@@ -123,7 +128,15 @@ async function getDbEntries() {
       }))
     );
 
-    return [...articleUrls, ...vehicleUrls, ...authorUrls, ...tagUrls, ...brandUrls, ...cityPriceUrls];
+    /* ── Blog pages ──────────────────────────────────────────────── */
+    const blogUrls = blogs.map(b => ({
+      url:             `${SITE_URL}/blogs/${b.slug}`,
+      lastModified:    b.publishedAt || b.updatedAt || new Date(),
+      changeFrequency: "monthly",
+      priority:        b.featured ? 0.82 : 0.72,
+    }));
+
+    return [...articleUrls, ...vehicleUrls, ...authorUrls, ...tagUrls, ...brandUrls, ...cityPriceUrls, ...blogUrls];
   } catch {
     return [];
   }

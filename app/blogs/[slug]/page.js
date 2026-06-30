@@ -7,14 +7,49 @@ import { getBlogBySlug, getRelatedBlogs, blogsData } from "@/data/blogsData";
 import { AdBannerInArticle, AdBannerHorizontal } from "@/components/ads/AdBanner";
 import { SITE_URL, SITE_NAME } from "@/app/layout";
 import ArticleAudioPlayer from "@/components/audio/ArticleAudioPlayer";
+import ShareButtons from "@/components/ShareButtons";
+import TableOfContents from "@/components/TableOfContents";
+
+async function getBlogFromDb(slug) {
+  try {
+    const dbConnect = (await import("@/lib/mongodb")).default;
+    const Blog = (await import("@/lib/models/Blog")).default;
+    await dbConnect();
+    const blog = await Blog.findOne({ slug, status: "published" }).lean();
+    if (blog) return { ...blog, id: blog._id.toString(), tags: blog.tags || [] };
+  } catch {}
+  return null;
+}
+
+async function getRelatedFromDb(slug, category) {
+  try {
+    const dbConnect = (await import("@/lib/mongodb")).default;
+    const Blog = (await import("@/lib/models/Blog")).default;
+    await dbConnect();
+    return await Blog.find({ slug: { $ne: slug }, status: "published", category })
+      .sort({ publishedAt: -1 })
+      .limit(3)
+      .lean();
+  } catch {}
+  return [];
+}
+
+export const revalidate = 300;
 
 export async function generateStaticParams() {
+  try {
+    const dbConnect = (await import("@/lib/mongodb")).default;
+    const Blog = (await import("@/lib/models/Blog")).default;
+    await dbConnect();
+    const docs = await Blog.find({ status: "published" }).select("slug").lean();
+    if (docs.length > 0) return docs.map(b => ({ slug: b.slug }));
+  } catch {}
   return blogsData.map((blog) => ({ slug: blog.slug }));
 }
 
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const blog = getBlogBySlug(slug);
+  const blog = (await getBlogFromDb(slug)) || getBlogBySlug(slug);
 
   if (!blog) return { title: "Blog Not Found" };
 
@@ -43,11 +78,12 @@ export async function generateMetadata({ params }) {
 
 export default async function BlogPostPage({ params }) {
   const { slug } = await params;
-  const blog = getBlogBySlug(slug);
+  const blog = (await getBlogFromDb(slug)) || getBlogBySlug(slug);
 
   if (!blog) notFound();
 
-  const related = getRelatedBlogs(slug, 3);
+  const dbRelated = await getRelatedFromDb(slug, blog.category);
+  const related = dbRelated.length > 0 ? dbRelated : getRelatedBlogs(slug, 3);
 
   const safeContent = sanitizeHtml(blog.content || "", {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat([
@@ -66,6 +102,12 @@ export default async function BlogPostPage({ params }) {
       "*":      ["class"],
     },
     allowedIframeHostnames: ["www.youtube.com", "youtube.com", "player.vimeo.com"],
+  });
+
+  // Inject data-toc-id onto h2/h3 so the client TOC component can scroll to them
+  let tocIndex = 0;
+  const tocContent = safeContent.replace(/<(h[23])(\s[^>]*)?>/g, (_, tag, attrs) => {
+    return `<${tag}${attrs || ""} data-toc-id="toc-heading-${tocIndex++}">`;
   });
 
   const articleJsonLd = {
@@ -117,7 +159,7 @@ export default async function BlogPostPage({ params }) {
             </h1>
             <p className="mt-4 text-lg text-gray-500 leading-relaxed">{blog.excerpt}</p>
 
-            <div className="mt-6 flex flex-wrap items-center gap-4 border-y border-gray-100 py-4 text-sm text-gray-500">
+            <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-y border-gray-100 py-4 text-sm text-gray-500">
               <div className="flex items-center gap-2">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-600 text-xs font-bold text-white">
                   {blog.author.charAt(0)}
@@ -135,6 +177,7 @@ export default async function BlogPostPage({ params }) {
                 <Clock3 size={15} />
                 {blog.readTime} read
               </div>
+              <ShareButtons url={`${SITE_URL}/blogs/${blog.slug}`} title={blog.title} />
             </div>
           </header>
 
@@ -156,10 +199,13 @@ export default async function BlogPostPage({ params }) {
           {/* In-article Ad */}
           <AdBannerInArticle slot="3579124680" />
 
+          {/* Table of Contents */}
+          <TableOfContents content={safeContent} />
+
           {/* Blog Content */}
           <div
             className="prose prose-lg max-w-none prose-headings:font-black prose-headings:text-gray-900 prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-p:text-gray-700 prose-p:leading-relaxed prose-strong:text-gray-900 prose-ul:text-gray-700 prose-li:my-1 prose-table:text-sm"
-            dangerouslySetInnerHTML={{ __html: safeContent }}
+            dangerouslySetInnerHTML={{ __html: tocContent }}
           />
 
           {/* Second Ad */}
