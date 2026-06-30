@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import sanitizeHtml from "sanitize-html";
 import Image from "next/image";
 import Link from "next/link";
 import { Clock3, Calendar, ChevronRight, Tag } from "lucide-react";
@@ -68,13 +69,16 @@ export async function generateMetadata({ params }) {
       publishedTime: article.publishedAt,
       authors: [article.author],
       tags: article.tags,
-      images: [{ url: article.image, width: 1200, height: 630, alt: article.title }],
+      images: [{
+        url: article.image || `${SITE_URL}/api/og?title=${encodeURIComponent(article.title)}&tag=${encodeURIComponent(article.category)}&type=article`,
+        width: 1200, height: 630, alt: article.title,
+      }],
     },
     twitter: {
       card: "summary_large_image",
       title: article.title,
       description: article.excerpt,
-      images: [article.image],
+      images: [article.image || `${SITE_URL}/api/og?title=${encodeURIComponent(article.title)}&tag=${encodeURIComponent(article.category)}`],
     },
   };
 }
@@ -86,7 +90,26 @@ export default async function ArticlePage({ params }) {
 
   const related = await getRelated(article.category, slug);
 
-  const wordCount = (article.content || "")
+  const safeContent = sanitizeHtml(article.content || "", {
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+      "img", "h1", "h2", "h3", "h4", "h5", "h6",
+      "figure", "figcaption", "table", "thead", "tbody", "tr", "td", "th",
+      "iframe", "picture", "source",
+    ]),
+    allowedAttributes: {
+      ...sanitizeHtml.defaults.allowedAttributes,
+      "img":    ["src", "alt", "width", "height", "loading", "class"],
+      "a":      ["href", "target", "rel", "class"],
+      "iframe": ["src", "width", "height", "frameborder", "allowfullscreen", "loading", "title"],
+      "table":  ["class"],
+      "td":     ["colspan", "rowspan", "class"],
+      "th":     ["colspan", "rowspan", "class"],
+      "*":      ["class"],
+    },
+    allowedIframeHostnames: ["www.youtube.com", "youtube.com", "player.vimeo.com"],
+  });
+
+  const wordCount = safeContent
     .replace(/<[^>]+>/g, " ")
     .trim()
     .split(/\s+/)
@@ -199,15 +222,17 @@ export default async function ArticlePage({ params }) {
               {/* Audio Player */}
               <ArticleAudioPlayer title={article.title} content={article.content} />
 
-              <div className="relative my-8 h-62.5 overflow-hidden rounded-2xl sm:h-87.5 md:h-112.5">
-                <Image src={article.image} alt={article.imageAlt || article.title} fill className="object-cover" priority sizes="800px" />
-              </div>
+              {article.image && (
+                <div className="relative my-8 h-62.5 overflow-hidden rounded-2xl sm:h-87.5 md:h-112.5">
+                  <Image src={article.image} alt={article.imageAlt || article.title} fill className="object-cover" priority sizes="800px" />
+                </div>
+              )}
 
               <AdBannerInArticle slot="4567890123" />
 
               <div
                 className="prose prose-lg max-w-none prose-headings:font-black prose-headings:text-gray-900 prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4 prose-p:text-gray-700 prose-p:leading-relaxed prose-strong:text-gray-900 prose-ul:text-gray-700 prose-li:my-1"
-                dangerouslySetInnerHTML={{ __html: article.content }}
+                dangerouslySetInnerHTML={{ __html: safeContent }}
               />
 
               <AdBannerInArticle slot="5678901234" />
@@ -264,6 +289,40 @@ export default async function ArticlePage({ params }) {
             </section>
           )}
         </div>
+
+        {/* Author Bio */}
+        {article.author && (
+          <div className="mx-auto max-w-7xl px-4 pb-10">
+            <div className="rounded-2xl border border-gray-100 bg-gray-50 p-6">
+              <div className="flex items-start gap-4">
+                <Link
+                  href={`/authors/${encodeURIComponent((article.author || "").toLowerCase().replace(/\s+/g, "-"))}`}
+                  className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-green-600 text-2xl font-black text-white hover:opacity-90 transition"
+                >
+                  {article.author.charAt(0).toUpperCase()}
+                </Link>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-green-600">Written by</p>
+                  <Link
+                    href={`/authors/${encodeURIComponent((article.author || "").toLowerCase().replace(/\s+/g, "-"))}`}
+                    className="text-lg font-black text-gray-900 hover:text-green-700 transition"
+                  >
+                    {article.author}
+                  </Link>
+                  <p className="mt-1 text-sm text-gray-500">
+                    EV journalist at EV News India — covering electric cars, bikes, and India&apos;s EV revolution.
+                  </p>
+                  <Link
+                    href={`/authors/${encodeURIComponent((article.author || "").toLowerCase().replace(/\s+/g, "-"))}`}
+                    className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-green-600 px-4 py-2 text-xs font-bold text-white hover:bg-green-700 transition"
+                  >
+                    View all articles by {article.author} →
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
       <ArticleStickyBar />
     </>

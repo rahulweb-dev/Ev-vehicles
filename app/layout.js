@@ -11,8 +11,6 @@ import ScrollRestorer from "@/components/ScrollRestorer";
 import BackToTop from "@/components/BackToTop";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import ContentProtection from "@/components/ContentProtection";
-import ExitIntentPopup from "@/components/ExitIntentPopup";
-import WhatsAppChannelCTA from "@/components/WhatsAppChannelCTA";
 const ADSENSE_PUBLISHER_ID = process.env.NEXT_PUBLIC_ADSENSE_ID || "ca-pub-XXXXXXXXXXXXXXXXX";
 
 export const SITE_URL = "https://www.evradar.in";

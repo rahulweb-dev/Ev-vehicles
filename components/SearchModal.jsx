@@ -167,12 +167,23 @@ export default function SearchModal() {
                       </div>
                     </Link>
                   ))}
+                  <Link
+                    href={`/search?q=${encodeURIComponent(query)}`}
+                    onClick={close}
+                    className="mt-1 flex items-center justify-center gap-2 rounded-xl border border-green-100 bg-green-50 py-2.5 text-sm font-bold text-green-700 hover:bg-green-100 transition"
+                  >
+                    See all results for &ldquo;{query}&rdquo; <ArrowRight size={14} />
+                  </Link>
                 </div>
               ) : query ? (
-                <div className="py-14 text-center text-gray-400">
+                <div className="py-10 text-center text-gray-400">
                   <Search size={36} className="mx-auto mb-3 opacity-30" />
                   <p className="font-medium">No results for &quot;{query}&quot;</p>
                   <p className="mt-1 text-sm">Try a different keyword or filter</p>
+                  <Link href={`/search?q=${encodeURIComponent(query)}`} onClick={close}
+                    className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-green-600 px-4 py-2 text-xs font-bold text-white hover:bg-green-700 transition">
+                    Full search page <ArrowRight size={12} />
+                  </Link>
                 </div>
               ) : (
                 <div className="p-4">

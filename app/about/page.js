@@ -6,6 +6,19 @@ export const metadata = {
   description:
     "EV News India is India's most trusted source for electric vehicle news, reviews, and buying guides. Learn about our mission to accelerate EV adoption in India.",
   alternates: { canonical: `${SITE_URL}/about` },
+  openGraph: {
+    title: "About EV News India – India's #1 Electric Vehicle News Platform",
+    description: "India's most trusted source for EV news, reviews, and buying guides. Our mission: accelerate EV adoption across India.",
+    url: `${SITE_URL}/about`,
+    type: "website",
+    images: [{ url: `${SITE_URL}/api/og?title=About EV News India&subtitle=India's %231 Electric Vehicle News Platform&tag=default&type=page`, width: 1200, height: 630, alt: "About EV News India" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About EV News India",
+    description: "India's most trusted source for EV news, reviews, and buying guides.",
+    images: [`${SITE_URL}/api/og?title=About EV News India&subtitle=India's %231 Electric Vehicle News Platform&tag=default&type=page`],
+  },
 };
 
 const team = [
@@ -42,8 +55,34 @@ const stats = [
   { value: "3+", label: "Years Covering EVs" },
 ];
 
+const aboutJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "NewsMediaOrganization",
+  name: "EV News India",
+  alternateName: "EVRadar India",
+  url: SITE_URL,
+  logo: { "@type": "ImageObject", url: `${SITE_URL}/images/logo.png`, width: 200, height: 60 },
+  description: "India's #1 Electric Vehicle News Platform — EV news, reviews, buying guides, and price comparisons.",
+  foundingDate: "2022",
+  email: "contact@evradar.in",
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Mumbai",
+    addressRegion: "Maharashtra",
+    addressCountry: "IN",
+  },
+  sameAs: [
+    "https://twitter.com/EVNewsIndia",
+    "https://www.facebook.com/EVNewsIndia",
+    "https://www.instagram.com/evnewsindia",
+    "https://www.youtube.com/@EVNewsIndia",
+  ],
+};
+
 export default function AboutPage() {
   return (
+    <>
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutJsonLd) }} />
     <div className="bg-white">
       {/* Hero */}
       <div className="bg-gradient-to-br from-gray-900 to-gray-950 py-20">
@@ -154,5 +193,6 @@ export default function AboutPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

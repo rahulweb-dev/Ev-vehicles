@@ -3,6 +3,10 @@ import dbConnect from "@/lib/mongodb";
 import Lead from "@/lib/models/Lead";
 import { getAuthUser } from "@/lib/auth";
 
+function escapeRegExp(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 export async function POST(request) {
   try {
     const body = await request.json();
@@ -52,12 +56,12 @@ export async function GET(request) {
 
     // Dealers are auto-scoped to their city/state — they can't override this
     if (user && user.role === "dealer") {
-      if (user.city)  filter.city  = { $regex: new RegExp(`^${user.city}$`, "i") };
-      if (user.state) filter.state = { $regex: new RegExp(`^${user.state}$`, "i") };
+      if (user.city)  filter.city  = { $regex: new RegExp(`^${escapeRegExp(user.city)}$`, "i") };
+      if (user.state) filter.state = { $regex: new RegExp(`^${escapeRegExp(user.state)}$`, "i") };
     } else {
       // Admin can filter by city/state optionally
-      if (cityFilter)  filter.city  = { $regex: new RegExp(cityFilter, "i") };
-      if (stateFilter) filter.state = { $regex: new RegExp(stateFilter, "i") };
+      if (cityFilter)  filter.city  = { $regex: new RegExp(escapeRegExp(cityFilter), "i") };
+      if (stateFilter) filter.state = { $regex: new RegExp(escapeRegExp(stateFilter), "i") };
     }
 
     if (vehicleSlug)  filter.vehicleSlug  = vehicleSlug;

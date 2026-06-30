@@ -1,3 +1,5 @@
+import { requireAuth } from "@/lib/auth";
+
 export const maxDuration = 60;
 
 const GEMINI_API = "https://generativelanguage.googleapis.com/v1beta/models";
@@ -72,6 +74,9 @@ Return a JSON object with EXACTLY this structure:
 }
 
 export async function POST(request) {
+  const auth = await requireAuth();
+  if (auth.error) return Response.json({ error: auth.error }, { status: auth.status });
+
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return Response.json(

@@ -5,16 +5,13 @@ import User from "@/lib/models/User";
 import Article from "@/lib/models/Article";
 import { newsArticles } from "@/data/newsArticles";
 
-// GET /api/setup — Check current DB status
+// GET /api/setup — Only returns whether setup is needed (no counts in production)
 export async function GET() {
   try {
     await dbConnect();
     const userCount = await User.countDocuments();
-    const articleCount = await Article.countDocuments();
     return NextResponse.json({
       status: "connected",
-      users: userCount,
-      articles: articleCount,
       setupNeeded: userCount === 0,
     });
   } catch (error) {
@@ -22,13 +19,19 @@ export async function GET() {
   }
 }
 
-// POST /api/setup
-// • First run  → creates admin user + seeds articles
-// • Re-run with same email → resets password (useful during dev)
-// • Re-run with different email → blocked (admin already exists)
+// POST /api/setup — First-run only. Blocked once any admin exists.
 export async function POST(request) {
   try {
     await dbConnect();
+
+    // Block entirely if any user already exists
+    const existingUser = await User.findOne({});
+    if (existingUser) {
+      return NextResponse.json(
+        { error: "Setup already completed. Go to /admin/login to sign in." },
+        { status: 403 }
+      );
+    }
 
     const { name, email, password } = await request.json();
 
@@ -36,38 +39,14 @@ export async function POST(request) {
       return NextResponse.json({ error: "name, email and password are required" }, { status: 400 });
     }
 
-    if (password.length < 6) {
-      return NextResponse.json({ error: "Password must be at least 6 characters" }, { status: 400 });
+    if (password.length < 8) {
+      return NextResponse.json({ error: "Password must be at least 8 characters" }, { status: 400 });
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
+    const user = await User.create({ name, email: email.toLowerCase().trim(), password: hashedPassword, role: "admin" });
 
-    // Check if any admin user already exists
-    const existingUser = await User.findOne({});
-
-    if (existingUser) {
-      // Allow password reset only if same email is provided
-      if (existingUser.email !== email.toLowerCase().trim()) {
-        return NextResponse.json(
-          { error: "Setup already completed. Admin user already exists. Go to /admin/login to sign in." },
-          { status: 403 }
-        );
-      }
-
-      // Same email → reset password
-      await User.findByIdAndUpdate(existingUser._id, { name, password: hashedPassword });
-
-      return NextResponse.json({
-        success: true,
-        message: "Admin password updated successfully. Go to /admin/login to sign in.",
-        user: { email: existingUser.email, name },
-      });
-    }
-
-    // No users exist → create fresh admin
-    const user = await User.create({ name, email, password: hashedPassword, role: "admin" });
-
-    // Seed articles
+    // Seed articles on first run
     const articleCount = await Article.countDocuments();
     let seeded = 0;
 
@@ -104,8 +83,6 @@ export async function POST(request) {
     console.error("[Setup]", error);
     return NextResponse.json({
       error: error.message || "Setup failed",
-      code: error.code,
-      name: error.name,
     }, { status: 500 });
   }
 }

@@ -1,7 +1,47 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Calculator, ChevronDown, ChevronUp } from "lucide-react";
+import Link from "next/link";
+import { Calculator, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
+
+const LENDERS = [
+  {
+    name: "HDFC Bank",
+    rate: "8.5% – 12%",
+    logo: "🏦",
+    tag: "Most Popular",
+    tagColor: "bg-blue-100 text-blue-700",
+    url: "https://www.hdfcbank.com/content/bbp/repositories/723fb80a-2dde-42a3-9793-7ae1be57c87f/?folderPath=/OLB/assets/Common/pdfs/EV-car-loan.pdf",
+    benefit: "Zero processing fee on EVs",
+  },
+  {
+    name: "SBI",
+    rate: "8.65% – 11%",
+    logo: "🏛️",
+    tag: "Lowest Rate",
+    tagColor: "bg-green-100 text-green-700",
+    url: "https://sbi.co.in/web/personal-banking/loans/auto-loans/green-car-loan",
+    benefit: "Green Car Loan – 0.20% concession",
+  },
+  {
+    name: "IDFC FIRST",
+    rate: "9% – 14%",
+    logo: "💳",
+    tag: "Fast Approval",
+    tagColor: "bg-purple-100 text-purple-700",
+    url: "https://www.idfcfirstbank.com/personal-banking/loans/car-loan",
+    benefit: "90% financing on ex-showroom",
+  },
+  {
+    name: "Tata Capital",
+    rate: "9.5% – 13%",
+    logo: "⚡",
+    tag: "EV Specialist",
+    tagColor: "bg-orange-100 text-orange-700",
+    url: "https://www.tatacapital.com/vehicle-loans/car-loan.html",
+    benefit: "Special rates for Tata EVs",
+  },
+];
 
 function parsePriceToNumber(str) {
   if (!str) return 0;
@@ -116,6 +156,29 @@ export default function EMICalculator({ basePrice = "" }) {
           </div>
 
           <p className="text-[10px] text-gray-400">* Indicative values only. Actual EMI may vary based on bank terms.</p>
+
+          {/* Finance affiliate links */}
+          <div className="pt-2">
+            <p className="text-xs font-bold text-gray-700 mb-2.5">Get Loan Offers from Top Banks</p>
+            <div className="grid grid-cols-2 gap-2">
+              {LENDERS.map(l => (
+                <a key={l.name} href={l.url} target="_blank" rel="noopener noreferrer sponsored"
+                  className="flex flex-col rounded-xl border border-gray-200 p-3 hover:border-green-400 hover:shadow-sm transition group">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-base">{l.logo}</span>
+                      <span className="text-xs font-bold text-gray-800">{l.name}</span>
+                    </div>
+                    <ExternalLink size={10} className="text-gray-300 group-hover:text-green-500 transition" />
+                  </div>
+                  <span className={`self-start rounded-full px-1.5 py-0.5 text-[9px] font-bold mb-1 ${l.tagColor}`}>{l.tag}</span>
+                  <p className="text-[10px] text-green-600 font-semibold">{l.rate}</p>
+                  <p className="text-[10px] text-gray-400 mt-0.5">{l.benefit}</p>
+                </a>
+              ))}
+            </div>
+            <p className="text-[9px] text-gray-300 mt-2">* Affiliate links — rates indicative, subject to bank approval</p>
+          </div>
         </div>
       )}
     </div>

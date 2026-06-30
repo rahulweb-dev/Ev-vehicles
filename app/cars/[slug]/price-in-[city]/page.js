@@ -61,7 +61,19 @@ export async function generateMetadata({ params }) {
     openGraph: {
       title:       `${vehicle.name} Price in ${cityData.name} ${year}`,
       description: `On-road price of ${vehicle.name} in ${cityData.name} with RTO, insurance, and all charges.`,
-      images:      [{ url: vehicle.featuredImage || "", width: 1200, height: 630 }],
+      url: `${SITE_URL}/cars/${slug}/price-in-${city}`,
+      type: "website",
+      images: [{
+        url: vehicle.featuredImage ||
+          `${SITE_URL}/api/og?title=${encodeURIComponent(vehicle.name + " Price in " + cityData.name)}&subtitle=${encodeURIComponent("On-road price with RTO, insurance & taxes")}&type=vehicle&tag=cars`,
+        width: 1200, height: 630,
+      }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${vehicle.name} Price in ${cityData.name} ${year}`,
+      description: `On-road price of ${vehicle.name} in ${cityData.name} with RTO, insurance, and all charges.`,
+      images: [vehicle.featuredImage || `${SITE_URL}/api/og?title=${encodeURIComponent(vehicle.name + " Price in " + cityData.name)}&subtitle=${encodeURIComponent("On-road price with RTO, insurance & taxes")}&type=vehicle&tag=cars`],
     },
   };
 }
@@ -74,11 +86,86 @@ export default async function CityPricePage({ params }) {
   const vehicle = await getVehicle(slug);
   if (!vehicle) notFound();
 
+  const year       = new Date().getFullYear();
+  const exNum      = parseInt((vehicle.variants?.[0]?.exShowroomPrice || "").replace(/[^0-9]/g, "")) || 0;
+  const onRoadNum  = exNum ? Math.round(exNum * (1 + cityData.regPct + 0.028 * 0.88 + 0.03)) : 0;
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type":    "Product",
+    name:       `${vehicle.name} On-Road Price in ${cityData.name}`,
+    brand:      { "@type": "Brand", name: vehicle.brand },
+    description: `${vehicle.name} on-road price in ${cityData.name} ${year} including RTO, insurance and accessories.`,
+    image:       vehicle.featuredImage || "",
+    url:         `${SITE_URL}/cars/${slug}/price-in-${city}`,
+    ...(onRoadNum && {
+      offers: {
+        "@type":       "Offer",
+        priceCurrency: "INR",
+        price:         onRoadNum,
+        priceValidUntil: `${year}-12-31`,
+        availability:  "https://schema.org/InStock",
+        itemCondition: "https://schema.org/NewCondition",
+        url:           `${SITE_URL}/cars/${slug}/price-in-${city}`,
+        areaServed:    { "@type": "City", name: cityData.name },
+      },
+    }),
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type":    "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home",                item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: "Electric Cars",       item: `${SITE_URL}/cars` },
+      { "@type": "ListItem", position: 3, name: vehicle.name,          item: `${SITE_URL}/cars/${slug}` },
+      { "@type": "ListItem", position: 4, name: `Price in ${cityData.name}`, item: `${SITE_URL}/cars/${slug}/price-in-${city}` },
+    ],
+  };
+
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type":    "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name:    `What is the on-road price of ${vehicle.name} in ${cityData.name}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: onRoadNum
+            ? `The on-road price of ${vehicle.name} in ${cityData.name} is approximately ₹${onRoadNum.toLocaleString("en-IN")} including RTO (${Math.round(cityData.regPct * 100)}%), insurance, and accessories.`
+            : `The on-road price of ${vehicle.name} in ${cityData.name} includes the ex-showroom price plus RTO charges, insurance, and handling fees.`,
+        },
+      },
+      {
+        "@type": "Question",
+        name:    `What is the RTO charge for ${vehicle.name} in ${cityData.state}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `In ${cityData.state}, the road tax for electric vehicles is ${Math.round(cityData.regPct * 100)}% of the ex-showroom price. Many states offer reduced road tax for EVs to promote adoption.`,
+        },
+      },
+      {
+        "@type": "Question",
+        name:    `Is ${vehicle.name} available in ${cityData.name}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `Yes, the ${vehicle.name} is available at authorised ${vehicle.brand} dealerships in ${cityData.name}, ${cityData.state}. You can book a test drive or get exact pricing from the dealer.`,
+        },
+      },
+    ],
+  };
+
   return (
-    <CityPriceClient
-      vehicle={JSON.parse(JSON.stringify(vehicle))}
-      cityData={cityData}
-      allCities={CITIES}
-    />
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      <CityPriceClient
+        vehicle={JSON.parse(JSON.stringify(vehicle))}
+        cityData={cityData}
+        allCities={CITIES}
+      />
+    </>
   );
 }

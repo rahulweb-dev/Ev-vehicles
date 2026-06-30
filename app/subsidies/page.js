@@ -2,10 +2,59 @@ import Link from "next/link";
 import { IndianRupee, Zap, CheckCircle, ExternalLink, Info, ChevronRight } from "lucide-react";
 import { SITE_URL } from "@/app/layout";
 
+const subsidyFaqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "What is the FAME III subsidy amount for electric vehicles in India?",
+      acceptedAnswer: { "@type": "Answer", text: "The proposed FAME III scheme (expected 2024–2029) is expected to offer up to ₹50,000 subsidy on electric 2-wheelers and up to ₹2.5 lakh on electric 4-wheelers for vehicles manufactured in India with minimum local content requirements." },
+    },
+    {
+      "@type": "Question",
+      name: "Which state gives the highest EV subsidy in India?",
+      acceptedAnswer: { "@type": "Answer", text: "Delhi offers the highest EV subsidies in India — up to ₹30,000 for electric 2-wheelers and ₹1.5 lakh for electric 4-wheelers under the Delhi EV Policy 2020, along with road tax and registration fee waiver. Gujarat, Maharashtra, and Rajasthan also offer significant subsidies." },
+    },
+    {
+      "@type": "Question",
+      name: "What is Section 80EEB tax benefit for electric vehicles?",
+      acceptedAnswer: { "@type": "Answer", text: "Section 80EEB of the Income Tax Act allows a deduction of up to ₹1.5 lakh per year on interest paid on loans taken for purchasing an electric vehicle. This benefit is available for individual taxpayers who purchase an EV on loan from a financial institution." },
+    },
+    {
+      "@type": "Question",
+      name: "How do I claim EV subsidy in India?",
+      acceptedAnswer: { "@type": "Answer", text: "You don't need to apply directly — the subsidy is deducted upfront from your invoice by the authorized EV dealer. Simply visit an authorized dealer, select your EV, provide KYC documents (Aadhaar, PAN), and the dealer applies for the subsidy via the FAME/state portal on your behalf. The subsidy amount is deducted from the price you pay." },
+    },
+  ],
+};
+
+const subsidyBreadcrumbJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+    { "@type": "ListItem", position: 2, name: "EV Subsidies India 2026", item: `${SITE_URL}/subsidies` },
+  ],
+};
+
 export const metadata = {
   title: "EV Subsidies & Government Schemes 2026 – FAME III, State Incentives",
   description: "Complete guide to EV subsidies in India 2026. FAME III scheme, state-wise incentives, tax benefits, and how to claim them.",
   alternates: { canonical: `${SITE_URL}/subsidies` },
+  openGraph: {
+    title: "EV Subsidies & Government Schemes 2026 – FAME III, State Incentives",
+    description: "Complete guide to EV subsidies in India. FAME III scheme, state-wise incentives, Section 80EEB tax benefits and how to claim them.",
+    url: `${SITE_URL}/subsidies`,
+    type: "website",
+    images: [{ url: `${SITE_URL}/api/og?title=EV Subsidies India 2026&subtitle=FAME III, state incentives %26 tax benefits guide&tag=charging&type=page`, width: 1200, height: 630, alt: "EV Subsidies India 2026" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "EV Subsidies India 2026 – FAME III & State Incentives",
+    description: "Complete guide to EV subsidies in India. FAME III scheme, state-wise incentives and tax benefits.",
+    images: [`${SITE_URL}/api/og?title=EV Subsidies India 2026&subtitle=FAME III, state incentives %26 tax benefits guide&tag=charging&type=page`],
+  },
 };
 
 const CENTRAL_SCHEMES = [
@@ -78,6 +127,9 @@ const TAX_BENEFITS = [
 
 export default function SubsidiesPage() {
   return (
+    <>
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(subsidyFaqJsonLd) }} />
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(subsidyBreadcrumbJsonLd) }} />
     <div className="min-h-screen bg-gray-50 py-10">
       <div className="mx-auto max-w-6xl px-4">
         {/* Breadcrumb */}
@@ -210,5 +262,6 @@ export default function SubsidiesPage() {
         </section>
       </div>
     </div>
+    </>
   );
 }

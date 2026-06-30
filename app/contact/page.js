@@ -7,6 +7,19 @@ export const metadata = {
   description:
     "Contact the EV News India team for editorial inquiries, press releases, advertising partnerships, or general queries about electric vehicles in India.",
   alternates: { canonical: `${SITE_URL}/contact` },
+  openGraph: {
+    title: "Contact EV News India – Get In Touch",
+    description: "Reach the EV News India team for editorial inquiries, press releases, advertising, or general EV questions.",
+    url: `${SITE_URL}/contact`,
+    type: "website",
+    images: [{ url: `${SITE_URL}/api/og?title=Contact EV News India&subtitle=Editorial, advertising %26 general inquiries&tag=default&type=page`, width: 1200, height: 630, alt: "Contact EV News India" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Contact EV News India",
+    description: "Reach the EV News India team for editorial inquiries, press releases or advertising partnerships.",
+    images: [`${SITE_URL}/api/og?title=Contact EV News India&subtitle=Editorial, advertising %26 general inquiries&tag=default&type=page`],
+  },
 };
 
 const contactJsonLd = {

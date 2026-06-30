@@ -12,6 +12,19 @@ export const metadata = {
   description:
     "Compare all electric cars in India 2026. Filter by budget, brand, range and battery. Check specs, colors and latest news for Tata, Mahindra, Hyundai, BYD, Kia EVs.",
   alternates: { canonical: `${SITE_URL}/cars` },
+  openGraph: {
+    title: "Electric Cars in India 2026 – Price, Range & Specs",
+    description: "Compare all electric cars in India. Filter by budget, brand, range & battery. Tata, Mahindra, Hyundai, BYD, Kia EVs.",
+    url: `${SITE_URL}/cars`,
+    type: "website",
+    images: [{ url: `${SITE_URL}/api/og?title=Electric Cars in India 2026&subtitle=Compare by price, range %26 battery&tag=cars&type=page`, width: 1200, height: 630, alt: "Electric Cars in India 2026" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Electric Cars in India 2026 – Price, Range & Specs",
+    description: "Compare all electric cars in India. Filter by budget, brand, range & battery.",
+    images: [`${SITE_URL}/api/og?title=Electric Cars in India 2026&subtitle=Compare by price, range %26 battery&tag=cars&type=page`],
+  },
 };
 
 export default async function CarsPage({ searchParams }) {

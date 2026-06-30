@@ -12,6 +12,19 @@ export const metadata = {
   description:
     "Compare all electric scooters and bikes in India 2026. Filter by budget, brand, range and battery. Ather 450X, Ola S1 Pro, TVS iQube, Bajaj Chetak and more.",
   alternates: { canonical: `${SITE_URL}/bikes` },
+  openGraph: {
+    title: "Electric Bikes & Scooters in India 2026 – Price, Range & Specs",
+    description: "Compare all electric scooters and bikes in India. Ather 450X, Ola S1 Pro, TVS iQube, Bajaj Chetak and more.",
+    url: `${SITE_URL}/bikes`,
+    type: "website",
+    images: [{ url: `${SITE_URL}/api/og?title=Electric Bikes %26 Scooters 2026&subtitle=Compare by price, range %26 battery&tag=bikes&type=page`, width: 1200, height: 630, alt: "Electric Bikes & Scooters in India 2026" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Electric Bikes & Scooters in India 2026",
+    description: "Compare all electric scooters and bikes in India. Ather, Ola, TVS, Bajaj and more.",
+    images: [`${SITE_URL}/api/og?title=Electric Bikes %26 Scooters 2026&subtitle=Compare by price, range %26 battery&tag=bikes&type=page`],
+  },
 };
 
 export default async function BikesPage({ searchParams }) {

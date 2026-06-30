@@ -11,6 +11,19 @@ export const metadata = {
   description:
     "Latest commercial EV news in India. Electric trucks, buses, delivery vans, and three-wheelers — launches, prices, and fleet operator reviews.",
   alternates: { canonical: `${SITE_URL}/commercial` },
+  openGraph: {
+    title: "Commercial Electric Vehicles India 2026 – Trucks, Buses & Vans",
+    description: "Latest commercial EV news in India. Electric trucks, buses, delivery vans, and three-wheelers — launches, prices, and reviews.",
+    url: `${SITE_URL}/commercial`,
+    type: "website",
+    images: [{ url: `${SITE_URL}/api/og?title=Commercial EVs India 2026&subtitle=Electric trucks, buses %26 delivery vans&tag=commercial&type=page`, width: 1200, height: 630, alt: "Commercial Electric Vehicles India 2026" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Commercial Electric Vehicles India 2026",
+    description: "Latest commercial EV news — electric trucks, buses, delivery vans, and three-wheelers.",
+    images: [`${SITE_URL}/api/og?title=Commercial EVs India 2026&subtitle=Electric trucks, buses %26 delivery vans&tag=commercial&type=page`],
+  },
 };
 
 const SEGMENTS = [
@@ -40,8 +53,42 @@ const SEGMENTS = [
   },
 ];
 
+const commercialJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+    { "@type": "ListItem", position: 2, name: "Commercial Electric Vehicles", item: `${SITE_URL}/commercial` },
+  ],
+};
+
+const commercialFaqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Which is the best electric bus in India?",
+      acceptedAnswer: { "@type": "Answer", text: "The Tata Motors Starbus EV and Olectra-BYD K9 are among the best electric buses in India. Tata's buses are widely deployed by BEST Mumbai and DTC Delhi, while Olectra-BYD buses serve multiple state transport undertakings. Both offer 200–300 km range per charge." },
+    },
+    {
+      "@type": "Question",
+      name: "Which electric delivery van is best for last-mile logistics in India?",
+      acceptedAnswer: { "@type": "Answer", text: "The Mahindra Treo Zor electric three-wheeler and Piaggio Ape E-City are popular for last-mile logistics. For cargo vans, the Tata Ace EV and Mahindra eSupro are widely used by e-commerce companies including Flipkart and Amazon in India." },
+    },
+    {
+      "@type": "Question",
+      name: "What is the subsidy on commercial electric vehicles in India?",
+      acceptedAnswer: { "@type": "Answer", text: "Under FAME II, electric buses received a subsidy of ₹20,000–₹55,000 per kWh of battery capacity. Electric three-wheelers (e-rickshaws) received up to ₹50,000 subsidy. The PM E-Drive scheme also provides incentives for electric buses procured by state transport undertakings." },
+    },
+  ],
+};
+
 export default function CommercialPage() {
   return (
+    <>
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(commercialJsonLd) }} />
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(commercialFaqJsonLd) }} />
     <div className="bg-white min-h-screen">
       <div className="bg-linear-to-br from-purple-900 to-purple-950 py-14">
         <div className="mx-auto max-w-7xl px-4">
@@ -80,5 +127,6 @@ export default function CommercialPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

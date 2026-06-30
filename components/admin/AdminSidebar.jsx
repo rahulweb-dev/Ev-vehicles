@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import {
   LayoutDashboard, Newspaper, LogOut,
   Menu, X, ExternalLink, Settings,
-  Users, Building2, MapPin, ShieldCheck, Car, LayoutTemplate, MessageSquare, Radio, MessagesSquare, BookOpen, Bell,
+  Users, Building2, MapPin, ShieldCheck, Car, LayoutTemplate, MessageSquare, Radio, MessagesSquare, BookOpen, Bell, SearchCheck, UserCircle, Tag, Star, Mail,
 } from "lucide-react";
 import { getPusherClient } from "@/lib/pusherClient";
 
@@ -16,12 +16,17 @@ const ADMIN_NAV = [
   { href: "/admin/articles",        label: "Articles",     icon: Newspaper },
   { href: "/admin/blogs",           label: "Blogs",        icon: BookOpen },
   { href: "/admin/vehicles",        label: "Vehicles",     icon: Car },
+  { href: "/admin/brands",          label: "Brand Logos",  icon: Tag },
   { href: "/admin/banners",         label: "Banners",      icon: LayoutTemplate },
   { href: "/admin/leads",           label: "Leads",        icon: Users },
   { href: "/admin/chatbot-leads",   label: "Chatbot Leads", icon: MessageSquare },
   { href: "/admin/live-chat",       label: "Live Chat",    icon: Radio, badge: "liveChat" },
+  { href: "/admin/reviews",             label: "Reviews",           icon: Star,           badge: "reviews" },
   { href: "/admin/comments",           label: "Comments",          icon: MessagesSquare, badge: "comments" },
+  { href: "/admin/subscribers",         label: "Subscribers",        icon: Mail },
   { href: "/admin/push-notifications", label: "Push Notifications", icon: Bell },
+  { href: "/admin/seo-audit",          label: "SEO Audit",          icon: SearchCheck },
+  { href: "/admin/authors",            label: "Authors",            icon: UserCircle },
   { href: "/admin/dealers",            label: "Dealers",            icon: Building2 },
   { href: "/admin/settings",           label: "Settings",           icon: Settings },
 ];
@@ -97,7 +102,7 @@ export default function AdminSidebar() {
             <Link href="/admin" className="flex items-center gap-2 min-w-0">
               <Image
                 src="/images/logo.png"
-                alt="EVBharat India"
+                alt="EVRadar"
                 width={120}
                 height={36}
                 className="object-contain h-9 w-auto"
@@ -109,7 +114,7 @@ export default function AdminSidebar() {
             <Link href="/admin" className="mx-auto">
               <Image
                 src="/images/logo.png"
-                alt="EVBharat India"
+                alt="EVRadar"
                 width={32}
                 height={32}
                 className="object-contain h-8 w-8"
@@ -241,7 +246,7 @@ function MobileTopBar({ navItems, pathname, onLogout, currentUser, isAdmin, wait
         <Link href="/admin">
           <Image
             src="/images/logo.png"
-            alt="EVBharat India"
+            alt="EVRadar"
             width={100}
             height={30}
             className="object-contain h-8 w-auto"

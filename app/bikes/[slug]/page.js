@@ -51,7 +51,19 @@ export async function generateMetadata({ params }) {
     openGraph: {
       title:       bike.ogTitle       || bike.metaTitle       || `${bike.name} – Price, Range & Specs`,
       description: bike.ogDescription || bike.metaDescription || `${bike.name}${price ? ` starts at ${price}` : ""}${range ? `. Range: ${range}` : ""}.`,
-      images:      [{ url: bike.ogImage || bike.featuredImage || "", width: 1200, height: 630 }],
+      url: bike.canonicalUrl || `${SITE_URL}/bikes/${slug}`,
+      type: "website",
+      images: [{
+        url: bike.ogImage || bike.featuredImage ||
+          `${SITE_URL}/api/og?title=${encodeURIComponent(bike.name)}&subtitle=${encodeURIComponent(`${price ? price + " onwards" : ""}${range ? " · Range " + range : ""}`)}&type=vehicle&tag=bikes${bike.featuredImage ? "&image=" + encodeURIComponent(bike.featuredImage) : ""}`,
+        width: 1200, height: 630,
+      }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: bike.ogTitle || bike.metaTitle || `${bike.name} – Price, Range & Specs`,
+      description: bike.ogDescription || bike.metaDescription || `${bike.name}${price ? ` starts at ${price}` : ""}${range ? `. Range: ${range}` : ""}.`,
+      images: [bike.ogImage || bike.featuredImage || `${SITE_URL}/api/og?title=${encodeURIComponent(bike.name)}&subtitle=${encodeURIComponent(`${price ? price + " onwards" : ""}${range ? " · Range " + range : ""}`)}&type=vehicle&tag=bikes${bike.featuredImage ? "&image=" + encodeURIComponent(bike.featuredImage) : ""}`],
     },
   };
 }
@@ -146,11 +158,25 @@ export default async function BikeDetailPage({ params }) {
     ],
   };
 
+  const videoId = bike.videoUrl?.match(/(?:youtu\.be\/|[?&]v=)([^?&]{11})/)?.[1];
+  const videoJsonLd = videoId ? {
+    "@context":    "https://schema.org",
+    "@type":       "VideoObject",
+    name:          `${bike.name} Review & First Look`,
+    description:   `Watch the full ${bike.name} review including range test, features, and performance.`,
+    thumbnailUrl:  `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+    uploadDate:    bike.createdAt ? new Date(bike.createdAt).toISOString() : new Date().toISOString(),
+    contentUrl:    `https://www.youtube.com/watch?v=${videoId}`,
+    embedUrl:      `https://www.youtube.com/embed/${videoId}`,
+    publisher:     { "@type": "Organization", name: "EV News India", url: SITE_URL },
+  } : null;
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      {videoJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(videoJsonLd) }} />}
       <VehicleDetailPage vehicle={bike} relatedVehicles={related} vehicleType="bike" />
     </>
   );

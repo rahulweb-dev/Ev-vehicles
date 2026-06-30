@@ -25,10 +25,25 @@ async function getArticlesByTag(tag) {
 export async function generateMetadata({ params }) {
   const { tag } = await params;
   const decoded = decodeURIComponent(tag);
+  const ogTitle = `#${decoded} – EV News India`;
+  const ogDesc = `Latest electric vehicle news tagged with ${decoded}. Stay updated on EV launches, reviews, and industry news in India.`;
   return {
-    title: `#${decoded} – EV News`,
-    description: `Latest electric vehicle news tagged with ${decoded} on EVRadar India.`,
+    title: `#${decoded} – EV News India | EVRadar`,
+    description: ogDesc,
     alternates: { canonical: `${SITE_URL}/news/tags/${tag}` },
+    openGraph: {
+      title: ogTitle,
+      description: ogDesc,
+      url: `${SITE_URL}/news/tags/${tag}`,
+      type: "website",
+      images: [{ url: `${SITE_URL}/api/og?title=%23${encodeURIComponent(decoded)}&subtitle=Latest EV news %26 updates from EVRadar India&tag=news&type=page`, width: 1200, height: 630, alt: `#${decoded} EV News` }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: ogTitle,
+      description: ogDesc,
+      images: [`${SITE_URL}/api/og?title=%23${encodeURIComponent(decoded)}&subtitle=Latest EV news %26 updates from EVRadar India&tag=news&type=page`],
+    },
   };
 }
 

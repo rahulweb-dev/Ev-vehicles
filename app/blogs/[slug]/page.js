@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import sanitizeHtml from "sanitize-html";
 import Image from "next/image";
 import Link from "next/link";
 import { Clock3, Calendar, ChevronRight } from "lucide-react";
@@ -47,6 +48,25 @@ export default async function BlogPostPage({ params }) {
   if (!blog) notFound();
 
   const related = getRelatedBlogs(slug, 3);
+
+  const safeContent = sanitizeHtml(blog.content || "", {
+    allowedTags: sanitizeHtml.defaults.allowedTags.concat([
+      "img", "h1", "h2", "h3", "h4", "h5", "h6",
+      "figure", "figcaption", "table", "thead", "tbody", "tr", "td", "th",
+      "iframe", "picture", "source",
+    ]),
+    allowedAttributes: {
+      ...sanitizeHtml.defaults.allowedAttributes,
+      "img":    ["src", "alt", "width", "height", "loading", "class"],
+      "a":      ["href", "target", "rel", "class"],
+      "iframe": ["src", "width", "height", "frameborder", "allowfullscreen", "loading", "title"],
+      "table":  ["class"],
+      "td":     ["colspan", "rowspan", "class"],
+      "th":     ["colspan", "rowspan", "class"],
+      "*":      ["class"],
+    },
+    allowedIframeHostnames: ["www.youtube.com", "youtube.com", "player.vimeo.com"],
+  });
 
   const articleJsonLd = {
     "@context": "https://schema.org",
@@ -139,7 +159,7 @@ export default async function BlogPostPage({ params }) {
           {/* Blog Content */}
           <div
             className="prose prose-lg max-w-none prose-headings:font-black prose-headings:text-gray-900 prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-p:text-gray-700 prose-p:leading-relaxed prose-strong:text-gray-900 prose-ul:text-gray-700 prose-li:my-1 prose-table:text-sm"
-            dangerouslySetInnerHTML={{ __html: blog.content }}
+            dangerouslySetInnerHTML={{ __html: safeContent }}
           />
 
           {/* Second Ad */}

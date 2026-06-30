@@ -177,6 +177,7 @@ function CheckGroup({ items, values, onChange }) {
 /* ─── Main export ─────────────────────────────────────────────────── */
 export default function CarsClient({ initialBrand, initialBudget, initialSearch }) {
   const [allCars,      setAllCars]      = useState([])
+  const [brandLogos,   setBrandLogos]   = useState({})
   const [loading,      setLoading]      = useState(true)
   const [showDrawer,   setShowDrawer]   = useState(false)
   const [searchQ,      setSearchQ]      = useState(initialSearch || '')
@@ -189,9 +190,20 @@ export default function CarsClient({ initialBrand, initialBudget, initialSearch 
   })
 
   useEffect(() => {
-    fetch('/api/vehicles?vehicleType=car&status=published&limit=200')
-      .then(r => r.json())
-      .then(data => setAllCars((data.vehicles || []).map(mapVehicle)))
+    /* fetch vehicles and brand logos in parallel */
+    Promise.all([
+      fetch('/api/vehicles?vehicleType=car&status=published&limit=200').then(r => r.json()),
+      fetch('/api/brands').then(r => r.json()),
+    ])
+      .then(([vehicleData, brandData]) => {
+        /* build slug→logo map */
+        const logoMap = {}
+        for (const b of brandData.brands || []) {
+          if (b.logo) logoMap[b.slug] = b.logo
+        }
+        setBrandLogos(logoMap)
+        setAllCars((vehicleData.vehicles || []).map(mapVehicle))
+      })
       .catch(() => setAllCars([]))
       .finally(() => setLoading(false))
   }, [])
@@ -403,7 +415,7 @@ export default function CarsClient({ initialBrand, initialBudget, initialSearch 
             </div>
           ) : (
             <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-              {filtered.map(car => <CarCard key={car.slug} car={car} />)}
+              {filtered.map(car => <CarCard key={car.slug} car={car} brandLogos={brandLogos} />)}
             </div>
           )}
         </div>
@@ -440,7 +452,9 @@ export default function CarsClient({ initialBrand, initialBudget, initialSearch 
 }
 
 /* ─── CarCard ─────────────────────────────────────────────────────── */
-function CarCard({ car }) {
+function CarCard({ car, brandLogos = {} }) {
+  const brandSlug = car.brand?.toLowerCase().replace(/\s+/g, '-')
+  const logo = brandLogos[brandSlug] || ''
   return (
     <Link href={`/cars/${car.slug}`} className="group block">
       <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
@@ -457,9 +471,21 @@ function CarCard({ car }) {
               {car.tag}
             </span>
           </div>
+          {logo && (
+            <div className="absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-xl border border-white/40 bg-white/95 shadow-md">
+              <Image src={logo} alt={car.brand} width={28} height={28} className="object-contain" />
+            </div>
+          )}
         </div>
         <div className="p-4">
-          <p className="text-[11px] font-semibold text-green-600">{car.brand}</p>
+          <div className="flex items-center gap-1.5">
+            {logo && (
+              <div className="flex h-5 w-5 items-center justify-center overflow-hidden rounded-sm border border-gray-100">
+                <Image src={logo} alt={car.brand} width={16} height={16} className="object-contain" />
+              </div>
+            )}
+            <p className="text-[11px] font-semibold text-green-600">{car.brand}</p>
+          </div>
           <h3 className="mt-0.5 text-base font-black text-gray-900 group-hover:text-green-600 transition line-clamp-1">
             {car.name}
           </h3>

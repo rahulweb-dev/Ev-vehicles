@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronRight, Car, Bike, Newspaper } from "lucide-react";
+import { ChevronRight, Car, Bike, Newspaper, Globe } from "lucide-react";
 import NewsCard from "@/components/news/NewsCard";
 import { SITE_URL } from "@/app/layout";
 
@@ -12,12 +12,13 @@ async function getBrandData(brand) {
     const dbConnect = (await import("@/lib/mongodb")).default;
     const Vehicle   = (await import("@/lib/models/Vehicle")).default;
     const Article   = (await import("@/lib/models/Article")).default;
+    const Brand     = (await import("@/lib/models/Brand")).default;
     await dbConnect();
 
     const decoded = decodeURIComponent(brand).replace(/-/g, " ");
     const brandRegex = new RegExp(decoded, "i");
 
-    const [vehicles, articles] = await Promise.all([
+    const [vehicles, articles, brandProfile] = await Promise.all([
       Vehicle.find({ brand: brandRegex, status: "published" }).sort({ createdAt: -1 }).lean(),
       Article.find({
         status: "published",
@@ -26,27 +27,44 @@ async function getBrandData(brand) {
           { tags:  { $elemMatch: { $regex: decoded, $options: "i" } } },
         ],
       }).sort({ publishedAt: -1 }).limit(9).lean(),
+      Brand.findOne({ slug: brand }).lean(),
     ]);
 
-    return { vehicles, articles, brandName: vehicles[0]?.brand || decoded };
+    return { vehicles, articles, brandName: vehicles[0]?.brand || decoded, brandProfile };
   } catch {
-    return { vehicles: [], articles: [], brandName: decodeURIComponent(brand).replace(/-/g, " ") };
+    return { vehicles: [], articles: [], brandName: decodeURIComponent(brand).replace(/-/g, " "), brandProfile: null };
   }
 }
 
 export async function generateMetadata({ params }) {
   const { brand } = await params;
-  const decoded = decodeURIComponent(brand).replace(/-/g, " ");
+  const { brandName, brandProfile } = await getBrandData(brand);
   return {
-    title: `${decoded} Electric Vehicles – Prices, Specs & News`,
-    description: `All ${decoded} electric vehicles with prices, specs, variants and latest news in India.`,
+    title: `${brandName} Electric Vehicles – Prices, Specs & News`,
+    description: brandProfile?.description || `All ${brandName} electric vehicles with prices, specs, variants and latest news in India.`,
     alternates: { canonical: `${SITE_URL}/brands/${brand}` },
+    openGraph: {
+      title:  `${brandName} Electric Vehicles – Prices, Specs & News`,
+      description: brandProfile?.description || `All ${brandName} electric vehicles with prices, specs, variants and latest news in India.`,
+      url: `${SITE_URL}/brands/${brand}`,
+      type: "website",
+      images: [{
+        url: brandProfile?.logo || `${SITE_URL}/api/og?title=${encodeURIComponent(brandName + " Electric Vehicles")}&subtitle=Prices, specs %26 latest news in India&tag=cars&type=page`,
+        width: 1200, height: 630,
+      }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${brandName} Electric Vehicles – Prices, Specs & News`,
+      description: brandProfile?.description || `All ${brandName} electric vehicles with prices, specs and latest news in India.`,
+      images: [brandProfile?.logo || `${SITE_URL}/api/og?title=${encodeURIComponent(brandName + " Electric Vehicles")}&subtitle=Prices, specs %26 latest news in India&tag=cars&type=page`],
+    },
   };
 }
 
 export default async function BrandPage({ params }) {
   const { brand } = await params;
-  const { vehicles, articles, brandName } = await getBrandData(brand);
+  const { vehicles, articles, brandName, brandProfile } = await getBrandData(brand);
 
   if (!vehicles.length && !articles.length) notFound();
 
@@ -85,14 +103,39 @@ export default async function BrandPage({ params }) {
         </nav>
 
         {/* Brand header */}
-        <div className="mb-8 rounded-2xl bg-white p-6 shadow-sm">
-          <h1 className="text-3xl font-black text-gray-900">{brandName} Electric Vehicles</h1>
-          <p className="mt-2 text-gray-500">
-            {vehicles.length} EV{vehicles.length !== 1 ? "s" : ""} · {articles.length} News article{articles.length !== 1 ? "s" : ""}
-          </p>
-          <div className="mt-4 flex gap-3">
-            {cars.length  > 0 && <span className="flex items-center gap-1.5 rounded-full bg-blue-50 px-4 py-1.5 text-sm font-semibold text-blue-700"><Car  size={14} />{cars.length} Car{cars.length !== 1 ? "s" : ""}</span>}
-            {bikes.length > 0 && <span className="flex items-center gap-1.5 rounded-full bg-orange-50 px-4 py-1.5 text-sm font-semibold text-orange-700"><Bike size={14} />{bikes.length} Bike{bikes.length !== 1 ? "s" : ""}</span>}
+        <div className="mb-8 overflow-hidden rounded-2xl bg-white shadow-sm">
+          <div className="h-20 bg-linear-to-r from-gray-900 to-gray-700" />
+          <div className="px-6 pb-6 -mt-10 flex flex-col sm:flex-row sm:items-end gap-4">
+            {/* Logo */}
+            <div className="shrink-0 flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl border-4 border-white bg-white shadow-md">
+              {brandProfile?.logo ? (
+                <Image src={brandProfile.logo} alt={brandName} width={72} height={72} className="object-contain p-1" />
+              ) : (
+                <span className="text-4xl font-black text-gray-200">{brandName.charAt(0)}</span>
+              )}
+            </div>
+
+            <div className="flex-1 pt-4 sm:pt-0">
+              <h1 className="text-2xl font-black text-gray-900">{brandName} Electric Vehicles</h1>
+              <div className="mt-1 flex flex-wrap items-center gap-3 text-sm text-gray-500">
+                <span>{vehicles.length} EV{vehicles.length !== 1 ? "s" : ""}</span>
+                <span>·</span>
+                <span>{articles.length} News article{articles.length !== 1 ? "s" : ""}</span>
+                {brandProfile?.website && (
+                  <a href={brandProfile.website} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-green-600 hover:underline">
+                    <Globe size={12} /> Official Site
+                  </a>
+                )}
+              </div>
+              {brandProfile?.description && (
+                <p className="mt-2 text-sm text-gray-600 max-w-2xl">{brandProfile.description}</p>
+              )}
+              <div className="mt-3 flex gap-2">
+                {cars.length  > 0 && <span className="flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700"><Car  size={12} />{cars.length} Car{cars.length !== 1 ? "s" : ""}</span>}
+                {bikes.length > 0 && <span className="flex items-center gap-1.5 rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold text-orange-700"><Bike size={12} />{bikes.length} Bike{bikes.length !== 1 ? "s" : ""}</span>}
+              </div>
+            </div>
           </div>
         </div>
 

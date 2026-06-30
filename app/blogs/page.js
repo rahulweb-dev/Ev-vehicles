@@ -16,6 +16,13 @@ export const metadata = {
     description: "In-depth EV guides, buying tips, and ownership advice for Indian EV buyers.",
     url: `${SITE_URL}/blogs`,
     type: "website",
+    images: [{ url: `${SITE_URL}/api/og?title=EV Blogs %26 Guides India&subtitle=Buying tips, cost analysis %26 EV ownership advice&tag=default&type=page`, width: 1200, height: 630, alt: "EV Blogs & Guides India" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "EV Blogs & Guides – Electric Vehicle Tips for India",
+    description: "In-depth EV guides, buying tips, and ownership advice for Indian EV buyers.",
+    images: [`${SITE_URL}/api/og?title=EV Blogs %26 Guides India&subtitle=Buying tips, cost analysis %26 EV ownership advice&tag=default&type=page`],
   },
 };
 
@@ -26,11 +33,38 @@ const categoryColors = {
   tips: "bg-orange-100 text-orange-700",
 };
 
+const blogsBreadcrumbJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+    { "@type": "ListItem", position: 2, name: "EV Blogs & Guides", item: `${SITE_URL}/blogs` },
+  ],
+};
+
 export default function BlogsPage() {
   const featured = blogsData[0];
   const rest = blogsData.slice(1);
 
+  const blogsItemListJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "EV Blogs & Guides – Electric Vehicle Tips India",
+    description: "In-depth electric vehicle guides, buying tips, and EV ownership advice for India.",
+    url: `${SITE_URL}/blogs`,
+    numberOfItems: blogsData.length,
+    itemListElement: blogsData.map((blog, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: blog.title,
+      url: `${SITE_URL}/blogs/${blog.slug}`,
+    })),
+  };
+
   return (
+    <>
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogsItemListJsonLd) }} />
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(blogsBreadcrumbJsonLd) }} />
     <div className="bg-white">
       {/* Header */}
       <div className="bg-gray-950 py-14">
@@ -143,5 +177,6 @@ export default function BlogsPage() {
         </section>
       </div>
     </div>
+    </>
   );
 }

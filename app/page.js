@@ -1,9 +1,19 @@
+import Link from "next/link";
 import EVHomepage from "@/components/home/HeroSection";
 import LatestNewsSection from "@/components/home/LatestNewsSection";
 import HomeCompareWidget from "@/components/home/HomeCompareWidget";
 import VehicleSlider from "@/components/home/VehicleSlider";
 import { AdBannerHorizontal } from "@/components/ads/AdBanner";
 import { SITE_URL } from "./layout";
+
+const GUIDE_LINKS = [
+  { href: "/best-electric-cars-india-2026", title: "Best EVs 2026", desc: "Expert-ranked top 10", emoji: "🏆" },
+  { href: "/upcoming-electric-cars-india",  title: "Upcoming EVs",   desc: "Launching soon in India", emoji: "🚀" },
+  { href: "/electric-cars-under-10-lakh",   title: "Under ₹10 Lakh", desc: "Budget EV picks", emoji: "💰" },
+  { href: "/ev-charging-guide",             title: "Charging Guide",  desc: "Everything about EV charging", emoji: "⚡" },
+  { href: "/subsidy-calculator",            title: "Subsidy Calculator", desc: "Check your EV savings", emoji: "🧮" },
+  { href: "/government-ev-policy-india",    title: "EV Policy India", desc: "FAME, PM E-Drive & more", emoji: "📋" },
+];
 
 export const revalidate = 120; // re-fetch from DB every 2 minutes
 
@@ -17,22 +27,30 @@ export const metadata = {
     description: "Latest EV news, launches, reviews and prices for electric cars and bikes in India.",
     url: SITE_URL,
     type: "website",
+    images: [{ url: `${SITE_URL}/api/og?title=EV News India&subtitle=India's %231 Electric Vehicle News Platform&tag=default&type=page`, width: 1200, height: 630, alt: "EV News India – India's #1 Electric Vehicle News Platform" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "EV News India – India's #1 Electric Vehicle News Platform",
+    description: "Latest EV news, launches, reviews and prices for electric cars and bikes in India.",
+    images: [`${SITE_URL}/api/og?title=EV News India&subtitle=India's %231 Electric Vehicle News Platform&tag=default&type=page`],
   },
 };
 
 /* ── Map MongoDB Vehicle → VehicleSlider card format ─────────────── */
-function mapVehicle(v) {
+function mapVehicle(v, brandLogoMap = {}) {
   const firstVariant = v.variants?.[0];
   const lastVariant  = v.variants?.[v.variants.length - 1];
-  // Map DB colors (objects with hexCode) to hex strings for the slider swatches
   const colors = (v.colors || []).map((c) =>
     typeof c === "string" ? c : (c.hexCode || "#888888")
   );
+  const brandKey = (v.brand || "").toLowerCase().replace(/\s+/g, "-");
   return {
     id:          v._id?.toString() || v.slug,
     slug:        v.slug,
     name:        v.name,
     brand:       v.brand,
+    brandLogo:   brandLogoMap[brandKey] || "",
     price:       firstVariant?.exShowroomPrice || "Price TBA",
     priceMax:    lastVariant?.exShowroomPrice  || firstVariant?.exShowroomPrice || "",
     emi:         "",
@@ -63,6 +81,19 @@ async function getLatestArticles() {
   }
 }
 
+/* ── Fetch brand logo map  slug → url ────────────────────────────── */
+async function getBrandLogos() {
+  try {
+    const dbConnect = (await import("@/lib/mongodb")).default;
+    const Brand     = (await import("@/lib/models/Brand")).default;
+    await dbConnect();
+    const brands = await Brand.find({ logo: { $ne: "" } }).select("slug logo").lean();
+    return Object.fromEntries(brands.map(b => [b.slug, b.logo]));
+  } catch {
+    return {};
+  }
+}
+
 /* ── Fetch a section from MongoDB ────────────────────────────────── */
 async function getVehicles({ category, vehicleType, featured }) {
   const dbConnect = (await import("@/lib/mongodb")).default;
@@ -75,17 +106,24 @@ async function getVehicles({ category, vehicleType, featured }) {
     .sort({ createdAt: -1 })
     .limit(12)
     .lean();
-  return docs.map(mapVehicle);
+  /* brandLogoMap is applied separately after all parallel fetches */
+  return docs;
+}
+
+function applyLogos(docs, brandLogoMap) {
+  return docs.map(v => mapVehicle(v, brandLogoMap));
 }
 
 export default async function Home() {
   const [
     latestArticles,
+    brandLogoMap,
     featuredCars, featuredBikes, featuredCommercial,
     popularCars, popularBikes, popularCommercial,
     upcomingCars, upcomingBikes, upcomingCommercial,
   ] = await Promise.all([
     getLatestArticles(),
+    getBrandLogos(),
     getVehicles({ vehicleType: "car",        featured: true }),
     getVehicles({ vehicleType: "bike",       featured: true }),
     getVehicles({ vehicleType: "commercial", featured: true }),
@@ -96,6 +134,16 @@ export default async function Home() {
     getVehicles({ vehicleType: "bike",       category: "upcoming" }),
     getVehicles({ vehicleType: "commercial", category: "upcoming" }),
   ]);
+
+  const [
+    fCars, fBikes, fCommercial,
+    pCars, pBikes, pCommercial,
+    uCars, uBikes, uCommercial,
+  ] = [
+    featuredCars, featuredBikes, featuredCommercial,
+    popularCars, popularBikes, popularCommercial,
+    upcomingCars, upcomingBikes, upcomingCommercial,
+  ].map(docs => applyLogos(docs, brandLogoMap));
 
   const itemListJsonLd = latestArticles.length > 0
     ? {
@@ -125,33 +173,50 @@ export default async function Home() {
         </div>
       </div>
 
+      {/* Popular Guides — internal links to high-value SEO pages */}
+      <section className="bg-gray-50 py-8">
+        <div className="mx-auto max-w-7xl px-4">
+          <h2 className="mb-4 text-xl font-black text-gray-900">EV Buying Guides</h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+            {GUIDE_LINKS.map(g => (
+              <Link key={g.href} href={g.href}
+                className="flex flex-col rounded-2xl border border-gray-200 bg-white p-4 shadow-sm hover:border-green-400 hover:shadow-md transition">
+                <span className="text-2xl mb-2">{g.emoji}</span>
+                <p className="text-sm font-bold text-gray-900 leading-tight">{g.title}</p>
+                <p className="text-[11px] text-gray-500 mt-0.5">{g.desc}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <LatestNewsSection />
 
       <HomeCompareWidget />
 
-      {featuredCars.length > 0 && (
+      {fCars.length > 0 && (
         <VehicleSlider
           title="Featured Electric Cars"
           subtitle="Editor's Top Picks"
-          vehicles={featuredCars}
+          vehicles={fCars}
           vehicleType="cars"
         />
       )}
 
-      {featuredBikes.length > 0 && (
+      {fBikes.length > 0 && (
         <VehicleSlider
           title="Featured Electric Bikes"
           subtitle="Editor's Top Picks"
-          vehicles={featuredBikes}
+          vehicles={fBikes}
           vehicleType="bikes"
         />
       )}
 
-      {popularCars.length > 0 && (
+      {pCars.length > 0 && (
         <VehicleSlider
           title="Popular Electric Cars"
           subtitle="Trending EV Cars in India"
-          vehicles={popularCars}
+          vehicles={pCars}
           vehicleType="cars"
         />
       )}
@@ -162,56 +227,56 @@ export default async function Home() {
         </div>
       </div>
 
-      {popularBikes.length > 0 && (
+      {pBikes.length > 0 && (
         <VehicleSlider
           title="Popular Electric Bikes"
           subtitle="Trending EV Bikes in India"
-          vehicles={popularBikes}
+          vehicles={pBikes}
           vehicleType="bikes"
         />
       )}
 
-      {upcomingCars.length > 0 && (
+      {uCars.length > 0 && (
         <VehicleSlider
           title="Upcoming Electric Cars"
           subtitle="Launching Soon in India"
-          vehicles={upcomingCars}
+          vehicles={uCars}
           vehicleType="cars"
         />
       )}
 
-      {upcomingBikes.length > 0 && (
+      {uBikes.length > 0 && (
         <VehicleSlider
           title="Upcoming Electric Bikes"
           subtitle="Launching Soon in India"
-          vehicles={upcomingBikes}
+          vehicles={uBikes}
           vehicleType="bikes"
         />
       )}
 
-      {featuredCommercial.length > 0 && (
+      {fCommercial.length > 0 && (
         <VehicleSlider
           title="Featured Commercial EVs"
           subtitle="Electric Trucks, Buses & Vans"
-          vehicles={featuredCommercial}
+          vehicles={fCommercial}
           vehicleType="commercial"
         />
       )}
 
-      {popularCommercial.length > 0 && (
+      {pCommercial.length > 0 && (
         <VehicleSlider
           title="Popular Commercial EVs"
           subtitle="Top Electric Trucks, Buses & Delivery Vans in India"
-          vehicles={popularCommercial}
+          vehicles={pCommercial}
           vehicleType="commercial"
         />
       )}
 
-      {upcomingCommercial.length > 0 && (
+      {uCommercial.length > 0 && (
         <VehicleSlider
           title="Upcoming Commercial EVs"
           subtitle="Electric Commercial Vehicles Launching Soon"
-          vehicles={upcomingCommercial}
+          vehicles={uCommercial}
           vehicleType="commercial"
         />
       )}

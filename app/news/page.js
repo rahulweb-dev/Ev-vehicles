@@ -20,6 +20,13 @@ export async function generateMetadata({ searchParams }) {
       description: "Get the latest electric vehicle news, launches, reviews, and price updates from India.",
       url: `${SITE_URL}/news${cat ? `?category=${cat}` : ""}`,
       type: "website",
+      images: [{ url: `${SITE_URL}/api/og?title=${encodeURIComponent(label + " EV News India")}&subtitle=Latest launches, reviews %26 price updates&tag=news&type=page`, width: 1200, height: 630, alt: `${label} EV News India` }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${label} EV News – Electric Vehicle Updates India 2026`,
+      description: "Get the latest EV news, launches, reviews, and price updates from India.",
+      images: [`${SITE_URL}/api/og?title=${encodeURIComponent(label + " EV News India")}&subtitle=Latest launches, reviews %26 price updates&tag=news&type=page`],
     },
   };
 }

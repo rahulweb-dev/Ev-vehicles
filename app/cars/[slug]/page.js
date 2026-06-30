@@ -4,6 +4,18 @@ import { SITE_URL } from "@/app/layout";
 
 export const revalidate = 3600;
 
+function parsePriceToINR(str) {
+  if (!str) return "0";
+  const cleaned = String(str).replace(/[₹,\s]/g, "").toLowerCase();
+  const m = cleaned.match(/([\d.]+)\s*(lakh|l|cr|crore)?/);
+  if (!m) return "0";
+  const num = parseFloat(m[1]);
+  const unit = m[2] || "";
+  if (unit.startsWith("cr")) return String(Math.round(num * 10000000));
+  if (unit === "lakh" || unit === "l") return String(Math.round(num * 100000));
+  return String(Math.round(num));
+}
+
 async function getVehicle(slug) {
   try {
     const dbConnect = (await import("@/lib/mongodb")).default;
@@ -51,9 +63,34 @@ export async function generateMetadata({ params }) {
     openGraph: {
       title:       car.ogTitle       || car.metaTitle       || `${car.name} – Price, Range & Specs`,
       description: car.ogDescription || car.metaDescription || `${car.name}${price ? ` starts at ${price}` : ""}${range ? `. Range: ${range}` : ""}.`,
-      images:      [{ url: car.ogImage || car.featuredImage || "", width: 1200, height: 630 }],
+      url: car.canonicalUrl || `${SITE_URL}/cars/${slug}`,
+      type: "website",
+      images: [{
+        url: car.ogImage || car.featuredImage ||
+          `${SITE_URL}/api/og?title=${encodeURIComponent(car.name)}&subtitle=${encodeURIComponent(`${price ? price + " onwards" : ""}${range ? " · Range " + range : ""}`)}&type=vehicle&tag=cars${car.featuredImage ? "&image=" + encodeURIComponent(car.featuredImage) : ""}`,
+        width: 1200, height: 630,
+      }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: car.ogTitle || car.metaTitle || `${car.name} – Price, Range & Specs`,
+      description: car.ogDescription || car.metaDescription || `${car.name}${price ? ` starts at ${price}` : ""}${range ? `. Range: ${range}` : ""}.`,
+      images: [car.ogImage || car.featuredImage || `${SITE_URL}/api/og?title=${encodeURIComponent(car.name)}&subtitle=${encodeURIComponent(`${price ? price + " onwards" : ""}${range ? " · Range " + range : ""}`)}&type=vehicle&tag=cars${car.featuredImage ? "&image=" + encodeURIComponent(car.featuredImage) : ""}`],
     },
   };
+}
+
+async function getReviewStats(slug) {
+  try {
+    const dbConnect    = (await import("@/lib/mongodb")).default;
+    const VehicleReview = (await import("@/lib/models/VehicleReview")).default;
+    await dbConnect();
+    const stats = await VehicleReview.aggregate([
+      { $match: { vehicleSlug: slug, status: "approved" } },
+      { $group: { _id: null, avg: { $avg: "$rating" }, count: { $sum: 1 } } },
+    ]);
+    return stats[0] || null;
+  } catch { return null; }
 }
 
 export default async function CarDetailPage({ params }) {
@@ -61,7 +98,10 @@ export default async function CarDetailPage({ params }) {
   const car = await getVehicle(slug);
   if (!car) notFound();
 
-  const related = await getRelated(slug, car.brand);
+  const [related, reviewStats] = await Promise.all([
+    getRelated(slug, car.brand),
+    getReviewStats(slug),
+  ]);
 
   const firstVariant = car.variants?.[0];
   const jsonLd = {
@@ -76,11 +116,20 @@ export default async function CarDetailPage({ params }) {
       offers: {
         "@type":       "Offer",
         priceCurrency: "INR",
-        price:         (firstVariant.exShowroomPrice || "").replace(/[^0-9]/g, "") || "0",
+        price:         parsePriceToINR(firstVariant.exShowroomPrice),
         availability:  car.availability === "available"
           ? "https://schema.org/InStock"
           : "https://schema.org/PreOrder",
         url: `${SITE_URL}/cars/${slug}`,
+      },
+    }),
+    ...(reviewStats?.count > 0 && {
+      aggregateRating: {
+        "@type":       "AggregateRating",
+        ratingValue:   reviewStats.avg.toFixed(1),
+        reviewCount:   reviewStats.count,
+        bestRating:    "5",
+        worstRating:   "1",
       },
     }),
   };
@@ -146,11 +195,25 @@ export default async function CarDetailPage({ params }) {
     ],
   };
 
+  const videoId = car.videoUrl?.match(/(?:youtu\.be\/|[?&]v=)([^?&]{11})/)?.[1];
+  const videoJsonLd = videoId ? {
+    "@context":    "https://schema.org",
+    "@type":       "VideoObject",
+    name:          `${car.name} Review & First Look`,
+    description:   `Watch the full ${car.name} review including range test, features, and performance.`,
+    thumbnailUrl:  `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+    uploadDate:    car.createdAt ? new Date(car.createdAt).toISOString() : new Date().toISOString(),
+    contentUrl:    `https://www.youtube.com/watch?v=${videoId}`,
+    embedUrl:      `https://www.youtube.com/embed/${videoId}`,
+    publisher:     { "@type": "Organization", name: "EV News India", url: SITE_URL },
+  } : null;
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      {videoJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(videoJsonLd) }} />}
       <VehicleDetailPage vehicle={car} relatedVehicles={related} vehicleType="car" />
     </>
   );

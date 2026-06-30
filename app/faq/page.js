@@ -13,6 +13,13 @@ export const metadata = {
       "Answers to the most common questions about electric vehicles in India — range, charging, cost, subsidies, and best EVs.",
     url: `${SITE_URL}/faq`,
     type: "website",
+    images: [{ url: `${SITE_URL}/api/og?title=EV FAQ India 2026&subtitle=Range, charging, cost, subsidies %26 best EVs answered&tag=default&type=page`, width: 1200, height: 630, alt: "Electric Vehicle FAQ India 2026" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Electric Vehicle FAQ India 2026 | EV News India",
+    description: "Answers to the most common questions about EVs in India — range, charging, cost, subsidies and best models.",
+    images: [`${SITE_URL}/api/og?title=EV FAQ India 2026&subtitle=Range, charging, cost, subsidies %26 best EVs answered&tag=default&type=page`],
   },
 };
 

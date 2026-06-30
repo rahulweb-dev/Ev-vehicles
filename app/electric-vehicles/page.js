@@ -11,6 +11,19 @@ export const metadata = {
   description:
     "Latest EV charging infrastructure news in India. Fast chargers, battery swapping, home charging tips, charging costs, and India's expanding charging network.",
   alternates: { canonical: `${SITE_URL}/electric-vehicles` },
+  openGraph: {
+    title: "EV Charging Infrastructure India 2026 – Fast Charging & Battery Swapping News",
+    description: "Latest EV charging news from India — fast chargers, battery swapping, home charging and the expanding charging network.",
+    url: `${SITE_URL}/electric-vehicles`,
+    type: "website",
+    images: [{ url: `${SITE_URL}/api/og?title=EV Charging India 2026&subtitle=Fast charging, battery swapping %26 infrastructure news&tag=charging&type=page`, width: 1200, height: 630, alt: "EV Charging India 2026" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "EV Charging Infrastructure India 2026",
+    description: "Latest EV charging news — fast chargers, battery swapping, home charging and network updates.",
+    images: [`${SITE_URL}/api/og?title=EV Charging India 2026&subtitle=Fast charging, battery swapping %26 infrastructure news&tag=charging&type=page`],
+  },
 };
 
 const CHARGING_TYPES = [
@@ -48,8 +61,42 @@ const CHARGING_TYPES = [
   },
 ];
 
+const evChargingBreadcrumb = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+    { "@type": "ListItem", position: 2, name: "EV Charging India", item: `${SITE_URL}/electric-vehicles` },
+  ],
+};
+
+const evChargingFaqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "How many EV charging stations are there in India?",
+      acceptedAnswer: { "@type": "Answer", text: "As of 2025, India has over 25,000 public EV charging stations installed across the country. The government aims to reach 1 lakh (100,000) public charging stations by 2030. Major networks include Tata Power EV, Ather Grid, BPCL Pulse, Statiq, and ChargeZone." },
+    },
+    {
+      "@type": "Question",
+      name: "How long does it take to charge an electric car in India?",
+      acceptedAnswer: { "@type": "Answer", text: "Charging time depends on the charger type: Home AC charger (3.3–7.2 kW) takes 6–12 hours for a full charge; public AC fast charger (22 kW) takes 2–4 hours; and DC fast charger (50–100 kW) charges up to 80% in 45–90 minutes. Tesla Supercharger-equivalent speeds (150+ kW) are not yet widely available in India." },
+    },
+    {
+      "@type": "Question",
+      name: "What is the cost of charging an EV at a public station in India?",
+      acceptedAnswer: { "@type": "Answer", text: "Public EV charging in India costs ₹12–25 per kWh depending on the network and city. Most networks charge ₹15–18 per kWh, meaning a full charge for a 40 kWh battery costs ₹600–720. Home charging is cheaper at ₹6–9 per kWh (₹240–360 for the same battery), saving ₹300–400 per charge." },
+    },
+  ],
+};
+
 export default function EVChargingPage() {
   return (
+    <>
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(evChargingFaqJsonLd) }} />
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(evChargingBreadcrumb) }} />
     <div className="bg-white min-h-screen">
       <div className="bg-linear-to-br from-green-900 to-green-950 py-14">
         <div className="mx-auto max-w-7xl px-4">
@@ -105,5 +152,6 @@ export default function EVChargingPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }

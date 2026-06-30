@@ -15,7 +15,7 @@ import "swiper/css/navigation";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function VehicleSlider({ title, vehicles = [], vehicleType = "cars" }) {
+export default function VehicleSlider({ title, subtitle, vehicles = [], vehicleType = "cars" }) {
   const viewAllHref = `/${vehicleType}`;
   const [mounted, setMounted]   = useState(false);
   const sectionRef  = useRef(null);
@@ -59,8 +59,11 @@ export default function VehicleSlider({ title, vehicles = [], vehicleType = "car
       <div className="mx-auto max-w-7xl px-4 lg:px-6">
 
         <div ref={headerRef} className="mb-6 flex items-center justify-between border-b border-gray-200 pb-4">
-          <h2 className="text-lg sm:text-[22px] font-bold text-[#1a1a1a] lg:text-[28px]">{title}</h2>
-          <Link href={viewAllHref} className="text-sm sm:text-base font-semibold text-[#00a651] flex items-center gap-1 transition hover:text-[#009245]">
+          <div>
+            <h2 className="text-lg sm:text-[22px] font-bold text-[#1a1a1a] lg:text-[28px]">{title}</h2>
+            {subtitle && <p className="mt-0.5 text-sm text-gray-500">{subtitle}</p>}
+          </div>
+          <Link href={viewAllHref} className="shrink-0 text-sm sm:text-base font-semibold text-[#00a651] flex items-center gap-1 transition hover:text-[#009245]">
             View All <ArrowRight size={15} />
           </Link>
         </div>
@@ -81,7 +84,7 @@ export default function VehicleSlider({ title, vehicles = [], vehicleType = "car
           className="vehicle-swiper"
         >
           {vehicles.map((vehicle) => (
-            <SwiperSlide key={vehicle.id} className="h-auto">
+            <SwiperSlide key={vehicle.id || vehicle.slug} className="h-auto">
               <VehicleCard vehicle={vehicle} vehicleType={vehicleType} />
             </SwiperSlide>
           ))}
@@ -112,11 +115,30 @@ function VehicleCard({ vehicle, vehicleType }) {
         <span className="absolute top-3 left-3 rounded-full bg-[#00a651] px-3 py-1 text-xs font-semibold text-white shadow">
           {vehicle.tag}
         </span>
+        {/* Brand logo badge */}
+        {vehicle.brandLogo && (
+          <div className="absolute bottom-3 right-3 flex h-9 w-9 items-center justify-center rounded-xl border border-white/40 bg-white/95 shadow-md backdrop-blur-sm">
+            <Image
+              src={vehicle.brandLogo}
+              alt={vehicle.brand}
+              width={28}
+              height={28}
+              className="object-contain"
+            />
+          </div>
+        )}
       </Link>
 
       {/* Content */}
       <div className="flex flex-1 flex-col gap-3 p-4">
-        <p className="text-sm font-semibold text-[#00a651]">{vehicle.brand}</p>
+        <div className="flex items-center gap-2">
+          {vehicle.brandLogo && (
+            <div className="flex h-5 w-5 items-center justify-center overflow-hidden rounded-sm border border-gray-100">
+              <Image src={vehicle.brandLogo} alt={vehicle.brand} width={16} height={16} className="object-contain" />
+            </div>
+          )}
+          <p className="text-sm font-semibold text-[#00a651]">{vehicle.brand}</p>
+        </div>
 
         <Link href={href}>
           <h3 className="text-base font-bold leading-tight text-[#111] transition group-hover:text-[#00a651]">

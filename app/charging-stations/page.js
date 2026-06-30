@@ -3,10 +3,82 @@ import { SITE_URL } from "@/app/layout";
 
 export const metadata = {
   title: "EV Charging Stations Near Me – Find Charging Points in India",
-  description: "Find electric vehicle charging stations near you across India. Filter by connector type, network, and availability.",
+  description: "Find electric vehicle charging stations near you across India. Filter by connector type, network, and availability. Tata Power, Ather Grid, ChargeZone, and more.",
+  keywords: "ev charging station near me india, electric car charging point india, tata power ev charging, fast charging station india",
   alternates: { canonical: `${SITE_URL}/charging-stations` },
+  openGraph: {
+    title: "EV Charging Stations Near Me – India",
+    description: "Locate EV charging stations across all Indian cities. Filter by connector type and charging speed.",
+    images: [{ url: `${SITE_URL}/api/og?title=EV Charging Stations India&subtitle=Find chargers near you&tag=map`, width: 1200, height: 630 }],
+  },
 };
 
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    name: "EV Charging Station Finder India",
+    applicationCategory: "TravelApplication",
+    operatingSystem: "Web",
+    url: `${SITE_URL}/charging-stations`,
+    description: "Find electric vehicle charging stations near any location in India. Search by city, connector type (CCS2, CHAdeMO, Type 2, AC), and charging network.",
+    offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "How many EV charging stations are there in India?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "India had over 12,000 public EV charging stations as of 2024, installed by networks like Tata Power EV, ChargeZone, Ather Grid, Statiq, and BPCL. The government targets 46,000 charging stations by 2030 under the National Electric Mobility Mission.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Which EV charging networks operate in India?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Major EV charging networks in India include Tata Power EZ Charge, ChargeZone, Ather Grid, Statiq, Jio-BP Pulse, BPCL EV Recharge, Magenta ChargeGrid, and EESL. Most support the CCS2 (DC fast charging) and Type 2 (AC) connector standards.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "What connector type do Indian EVs use?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Most Indian electric cars (Tata, Mahindra, MG, Kia, Hyundai) use the CCS2 connector for DC fast charging and Type 2 for AC charging. Electric two-wheelers (Ola, Ather, TVS) typically use proprietary connectors with adapters for public AC charging.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "How long does it take to charge an EV in India?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Charging time depends on the charger type: AC slow charging (3.3–7.2 kW) takes 6–12 hours for a full charge. DC fast chargers (25–100 kW) charge to 80% in 30–60 minutes. Ultra-fast chargers (100–150 kW) can charge to 80% in 20–35 minutes.",
+        },
+      },
+    ],
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home",              item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: "Charging Stations", item: `${SITE_URL}/charging-stations` },
+    ],
+  },
+];
+
 export default function ChargingStationsPage() {
-  return <ChargingStationFinder />;
+  return (
+    <>
+      {jsonLd.map((schema, i) => (
+        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+      ))}
+      <ChargingStationFinder />
+    </>
+  );
 }
