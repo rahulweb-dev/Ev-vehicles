@@ -11,6 +11,7 @@ import ScrollRestorer from "@/components/ScrollRestorer";
 import BackToTop from "@/components/BackToTop";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import ContentProtection from "@/components/ContentProtection";
+import WebVitals from "@/components/WebVitals";
 const ADSENSE_PUBLISHER_ID = process.env.NEXT_PUBLIC_ADSENSE_ID || "ca-pub-XXXXXXXXXXXXXXXXX";
 
 export const SITE_URL = "https://www.evradar.in";
@@ -171,8 +172,12 @@ export default function RootLayout({ children }) {
 
         {/* Preconnect to speed up third-party resource loading */}
         <link rel="preconnect" href="https://ik.imagekit.io" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://www.googletagmanager.com" />
+        <link rel="preconnect" href="https://www.google-analytics.com" />
         <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
-        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net" />
 
         {/* JSON-LD: Organization + WebSite Schema */}
         <script
@@ -189,6 +194,7 @@ export default function RootLayout({ children }) {
           strategy="afterInteractive"
         />
 
+        <WebVitals />
         <ThemeProvider>
         <ContentProtection />
         {/* <ExitIntentPopup />

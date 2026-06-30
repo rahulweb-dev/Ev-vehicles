@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 const SITE_URL  = "https://www.evradar.in";
 const SITE_NAME = "EV News India";
 
-export const revalidate = 600; // regenerate every 10 minutes
+export const revalidate = 600;
 
 function esc(str) {
   return String(str || "")
@@ -11,6 +11,12 @@ function esc(str) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+// Wrap HTML in CDATA so it passes through XML parsers intact
+function cdataWrap(html) {
+  if (!html) return "";
+  return `<![CDATA[${html.replace(/\]\]>/g, "]]]]><![CDATA[>")}]]>`;
 }
 
 export async function GET() {
@@ -22,26 +28,36 @@ export async function GET() {
     const articles = await Article.find({ status: "published" })
       .sort({ publishedAt: -1 })
       .limit(30)
-      .select("title slug excerpt image author category tags publishedAt updatedAt")
+      .select("title slug excerpt content image author category tags publishedAt updatedAt")
       .lean();
 
-    const items = articles.map(a => `
+    const items = articles.map(a => {
+      const url     = `${SITE_URL}/news/${a.slug}`;
+      const pubDate = new Date(a.publishedAt || a.updatedAt).toUTCString();
+      const fullHtml = a.content
+        ? `<p><a href="${url}"><img src="${esc(a.image || "")}" alt="${esc(a.title)}" style="max-width:100%"/></a></p>${a.content}`
+        : a.excerpt || "";
+
+      return `
     <item>
-      <title>${esc(a.title)}</title>
-      <link>${SITE_URL}/news/${esc(a.slug)}</link>
-      <guid isPermaLink="true">${SITE_URL}/news/${esc(a.slug)}</guid>
-      <description>${esc(a.excerpt || "")}</description>
-      <pubDate>${new Date(a.publishedAt || a.updatedAt).toUTCString()}</pubDate>
+      <title>${cdataWrap(a.title)}</title>
+      <link>${url}</link>
+      <guid isPermaLink="true">${url}</guid>
+      <description>${cdataWrap(a.excerpt || "")}</description>
+      <content:encoded>${cdataWrap(fullHtml)}</content:encoded>
+      <pubDate>${pubDate}</pubDate>
       <dc:creator>${esc(a.author || "Editorial Team")}</dc:creator>
       <category>${esc(a.category || "")}</category>
-      ${a.image ? `<media:content url="${esc(a.image)}" medium="image"/>` : ""}
+      ${a.image ? `<media:content url="${esc(a.image)}" medium="image" type="image/jpeg"/>` : ""}
       ${(a.tags || []).map(t => `<category>${esc(t)}</category>`).join("\n      ")}
-    </item>`).join("");
+    </item>`;
+    }).join("");
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"
   xmlns:atom="http://www.w3.org/2005/Atom"
   xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:content="http://purl.org/rss/modules/content/"
   xmlns:media="http://www.rssboard.org/media-rss">
   <channel>
     <title>${SITE_NAME} – India's #1 Electric Vehicle News</title>
@@ -50,6 +66,7 @@ export async function GET() {
     <language>en-in</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     <managingEditor>editorial@evradar.in (${SITE_NAME})</managingEditor>
+    <ttl>10</ttl>
     <atom:link href="${SITE_URL}/feed.xml" rel="self" type="application/rss+xml"/>
     <image>
       <url>${SITE_URL}/images/logo.png</url>

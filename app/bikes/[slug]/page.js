@@ -68,12 +68,28 @@ export async function generateMetadata({ params }) {
   };
 }
 
+async function getReviewStats(slug) {
+  try {
+    const dbConnect     = (await import("@/lib/mongodb")).default;
+    const VehicleReview = (await import("@/lib/models/VehicleReview")).default;
+    await dbConnect();
+    const stats = await VehicleReview.aggregate([
+      { $match: { vehicleSlug: slug, status: "approved" } },
+      { $group: { _id: null, avg: { $avg: "$rating" }, count: { $sum: 1 } } },
+    ]);
+    return stats[0] || null;
+  } catch { return null; }
+}
+
 export default async function BikeDetailPage({ params }) {
   const { slug } = await params;
   const bike = await getVehicle(slug);
   if (!bike) notFound();
 
-  const related = await getRelated(slug, bike.brand);
+  const [related, reviewStats] = await Promise.all([
+    getRelated(slug, bike.brand),
+    getReviewStats(slug),
+  ]);
 
   const firstVariant = bike.variants?.[0];
   const jsonLd = {
@@ -93,6 +109,15 @@ export default async function BikeDetailPage({ params }) {
           ? "https://schema.org/InStock"
           : "https://schema.org/PreOrder",
         url: `${SITE_URL}/bikes/${slug}`,
+      },
+    }),
+    ...(reviewStats?.count > 0 && {
+      aggregateRating: {
+        "@type":       "AggregateRating",
+        ratingValue:   reviewStats.avg.toFixed(1),
+        reviewCount:   reviewStats.count,
+        bestRating:    "5",
+        worstRating:   "1",
       },
     }),
   };

@@ -1,0 +1,11 @@
+import Link from "next/link";
+import OfflineClient from "./OfflineClient";
+
+export const metadata = {
+  title: "You're Offline – EV News India",
+  robots: { index: false },
+};
+
+export default function OfflinePage() {
+  return <OfflineClient />;
+}
