@@ -11,15 +11,25 @@ export async function GET() {
     const Article = (await import("@/lib/models/Article")).default;
     await dbConnect();
 
+    // Google News sitemap: articles up to 2 days old are preferred,
+    // but always include at least the 50 most recent to avoid an empty sitemap.
     const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000);
-    articles = await Article.find({
-      status: "published",
-      publishedAt: { $gte: twoDaysAgo },
-    })
+    const recent = await Article.find({ status: "published", publishedAt: { $gte: twoDaysAgo } })
       .sort({ publishedAt: -1 })
       .limit(100)
       .select("slug title publishedAt tags")
       .lean();
+
+    if (recent.length >= 5) {
+      articles = recent;
+    } else {
+      // Fallback: always show at least the 50 most recent articles
+      articles = await Article.find({ status: "published" })
+        .sort({ publishedAt: -1 })
+        .limit(50)
+        .select("slug title publishedAt tags")
+        .lean();
+    }
   } catch {
     // DB unavailable — return empty sitemap
   }

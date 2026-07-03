@@ -122,15 +122,19 @@ const websiteJsonLd = {
   "@context": "https://schema.org",
   "@graph": [
     {
-      "@type": "Organization",
+      "@type": ["Organization", "NewsMediaOrganization"],
       "@id": `${SITE_URL}/#organization`,
       name: SITE_NAME,
+      alternateName: "EV Radar India",
       url: SITE_URL,
+      description: "India's most trusted electric vehicle news platform publishing daily EV news, in-depth reviews, prices, specifications, and buying guides for electric cars, bikes, scooters, and commercial vehicles in India.",
       logo: {
         "@type": "ImageObject",
+        "@id": `${SITE_URL}/#logo`,
         url: `${SITE_URL}/images/logo.png`,
         width: 180,
         height: 60,
+        caption: SITE_NAME,
       },
       sameAs: [
         "https://twitter.com/EVNewsIndia",
@@ -138,6 +142,37 @@ const websiteJsonLd = {
         "https://www.instagram.com/evnewsindia",
         "https://www.youtube.com/@EVNewsIndia",
       ],
+      knowsAbout: [
+        "Electric Vehicles India",
+        "Electric Cars India",
+        "Electric Bikes India",
+        "EV Charging Infrastructure India",
+        "FAME Scheme India",
+        "PM E-Drive Policy",
+        "Tata Electric Cars",
+        "Mahindra Electric Vehicles",
+        "Ola Electric Scooters",
+        "Ather Energy",
+        "EV Battery Technology",
+        "EV Subsidies India",
+        "Electric Vehicle Reviews",
+        "ARAI Range Testing",
+        "EV Buying Guide India",
+      ],
+      areaServed: {
+        "@type": "Country",
+        name: "India",
+        sameAs: "https://www.wikidata.org/wiki/Q668",
+      },
+      inLanguage: "en-IN",
+      publishingPrinciples: `${SITE_URL}/about`,
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "editorial",
+        url: `${SITE_URL}/contact`,
+        areaServed: "IN",
+        availableLanguage: "English",
+      },
     },
     {
       "@type": "WebSite",
@@ -145,7 +180,14 @@ const websiteJsonLd = {
       url: SITE_URL,
       name: SITE_NAME,
       description: SITE_TAGLINE,
+      inLanguage: "en-IN",
       publisher: { "@id": `${SITE_URL}/#organization` },
+      copyrightHolder: { "@id": `${SITE_URL}/#organization` },
+      audience: {
+        "@type": "Audience",
+        geographicArea: { "@type": "Country", name: "India" },
+        audienceType: "EV buyers, enthusiasts, and researchers in India",
+      },
       potentialAction: {
         "@type": "SearchAction",
         target: { "@type": "EntryPoint", urlTemplate: `${SITE_URL}/search?q={search_term_string}` },
@@ -157,8 +199,11 @@ const websiteJsonLd = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="en-IN" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <head>
+        {/* Hreflang — geo-targets India English for Google, helps rank in Indian SERPs */}
+        <link rel="alternate" hrefLang="en-IN" href={SITE_URL} />
+        <link rel="alternate" hrefLang="x-default" href={SITE_URL} />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -169,6 +214,9 @@ export default function RootLayout({ children }) {
 
         {/* RSS feed — enables Google News discovery and feed readers */}
         <link rel="alternate" type="application/rss+xml" title="EV News India – Latest EV News Feed" href="/feed.xml" />
+
+        {/* llms.txt — AI/LLM site description for generative engine optimization (GEO) */}
+        <link rel="llms" href="/llms.txt" type="text/plain" />
 
         {/* Preconnect to speed up third-party resource loading */}
         <link rel="preconnect" href="https://ik.imagekit.io" />

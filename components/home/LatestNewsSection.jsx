@@ -83,12 +83,22 @@ function articleToSide(a) {
   return { image: a.image, title: a.title, category: a.category, slug: a.slug, readTime: a.readTime || "4 min" };
 }
 
-export default function LatestNews() {
+export default function LatestNews({ initialArticles = null }) {
   const [active, setActive]     = useState("cars");
-  const [loading, setLoading]   = useState(true);
-  const [featured, setFeatured] = useState(null);
-  const [sideNews, setSideNews] = useState([]);
-  const cache = useRef({});
+
+  const parseInitial = (articles) => {
+    if (!articles || !articles.length) return { featured: null, sideNews: [] };
+    return {
+      featured: { image: articles[0].image, title: articles[0].title, excerpt: articles[0].excerpt, slug: articles[0].slug, readTime: articles[0].readTime || "5 min" },
+      sideNews: articles.slice(1, 5).map(a => ({ image: a.image, title: a.title, category: a.category, slug: a.slug, readTime: a.readTime || "4 min" })),
+    };
+  };
+
+  const { featured: initFeat, sideNews: initSide } = parseInitial(initialArticles);
+  const [loading, setLoading]   = useState(!initialArticles);
+  const [featured, setFeatured] = useState(initFeat);
+  const [sideNews, setSideNews] = useState(initSide);
+  const cache = useRef(initialArticles ? { cars: { featured: initFeat, sideNews: initSide } } : {});
 
   const sectionRef  = useRef(null);
   const headingRef  = useRef(null);

@@ -218,6 +218,39 @@ export default function BestElectricCars2026() {
     })),
   };
 
+  const reviewJsonLds = BEST_EVS.map(ev => ({
+    "@context": "https://schema.org",
+    "@type": "Review",
+    name: `${ev.name} Review – ${ev.badge}`,
+    reviewBody: ev.verdict,
+    reviewRating: {
+      "@type": "Rating",
+      ratingValue: ev.rating,
+      bestRating: "5",
+      worstRating: "1",
+    },
+    author: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: SITE_URL,
+    },
+    publisher: { "@id": `${SITE_URL}/#organization` },
+    datePublished: "2026-06-01",
+    url: `${SITE_URL}/best-electric-cars-india-2026#rank-${ev.rank}`,
+    itemReviewed: {
+      "@type": "Car",
+      name: ev.name,
+      url: `${SITE_URL}/cars/${ev.slug}`,
+      fuelType: "Electric",
+      offers: {
+        "@type": "Offer",
+        priceCurrency: "INR",
+        description: ev.price,
+        availability: "https://schema.org/InStock",
+      },
+    },
+  }));
+
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -233,6 +266,9 @@ export default function BestElectricCars2026() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      {reviewJsonLds.map((r, i) => (
+        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(r) }} />
+      ))}
 
       <div className="min-h-screen bg-gray-50">
         {/* Hero */}
@@ -285,7 +321,7 @@ export default function BestElectricCars2026() {
           {/* EV list */}
           <div className="space-y-6">
             {BEST_EVS.map(ev => (
-              <article key={ev.rank} className="rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden">
+              <article key={ev.rank} id={`rank-${ev.rank}`} className="rounded-2xl bg-white border border-gray-200 shadow-sm overflow-hidden">
                 <div className="flex items-center gap-3 border-b border-gray-100 bg-gray-50 px-6 py-3">
                   <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-900 text-sm font-black text-white shrink-0">#{ev.rank}</span>
                   <h2 className="text-lg font-black text-gray-900">{ev.name}</h2>

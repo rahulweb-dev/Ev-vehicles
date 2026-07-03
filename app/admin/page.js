@@ -109,6 +109,8 @@ export default function AdminDashboard() {
   const [loading, setLoading]       = useState(true);
   const [soundOn, setSoundOn]       = useState(true);
   const [newChats, setNewChats]     = useState(0);
+  const [reindexing, setReindexing] = useState(false);
+  const [reindexResult, setReindexResult] = useState(null);
   const soundOnRef                  = useRef(true);
   useEffect(() => { soundOnRef.current = soundOn; }, [soundOn]);
 
@@ -219,6 +221,28 @@ export default function AdminDashboard() {
               <BellRing size={14} /> {newChats} New Chat{newChats > 1 ? "s" : ""}
             </Link>
           )}
+          <button
+            onClick={async () => {
+              setReindexing(true);
+              setReindexResult(null);
+              try {
+                const res = await fetch("/api/admin/reindex", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "all" }) });
+                const data = await res.json();
+                setReindexResult(data.success ? `✓ Submitted ${data.totalUrls} URLs to Google/Bing` : "✗ Reindex failed");
+              } catch {
+                setReindexResult("✗ Network error");
+              } finally {
+                setReindexing(false);
+                setTimeout(() => setReindexResult(null), 8000);
+              }
+            }}
+            disabled={reindexing}
+            title="Submit all content to Google & Bing via IndexNow"
+            className="flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2.5 text-sm font-bold text-blue-700 hover:bg-blue-100 transition disabled:opacity-50"
+          >
+            <Zap size={14} className={reindexing ? "animate-spin" : ""} />
+            {reindexing ? "Submitting…" : reindexResult || "Re-index All"}
+          </button>
           <Link href="/admin/articles/new"
             className="flex items-center gap-2 rounded-xl bg-green-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-green-800 transition shadow-sm">
             <Plus size={16} /> New Article

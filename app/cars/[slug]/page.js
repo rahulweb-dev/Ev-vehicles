@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
 import VehicleDetailPage from "@/components/vehicles/VehicleDetailPage";
 import { SITE_URL } from "@/app/layout";
 
@@ -80,6 +82,27 @@ export async function generateMetadata({ params }) {
   };
 }
 
+async function getRelatedNews(name, brand) {
+  try {
+    const dbConnect = (await import("@/lib/mongodb")).default;
+    const Article   = (await import("@/lib/models/Article")).default;
+    await dbConnect();
+    return await Article.find({
+      status: "published",
+      $or: [
+        { title: { $regex: brand, $options: "i" } },
+        { tags:  { $in: [brand, name] } },
+      ],
+    })
+      .sort({ publishedAt: -1 })
+      .limit(4)
+      .select("slug title image excerpt publishedAt readTime")
+      .lean();
+  } catch {
+    return [];
+  }
+}
+
 async function getReviewStats(slug) {
   try {
     const dbConnect    = (await import("@/lib/mongodb")).default;
@@ -98,29 +121,47 @@ export default async function CarDetailPage({ params }) {
   const car = await getVehicle(slug);
   if (!car) notFound();
 
-  const [related, reviewStats] = await Promise.all([
+  const [related, reviewStats, relatedNews] = await Promise.all([
     getRelated(slug, car.brand),
     getReviewStats(slug),
+    getRelatedNews(car.name, car.brand),
   ]);
 
   const firstVariant = car.variants?.[0];
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Product",
+    "@type": "Car",
     name:   car.name,
     brand:  { "@type": "Brand", name: car.brand },
     description: car.shortDescription || car.metaDescription || `${car.name} electric car`,
     image:  car.featuredImage || "",
     url: `${SITE_URL}/cars/${slug}`,
+    inLanguage: "en-IN",
+    fuelType: "Electric",
+    vehicleTransmission: "Automatic",
+    driveWheelConfiguration: car.performance?.driveType || "FrontWheelDriveConfiguration",
+    ...(car.specs?.seatingCapacity && { vehicleSeatingCapacity: parseInt(car.specs.seatingCapacity) || undefined }),
+    ...(car.performance?.power && {
+      vehicleEngine: {
+        "@type": "EngineSpecification",
+        engineType: "Electric Motor",
+        enginePower: { "@type": "QuantitativeValue", value: car.performance.power, unitText: "kW" },
+        torque: car.performance?.torque ? { "@type": "QuantitativeValue", value: car.performance.torque, unitText: "Nm" } : undefined,
+      },
+    }),
     ...(firstVariant && {
       offers: {
         "@type":       "Offer",
         priceCurrency: "INR",
         price:         parsePriceToINR(firstVariant.exShowroomPrice),
+        priceValidUntil: `${new Date().getFullYear() + 1}-12-31`,
         availability:  car.availability === "available"
           ? "https://schema.org/InStock"
           : "https://schema.org/PreOrder",
+        itemCondition: "https://schema.org/NewCondition",
         url: `${SITE_URL}/cars/${slug}`,
+        seller: { "@id": `${SITE_URL}/#organization` },
+        areaServed: { "@type": "Country", name: "India" },
       },
     }),
     ...(reviewStats?.count > 0 && {
@@ -132,6 +173,18 @@ export default async function CarDetailPage({ params }) {
         worstRating:   "1",
       },
     }),
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: ["h1", "[data-speakable]"],
+    },
+    additionalProperty: [
+      ...(car.performance?.drivingRange ? [{ "@type": "PropertyValue", name: "ARAI Range", value: car.performance.drivingRange, unitText: "km" }] : []),
+      ...(car.performance?.batteryCapacity ? [{ "@type": "PropertyValue", name: "Battery Capacity", value: car.performance.batteryCapacity, unitText: "kWh" }] : []),
+      ...(car.performance?.power ? [{ "@type": "PropertyValue", name: "Motor Power", value: car.performance.power }] : []),
+      ...(car.performance?.topSpeed ? [{ "@type": "PropertyValue", name: "Top Speed", value: car.performance.topSpeed, unitText: "km/h" }] : []),
+      ...(car.charging?.dcChargingTime ? [{ "@type": "PropertyValue", name: "DC Fast Charge Time (10–80%)", value: car.charging.dcChargingTime }] : []),
+      ...(car.specs?.bootSpace ? [{ "@type": "PropertyValue", name: "Boot Space", value: car.specs.bootSpace, unitText: "litres" }] : []),
+    ],
   };
 
   const breadcrumbJsonLd = {
@@ -214,7 +267,64 @@ export default async function CarDetailPage({ params }) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       {videoJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(videoJsonLd) }} />}
+
+      {/* Speakable summary — voice search / AEO: indexed by Google, read by assistants */}
+      <p className="sr-only" data-speakable aria-label={`${car.name} key facts`}>
+        {`${car.name} is an electric car by ${car.brand}.`}
+        {firstVariant?.exShowroomPrice ? ` Price starts at ${firstVariant.exShowroomPrice} ex-showroom.` : ""}
+        {range ? ` ARAI certified range: ${range}.` : ""}
+        {car.performance?.power ? ` Motor power: ${car.performance.power}.` : ""}
+        {car.performance?.batteryCapacity ? ` Battery: ${car.performance.batteryCapacity}.` : ""}
+        {car.charging?.dcChargingTime ? ` DC fast charge time: ${car.charging.dcChargingTime}.` : ""}
+        {car.availability === "available" ? " Currently available at authorised dealerships across India." : " Expected to launch in India soon."}
+      </p>
+
       <VehicleDetailPage vehicle={car} relatedVehicles={related} vehicleType="car" />
+
+      {relatedNews.length > 0 && (
+        <section className="border-t border-gray-100 bg-gray-50 py-12">
+          <div className="mx-auto max-w-7xl px-4">
+            <h2 className="mb-6 text-2xl font-black text-gray-900">
+              Latest {car.brand} News & Updates
+            </h2>
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {relatedNews.map((article) => (
+                <Link key={article.slug} href={`/news/${article.slug}`} className="group block">
+                  <article className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition hover:shadow-md">
+                    {article.image && (
+                      <div className="relative h-40 overflow-hidden">
+                        <Image
+                          src={article.image}
+                          alt={article.title}
+                          fill
+                          className="object-cover transition duration-300 group-hover:scale-105"
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        />
+                      </div>
+                    )}
+                    <div className="p-4">
+                      <h3 className="line-clamp-2 text-sm font-bold text-gray-900 group-hover:text-green-600 transition">
+                        {article.title}
+                      </h3>
+                      {article.readTime && (
+                        <p className="mt-2 text-xs text-gray-400">{article.readTime} read</p>
+                      )}
+                    </div>
+                  </article>
+                </Link>
+              ))}
+            </div>
+            <div className="mt-6 text-center">
+              <Link
+                href={`/news?q=${encodeURIComponent(car.brand)}`}
+                className="inline-flex items-center gap-2 rounded-full border border-green-600 px-6 py-2.5 text-sm font-bold text-green-700 transition hover:bg-green-600 hover:text-white"
+              >
+                View All {car.brand} News →
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
     </>
   );
 }

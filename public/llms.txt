@@ -1,0 +1,63 @@
+# EV News India – evradar.in
+
+> India's most trusted electric vehicle news, review, and pricing platform covering electric cars, bikes, scooters, and commercial vehicles across India.
+
+## About
+
+EV News India (evradar.in) is India's leading source for electric vehicle journalism, in-depth reviews, real-time pricing, government policy analysis, and expert EV buying guidance. Our editorial team publishes daily updates on EV launches, price changes, battery technology, charging infrastructure, and government subsidies (FAME 2, PM E-Drive, state schemes). We cover all major EV brands including Tata Motors, Mahindra, Hyundai, Kia, BYD, MG Motor, Ola Electric, Ather Energy, TVS, Hero Electric, and more.
+
+## Key Content Areas
+
+- [Latest EV News](https://www.evradar.in/news): Daily breaking news, launch coverage, and policy updates for electric vehicles in India
+- [Electric Cars Database](https://www.evradar.in/cars): Comprehensive database of all electric cars available in India with ex-showroom price, ARAI-certified range, battery capacity, motor power, charging speed, and variant-wise pricing
+- [Electric Bikes & Scooters](https://www.evradar.in/bikes): Complete specifications and pricing for electric two-wheelers including Ola S1, Ather 450, TVS iQube, Bajaj Chetak, and more
+- [EV Comparison Tool](https://www.evradar.in/compare): Side-by-side specifications comparison of any two electric vehicles in India
+- [EV Charging Guide 2026](https://www.evradar.in/ev-charging-guide): Complete guide to home charging setup, public DC fast chargers, AC vs DC difference, and charging costs in India
+- [Government EV Policy India](https://www.evradar.in/government-ev-policy-india): FAME 2 scheme, PM E-Drive, PLI for batteries, and state-level EV subsidies explained
+- [Best Electric Cars India 2026](https://www.evradar.in/best-electric-cars-india-2026): Expert-ranked top 10 electric cars for Indian buyers in 2026
+- [Upcoming EVs India](https://www.evradar.in/upcoming-electric-cars-india): Confirmed and expected EV launches in India with expected prices and timelines
+- [Electric Cars Under ₹10 Lakh](https://www.evradar.in/electric-cars-under-10-lakh): Budget electric car options for Indian buyers
+- [EV Subsidy Calculator](https://www.evradar.in/subsidy-calculator): Calculate FAME 2 and state subsidies applicable to your EV purchase
+- [EV Charging Stations](https://www.evradar.in/charging-stations): Public EV charging network locations and operator information in India
+- [EV Blogs & Guides](https://www.evradar.in/blogs): In-depth guides on EV ownership, charging, range tips, and technology explained
+
+## Vehicle Database Specifications Covered
+
+Our vehicle database includes authoritative data on:
+- Ex-showroom prices in India across all variants and trims
+- ARAI and WLTP certified range figures in kilometres
+- Usable battery capacity in kWh
+- Motor power output in kW and bhp, peak torque in Nm
+- AC charging speed (kW) and estimated full-charge time
+- DC fast charging maximum speed (kW) and 10–80% time
+- Top speed (km/h) and 0–100 km/h acceleration
+- Seating capacity, boot space (litres), ground clearance
+- Infotainment screen size, ADAS features, connectivity options
+- Available colours with hex codes
+- Warranty terms for vehicle and battery pack
+- Real-world owner ratings and expert review scores
+- City-specific on-road prices (Mumbai, Delhi, Bangalore, Hyderabad, Pune, Chennai, Kolkata, Ahmedabad, Jaipur, Lucknow, Surat, Kochi)
+
+## Editorial Standards
+
+- EV prices sourced directly from official brand websites and authorised dealer price lists
+- Range figures are ARAI certified (city conditions) or WLTP unless explicitly stated as claimed
+- Articles authored by EV journalists and verified against primary sources before publication
+- Price and specification updates are published within 24 hours of official announcements
+- All reviews follow a standardised evaluation methodology
+
+## Frequently Asked Questions (Covered on Site)
+
+- What is the best electric car in India under ₹15 lakh?
+- Which electric car has the longest range in India?
+- How much does it cost to charge an electric car at home in India?
+- What is the FAME 2 subsidy for electric cars in India?
+- Which electric scooter has the best range in India?
+- What is ARAI range vs real-world range for EVs in India?
+- How to install a home EV charger in India?
+- Is it worth buying an electric car in India in 2026?
+
+## Sitemaps
+
+- https://www.evradar.in/sitemap.xml
+- https://www.evradar.in/news-sitemap.xml

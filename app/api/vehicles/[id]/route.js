@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Vehicle from "@/lib/models/Vehicle";
 import { requireAuth } from "@/lib/auth";
+import { pingIndexNow, buildVehicleUrl } from "@/lib/indexnow";
 
 // GET /api/vehicles/:id
 export async function GET(request, { params }) {
@@ -33,8 +34,15 @@ export async function PATCH(request, { params }) {
       if (conflict) return NextResponse.json({ error: "Slug already exists" }, { status: 409 });
     }
 
+    const existing = await Vehicle.findById(id).lean();
+    const isPublishingNow = existing?.status !== "published" && body.status === "published";
+
     const vehicle = await Vehicle.findByIdAndUpdate(id, { $set: body }, { new: true, runValidators: true }).lean();
     if (!vehicle) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    if (isPublishingNow || existing?.status === "published") {
+      pingIndexNow(buildVehicleUrl(vehicle.slug, vehicle.vehicleType)).catch(console.error);
+    }
 
     return NextResponse.json({ success: true, vehicle });
   } catch (error) {

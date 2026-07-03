@@ -31,6 +31,22 @@ async function getArticle(slug) {
   }
 }
 
+async function getFeaturedVehicle(tags = []) {
+  try {
+    const dbConnect = (await import("@/lib/mongodb")).default;
+    const Vehicle   = (await import("@/lib/models/Vehicle")).default;
+    await dbConnect();
+    const orConditions = tags.map(t => ({ name: { $regex: t, $options: "i" } }))
+      .concat(tags.map(t => ({ brand: { $regex: t, $options: "i" } })));
+    if (!orConditions.length) return null;
+    return await Vehicle.findOne({ status: "published", $or: orConditions })
+      .select("slug name brand featuredImage variants performance vehicleType")
+      .lean();
+  } catch {
+    return null;
+  }
+}
+
 async function getRelated(category, currentSlug) {
   try {
     const dbConnect = (await import("@/lib/mongodb")).default;
@@ -67,6 +83,7 @@ export async function generateMetadata({ params }) {
       url: `${SITE_URL}/news/${article.slug}`,
       type: "article",
       publishedTime: article.publishedAt,
+      modifiedTime: article.updatedAt || article.publishedAt,
       authors: [article.author],
       tags: article.tags,
       images: [{
@@ -88,7 +105,10 @@ export default async function ArticlePage({ params }) {
   const article = await getArticle(slug);
   if (!article) notFound();
 
-  const related = await getRelated(article.category, slug);
+  const [related, featuredVehicle] = await Promise.all([
+    getRelated(article.category, slug),
+    getFeaturedVehicle(article.tags || []),
+  ]);
 
   const safeContent = sanitizeHtml(article.content || "", {
     allowedTags: sanitizeHtml.defaults.allowedTags.concat([
@@ -124,25 +144,34 @@ export default async function ArticlePage({ params }) {
     url: `${SITE_URL}/news/${slug}`,
     datePublished: article.publishedAt,
     dateModified: article.updatedAt || article.publishedAt,
+    inLanguage: "en-IN",
     isAccessibleForFree: true,
     wordCount,
     speakable: {
       "@type": "SpeakableSpecification",
-      cssSelector: ["h1", "p.mt-4"],
+      cssSelector: ["h1", ".article-lede"],
     },
     author: {
       "@type": "Person",
       name: article.author,
       url: `${SITE_URL}/authors/${encodeURIComponent((article.author || "").toLowerCase().replace(/\s+/g, "-"))}`,
+      worksFor: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
     },
     publisher: {
       "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
       name: SITE_NAME,
       logo: { "@type": "ImageObject", url: `${SITE_URL}/images/logo.png` },
     },
     mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE_URL}/news/${slug}` },
     keywords: article.tags?.join(", "),
     articleSection: article.category,
+    about: { "@type": "Thing", name: article.category },
+    ...(article.tags?.length && {
+      mentions: article.tags.map(tag => ({ "@type": "Thing", name: tag })),
+    }),
+    copyrightHolder: { "@id": `${SITE_URL}/#organization` },
+    copyrightYear: new Date(article.publishedAt || Date.now()).getFullYear(),
   };
 
   const breadcrumbJsonLd = {
@@ -185,7 +214,7 @@ export default async function ArticlePage({ params }) {
                 <h1 className="text-3xl font-black leading-tight text-gray-900 md:text-4xl lg:text-5xl">
                   {article.title}
                 </h1>
-                <p className="mt-4 text-lg leading-relaxed text-gray-600">{article.excerpt}</p>
+                <p className="article-lede mt-4 text-lg leading-relaxed text-gray-600">{article.excerpt}</p>
                 <div className="mt-6 flex flex-wrap items-center gap-4 border-y border-gray-100 py-4 text-sm text-gray-500">
                   <Link href={`/authors/${encodeURIComponent(article.author?.toLowerCase().replace(/\s+/g, "-") || "")}`} className="flex items-center gap-2 hover:opacity-80 transition">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-600 text-xs font-bold text-white">
@@ -263,6 +292,39 @@ export default async function ArticlePage({ params }) {
               <div className="sticky top-24 space-y-8">
                 <AdBannerInArticle slot="6789012345" />
                 <TrendingWidget />
+                {featuredVehicle && (
+                  <div className="overflow-hidden rounded-2xl border border-green-100 bg-green-50">
+                    <div className="border-b border-green-100 bg-green-600 px-4 py-2.5">
+                      <p className="text-xs font-bold uppercase tracking-wider text-white">Featured EV</p>
+                    </div>
+                    <Link href={`/${featuredVehicle.vehicleType === "car" ? "cars" : "bikes"}/${featuredVehicle.slug}`} className="group block p-4">
+                      {featuredVehicle.featuredImage && (
+                        <div className="relative mb-3 h-36 overflow-hidden rounded-xl bg-white">
+                          <Image
+                            src={featuredVehicle.featuredImage}
+                            alt={featuredVehicle.name}
+                            fill
+                            className="object-contain p-2 transition duration-300 group-hover:scale-105"
+                            sizes="320px"
+                          />
+                        </div>
+                      )}
+                      <p className="text-xs font-bold uppercase tracking-wide text-green-700">{featuredVehicle.brand}</p>
+                      <p className="text-base font-black text-gray-900 group-hover:text-green-700 transition">{featuredVehicle.name}</p>
+                      {featuredVehicle.variants?.[0]?.exShowroomPrice && (
+                        <p className="mt-1 text-sm font-semibold text-gray-600">
+                          From {featuredVehicle.variants[0].exShowroomPrice}
+                        </p>
+                      )}
+                      {featuredVehicle.performance?.drivingRange && (
+                        <p className="text-xs text-gray-500">Range: {featuredVehicle.performance.drivingRange}</p>
+                      )}
+                      <span className="mt-3 inline-flex items-center gap-1 rounded-lg bg-green-600 px-3 py-1.5 text-xs font-bold text-white group-hover:bg-green-700 transition">
+                        View Full Details →
+                      </span>
+                    </Link>
+                  </div>
+                )}
                 {related.length > 0 && (
                   <div>
                     <h3 className="mb-4 text-lg font-black text-gray-900">Related Stories</h3>

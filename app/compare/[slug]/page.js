@@ -9,6 +9,30 @@ import { SITE_URL, SITE_NAME } from "@/app/layout";
 
 export const revalidate = 3600;
 
+/* ─── Pre-generate top vehicle pairs for Google indexing ────────── */
+export async function generateStaticParams() {
+  try {
+    const dbConnect = (await import("@/lib/mongodb")).default;
+    const Vehicle   = (await import("@/lib/models/Vehicle")).default;
+    await dbConnect();
+    const vehicles = await Vehicle.find({ status: "published" })
+      .select("slug")
+      .sort({ featured: -1, createdAt: -1 })
+      .limit(15)
+      .lean();
+    const slugs = vehicles.map(v => v.slug);
+    const pairs = [];
+    for (let i = 0; i < slugs.length; i++) {
+      for (let j = i + 1; j < slugs.length; j++) {
+        pairs.push({ slug: `${slugs[i]}-vs-${slugs[j]}` });
+      }
+    }
+    return pairs;
+  } catch {
+    return [];
+  }
+}
+
 /* ─── parse "slug1-vs-slug2" ────────────────────────────────────── */
 function parsePair(slug) {
   const idx = slug.indexOf("-vs-");
@@ -134,6 +158,45 @@ export default async function ComparePairPage({ params }) {
     ],
   };
 
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: `What is the price difference between ${vA.name} and ${vB.name}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `The ${vA.name} starts at ${vA.variants?.[0]?.exShowroomPrice || "TBA"} (ex-showroom) while the ${vB.name} starts at ${vB.variants?.[0]?.exShowroomPrice || "TBA"} (ex-showroom). Prices may vary by city and variant.`,
+        },
+      },
+      {
+        "@type": "Question",
+        name: `Which has better range — ${vA.name} or ${vB.name}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `The ${vA.name} offers ${vA.performance?.drivingRange || "unspecified"} range while the ${vB.name} offers ${vB.performance?.drivingRange || "unspecified"} range on a full charge under standard test conditions.`,
+        },
+      },
+      {
+        "@type": "Question",
+        name: `Which charges faster — ${vA.name} or ${vB.name}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `${vA.name} DC fast charge time: ${vA.charging?.dcChargingTime || "not specified"}. ${vB.name} DC fast charge time: ${vB.charging?.dcChargingTime || "not specified"}. Both support home AC charging for overnight top-ups.`,
+        },
+      },
+      {
+        "@type": "Question",
+        name: `Should I buy ${vA.name} or ${vB.name}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `The best choice between ${vA.name} and ${vB.name} depends on your needs. The ${vA.name} starts at ${vA.variants?.[0]?.exShowroomPrice || "TBA"} with ${vA.performance?.drivingRange || "unspecified"} range, while the ${vB.name} starts at ${vB.variants?.[0]?.exShowroomPrice || "TBA"} with ${vB.performance?.drivingRange || "unspecified"} range. Compare the full specs, features, and after-sales service before deciding.`,
+        },
+      },
+    ],
+  };
+
   const vehicles = [vA, vB];
 
   return (
@@ -141,6 +204,7 @@ export default async function ComparePairPage({ params }) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(makeProduct(vA)) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(makeProduct(vB)) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
 
       <div className="min-h-screen bg-gray-50">
 

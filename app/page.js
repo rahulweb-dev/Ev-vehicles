@@ -98,6 +98,31 @@ async function getLatestArticles() {
   }
 }
 
+/* ── Fetch initial news for LatestNewsSection SSR ────────────────── */
+async function getInitialNews() {
+  try {
+    const dbConnect = (await import("@/lib/mongodb")).default;
+    const Article   = (await import("@/lib/models/Article")).default;
+    await dbConnect();
+    const articles = await Article.find({ status: "published", category: "cars", image: { $exists: true, $nin: [null, ""] } })
+      .sort({ publishedAt: -1 })
+      .limit(6)
+      .select("slug title image excerpt category readTime")
+      .lean();
+    if (!articles.length) return null;
+    return articles.map(a => ({
+      image:    a.image    || "",
+      title:    a.title    || "",
+      excerpt:  a.excerpt  || "",
+      slug:     a.slug     || "",
+      category: a.category || "cars",
+      readTime: a.readTime || "5 min",
+    }));
+  } catch {
+    return null;
+  }
+}
+
 /* ── Fetch brand logo map  slug → url ────────────────────────────── */
 async function getBrandLogos() {
   try {
@@ -137,6 +162,7 @@ export default async function Home() {
     latestArticles,
     latestBlogs,
     brandLogoMap,
+    initialNews,
     featuredCars, featuredBikes, featuredCommercial,
     popularCars, popularBikes, popularCommercial,
     upcomingCars, upcomingBikes, upcomingCommercial,
@@ -144,6 +170,7 @@ export default async function Home() {
     getLatestArticles(),
     getLatestBlogs(),
     getBrandLogos(),
+    getInitialNews(),
     getVehicles({ vehicleType: "car",        featured: true }),
     getVehicles({ vehicleType: "bike",       featured: true }),
     getVehicles({ vehicleType: "commercial", featured: true }),
@@ -210,7 +237,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <LatestNewsSection />
+      <LatestNewsSection initialArticles={initialNews} />
 
       {/* Latest Blog Posts */}
       {latestBlogs.length > 0 && (

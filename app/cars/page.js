@@ -42,9 +42,33 @@ export default async function CarsPage({ searchParams }) {
     ],
   };
 
+  const collectionPageJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": `${SITE_URL}/cars#collection`,
+    name: "Electric Cars in India 2026 – Complete Database",
+    description: "Comprehensive database of all electric cars available and upcoming in India. Compare prices, range, battery capacity, motor power, and specifications for Tata, Mahindra, Hyundai, Kia, BYD, MG, and more EVs.",
+    url: `${SITE_URL}/cars`,
+    inLanguage: "en-IN",
+    publisher: { "@id": `${SITE_URL}/#organization` },
+    about: { "@type": "Thing", name: "Electric Cars in India" },
+    keywords: "electric cars india 2026, best electric car india, ev price india, electric car range india, tata ev, mahindra ev",
+    audience: {
+      "@type": "Audience",
+      geographicArea: { "@type": "Country", name: "India" },
+    },
+    mainEntity: {
+      "@type": "ItemList",
+      name: "Electric Cars in India",
+      description: "All electric cars available in India sorted by price, range, and popularity",
+      url: `${SITE_URL}/cars`,
+    },
+  };
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionPageJsonLd) }} />
       <div className="min-h-screen bg-gray-50">
 
         {/* Header */}

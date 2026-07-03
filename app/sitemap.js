@@ -22,6 +22,7 @@ const STATIC_PAGES = [
   { url: `${SITE_URL}/electric-cars-under-10-lakh`,   priority: 0.9,  freq: "weekly"  },
   { url: `${SITE_URL}/ev-charging-guide`,             priority: 0.85, freq: "monthly" },
   { url: `${SITE_URL}/government-ev-policy-india`,    priority: 0.8,  freq: "monthly" },
+  { url: `${SITE_URL}/ev-glossary`,                   priority: 0.82, freq: "monthly" },
   /* Interactive tools */
   { url: `${SITE_URL}/range-calculator`,              priority: 0.8,  freq: "monthly" },
   { url: `${SITE_URL}/resale-calculator`,             priority: 0.78, freq: "monthly" },
@@ -33,10 +34,15 @@ const STATIC_PAGES = [
 ];
 
 /*
- * Only top 5 cities for price pages — 12 cities × all cars = hundreds of thin pages
- * that waste crawl budget. Keep only the highest-traffic metro cities.
+ * Top 12 metro cities for price pages — major Indian markets with highest EV adoption.
+ * Balanced crawl budget vs. coverage: 12 cities × N cars = N×12 URLs.
  */
-const TOP_CITIES = ["mumbai", "delhi", "bangalore", "hyderabad", "pune"];
+// MUST match the CITIES array in app/cars/[slug]/price-in-[city]/page.js exactly
+const TOP_CITIES = [
+  "mumbai", "delhi", "bangalore", "hyderabad", "chennai",
+  "pune", "ahmedabad", "kolkata", "jaipur", "lucknow",
+  "chandigarh", "bhopal",
+];
 
 async function getDbEntries() {
   try {

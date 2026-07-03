@@ -25,10 +25,10 @@ async function getArticlesByTag(tag) {
 export async function generateMetadata({ params }) {
   const { tag } = await params;
   const decoded = decodeURIComponent(tag);
-  const ogTitle = `#${decoded} – EV News India`;
-  const ogDesc = `Latest electric vehicle news tagged with ${decoded}. Stay updated on EV launches, reviews, and industry news in India.`;
+  const ogTitle = `${decoded} – Electric Vehicle News India`;
+  const ogDesc = `Latest electric vehicle news about ${decoded}. Stay updated on EV launches, reviews, prices, and industry news from India.`;
   return {
-    title: `#${decoded} – EV News India | EVRadar`,
+    title: `${decoded} EV News – Latest Updates`,
     description: ogDesc,
     alternates: { canonical: `${SITE_URL}/news/tags/${tag}` },
     openGraph: {
@@ -63,9 +63,25 @@ export default async function TagPage({ params }) {
     ],
   };
 
+  const itemListJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: `${decodedTag} – Latest EV News`,
+    description: `All electric vehicle news articles tagged with ${decodedTag} on EV News India.`,
+    url: `${SITE_URL}/news/tags/${tag}`,
+    numberOfItems: articles.length,
+    itemListElement: articles.map((a, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: `${SITE_URL}/news/${a.slug}`,
+      name: a.title,
+    })),
+  };
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
     <div className="min-h-screen bg-gray-50 py-10">
       <div className="mx-auto max-w-7xl px-4">
         {/* Breadcrumb */}

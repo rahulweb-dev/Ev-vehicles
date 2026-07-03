@@ -42,9 +42,33 @@ export default async function BikesPage({ searchParams }) {
     ],
   };
 
+  const collectionPageJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": `${SITE_URL}/bikes#collection`,
+    name: "Electric Bikes & Scooters in India 2026 – Complete Database",
+    description: "Comprehensive database of all electric scooters and bikes available in India. Compare prices, range, battery, and performance for Ather, Ola, TVS, Bajaj, Hero, and more EV brands.",
+    url: `${SITE_URL}/bikes`,
+    inLanguage: "en-IN",
+    publisher: { "@id": `${SITE_URL}/#organization` },
+    about: { "@type": "Thing", name: "Electric Scooters and Bikes in India" },
+    keywords: "electric scooters india 2026, electric bike india, ola s1 pro, ather 450x, tvs iqube, bajaj chetak, best electric scooter india",
+    audience: {
+      "@type": "Audience",
+      geographicArea: { "@type": "Country", name: "India" },
+    },
+    mainEntity: {
+      "@type": "ItemList",
+      name: "Electric Scooters and Bikes in India",
+      description: "All electric two-wheelers available in India sorted by price, range, and popularity",
+      url: `${SITE_URL}/bikes`,
+    },
+  };
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionPageJsonLd) }} />
       <div className="min-h-screen bg-gray-50">
 
         <div className="bg-linear-to-br from-green-900 to-green-950 py-14">

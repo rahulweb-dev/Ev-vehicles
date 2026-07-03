@@ -147,18 +147,98 @@ const TIMELINE = [
 ];
 
 export default function UpcomingEVsPage() {
-  const eventJsonLd = UPCOMING.filter(e => e.status === "confirmed").map(ev => ({
+  const vehicleJsonLd = UPCOMING.map(ev => ({
     "@context": "https://schema.org",
-    "@type": "Product",
+    "@type": "Car",
     name: ev.name,
     brand: { "@type": "Brand", name: ev.brand },
     description: ev.highlight,
+    fuelType: "Electric",
     offers: {
       "@type": "Offer",
       priceSpecification: { "@type": "PriceSpecification", priceCurrency: "INR", description: ev.expectedPrice },
       availability: "https://schema.org/PreOrder",
+      areaServed: { "@type": "Country", name: "India" },
     },
   }));
+
+  const itemListJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Upcoming Electric Cars in India 2026–2027",
+    description: `${UPCOMING.length} new electric cars launching in India in 2026 and 2027 with expected price, range, and launch date.`,
+    url: `${SITE_URL}/upcoming-electric-cars-india`,
+    numberOfItems: UPCOMING.length,
+    itemListElement: UPCOMING.map((ev, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: `${ev.name} (${ev.expectedLaunch}) – ${ev.expectedPrice}`,
+      description: ev.highlight,
+    })),
+  };
+
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "Which electric cars are launching in India in 2026?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `The confirmed electric cars launching in India in 2026 include: ${UPCOMING.filter(e => e.status === "confirmed" && !e.expectedLaunch.includes("2027")).map(e => `${e.name} (${e.expectedLaunch}, ${e.expectedPrice})`).join("; ")}. Several more are likely to launch pending official confirmation.`,
+        },
+      },
+      {
+        "@type": "Question",
+        name: "When is the Maruti e Vitara launching in India?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "The Maruti Suzuki e Vitara is confirmed for launch in Q3 2026 in India. It is expected to be priced between ₹17 and ₹22 Lakh (ex-showroom) and offer an estimated range of around 500 km on a full charge.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "What is the expected price of the Tata Sierra EV?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "The Tata Sierra EV is expected to be priced between ₹25 and ₹32 Lakh (ex-showroom). It is confirmed for launch in Q2 2026 and will be built on the Acti.ev platform with an estimated range of around 450 km.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "What is the range of the Mahindra XEV 9e?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "The Mahindra XEV 9e is expected to offer a range of approximately 656 km (ARAI estimated) on a 79 kWh battery. It supports 175 kW DC fast charging and is confirmed for launch in Q2 2026 at a price between ₹35 and ₹55 Lakh.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Is the Skoda Elroq launching in India?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "The Skoda Elroq is likely to launch in India in Q3 2026. It is based on the Volkswagen MEB platform and expected to be priced between ₹25 and ₹35 Lakh, with an estimated range of around 560 km on a 82 kWh battery. Skoda has not officially confirmed the India launch yet.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "What is the cheapest upcoming electric car in India?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "The Renault Kwid EV is expected to be the most affordable upcoming electric car in India, with a target price of ₹8–₹12 Lakh. It is expected to launch in Q1 2027 with a range of approximately 250 km. Currently, the Tata Tiago EV is the most affordable electric car on sale.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "When is the Honda Elevate EV launching in India?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "The Honda Elevate EV is confirmed for launch in the first half of 2027 (H1 2027). It is expected to be priced between ₹20 and ₹28 Lakh and offer approximately 450 km of range on a roughly 50 kWh LFP battery.",
+        },
+      },
+    ],
+  };
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -172,9 +252,11 @@ export default function UpcomingEVsPage() {
 
   return (
     <>
-      {eventJsonLd.map((j, i) => (
+      {vehicleJsonLd.map((j, i) => (
         <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(j) }} />
       ))}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
       <div className="min-h-screen bg-gray-50">

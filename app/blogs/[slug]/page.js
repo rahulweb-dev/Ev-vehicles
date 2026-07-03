@@ -65,6 +65,7 @@ export async function generateMetadata({ params }) {
       url: `${SITE_URL}/blogs/${blog.slug}`,
       type: "article",
       publishedTime: blog.publishedAt,
+      modifiedTime: blog.updatedAt || blog.publishedAt,
       images: [{ url: blog.image, width: 1200, height: 630, alt: blog.title }],
     },
     twitter: {
@@ -110,6 +111,16 @@ export default async function BlogPostPage({ params }) {
     return `<${tag}${attrs || ""} data-toc-id="toc-heading-${tocIndex++}">`;
   });
 
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: "Blogs", item: `${SITE_URL}/blogs` },
+      { "@type": "ListItem", position: 3, name: blog.title, item: `${SITE_URL}/blogs/${blog.slug}` },
+    ],
+  };
+
   const articleJsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -117,10 +128,21 @@ export default async function BlogPostPage({ params }) {
     description: blog.excerpt,
     image: [blog.image],
     datePublished: blog.publishedAt,
-    dateModified: blog.publishedAt,
-    author: { "@type": "Person", name: blog.author },
+    dateModified: blog.updatedAt || blog.publishedAt,
+    inLanguage: "en-IN",
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: ["h1", ".blog-lede"],
+    },
+    author: {
+      "@type": "Person",
+      name: blog.author,
+      url: `${SITE_URL}/authors/${encodeURIComponent((blog.author || "").toLowerCase().replace(/\s+/g, "-"))}`,
+      worksFor: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+    },
     publisher: {
       "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
       name: SITE_NAME,
       logo: { "@type": "ImageObject", url: `${SITE_URL}/images/logo.png` },
     },
@@ -130,10 +152,17 @@ export default async function BlogPostPage({ params }) {
     },
     keywords: blog.tags?.join(", "),
     url: `${SITE_URL}/blogs/${blog.slug}`,
+    about: { "@type": "Thing", name: blog.category },
+    ...(blog.tags?.length && {
+      mentions: blog.tags.map(tag => ({ "@type": "Thing", name: tag })),
+    }),
+    copyrightHolder: { "@id": `${SITE_URL}/#organization` },
+    copyrightYear: new Date(blog.publishedAt || Date.now()).getFullYear(),
   };
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
 
       <div className="bg-white">
@@ -157,7 +186,7 @@ export default async function BlogPostPage({ params }) {
             <h1 className="text-3xl font-black leading-tight text-gray-900 md:text-4xl lg:text-5xl">
               {blog.title}
             </h1>
-            <p className="mt-4 text-lg text-gray-500 leading-relaxed">{blog.excerpt}</p>
+            <p className="blog-lede mt-4 text-lg text-gray-500 leading-relaxed">{blog.excerpt}</p>
 
             <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-y border-gray-100 py-4 text-sm text-gray-500">
               <div className="flex items-center gap-2">

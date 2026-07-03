@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
 import VehicleDetailPage from "@/components/vehicles/VehicleDetailPage";
 import { SITE_URL } from "@/app/layout";
 
@@ -68,6 +70,27 @@ export async function generateMetadata({ params }) {
   };
 }
 
+async function getRelatedNews(name, brand) {
+  try {
+    const dbConnect = (await import("@/lib/mongodb")).default;
+    const Article   = (await import("@/lib/models/Article")).default;
+    await dbConnect();
+    return await Article.find({
+      status: "published",
+      $or: [
+        { title: { $regex: brand, $options: "i" } },
+        { tags:  { $in: [brand, name] } },
+      ],
+    })
+      .sort({ publishedAt: -1 })
+      .limit(4)
+      .select("slug title image excerpt publishedAt readTime")
+      .lean();
+  } catch {
+    return [];
+  }
+}
+
 async function getReviewStats(slug) {
   try {
     const dbConnect     = (await import("@/lib/mongodb")).default;
@@ -86,29 +109,58 @@ export default async function BikeDetailPage({ params }) {
   const bike = await getVehicle(slug);
   if (!bike) notFound();
 
-  const [related, reviewStats] = await Promise.all([
+  const [related, reviewStats, relatedNews] = await Promise.all([
     getRelated(slug, bike.brand),
     getReviewStats(slug),
+    getRelatedNews(bike.name, bike.brand),
   ]);
 
   const firstVariant = bike.variants?.[0];
+
+  function parsePriceToINR(str) {
+    if (!str) return "0";
+    const cleaned = String(str).replace(/[₹,\s]/g, "").toLowerCase();
+    const m = cleaned.match(/([\d.]+)\s*(lakh|l|cr|crore)?/);
+    if (!m) return "0";
+    const num = parseFloat(m[1]);
+    const unit = m[2] || "";
+    if (unit.startsWith("cr")) return String(Math.round(num * 10000000));
+    if (unit === "lakh" || unit === "l") return String(Math.round(num * 100000));
+    return String(Math.round(num));
+  }
+
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Product",
+    "@type": "Motorcycle",
     name:   bike.name,
     brand:  { "@type": "Brand", name: bike.brand },
     description: bike.shortDescription || bike.metaDescription || `${bike.name} electric scooter/bike`,
     image:  bike.featuredImage || "",
     url: `${SITE_URL}/bikes/${slug}`,
+    inLanguage: "en-IN",
+    fuelType: "Electric",
+    vehicleTransmission: "Automatic",
+    ...(bike.performance?.power && {
+      vehicleEngine: {
+        "@type": "EngineSpecification",
+        engineType: "Electric Motor",
+        enginePower: { "@type": "QuantitativeValue", value: bike.performance.power, unitText: "kW" },
+        ...(bike.performance?.torque && { torque: { "@type": "QuantitativeValue", value: bike.performance.torque, unitText: "Nm" } }),
+      },
+    }),
     ...(firstVariant && {
       offers: {
         "@type":       "Offer",
         priceCurrency: "INR",
-        price:         (firstVariant.exShowroomPrice || "").replace(/[^0-9]/g, "") || "0",
+        price:         parsePriceToINR(firstVariant.exShowroomPrice),
+        priceValidUntil: `${new Date().getFullYear() + 1}-12-31`,
         availability:  bike.availability === "available"
           ? "https://schema.org/InStock"
           : "https://schema.org/PreOrder",
+        itemCondition: "https://schema.org/NewCondition",
         url: `${SITE_URL}/bikes/${slug}`,
+        seller: { "@id": `${SITE_URL}/#organization` },
+        areaServed: { "@type": "Country", name: "India" },
       },
     }),
     ...(reviewStats?.count > 0 && {
@@ -120,6 +172,17 @@ export default async function BikeDetailPage({ params }) {
         worstRating:   "1",
       },
     }),
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: ["h1", "[data-speakable]"],
+    },
+    additionalProperty: [
+      ...(bike.performance?.drivingRange ? [{ "@type": "PropertyValue", name: "ARAI Range", value: bike.performance.drivingRange, unitText: "km" }] : []),
+      ...(bike.performance?.batteryCapacity ? [{ "@type": "PropertyValue", name: "Battery Capacity", value: bike.performance.batteryCapacity, unitText: "kWh" }] : []),
+      ...(bike.performance?.power ? [{ "@type": "PropertyValue", name: "Motor Power", value: bike.performance.power }] : []),
+      ...(bike.performance?.topSpeed ? [{ "@type": "PropertyValue", name: "Top Speed", value: bike.performance.topSpeed, unitText: "km/h" }] : []),
+      ...(bike.charging?.fastChargingTime ? [{ "@type": "PropertyValue", name: "Fast Charge Time (10–80%)", value: bike.charging.fastChargingTime }] : []),
+    ],
   };
 
   const breadcrumbJsonLd = {
@@ -202,7 +265,63 @@ export default async function BikeDetailPage({ params }) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       {videoJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(videoJsonLd) }} />}
+
+      {/* Speakable summary — voice search / AEO */}
+      <p className="sr-only" data-speakable aria-label={`${bike.name} key facts`}>
+        {`${bike.name} is an electric scooter/bike by ${bike.brand}.`}
+        {firstVariant?.exShowroomPrice ? ` Price starts at ${firstVariant.exShowroomPrice} ex-showroom.` : ""}
+        {range ? ` Certified range: ${range}.` : ""}
+        {bike.performance?.power ? ` Motor power: ${bike.performance.power}.` : ""}
+        {bike.performance?.batteryCapacity ? ` Battery: ${bike.performance.batteryCapacity}.` : ""}
+        {bike.availability === "available" ? " Currently available at authorised dealers across India." : " Expected to launch in India soon."}
+      </p>
+
       <VehicleDetailPage vehicle={bike} relatedVehicles={related} vehicleType="bike" />
+
+      {relatedNews.length > 0 && (
+        <section className="border-t border-gray-100 bg-gray-50 py-12">
+          <div className="mx-auto max-w-7xl px-4">
+            <h2 className="mb-6 text-2xl font-black text-gray-900">
+              Latest {bike.brand} News & Updates
+            </h2>
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {relatedNews.map((article) => (
+                <Link key={article.slug} href={`/news/${article.slug}`} className="group block">
+                  <article className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition hover:shadow-md">
+                    {article.image && (
+                      <div className="relative h-40 overflow-hidden">
+                        <Image
+                          src={article.image}
+                          alt={article.title}
+                          fill
+                          className="object-cover transition duration-300 group-hover:scale-105"
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        />
+                      </div>
+                    )}
+                    <div className="p-4">
+                      <h3 className="line-clamp-2 text-sm font-bold text-gray-900 group-hover:text-green-600 transition">
+                        {article.title}
+                      </h3>
+                      {article.readTime && (
+                        <p className="mt-2 text-xs text-gray-400">{article.readTime} read</p>
+                      )}
+                    </div>
+                  </article>
+                </Link>
+              ))}
+            </div>
+            <div className="mt-6 text-center">
+              <Link
+                href={`/news?q=${encodeURIComponent(bike.brand)}`}
+                className="inline-flex items-center gap-2 rounded-full border border-green-600 px-6 py-2.5 text-sm font-bold text-green-700 transition hover:bg-green-600 hover:text-white"
+              >
+                View All {bike.brand} News →
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
     </>
   );
 }

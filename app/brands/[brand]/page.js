@@ -87,12 +87,42 @@ export default async function BrandPage({ params }) {
     name: brandName,
     url: `${SITE_URL}/brands/${brand}`,
     description: `${brandName} electric vehicles — prices, specs, and latest news in India.`,
+    ...(brandProfile?.logo && { logo: { "@type": "ImageObject", url: brandProfile.logo } }),
   };
+
+  const vehicleItemListJsonLd = vehicles.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: `${brandName} Electric Vehicles in India`,
+    description: `All ${brandName} electric cars, bikes, and scooters available in India with prices and specifications.`,
+    url: `${SITE_URL}/brands/${brand}`,
+    numberOfItems: vehicles.length,
+    itemListElement: vehicles.map((v, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: v.name,
+      url: `${SITE_URL}/${v.vehicleType === "car" ? "cars" : v.vehicleType === "bike" ? "bikes" : "commercial"}/${v.slug}`,
+      ...(v.variants?.[0]?.exShowroomPrice && {
+        item: {
+          "@type": v.vehicleType === "car" ? "Car" : "Motorcycle",
+          name: v.name,
+          brand: { "@type": "Brand", name: v.brand },
+          offers: {
+            "@type": "Offer",
+            priceCurrency: "INR",
+            description: v.variants[0].exShowroomPrice,
+            availability: v.availability === "available" ? "https://schema.org/InStock" : "https://schema.org/PreOrder",
+          },
+        },
+      }),
+    })),
+  } : null;
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(brandOrgJsonLd) }} />
+      {vehicleItemListJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(vehicleItemListJsonLd) }} />}
     <div className="min-h-screen bg-gray-50 py-10">
       <div className="mx-auto max-w-7xl px-4">
         {/* Breadcrumb */}

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Blog from "@/lib/models/Blog";
 import { requireAuth } from "@/lib/auth";
+import { pingIndexNow, buildBlogUrl } from "@/lib/indexnow";
 
 export async function GET(_, { params }) {
   try {
@@ -21,8 +22,20 @@ export async function PATCH(request, { params }) {
   try {
     await dbConnect();
     const body = await request.json();
+
+    const existing = await Blog.findById(params.id);
+    if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    const isPublishingNow = existing.status !== "published" && body.status === "published";
+    if (isPublishingNow && !body.publishedAt) body.publishedAt = new Date();
+
     const blog = await Blog.findByIdAndUpdate(params.id, body, { new: true, runValidators: true });
     if (!blog) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    if (isPublishingNow || existing.status === "published") {
+      pingIndexNow(buildBlogUrl(blog.slug)).catch(console.error);
+    }
+
     return NextResponse.json({ success: true, blog });
   } catch (err) {
     console.error("[PATCH /api/blogs/[id]]", err);
