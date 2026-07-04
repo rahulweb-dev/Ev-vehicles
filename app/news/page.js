@@ -38,8 +38,9 @@ async function getArticles(category, page = 1) {
 }
 
 export async function generateMetadata({ searchParams }) {
-  const sp  = await searchParams;
-  const cat = sp?.category || null;
+  const sp   = await searchParams;
+  const cat  = sp?.category || null;
+  const page = Math.max(1, parseInt(sp?.page || "1", 10));
   const label = CAT_LABELS[cat] || "All";
   return {
     title: `${label} News – Electric Vehicle Updates India 2026`,
