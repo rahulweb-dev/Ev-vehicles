@@ -12,7 +12,15 @@ export const metadata = {
   openGraph: {
     title: "EV Charging Guide India 2026 – Complete How-To",
     description: "Everything you need to know about charging your EV in India — home charging, public networks, costs, and tips.",
+    url: `${SITE_URL}/ev-charging-guide`,
+    type: "article",
     images: [{ url: `${SITE_URL}/api/og?title=EV Charging Guide India 2026&subtitle=Home, Public & Fast Charging Explained&tag=charging`, width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "EV Charging Guide India 2026 – Complete How-To",
+    description: "Everything you need to know about charging your EV in India — home charging, public networks, costs, and tips.",
+    images: [`${SITE_URL}/api/og?title=EV Charging Guide India 2026&subtitle=Home, Public & Fast Charging Explained&tag=charging`],
   },
 };
 
@@ -123,8 +131,30 @@ export default function EVChargingGuide() {
     ],
   };
 
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: "EV Charging Guide India 2026 – How to Charge Electric Car at Home & Public",
+    description: "Complete EV charging guide for India 2026. Learn how to charge electric cars at home, find public chargers, understand AC vs DC charging, and calculate charging cost.",
+    url: `${SITE_URL}/ev-charging-guide`,
+    inLanguage: "en-IN",
+    dateModified: new Date().toISOString().split("T")[0],
+    author: { "@type": "Organization", "@id": `${SITE_URL}/#organization` },
+    publisher: { "@type": "Organization", "@id": `${SITE_URL}/#organization` },
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: ["h1", "h2", "[data-speakable]"],
+    },
+    about: [
+      { "@type": "Thing", name: "EV Charging" },
+      { "@type": "Thing", name: "Electric Vehicle Charging India" },
+    ],
+    mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE_URL}/ev-charging-guide` },
+  };
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />

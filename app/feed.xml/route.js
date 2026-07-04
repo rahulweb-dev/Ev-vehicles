@@ -58,7 +58,7 @@ export async function GET() {
   xmlns:atom="http://www.w3.org/2005/Atom"
   xmlns:dc="http://purl.org/dc/elements/1.1/"
   xmlns:content="http://purl.org/rss/modules/content/"
-  xmlns:media="http://www.rssboard.org/media-rss">
+  xmlns:media="http://search.yahoo.com/mrss/">
   <channel>
     <title>${SITE_NAME} – India's #1 Electric Vehicle News</title>
     <link>${SITE_URL}</link>

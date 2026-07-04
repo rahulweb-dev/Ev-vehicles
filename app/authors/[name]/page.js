@@ -106,7 +106,7 @@ export default async function AuthorPage({ params }) {
           <nav className="mb-6 flex items-center gap-1 text-sm text-gray-500">
             <Link href="/" className="hover:text-green-600">Home</Link>
             <ChevronRight size={14} />
-            <Link href="/news" className="hover:text-green-600">News</Link>
+            <Link href="/authors" className="hover:text-green-600">Authors</Link>
             <ChevronRight size={14} />
             <span className="text-green-600">{authorName}</span>
           </nav>

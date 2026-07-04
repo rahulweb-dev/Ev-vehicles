@@ -12,7 +12,15 @@ export const metadata = {
   openGraph: {
     title: "India Government EV Policy 2026 – Complete Guide",
     description: "FAME III, PM E-DRIVE, PLI, GST cuts, tax benefits and state policies — everything you need to know.",
+    url: `${SITE_URL}/government-ev-policy-india`,
+    type: "article",
     images: [{ url: `${SITE_URL}/api/og?title=India EV Policy 2026&subtitle=FAME III, PM E-DRIVE & Subsidies&tag=policy`, width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "India Government EV Policy 2026 – Complete Guide",
+    description: "FAME III, PM E-DRIVE, PLI, GST cuts, tax benefits and state policies — everything you need to know.",
+    images: [`${SITE_URL}/api/og?title=India EV Policy 2026&subtitle=FAME III, PM E-DRIVE & Subsidies&tag=policy`],
   },
 };
 
@@ -119,8 +127,31 @@ export default function GovernmentEVPolicyPage() {
     ],
   };
 
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: "Government EV Policy India 2026 – FAME III, PM E-DRIVE, PLI & State Subsidies",
+    description: "Complete guide to India's government EV policies in 2026 — PM E-DRIVE scheme, FAME III, PLI scheme, GST benefits, Section 80EEB tax deduction, and state subsidies.",
+    url: `${SITE_URL}/government-ev-policy-india`,
+    inLanguage: "en-IN",
+    dateModified: new Date().toISOString().split("T")[0],
+    author: { "@type": "Organization", "@id": `${SITE_URL}/#organization` },
+    publisher: { "@type": "Organization", "@id": `${SITE_URL}/#organization` },
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: ["h1", "h2", "[data-speakable]"],
+    },
+    about: [
+      { "@type": "Thing", name: "FAME Scheme India" },
+      { "@type": "Thing", name: "PM E-Drive Policy" },
+      { "@type": "Thing", name: "EV Subsidy India" },
+    ],
+    mainEntityOfPage: { "@type": "WebPage", "@id": `${SITE_URL}/government-ev-policy-india` },
+  };
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 

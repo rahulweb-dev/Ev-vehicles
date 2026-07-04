@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import sanitizeHtml from "sanitize-html";
 import Image from "next/image";
 import Link from "next/link";
-import { Clock3, Calendar, ChevronRight } from "lucide-react";
+import { Clock3, Calendar, ChevronRight, Zap } from "lucide-react";
 import { getBlogBySlug, getRelatedBlogs, blogsData } from "@/data/blogsData";
 import { AdBannerInArticle, AdBannerHorizontal } from "@/components/ads/AdBanner";
 import { SITE_URL, SITE_NAME } from "@/app/layout";
@@ -19,6 +19,21 @@ async function getBlogFromDb(slug) {
     if (blog) return { ...blog, id: blog._id.toString(), tags: blog.tags || [] };
   } catch {}
   return null;
+}
+
+async function getFeaturedVehicle(tags = []) {
+  try {
+    const dbConnect = (await import("@/lib/mongodb")).default;
+    const Vehicle   = (await import("@/lib/models/Vehicle")).default;
+    await dbConnect();
+    const query = tags.length
+      ? { status: "published", $or: [{ brand: { $in: tags } }, { name: { $in: tags } }] }
+      : { status: "published", featured: true };
+    return await Vehicle.findOne(query)
+      .sort({ featured: -1 })
+      .select("slug name brand featuredImage performance variants vehicleType")
+      .lean();
+  } catch { return null; }
 }
 
 async function getRelatedFromDb(slug, category) {
@@ -83,7 +98,10 @@ export default async function BlogPostPage({ params }) {
 
   if (!blog) notFound();
 
-  const dbRelated = await getRelatedFromDb(slug, blog.category);
+  const [dbRelated, featuredVehicle] = await Promise.all([
+    getRelatedFromDb(slug, blog.category),
+    getFeaturedVehicle(blog.tags || []),
+  ]);
   const related = dbRelated.length > 0 ? dbRelated : getRelatedBlogs(slug, 3);
 
   const safeContent = sanitizeHtml(blog.content || "", {
@@ -158,6 +176,7 @@ export default async function BlogPostPage({ params }) {
     }),
     copyrightHolder: { "@id": `${SITE_URL}/#organization` },
     copyrightYear: new Date(blog.publishedAt || Date.now()).getFullYear(),
+    wordCount: blog.content ? blog.content.replace(/<[^>]+>/g, "").split(/\s+/).filter(Boolean).length : undefined,
   };
 
   return (
@@ -240,14 +259,56 @@ export default async function BlogPostPage({ params }) {
           {/* Second Ad */}
           <AdBannerInArticle slot="4680235791" />
 
-          {/* Tags */}
-          {blog.tags && (
+          {/* Tags — linked for internal crawl signal */}
+          {blog.tags && blog.tags.length > 0 && (
             <div className="mt-8 flex flex-wrap gap-2 border-t border-gray-100 pt-6">
               {blog.tags.map((tag) => (
-                <span key={tag} className="rounded-lg bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-600">
+                <Link
+                  key={tag}
+                  href={`/news/tags/${encodeURIComponent(tag)}`}
+                  className="rounded-lg bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-green-100 hover:text-green-700 transition"
+                >
                   #{tag}
-                </span>
+                </Link>
               ))}
+            </div>
+          )}
+
+          {/* Featured vehicle sidebar — cross-links to relevant EV */}
+          {featuredVehicle && (
+            <div className="mt-8 rounded-2xl border border-green-100 bg-green-50 p-5">
+              <p className="mb-3 text-xs font-bold uppercase tracking-wider text-green-600">Featured EV</p>
+              <Link
+                href={`/${featuredVehicle.vehicleType === "car" ? "cars" : featuredVehicle.vehicleType === "bike" ? "bikes" : "commercial"}/${featuredVehicle.slug}`}
+                className="group flex items-center gap-4"
+              >
+                {featuredVehicle.featuredImage && (
+                  <div className="relative h-20 w-28 shrink-0 overflow-hidden rounded-xl">
+                    <Image
+                      src={featuredVehicle.featuredImage}
+                      alt={featuredVehicle.name}
+                      fill
+                      className="object-cover transition duration-300 group-hover:scale-105"
+                      sizes="112px"
+                    />
+                  </div>
+                )}
+                <div>
+                  <p className="font-black text-gray-900 group-hover:text-green-700 transition">{featuredVehicle.name}</p>
+                  <p className="text-sm text-gray-500">{featuredVehicle.brand}</p>
+                  {featuredVehicle.variants?.[0]?.exShowroomPrice && (
+                    <p className="mt-1 text-sm font-semibold text-green-700">
+                      From {featuredVehicle.variants[0].exShowroomPrice}
+                    </p>
+                  )}
+                  {featuredVehicle.performance?.drivingRange && (
+                    <p className="flex items-center gap-1 text-xs text-gray-500 mt-0.5">
+                      <Zap size={10} className="text-green-500" />
+                      {featuredVehicle.performance.drivingRange} range
+                    </p>
+                  )}
+                </div>
+              </Link>
             </div>
           )}
         </div>

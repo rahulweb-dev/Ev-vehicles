@@ -1,8 +1,22 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
 import VehicleDetailPage from "@/components/vehicles/VehicleDetailPage";
 import { SITE_URL } from "@/app/layout";
 
 export const revalidate = 3600;
+
+function parsePriceToINR(str) {
+  if (!str) return "0";
+  const cleaned = String(str).replace(/[₹,\s]/g, "").toLowerCase();
+  const m = cleaned.match(/([\d.]+)\s*(lakh|l|cr|crore)?/);
+  if (!m) return "0";
+  const num = parseFloat(m[1]);
+  const unit = m[2] || "";
+  if (unit.startsWith("cr")) return String(Math.round(num * 10000000));
+  if (unit === "lakh" || unit === "l") return String(Math.round(num * 100000));
+  return String(Math.round(num));
+}
 
 async function getVehicle(slug) {
   try {
@@ -34,6 +48,27 @@ async function getRelated(slug, brand) {
   }
 }
 
+async function getRelatedNews(name, brand) {
+  try {
+    const dbConnect = (await import("@/lib/mongodb")).default;
+    const Article   = (await import("@/lib/models/Article")).default;
+    await dbConnect();
+    return await Article.find({
+      status: "published",
+      $or: [
+        { title: { $regex: brand, $options: "i" } },
+        { tags:  { $in: [brand, name] } },
+      ],
+    })
+      .sort({ publishedAt: -1 })
+      .limit(4)
+      .select("slug title image excerpt publishedAt readTime")
+      .lean();
+  } catch {
+    return [];
+  }
+}
+
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const vehicle = await getVehicle(slug);
@@ -50,8 +85,20 @@ export async function generateMetadata({ params }) {
     alternates:  { canonical: vehicle.canonicalUrl || `${SITE_URL}/commercial/${slug}` },
     openGraph: {
       title:       vehicle.ogTitle       || vehicle.metaTitle       || `${vehicle.name} – Price & Specs`,
-      description: vehicle.ogDescription || vehicle.metaDescription || `${vehicle.name}${price ? ` starts at ${price}` : ""}`,
-      images:      [{ url: vehicle.ogImage || vehicle.featuredImage || "", width: 1200, height: 630 }],
+      description: vehicle.ogDescription || vehicle.metaDescription || `${vehicle.name}${price ? ` starts at ${price}` : ""}${range ? `. Range: ${range}` : ""}.`,
+      url: vehicle.canonicalUrl || `${SITE_URL}/commercial/${slug}`,
+      type: "website",
+      images: [{
+        url: vehicle.ogImage || vehicle.featuredImage ||
+          `${SITE_URL}/api/og?title=${encodeURIComponent(vehicle.name)}&subtitle=${encodeURIComponent(`${price ? price + " onwards" : ""}${range ? " · Range " + range : ""}`)}&type=vehicle&tag=commercial${vehicle.featuredImage ? "&image=" + encodeURIComponent(vehicle.featuredImage) : ""}`,
+        width: 1200, height: 630,
+      }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: vehicle.ogTitle || vehicle.metaTitle || `${vehicle.name} – Price & Specs`,
+      description: vehicle.ogDescription || vehicle.metaDescription || `${vehicle.name}${price ? ` starts at ${price}` : ""}${range ? `. Range: ${range}` : ""}.`,
+      images: [vehicle.ogImage || vehicle.featuredImage || `${SITE_URL}/api/og?title=${encodeURIComponent(vehicle.name)}&subtitle=${encodeURIComponent(`${price ? price + " onwards" : ""}${range ? " · Range " + range : ""}`)}&type=vehicle&tag=commercial${vehicle.featuredImage ? "&image=" + encodeURIComponent(vehicle.featuredImage) : ""}`],
     },
   };
 }
@@ -74,29 +121,46 @@ export default async function CommercialDetailPage({ params }) {
   const vehicle = await getVehicle(slug);
   if (!vehicle) notFound();
 
-  const [related, reviewStats] = await Promise.all([
+  const [related, reviewStats, relatedNews] = await Promise.all([
     getRelated(slug, vehicle.brand),
     getReviewStats(slug),
+    getRelatedNews(vehicle.name, vehicle.brand),
   ]);
 
   const firstVariant = vehicle.variants?.[0];
+
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "Product",
+    "@type": "Vehicle",
     name:   vehicle.name,
     brand:  { "@type": "Brand", name: vehicle.brand },
     description: vehicle.shortDescription || vehicle.metaDescription || `${vehicle.name} electric commercial vehicle`,
     image:  vehicle.featuredImage || "",
     url: `${SITE_URL}/commercial/${slug}`,
+    inLanguage: "en-IN",
+    fuelType: "Electric",
+    vehicleTransmission: "Automatic",
+    ...(vehicle.performance?.power && {
+      vehicleEngine: {
+        "@type": "EngineSpecification",
+        engineType: "Electric Motor",
+        enginePower: { "@type": "QuantitativeValue", value: vehicle.performance.power, unitText: "kW" },
+        ...(vehicle.performance?.torque && { torque: { "@type": "QuantitativeValue", value: vehicle.performance.torque, unitText: "Nm" } }),
+      },
+    }),
     ...(firstVariant && {
       offers: {
         "@type":       "Offer",
         priceCurrency: "INR",
-        price:         (firstVariant.exShowroomPrice || "").replace(/[^0-9]/g, "") || "0",
+        price:         parsePriceToINR(firstVariant.exShowroomPrice),
+        priceValidUntil: `${new Date().getFullYear() + 1}-12-31`,
         availability:  vehicle.availability === "available"
           ? "https://schema.org/InStock"
           : "https://schema.org/PreOrder",
+        itemCondition: "https://schema.org/NewCondition",
         url: `${SITE_URL}/commercial/${slug}`,
+        seller: { "@id": `${SITE_URL}/#organization` },
+        areaServed: { "@type": "Country", name: "India" },
       },
     }),
     ...(reviewStats?.count > 0 && {
@@ -108,15 +172,27 @@ export default async function CommercialDetailPage({ params }) {
         worstRating:   "1",
       },
     }),
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: ["h1", "[data-speakable]"],
+    },
+    additionalProperty: [
+      ...(vehicle.performance?.drivingRange ? [{ "@type": "PropertyValue", name: "Range", value: vehicle.performance.drivingRange, unitText: "km" }] : []),
+      ...(vehicle.performance?.batteryCapacity ? [{ "@type": "PropertyValue", name: "Battery Capacity", value: vehicle.performance.batteryCapacity, unitText: "kWh" }] : []),
+      ...(vehicle.performance?.power ? [{ "@type": "PropertyValue", name: "Motor Power", value: vehicle.performance.power }] : []),
+      ...(vehicle.performance?.topSpeed ? [{ "@type": "PropertyValue", name: "Top Speed", value: vehicle.performance.topSpeed, unitText: "km/h" }] : []),
+      ...(vehicle.charging?.dcChargingTime ? [{ "@type": "PropertyValue", name: "DC Fast Charge Time (10–80%)", value: vehicle.charging.dcChargingTime }] : []),
+      ...(vehicle.specs?.payloadCapacity ? [{ "@type": "PropertyValue", name: "Payload Capacity", value: vehicle.specs.payloadCapacity, unitText: "kg" }] : []),
+    ],
   };
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home",             item: SITE_URL },
-      { "@type": "ListItem", position: 2, name: "Commercial EVs",   item: `${SITE_URL}/commercial` },
-      { "@type": "ListItem", position: 3, name: vehicle.name,       item: `${SITE_URL}/commercial/${slug}` },
+      { "@type": "ListItem", position: 1, name: "Home",           item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: "Commercial EVs", item: `${SITE_URL}/commercial` },
+      { "@type": "ListItem", position: 3, name: vehicle.name,     item: `${SITE_URL}/commercial/${slug}` },
     ],
   };
 
@@ -154,8 +230,8 @@ export default async function CommercialDetailPage({ params }) {
         acceptedAnswer: {
           "@type": "Answer",
           text: charging
-            ? `The ${vehicle.name} supports fast charging and can charge to 80% in approximately ${charging}.`
-            : `The ${vehicle.name} supports standard AC charging. Refer to the official specifications for exact charging times.`,
+            ? `The ${vehicle.name} supports DC fast charging and can charge to 80% in approximately ${charging}.`
+            : `The ${vehicle.name} supports standard AC charging. Refer to official specifications for exact charging times.`,
         },
       },
       {
@@ -171,12 +247,82 @@ export default async function CommercialDetailPage({ params }) {
     ],
   };
 
+  const videoId = vehicle.videoUrl?.match(/(?:youtu\.be\/|[?&]v=)([^?&]{11})/)?.[1];
+  const videoJsonLd = videoId ? {
+    "@context":    "https://schema.org",
+    "@type":       "VideoObject",
+    name:          `${vehicle.name} Review & First Look`,
+    description:   `Watch the full ${vehicle.name} review including range test, features, and performance.`,
+    thumbnailUrl:  `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+    uploadDate:    vehicle.createdAt ? new Date(vehicle.createdAt).toISOString() : new Date().toISOString(),
+    contentUrl:    `https://www.youtube.com/watch?v=${videoId}`,
+    embedUrl:      `https://www.youtube.com/embed/${videoId}`,
+    publisher:     { "@type": "Organization", name: "EV News India", url: SITE_URL },
+  } : null;
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      {videoJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(videoJsonLd) }} />}
+
+      {/* Speakable summary — voice search / AEO */}
+      <p className="sr-only" data-speakable aria-label={`${vehicle.name} key facts`}>
+        {`${vehicle.name} is an electric commercial vehicle by ${vehicle.brand}.`}
+        {firstVariant?.exShowroomPrice ? ` Price starts at ${firstVariant.exShowroomPrice} ex-showroom.` : ""}
+        {range ? ` Certified range: ${range}.` : ""}
+        {vehicle.performance?.power ? ` Motor power: ${vehicle.performance.power}.` : ""}
+        {vehicle.performance?.batteryCapacity ? ` Battery: ${vehicle.performance.batteryCapacity}.` : ""}
+        {vehicle.availability === "available" ? " Currently available in India." : " Expected to launch in India soon."}
+      </p>
+
       <VehicleDetailPage vehicle={vehicle} relatedVehicles={related} vehicleType="commercial" />
+
+      {relatedNews.length > 0 && (
+        <section className="border-t border-gray-100 bg-gray-50 py-12">
+          <div className="mx-auto max-w-7xl px-4">
+            <h2 className="mb-6 text-2xl font-black text-gray-900">
+              Latest {vehicle.brand} News & Updates
+            </h2>
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {relatedNews.map((article) => (
+                <Link key={article.slug} href={`/news/${article.slug}`} className="group block">
+                  <article className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition hover:shadow-md">
+                    {article.image && (
+                      <div className="relative h-40 overflow-hidden">
+                        <Image
+                          src={article.image}
+                          alt={article.title}
+                          fill
+                          className="object-cover transition duration-300 group-hover:scale-105"
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        />
+                      </div>
+                    )}
+                    <div className="p-4">
+                      <h3 className="line-clamp-2 text-sm font-bold text-gray-900 group-hover:text-green-600 transition">
+                        {article.title}
+                      </h3>
+                      {article.readTime && (
+                        <p className="mt-2 text-xs text-gray-400">{article.readTime} read</p>
+                      )}
+                    </div>
+                  </article>
+                </Link>
+              ))}
+            </div>
+            <div className="mt-6 text-center">
+              <Link
+                href={`/news?q=${encodeURIComponent(vehicle.brand)}`}
+                className="inline-flex items-center gap-2 rounded-full border border-green-600 px-6 py-2.5 text-sm font-bold text-green-700 transition hover:bg-green-600 hover:text-white"
+              >
+                View All {vehicle.brand} News →
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
     </>
   );
 }

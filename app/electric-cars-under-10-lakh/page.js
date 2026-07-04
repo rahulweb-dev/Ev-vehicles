@@ -12,7 +12,15 @@ export const metadata = {
   openGraph: {
     title: "Best Electric Cars Under ₹10 Lakh in India 2026",
     description: "The most affordable EVs you can buy in India — with real range, DC fast charging, and low running costs.",
+    url: `${SITE_URL}/electric-cars-under-10-lakh`,
+    type: "article",
     images: [{ url: `${SITE_URL}/api/og?title=Electric Cars Under 10 Lakh India&subtitle=Budget EV Guide 2026&tag=cars`, width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Best Electric Cars Under ₹10 Lakh in India 2026",
+    description: "The most affordable EVs you can buy in India — with real range, DC fast charging, and low running costs.",
+    images: [`${SITE_URL}/api/og?title=Electric Cars Under 10 Lakh India&subtitle=Budget EV Guide 2026&tag=cars`],
   },
 };
 
