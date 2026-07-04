@@ -172,6 +172,12 @@ export default async function ArticlePage({ params }) {
     }),
     copyrightHolder: { "@id": `${SITE_URL}/#organization` },
     copyrightYear: new Date(article.publishedAt || Date.now()).getFullYear(),
+    isPartOf: {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      name: SITE_NAME,
+      url: SITE_URL,
+    },
   };
 
   const breadcrumbJsonLd = {

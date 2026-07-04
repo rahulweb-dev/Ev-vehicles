@@ -175,10 +175,10 @@ function CheckGroup({ items, values, onChange }) {
 }
 
 /* ─── Main export ─────────────────────────────────────────────────── */
-export default function CarsClient({ initialBrand, initialBudget, initialSearch }) {
-  const [allCars,      setAllCars]      = useState([])
+export default function CarsClient({ initialBrand, initialBudget, initialSearch, initialVehicles = null }) {
+  const [allCars,      setAllCars]      = useState(() => initialVehicles ? initialVehicles.map(mapVehicle) : [])
   const [brandLogos,   setBrandLogos]   = useState({})
-  const [loading,      setLoading]      = useState(true)
+  const [loading,      setLoading]      = useState(!initialVehicles)
   const [showDrawer,   setShowDrawer]   = useState(false)
   const [searchQ,      setSearchQ]      = useState(initialSearch || '')
   const [sort,         setSort]         = useState('featured')
@@ -190,22 +190,33 @@ export default function CarsClient({ initialBrand, initialBudget, initialSearch 
   })
 
   useEffect(() => {
-    /* fetch vehicles and brand logos in parallel */
-    Promise.all([
-      fetch('/api/vehicles?vehicleType=car&status=published&limit=200').then(r => r.json()),
-      fetch('/api/brands').then(r => r.json()),
-    ])
-      .then(([vehicleData, brandData]) => {
-        /* build slug→logo map */
+    if (initialVehicles) {
+      /* vehicles already loaded — only fetch brand logos */
+      fetch('/api/brands').then(r => r.json()).then(brandData => {
         const logoMap = {}
         for (const b of brandData.brands || []) {
           if (b.logo) logoMap[b.slug] = b.logo
         }
         setBrandLogos(logoMap)
-        setAllCars((vehicleData.vehicles || []).map(mapVehicle))
-      })
-      .catch(() => setAllCars([]))
-      .finally(() => setLoading(false))
+      }).catch(() => {})
+    } else {
+      /* fallback: fetch both vehicles and logos */
+      Promise.all([
+        fetch('/api/vehicles?vehicleType=car&status=published&limit=200').then(r => r.json()),
+        fetch('/api/brands').then(r => r.json()),
+      ])
+        .then(([vehicleData, brandData]) => {
+          const logoMap = {}
+          for (const b of brandData.brands || []) {
+            if (b.logo) logoMap[b.slug] = b.logo
+          }
+          setBrandLogos(logoMap)
+          setAllCars((vehicleData.vehicles || []).map(mapVehicle))
+        })
+        .catch(() => setAllCars([]))
+        .finally(() => setLoading(false))
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   /* brands available in current data */

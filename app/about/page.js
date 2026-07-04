@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { SITE_URL } from "../layout";
 
 export const metadata = {
@@ -24,24 +25,28 @@ export const metadata = {
 const team = [
   {
     name: "Rahul Sharma",
+    slug: "rahul-sharma",
     role: "Editor-in-Chief",
     bio: "10+ years covering automotive industry. EV enthusiast and Tata Nexon EV owner.",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop",
   },
   {
     name: "Priya Menon",
+    slug: "priya-menon",
     role: "Senior Auto Journalist",
     bio: "Former CarWale and AutoX journalist. Specializes in EV reviews and long-distance EV road trips.",
     image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?q=80&w=400&auto=format&fit=crop",
   },
   {
     name: "Vikram Singh",
+    slug: "vikram-singh",
     role: "Two-Wheeler Editor",
     bio: "Lifelong biker turned EV convert. Tests every electric scooter and motorcycle that launches in India.",
     image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400&auto=format&fit=crop",
   },
   {
     name: "Deepika Nair",
+    slug: "deepika-nair",
     role: "Business & Policy Reporter",
     bio: "MBA from IIM Bangalore. Covers EV industry news, government policies, and investment trends.",
     image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=400&auto=format&fit=crop",
@@ -77,6 +82,12 @@ const aboutJsonLd = {
     "https://www.instagram.com/evnewsindia",
     "https://www.youtube.com/@EVNewsIndia",
   ],
+  member: team.map(m => ({
+    "@type": "Person",
+    name: m.name,
+    jobTitle: m.role,
+    url: `${SITE_URL}/authors/${m.slug}`,
+  })),
 };
 
 export default function AboutPage() {
@@ -158,14 +169,14 @@ export default function AboutPage() {
         <h2 className="mt-16 text-3xl font-black text-gray-900">Our Team</h2>
         <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {team.map((member) => (
-            <div key={member.name} className="text-center">
+            <Link key={member.name} href={`/authors/${member.slug}`} className="group text-center block">
               <div className="relative mx-auto h-24 w-24 overflow-hidden rounded-full">
                 <Image src={member.image} alt={member.name} fill className="object-cover" sizes="96px" />
               </div>
-              <h3 className="mt-3 font-bold text-gray-900">{member.name}</h3>
+              <h3 className="mt-3 font-bold text-gray-900 group-hover:text-green-700 transition">{member.name}</h3>
               <p className="text-sm font-medium text-green-600">{member.role}</p>
               <p className="mt-2 text-sm text-gray-500">{member.bio}</p>
-            </div>
+            </Link>
           ))}
         </div>
 

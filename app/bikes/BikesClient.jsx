@@ -165,10 +165,10 @@ function CheckGroup({ items, values, onChange }) {
 }
 
 /* ─── Main ────────────────────────────────────────────────────────── */
-export default function BikesClient({ initialBrand, initialBudget, initialSearch }) {
-  const [allBikes,   setAllBikes]   = useState([])
+export default function BikesClient({ initialBrand, initialBudget, initialSearch, initialVehicles = null }) {
+  const [allBikes,   setAllBikes]   = useState(() => initialVehicles ? initialVehicles.map(mapVehicle) : [])
   const [brandLogos, setBrandLogos] = useState({})
-  const [loading,    setLoading]    = useState(true)
+  const [loading,    setLoading]    = useState(!initialVehicles)
   const [showDrawer, setShowDrawer] = useState(false)
   const [searchQ,    setSearchQ]    = useState(initialSearch || '')
   const [sort,       setSort]       = useState('featured')
@@ -180,20 +180,31 @@ export default function BikesClient({ initialBrand, initialBudget, initialSearch
   })
 
   useEffect(() => {
-    Promise.all([
-      fetch('/api/vehicles?vehicleType=bike&status=published&limit=200').then(r => r.json()),
-      fetch('/api/brands').then(r => r.json()),
-    ])
-      .then(([vehicleData, brandData]) => {
+    if (initialVehicles) {
+      fetch('/api/brands').then(r => r.json()).then(brandData => {
         const logoMap = {}
         for (const b of brandData.brands || []) {
           if (b.logo) logoMap[b.slug] = b.logo
         }
         setBrandLogos(logoMap)
-        setAllBikes((vehicleData.vehicles || []).map(mapVehicle))
-      })
-      .catch(() => setAllBikes([]))
-      .finally(() => setLoading(false))
+      }).catch(() => {})
+    } else {
+      Promise.all([
+        fetch('/api/vehicles?vehicleType=bike&status=published&limit=200').then(r => r.json()),
+        fetch('/api/brands').then(r => r.json()),
+      ])
+        .then(([vehicleData, brandData]) => {
+          const logoMap = {}
+          for (const b of brandData.brands || []) {
+            if (b.logo) logoMap[b.slug] = b.logo
+          }
+          setBrandLogos(logoMap)
+          setAllBikes((vehicleData.vehicles || []).map(mapVehicle))
+        })
+        .catch(() => setAllBikes([]))
+        .finally(() => setLoading(false))
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const availableBrands = useMemo(

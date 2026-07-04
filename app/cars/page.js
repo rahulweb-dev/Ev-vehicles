@@ -7,6 +7,42 @@ import CarsClient from "./CarsClient";
 
 export const dynamic = "force-dynamic";
 
+async function getInitialCars() {
+  try {
+    const dbConnect = (await import("@/lib/mongodb")).default;
+    const Vehicle   = (await import("@/lib/models/Vehicle")).default;
+    await dbConnect();
+    const vehicles = await Vehicle.find({ status: "published", vehicleType: "car" })
+      .select("slug name brand featuredImage variants performance featured category colors")
+      .sort({ featured: -1, name: 1 })
+      .lean();
+    return vehicles.map(v => ({
+      slug:         v.slug,
+      name:         v.name,
+      brand:        v.brand,
+      featuredImage: v.featuredImage || null,
+      variants:     (v.variants || []).map(vr => ({
+        exShowroomPrice: vr.exShowroomPrice || null,
+        range:           vr.range           || null,
+        batteryCapacity: vr.batteryCapacity || null,
+      })),
+      performance:  {
+        drivingRange:     v.performance?.drivingRange     || null,
+        batteryCapacity:  v.performance?.batteryCapacity  || null,
+        power:            v.performance?.power            || null,
+        topSpeed:         v.performance?.topSpeed         || null,
+      },
+      featured:  !!v.featured,
+      category:  v.category  || "",
+      colors:    (v.colors   || []).map(c =>
+        typeof c === "string" ? { name: c, hex: "#888" } : { name: c.name || "", hex: c.hexCode || "#888" }
+      ),
+    }));
+  } catch {
+    return [];
+  }
+}
+
 export const metadata = {
   title: "Electric Cars in India 2026 – Price, Range & Specs | EV News India",
   description:
@@ -32,6 +68,8 @@ export default async function CarsPage({ searchParams }) {
   const brand  = sp?.brand  || null;
   const budget = sp?.budget || null;
   const search = sp?.search || null;
+
+  const initialCars = await getInitialCars();
 
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
@@ -95,6 +133,7 @@ export default async function CarsPage({ searchParams }) {
               initialBrand={brand}
               initialBudget={budget}
               initialSearch={search}
+              initialVehicles={initialCars}
             />
           </div>
 

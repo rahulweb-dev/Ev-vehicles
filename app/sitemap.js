@@ -6,29 +6,29 @@ const STATIC_PAGES = [
   { url: `${SITE_URL}/cars`,                          priority: 0.9,  freq: "daily"   },
   { url: `${SITE_URL}/bikes`,                         priority: 0.9,  freq: "daily"   },
   { url: `${SITE_URL}/compare`,                       priority: 0.85, freq: "weekly"  },
-  { url: `${SITE_URL}/faq`,                           priority: 0.7,  freq: "monthly" },
+  { url: `${SITE_URL}/faq`,                           priority: 0.7,  freq: "monthly", since: "2024-06-01" },
   { url: `${SITE_URL}/commercial`,                    priority: 0.75, freq: "daily"   },
   { url: `${SITE_URL}/electric-vehicles`,             priority: 0.75, freq: "daily"   },
   { url: `${SITE_URL}/blogs`,                         priority: 0.8,  freq: "weekly"  },
-  { url: `${SITE_URL}/brands`,                         priority: 0.7,  freq: "weekly"  },
+  { url: `${SITE_URL}/brands`,                        priority: 0.7,  freq: "weekly"  },
   { url: `${SITE_URL}/authors`,                       priority: 0.6,  freq: "weekly"  },
-  { url: `${SITE_URL}/about`,                         priority: 0.5,  freq: "monthly" },
-  { url: `${SITE_URL}/contact`,                       priority: 0.5,  freq: "monthly" },
-  { url: `${SITE_URL}/privacy-policy`,                priority: 0.3,  freq: "yearly"  },
-  { url: `${SITE_URL}/terms-and-conditions`,          priority: 0.3,  freq: "yearly"  },
+  { url: `${SITE_URL}/about`,                         priority: 0.5,  freq: "monthly", since: "2025-01-01" },
+  { url: `${SITE_URL}/contact`,                       priority: 0.5,  freq: "monthly", since: "2025-01-01" },
+  { url: `${SITE_URL}/privacy-policy`,                priority: 0.3,  freq: "yearly",  since: "2024-01-01" },
+  { url: `${SITE_URL}/terms-and-conditions`,          priority: 0.3,  freq: "yearly",  since: "2024-01-01" },
   /* High-traffic guide pages */
   { url: `${SITE_URL}/best-electric-cars-india-2026`, priority: 0.92, freq: "weekly"  },
   { url: `${SITE_URL}/upcoming-electric-cars-india`,  priority: 0.9,  freq: "weekly"  },
   { url: `${SITE_URL}/electric-cars-under-10-lakh`,   priority: 0.9,  freq: "weekly"  },
-  { url: `${SITE_URL}/ev-charging-guide`,             priority: 0.85, freq: "monthly" },
-  { url: `${SITE_URL}/government-ev-policy-india`,    priority: 0.8,  freq: "monthly" },
-  { url: `${SITE_URL}/ev-glossary`,                   priority: 0.82, freq: "monthly" },
+  { url: `${SITE_URL}/ev-charging-guide`,             priority: 0.85, freq: "monthly", since: "2025-03-01" },
+  { url: `${SITE_URL}/government-ev-policy-india`,    priority: 0.8,  freq: "monthly", since: "2025-03-01" },
+  { url: `${SITE_URL}/ev-glossary`,                   priority: 0.82, freq: "monthly", since: "2025-04-01" },
   /* Interactive tools */
-  { url: `${SITE_URL}/range-calculator`,              priority: 0.8,  freq: "monthly" },
-  { url: `${SITE_URL}/resale-calculator`,             priority: 0.78, freq: "monthly" },
-  { url: `${SITE_URL}/subsidy-calculator`,            priority: 0.8,  freq: "monthly" },
-  { url: `${SITE_URL}/ev-quiz`,                       priority: 0.75, freq: "monthly" },
-  { url: `${SITE_URL}/ev-savings-calculator`,         priority: 0.75, freq: "monthly" },
+  { url: `${SITE_URL}/range-calculator`,              priority: 0.8,  freq: "monthly", since: "2025-01-01" },
+  { url: `${SITE_URL}/resale-calculator`,             priority: 0.78, freq: "monthly", since: "2025-01-01" },
+  { url: `${SITE_URL}/subsidy-calculator`,            priority: 0.8,  freq: "monthly", since: "2025-01-01" },
+  { url: `${SITE_URL}/ev-quiz`,                       priority: 0.75, freq: "monthly", since: "2025-01-01" },
+  { url: `${SITE_URL}/ev-savings-calculator`,         priority: 0.75, freq: "monthly", since: "2025-01-01" },
   { url: `${SITE_URL}/charging-stations`,             priority: 0.78, freq: "weekly"  },
   { url: `${SITE_URL}/subsidies`,                     priority: 0.78, freq: "weekly"  },
 ];
@@ -55,10 +55,10 @@ async function getDbEntries() {
 
     const [articles, vehicles, blogs] = await Promise.all([
       Article.find({ status: "published" })
-        .select("slug publishedAt updatedAt author tags")
+        .select("slug publishedAt updatedAt author tags image")
         .lean(),
       Vehicle.find({ status: "published" })
-        .select("slug vehicleType brand updatedAt featured")
+        .select("slug vehicleType brand updatedAt featured featuredImage name")
         .lean(),
       Blog.find({ status: "published" })
         .select("slug publishedAt updatedAt featured")
@@ -71,6 +71,7 @@ async function getDbEntries() {
       lastModified:    a.publishedAt || a.updatedAt || new Date(),
       changeFrequency: "weekly",
       priority:        0.8,
+      ...(a.image && { images: [a.image] }),
     }));
 
     /* ── Vehicle detail pages ─────────────────────────────────────── */
@@ -79,6 +80,7 @@ async function getDbEntries() {
       lastModified:    v.updatedAt || new Date(),
       changeFrequency: "monthly",
       priority:        v.featured ? 0.85 : 0.75,
+      ...(v.featuredImage && { images: [v.featuredImage] }),
     }));
 
     /* ── Author archive pages ─────────────────────────────────────── */
@@ -123,16 +125,17 @@ async function getDbEntries() {
      * manually to STATIC_PAGES above (e.g. nexon-ev-vs-punch-ev).
      */
 
-    /* ── City price pages — top 5 cities only ────────────────────── */
-    const carSlugs = vehicles.filter(v => v.vehicleType === "car").map(v => v.slug);
-    const cityPriceUrls = carSlugs.flatMap(slug =>
-      TOP_CITIES.map(city => ({
-        url:             `${SITE_URL}/cars/${slug}/price-in-${city}`,
-        lastModified:    new Date(),
-        changeFrequency: "monthly",
-        priority:        0.7,
-      }))
-    );
+    /* ── City price pages — inherit vehicle's updatedAt ──────────── */
+    const cityPriceUrls = vehicles
+      .filter(v => v.vehicleType === "car")
+      .flatMap(v =>
+        TOP_CITIES.map(city => ({
+          url:             `${SITE_URL}/cars/${v.slug}/price-in-${city}`,
+          lastModified:    v.updatedAt || new Date(),
+          changeFrequency: "monthly",
+          priority:        0.7,
+        }))
+      );
 
     /* ── Blog pages ──────────────────────────────────────────────── */
     const blogUrls = blogs.map(b => ({
@@ -153,7 +156,7 @@ export default async function sitemap() {
 
   const staticEntries = STATIC_PAGES.map(p => ({
     url:             p.url,
-    lastModified:    new Date(),
+    lastModified:    p.since ? new Date(p.since) : new Date(),
     changeFrequency: p.freq,
     priority:        p.priority,
   }));

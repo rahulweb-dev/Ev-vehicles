@@ -78,8 +78,12 @@ export default async function AuthorPage({ params }) {
     ...(profile?.photo && { image: profile.photo }),
     ...(profile?.title && { jobTitle: profile.title }),
     ...(profile?.bio   && { description: profile.bio }),
-    ...(profile?.twitter  && { sameAs: [`https://twitter.com/${profile.twitter.replace("@", "")}`] }),
-    ...(profile?.linkedin && { sameAs: [profile.linkedin] }),
+    ...((profile?.twitter || profile?.linkedin) && {
+      sameAs: [
+        profile?.twitter && `https://twitter.com/${profile.twitter.replace("@", "")}`,
+        profile?.linkedin,
+      ].filter(Boolean),
+    }),
     worksFor: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
     knowsAbout: profile?.expertise?.length ? profile.expertise : ["Electric Vehicles", "EV News India"],
   };
