@@ -5,19 +5,25 @@ import CityPriceClient  from "./CityPriceClient";
 export const revalidate = 86400;
 
 const CITIES = [
-  { slug: "mumbai",    name: "Mumbai",    state: "Maharashtra", rto: "MH",  regPct: 0.11, tax: 0 },
-  { slug: "delhi",     name: "Delhi",     state: "Delhi",       rto: "DL",  regPct: 0.04, tax: 0 },
-  { slug: "bangalore", name: "Bangalore", state: "Karnataka",   rto: "KA",  regPct: 0.13, tax: 0 },
-  { slug: "hyderabad", name: "Hyderabad", state: "Telangana",   rto: "TS",  regPct: 0.09, tax: 0 },
-  { slug: "chennai",   name: "Chennai",   state: "Tamil Nadu",  rto: "TN",  regPct: 0.10, tax: 0 },
-  { slug: "pune",      name: "Pune",      state: "Maharashtra", rto: "MH",  regPct: 0.11, tax: 0 },
-  { slug: "ahmedabad", name: "Ahmedabad", state: "Gujarat",     rto: "GJ",  regPct: 0.06, tax: 0 },
-  { slug: "kolkata",   name: "Kolkata",   state: "West Bengal", rto: "WB",  regPct: 0.07, tax: 0 },
-  { slug: "jaipur",    name: "Jaipur",    state: "Rajasthan",   rto: "RJ",  regPct: 0.09, tax: 0 },
-  { slug: "lucknow",   name: "Lucknow",   state: "Uttar Pradesh", rto: "UP", regPct: 0.08, tax: 0 },
-  { slug: "chandigarh",name: "Chandigarh",state: "Chandigarh",  rto: "CH",  regPct: 0.06, tax: 0 },
-  { slug: "bhopal",    name: "Bhopal",    state: "Madhya Pradesh", rto: "MP", regPct: 0.08, tax: 0 },
+  { slug: "mumbai",     name: "Mumbai",     state: "Maharashtra",    rto: "MH", regPct: 0.11, tax: 0 },
+  { slug: "delhi",      name: "Delhi",      state: "Delhi",          rto: "DL", regPct: 0.04, tax: 0 },
+  { slug: "bangalore",  name: "Bangalore",  state: "Karnataka",      rto: "KA", regPct: 0.13, tax: 0 },
+  { slug: "hyderabad",  name: "Hyderabad",  state: "Telangana",      rto: "TS", regPct: 0.09, tax: 0 },
+  { slug: "chennai",    name: "Chennai",    state: "Tamil Nadu",     rto: "TN", regPct: 0.10, tax: 0 },
+  { slug: "pune",       name: "Pune",       state: "Maharashtra",    rto: "MH", regPct: 0.11, tax: 0 },
+  { slug: "ahmedabad",  name: "Ahmedabad",  state: "Gujarat",        rto: "GJ", regPct: 0.06, tax: 0 },
+  { slug: "kolkata",    name: "Kolkata",    state: "West Bengal",    rto: "WB", regPct: 0.07, tax: 0 },
+  { slug: "jaipur",     name: "Jaipur",     state: "Rajasthan",      rto: "RJ", regPct: 0.09, tax: 0 },
+  { slug: "lucknow",    name: "Lucknow",    state: "Uttar Pradesh",  rto: "UP", regPct: 0.08, tax: 0 },
+  { slug: "chandigarh", name: "Chandigarh", state: "Chandigarh",     rto: "CH", regPct: 0.06, tax: 0 },
+  { slug: "bhopal",     name: "Bhopal",     state: "Madhya Pradesh", rto: "MP", regPct: 0.08, tax: 0 },
 ];
+
+// NOTE: folder is [city] so params.city = full URL segment e.g. "price-in-mumbai"
+// Strip the "price-in-" prefix to get the city slug for CITIES lookup
+function parseCitySlug(raw) {
+  return (raw || "").replace(/^price-in-/, "");
+}
 
 export async function generateStaticParams() {
   try {
@@ -25,7 +31,9 @@ export async function generateStaticParams() {
     const Vehicle   = (await import("@/lib/models/Vehicle")).default;
     await dbConnect();
     const vehicles = await Vehicle.find({ vehicleType: "car", status: "published" }).select("slug").lean();
-    return vehicles.flatMap(v => CITIES.map(c => ({ slug: v.slug, city: c.slug })));
+    return vehicles.flatMap(v =>
+      CITIES.map(c => ({ slug: v.slug, city: `price-in-${c.slug}` }))
+    );
   } catch {
     return [];
   }
@@ -43,7 +51,8 @@ async function getVehicle(slug) {
 }
 
 export async function generateMetadata({ params }) {
-  const { slug, city } = await params;
+  const { slug, city: rawCity } = await params;
+  const city     = parseCitySlug(rawCity);
   const cityData = CITIES.find(c => c.slug === city);
   if (!cityData) return { title: "Not Found" };
 
@@ -79,16 +88,17 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function CityPricePage({ params }) {
-  const { slug, city } = await params;
+  const { slug, city: rawCity } = await params;
+  const city     = parseCitySlug(rawCity);
   const cityData = CITIES.find(c => c.slug === city);
   if (!cityData) notFound();
 
   const vehicle = await getVehicle(slug);
   if (!vehicle) notFound();
 
-  const year       = new Date().getFullYear();
-  const exNum      = parseInt((vehicle.variants?.[0]?.exShowroomPrice || "").replace(/[^0-9]/g, "")) || 0;
-  const onRoadNum  = exNum ? Math.round(exNum * (1 + cityData.regPct + 0.028 * 0.88 + 0.03)) : 0;
+  const year      = new Date().getFullYear();
+  const exNum     = parseInt((vehicle.variants?.[0]?.exShowroomPrice || "").replace(/[^0-9]/g, "")) || 0;
+  const onRoadNum = exNum ? Math.round(exNum * (1 + cityData.regPct + 0.028 * 0.88 + 0.03)) : 0;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -100,14 +110,14 @@ export default async function CityPricePage({ params }) {
     url:         `${SITE_URL}/cars/${slug}/price-in-${city}`,
     ...(onRoadNum && {
       offers: {
-        "@type":       "Offer",
-        priceCurrency: "INR",
-        price:         onRoadNum,
+        "@type":         "Offer",
+        priceCurrency:   "INR",
+        price:           onRoadNum,
         priceValidUntil: `${year}-12-31`,
-        availability:  "https://schema.org/InStock",
-        itemCondition: "https://schema.org/NewCondition",
-        url:           `${SITE_URL}/cars/${slug}/price-in-${city}`,
-        areaServed:    { "@type": "City", name: cityData.name },
+        availability:    "https://schema.org/InStock",
+        itemCondition:   "https://schema.org/NewCondition",
+        url:             `${SITE_URL}/cars/${slug}/price-in-${city}`,
+        areaServed:      { "@type": "City", name: cityData.name },
       },
     }),
   };
@@ -116,9 +126,9 @@ export default async function CityPricePage({ params }) {
     "@context": "https://schema.org",
     "@type":    "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home",                item: SITE_URL },
-      { "@type": "ListItem", position: 2, name: "Electric Cars",       item: `${SITE_URL}/cars` },
-      { "@type": "ListItem", position: 3, name: vehicle.name,          item: `${SITE_URL}/cars/${slug}` },
+      { "@type": "ListItem", position: 1, name: "Home",                     item: SITE_URL },
+      { "@type": "ListItem", position: 2, name: "Electric Cars",            item: `${SITE_URL}/cars` },
+      { "@type": "ListItem", position: 3, name: vehicle.name,               item: `${SITE_URL}/cars/${slug}` },
       { "@type": "ListItem", position: 4, name: `Price in ${cityData.name}`, item: `${SITE_URL}/cars/${slug}/price-in-${city}` },
     ],
   };

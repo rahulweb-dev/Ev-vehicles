@@ -171,21 +171,17 @@ export default function CityPriceClient({ vehicle, cityData, allCities }) {
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
             {allCities
               .filter(c => c.slug !== cityData.slug)
-              .map(c => {
-                const ex   = parsePrice(variant?.exShowroomPrice);
-                const onrd = ex ? Math.round(ex * (1 + c.regPct + INSURANCE_BASE * (1 - EV_INS_DISC) / ex + 0.03)) : null;
-                return (
-                  <Link key={c.slug}
-                    href={`/cars/${vehicle.slug}/price-in-${c.slug}`}
-                    className="flex items-center justify-between rounded-xl border border-gray-200 px-3 py-2.5 hover:border-green-400 transition">
-                    <div className="flex items-center gap-2">
-                      <MapPin size={12} className="text-gray-400" />
-                      <span className="text-xs font-semibold text-gray-800">{c.name}</span>
-                    </div>
-                    <ChevronRight size={12} className="text-gray-300" />
-                  </Link>
-                );
-              })}
+              .map(c => (
+                <Link key={c.slug}
+                  href={`/cars/${vehicle.slug}/price-in-${c.slug}`}
+                  className="flex items-center justify-between rounded-xl border border-gray-200 px-3 py-2.5 hover:border-green-400 transition">
+                  <div className="flex items-center gap-2">
+                    <MapPin size={12} className="text-gray-400" />
+                    <span className="text-xs font-semibold text-gray-800">{c.name}</span>
+                  </div>
+                  <ChevronRight size={12} className="text-gray-300" />
+                </Link>
+              ))}
           </div>
         </div>
 
