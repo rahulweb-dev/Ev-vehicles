@@ -61,7 +61,7 @@ export async function generateMetadata({ params }) {
   return {
     title:       car.metaTitle       || `${car.name} Price in India ${year} – Range, Specs & Colors`,
     description: car.metaDescription || `${car.name} electric car${price ? ` price starts at ${price} ex-showroom` : ""}${range ? `. ARAI range: ${range}` : ""}. Full specs, colors, and variants.`,
-    keywords:    car.keywords?.join(", "),
+    keywords:    car.keywords?.join(", ") || `${car.name} price india, ${car.name} on road price, ${car.name} range, ${car.name} specs, ${car.brand} electric car india, ${car.name} review`,
     alternates:  { canonical: car.canonicalUrl || `${SITE_URL}/cars/${slug}` },
     openGraph: {
       title:       car.ogTitle       || car.metaTitle       || `${car.name} – Price, Range & Specs`,

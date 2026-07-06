@@ -261,8 +261,24 @@ export default function BestElectricCars2026() {
     ],
   };
 
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: "Best Electric Cars in India 2026 – Top 10 EVs by Price, Range & Value",
+    description: "The definitive guide to the best electric cars in India 2026. Expert-ranked top EVs from ₹7 lakh to ₹70 lakh with pros, cons, and buying advice.",
+    url: `${SITE_URL}/best-electric-cars-india-2026`,
+    datePublished: "2026-01-01",
+    dateModified: "2026-07-01",
+    inLanguage: "en-IN",
+    author: { "@type": "Organization", name: "EV News India", url: SITE_URL },
+    publisher: { "@type": "Organization", "@id": `${SITE_URL}/#organization`, name: "EV News India", logo: { "@type": "ImageObject", url: `${SITE_URL}/images/logo.png` } },
+    about: { "@type": "Thing", name: "Best Electric Cars India 2026" },
+    speakable: { "@type": "SpeakableSpecification", cssSelector: ["h1"] },
+  };
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />

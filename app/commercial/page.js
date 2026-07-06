@@ -1,8 +1,32 @@
 import Link from "next/link";
+import Image from "next/image";
 import { AdBannerHorizontal } from "@/components/ads/AdBanner";
-import ArticlesFeed from "@/components/skeletons/ArticlesFeed";
 import { SITE_URL } from "../layout";
 import { Truck, Bus, Package, Zap, ChevronRight } from "lucide-react";
+
+async function getCommercialArticles() {
+  try {
+    const dbConnect = (await import("@/lib/mongodb")).default;
+    const Article   = (await import("@/lib/models/Article")).default;
+    await dbConnect();
+    const articles = await Article.find({ status: "published", category: "commercial" })
+      .sort({ publishedAt: -1 })
+      .limit(6)
+      .select("slug title excerpt image author readTime publishedAt")
+      .lean();
+    return articles.map(a => ({
+      slug:     a.slug,
+      title:    a.title,
+      excerpt:  a.excerpt || "",
+      image:    a.image || "",
+      author:   a.author || "EVRadar Team",
+      readTime: a.readTime || "5 min",
+      date:     a.publishedAt ? new Date(a.publishedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "",
+    }));
+  } catch {
+    return [];
+  }
+}
 
 export const revalidate = 60;
 
@@ -84,7 +108,8 @@ const commercialFaqJsonLd = {
   ],
 };
 
-export default function CommercialPage() {
+export default async function CommercialPage() {
+  const commercialArticles = await getCommercialArticles();
   return (
     <>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(commercialJsonLd) }} />
@@ -120,10 +145,38 @@ export default function CommercialPage() {
           ))}
         </div>
 
-        {/* Articles from DB */}
+        {/* Articles — SSR so Bing/Yahoo/Google can read them */}
         <div className="mt-12">
-          <h2 className="mb-6 text-2xl font-black text-gray-900">Latest Commercial EV News</h2>
-          <ArticlesFeed category="commercial" skeletonCount={6} />
+          <h2 className="mb-6 text-2xl font-black text-gray-900">Latest Commercial EV News India</h2>
+          {commercialArticles.length > 0 ? (
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {commercialArticles.map((article) => (
+                <Link key={article.slug} href={`/news/${article.slug}`} className="group block">
+                  <article className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
+                    {article.image && (
+                      <div className="relative h-44 overflow-hidden">
+                        <Image src={article.image} alt={article.title} fill
+                          className="object-cover transition duration-500 group-hover:scale-105"
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+                      </div>
+                    )}
+                    <div className="p-4">
+                      <h3 className="line-clamp-2 font-bold text-gray-900 group-hover:text-purple-700 transition text-sm leading-snug">{article.title}</h3>
+                      {article.excerpt && <p className="mt-1 line-clamp-2 text-xs text-gray-500">{article.excerpt}</p>}
+                      <p className="mt-2 text-xs text-gray-400">{article.readTime} · {article.date}</p>
+                    </div>
+                  </article>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500">No commercial EV news right now. Check back soon.</p>
+          )}
+          <div className="mt-5 text-center">
+            <Link href="/news?category=commercial" className="inline-flex items-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-5 py-2.5 text-sm font-semibold text-purple-700 hover:bg-purple-100 transition">
+              View all commercial EV news <ChevronRight size={16} />
+            </Link>
+          </div>
         </div>
       </div>
     </div>

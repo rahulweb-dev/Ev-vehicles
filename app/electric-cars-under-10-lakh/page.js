@@ -120,8 +120,24 @@ export default function ElectricCarsUnder10Lakh() {
     ],
   };
 
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: "Best Electric Cars Under ₹10 Lakh in India 2026 – Top Budget EVs",
+    description: "Find the best electric cars under 10 lakh in India 2026. Compare Tata Tiago EV, MG Comet EV and more.",
+    url: `${SITE_URL}/electric-cars-under-10-lakh`,
+    datePublished: "2026-01-01",
+    dateModified: "2026-07-01",
+    inLanguage: "en-IN",
+    author: { "@type": "Organization", name: "EV News India", url: SITE_URL },
+    publisher: { "@type": "Organization", "@id": `${SITE_URL}/#organization`, name: "EV News India", logo: { "@type": "ImageObject", url: `${SITE_URL}/images/logo.png` } },
+    about: { "@type": "Thing", name: "Budget Electric Cars India" },
+    speakable: { "@type": "SpeakableSpecification", cssSelector: ["h1"] },
+  };
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />

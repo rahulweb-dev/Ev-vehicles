@@ -250,8 +250,24 @@ export default function UpcomingEVsPage() {
     ],
   };
 
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: "Upcoming Electric Cars in India 2026–2027 – Launch Date, Price & Specs",
+    description: "Complete list of upcoming electric cars in India 2026 and 2027 with expected launch date, price, range and features.",
+    url: `${SITE_URL}/upcoming-electric-cars-india`,
+    datePublished: "2026-01-01",
+    dateModified: "2026-07-01",
+    inLanguage: "en-IN",
+    author: { "@type": "Organization", name: "EV News India", url: SITE_URL },
+    publisher: { "@type": "Organization", "@id": `${SITE_URL}/#organization`, name: "EV News India", logo: { "@type": "ImageObject", url: `${SITE_URL}/images/logo.png` } },
+    about: { "@type": "Thing", name: "Upcoming Electric Cars India 2026" },
+    speakable: { "@type": "SpeakableSpecification", cssSelector: ["h1"] },
+  };
+
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       {vehicleJsonLd.map((j, i) => (
         <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(j) }} />
       ))}

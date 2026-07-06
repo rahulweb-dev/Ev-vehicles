@@ -47,6 +47,7 @@ export const metadata = {
   title: "Electric Cars in India 2026 – Price, Range & Specs | EV News India",
   description:
     "Compare all electric cars in India 2026. Filter by budget, brand, range and battery. Check specs, colors and latest news for Tata, Mahindra, Hyundai, BYD, Kia EVs.",
+  keywords: "electric cars india 2026, electric car price india, best electric car india, tata nexon ev price, mahindra be6, hyundai creta electric, ev range india, electric suv india",
   alternates: { canonical: `${SITE_URL}/cars` },
   openGraph: {
     title: "Electric Cars in India 2026 – Price, Range & Specs",
