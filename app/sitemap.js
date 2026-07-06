@@ -17,9 +17,10 @@ const STATIC_PAGES = [
   { url: `${SITE_URL}/privacy-policy`,                priority: 0.3,  freq: "yearly",  since: "2024-01-01" },
   { url: `${SITE_URL}/terms-and-conditions`,          priority: 0.3,  freq: "yearly",  since: "2024-01-01" },
   /* High-traffic guide pages */
-  { url: `${SITE_URL}/best-electric-cars-india-2026`, priority: 0.92, freq: "weekly"  },
-  { url: `${SITE_URL}/upcoming-electric-cars-india`,  priority: 0.9,  freq: "weekly"  },
-  { url: `${SITE_URL}/electric-cars-under-10-lakh`,   priority: 0.9,  freq: "weekly"  },
+  { url: `${SITE_URL}/best-electric-cars-india-2026`,  priority: 0.92, freq: "weekly"  },
+  { url: `${SITE_URL}/best-electric-bikes-india-2026`, priority: 0.92, freq: "weekly"  },
+  { url: `${SITE_URL}/upcoming-electric-cars-india`,   priority: 0.9,  freq: "weekly"  },
+  { url: `${SITE_URL}/electric-cars-under-10-lakh`,    priority: 0.9,  freq: "weekly"  },
   { url: `${SITE_URL}/ev-charging-guide`,             priority: 0.85, freq: "monthly", since: "2025-03-01" },
   { url: `${SITE_URL}/government-ev-policy-india`,    priority: 0.8,  freq: "monthly", since: "2025-03-01" },
   { url: `${SITE_URL}/ev-glossary`,                   priority: 0.82, freq: "monthly", since: "2025-04-01" },

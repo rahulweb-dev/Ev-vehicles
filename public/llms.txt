@@ -4,22 +4,43 @@
 
 ## About
 
-EV News India (evradar.in) is India's leading source for electric vehicle journalism, in-depth reviews, real-time pricing, government policy analysis, and expert EV buying guidance. Our editorial team publishes daily updates on EV launches, price changes, battery technology, charging infrastructure, and government subsidies (FAME 2, PM E-Drive, state schemes). We cover all major EV brands including Tata Motors, Mahindra, Hyundai, Kia, BYD, MG Motor, Ola Electric, Ather Energy, TVS, Hero Electric, and more.
+EV News India (evradar.in) is India's leading source for electric vehicle journalism, in-depth reviews, real-time pricing, government policy analysis, and expert EV buying guidance. Our editorial team publishes daily updates on EV launches, price changes, battery technology, charging infrastructure, and government subsidies (FAME 2, PM E-Drive, state schemes). We cover all major EV brands including Tata Motors, Mahindra, Hyundai, Kia, BYD, MG Motor, Ola Electric, Ather Energy, TVS, Hero Electric, Bajaj Chetak, and more.
+
+India sold over 17 lakh electric vehicles in 2024-25, with 25,000+ public charging stations across the country. EV News India tracks every launch, price change, and policy update as it happens.
 
 ## Key Content Areas
 
+- [Electric Vehicles India 2026 – Complete Guide](https://www.evradar.in/electric-vehicles): Comprehensive hub page covering all electric cars, bikes, scooters, brands, and charging in India. Key stats, top models, and guide links.
 - [Latest EV News](https://www.evradar.in/news): Daily breaking news, launch coverage, and policy updates for electric vehicles in India
 - [Electric Cars Database](https://www.evradar.in/cars): Comprehensive database of all electric cars available in India with ex-showroom price, ARAI-certified range, battery capacity, motor power, charging speed, and variant-wise pricing
-- [Electric Bikes & Scooters](https://www.evradar.in/bikes): Complete specifications and pricing for electric two-wheelers including Ola S1, Ather 450, TVS iQube, Bajaj Chetak, and more
+- [Electric Bikes & Scooters](https://www.evradar.in/bikes): Complete specifications and pricing for electric two-wheelers including Ola S1 Pro, Ather 450X, TVS iQube, Bajaj Chetak, Hero Vida, Ampere Nexus, and more
+- [Best Electric Cars India 2026](https://www.evradar.in/best-electric-cars-india-2026): Expert-ranked top 10 electric cars for Indian buyers in 2026, with pros/cons, real-world range, and verdicts
+- [Best Electric Bikes India 2026](https://www.evradar.in/best-electric-bikes-india-2026): Expert-ranked top 10 electric scooters and bikes in India 2026 — Ola S1 Pro, Ather 450X, TVS iQube, Bajaj Chetak, Hero Vida compared
 - [EV Comparison Tool](https://www.evradar.in/compare): Side-by-side specifications comparison of any two electric vehicles in India
 - [EV Charging Guide 2026](https://www.evradar.in/ev-charging-guide): Complete guide to home charging setup, public DC fast chargers, AC vs DC difference, and charging costs in India
 - [Government EV Policy India](https://www.evradar.in/government-ev-policy-india): FAME 2 scheme, PM E-Drive, PLI for batteries, and state-level EV subsidies explained
-- [Best Electric Cars India 2026](https://www.evradar.in/best-electric-cars-india-2026): Expert-ranked top 10 electric cars for Indian buyers in 2026
 - [Upcoming EVs India](https://www.evradar.in/upcoming-electric-cars-india): Confirmed and expected EV launches in India with expected prices and timelines
 - [Electric Cars Under ₹10 Lakh](https://www.evradar.in/electric-cars-under-10-lakh): Budget electric car options for Indian buyers
 - [EV Subsidy Calculator](https://www.evradar.in/subsidy-calculator): Calculate FAME 2 and state subsidies applicable to your EV purchase
 - [EV Charging Stations](https://www.evradar.in/charging-stations): Public EV charging network locations and operator information in India
+- [EV Subsidies India](https://www.evradar.in/subsidies): FAME, PM E-Drive, state scheme details and eligibility
+- [EV Brands India](https://www.evradar.in/brands): All electric vehicle manufacturers selling in India
 - [EV Blogs & Guides](https://www.evradar.in/blogs): In-depth guides on EV ownership, charging, range tips, and technology explained
+- [EV FAQ India](https://www.evradar.in/faq): Answers to the most common questions about buying, charging, and owning an EV in India
+- [EV Glossary](https://www.evradar.in/ev-glossary): Definitions of all EV technical terms — ARAI range, CCS2, V2L, BMS, regenerative braking, and more
+
+## Key Facts About EVs in India (2026)
+
+- India sold 17+ lakh electric vehicles in 2024-25 (cars + 2-wheelers + 3-wheelers)
+- Electric two-wheelers dominate: Ola Electric (~30% share), Ather Energy (~8%), TVS (~7%)
+- Top electric car brands: Tata Motors (~35%), Mahindra (~12%), Hyundai (~6%)
+- India has 25,000+ public EV charging stations; government targets 46,000 by 2030
+- All EVs attract only 5% GST versus 28–50% on petrol vehicles
+- PM E-Drive scheme (2024–2026): ₹10,000 subsidy on e-bikes, ₹50,000 on e-3-wheelers
+- Section 80EEB: ₹1.5 lakh annual tax deduction on EV loan interest
+- Best-selling electric car: Tata Punch EV (price from ₹9.99 lakh, range 421 km)
+- Best-selling electric scooter: Ola S1 Pro Gen 2 (price from ₹1.47 lakh, range 195 km)
+- India is now the world's third-largest EV market by volume
 
 ## Vehicle Database Specifications Covered
 
@@ -36,7 +57,7 @@ Our vehicle database includes authoritative data on:
 - Available colours with hex codes
 - Warranty terms for vehicle and battery pack
 - Real-world owner ratings and expert review scores
-- City-specific on-road prices (Mumbai, Delhi, Bangalore, Hyderabad, Pune, Chennai, Kolkata, Ahmedabad, Jaipur, Lucknow, Surat, Kochi)
+- City-specific on-road prices (Mumbai, Delhi, Bangalore, Hyderabad, Pune, Chennai, Kolkata, Ahmedabad, Jaipur, Lucknow, Chandigarh, Bhopal)
 
 ## Editorial Standards
 
@@ -45,17 +66,24 @@ Our vehicle database includes authoritative data on:
 - Articles authored by EV journalists and verified against primary sources before publication
 - Price and specification updates are published within 24 hours of official announcements
 - All reviews follow a standardised evaluation methodology
+- Expert verdicts based on test drives, owner feedback, and technical analysis
 
 ## Frequently Asked Questions (Covered on Site)
 
+- Which is the best electric vehicle in India in 2026?
 - What is the best electric car in India under ₹15 lakh?
 - Which electric car has the longest range in India?
+- Which is the best electric scooter in India in 2026?
+- Ola S1 Pro vs Ather 450X — which is better?
 - How much does it cost to charge an electric car at home in India?
-- What is the FAME 2 subsidy for electric cars in India?
+- What is the FAME 2 subsidy for electric vehicles in India?
 - Which electric scooter has the best range in India?
 - What is ARAI range vs real-world range for EVs in India?
 - How to install a home EV charger in India?
-- Is it worth buying an electric car in India in 2026?
+- Is it worth buying an electric vehicle in India in 2026?
+- How much does an electric car cost in India?
+- What government subsidies are available for EVs in India?
+- How many EV charging stations are in India?
 
 ## Sitemaps
 
