@@ -383,13 +383,62 @@ export default async function ComparePairPage({ params }) {
             </div>
           )}
 
+          {/* Editorial verdict — unique text per pair for Google indexing */}
+          <div className="rounded-2xl bg-white border border-gray-200 shadow-sm p-6 space-y-4">
+            <h2 className="text-lg font-black text-gray-900">
+              {vA.name} vs {vB.name} — Which EV Should You Buy?
+            </h2>
+            <p className="text-sm text-gray-700 leading-relaxed">
+              The <strong>{vA.name}</strong> by {vA.brand} and the <strong>{vB.name}</strong> by {vB.brand} are both
+              compelling electric vehicles available in India in {year}. Here is how they compare across the key buying
+              criteria Indian EV buyers care about most.
+            </p>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="rounded-xl bg-green-50 border border-green-100 p-4">
+                <p className="text-xs font-bold uppercase tracking-wider text-green-700 mb-2">{vA.name}</p>
+                <ul className="space-y-1 text-sm text-gray-700">
+                  <li><strong>Starting price:</strong> {vA.variants?.[0]?.exShowroomPrice || "TBA"} (ex-showroom)</li>
+                  {vA.performance?.drivingRange && <li><strong>Certified range:</strong> {vA.performance.drivingRange}</li>}
+                  {vA.performance?.batteryCapacity && <li><strong>Battery:</strong> {vA.performance.batteryCapacity}</li>}
+                  {vA.performance?.power && <li><strong>Motor power:</strong> {vA.performance.power}</li>}
+                  {vA.variants?.length > 1 && <li><strong>Variants:</strong> {vA.variants.length} options available</li>}
+                </ul>
+              </div>
+              <div className="rounded-xl bg-blue-50 border border-blue-100 p-4">
+                <p className="text-xs font-bold uppercase tracking-wider text-blue-700 mb-2">{vB.name}</p>
+                <ul className="space-y-1 text-sm text-gray-700">
+                  <li><strong>Starting price:</strong> {vB.variants?.[0]?.exShowroomPrice || "TBA"} (ex-showroom)</li>
+                  {vB.performance?.drivingRange && <li><strong>Certified range:</strong> {vB.performance.drivingRange}</li>}
+                  {vB.performance?.batteryCapacity && <li><strong>Battery:</strong> {vB.performance.batteryCapacity}</li>}
+                  {vB.performance?.power && <li><strong>Motor power:</strong> {vB.performance.power}</li>}
+                  {vB.variants?.length > 1 && <li><strong>Variants:</strong> {vB.variants.length} options available</li>}
+                </ul>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 leading-relaxed">
+              Both the {vA.name} and {vB.name} are eligible for state EV subsidies under India&apos;s PM E-Drive scheme.
+              Check the on-road price in your city using the links above before making a final decision. For the most
+              current prices and availability, contact your nearest authorised {vA.brand} and {vB.brand} dealership.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Link href={`/${vA.vehicleType === "car" ? "cars" : "bikes"}/${vA.slug}`}
+                className="rounded-xl bg-green-600 px-4 py-2 text-xs font-bold text-white hover:bg-green-700 transition">
+                Full {vA.name} Details →
+              </Link>
+              <Link href={`/${vB.vehicleType === "car" ? "cars" : "bikes"}/${vB.slug}`}
+                className="rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-700 transition">
+                Full {vB.name} Details →
+              </Link>
+            </div>
+          </div>
+
           {/* Compare another CTA */}
           <div className="rounded-2xl bg-gray-900 p-6 text-center">
             <p className="text-base font-bold text-white">Compare more EVs</p>
-            <p className="mt-1 text-sm text-gray-400">Add a third vehicle or try a different combination</p>
-            <Link href={`/compare?v0=${vA.slug}&v1=${vB.slug}`}
+            <p className="mt-1 text-sm text-gray-400">Try a different combination</p>
+            <Link href="/compare" rel="nofollow"
               className="mt-4 inline-flex items-center gap-2 rounded-full bg-green-600 px-6 py-2.5 text-sm font-bold text-white hover:bg-green-700 transition">
-              Open Full Compare Tool →
+              Open Compare Tool →
             </Link>
           </div>
 

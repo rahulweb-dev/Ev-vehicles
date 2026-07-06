@@ -2,7 +2,17 @@ export default function robots() {
   return {
     rules: [
       // All crawlers: allow public content, block internal/private paths
-      { userAgent: "*", allow: "/", disallow: ["/admin", "/api/", "/saved", "/offline"] },
+      {
+        userAgent: "*",
+        allow: "/",
+        disallow: [
+          "/admin",
+          "/api/",
+          "/saved",
+          "/offline",
+          "/compare?",   // query-param compare URLs — clean /compare/[slug] is indexed instead
+        ],
+      },
 
       // ── Citation & retrieval bots (ALLOW) ──────────────────────────
       // These bots retrieve your content to cite it in AI-generated answers.
