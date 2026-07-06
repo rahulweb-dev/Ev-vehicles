@@ -206,7 +206,7 @@ export default async function ArticlePage({ params }) {
                 <ChevronRight size={14} />
                 <Link href="/news" className="hover:text-green-600">News</Link>
                 <ChevronRight size={14} />
-                <span className="capitalize text-green-600">{article.category}</span>
+                <Link href={`/news?category=${article.category}`} className="capitalize text-green-600 hover:text-green-800">{article.category}</Link>
               </nav>
 
               <header>

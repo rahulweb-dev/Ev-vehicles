@@ -17,7 +17,7 @@ export async function GET() {
     const recent = await Article.find({ status: "published", publishedAt: { $gte: twoDaysAgo } })
       .sort({ publishedAt: -1 })
       .limit(100)
-      .select("slug title publishedAt tags")
+      .select("slug title publishedAt tags image")
       .lean();
 
     if (recent.length >= 5) {
@@ -27,7 +27,7 @@ export async function GET() {
       articles = await Article.find({ status: "published" })
         .sort({ publishedAt: -1 })
         .limit(50)
-        .select("slug title publishedAt tags")
+        .select("slug title publishedAt tags image")
         .lean();
     }
   } catch {
@@ -48,7 +48,7 @@ export async function GET() {
       </news:publication>
       <news:publication_date>${pubDate}</news:publication_date>
       <news:title><![CDATA[${article.title}]]></news:title>${keywords ? `\n      <news:keywords><![CDATA[${keywords}]]></news:keywords>` : ""}
-    </news:news>
+    </news:news>${article.image ? `\n    <image:image>\n      <image:loc>${article.image}</image:loc>\n      <image:title><![CDATA[${article.title}]]></image:title>\n    </image:image>` : ""}
   </url>`;
     })
     .join("\n");
@@ -57,6 +57,7 @@ export async function GET() {
 <urlset
   xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
+  xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
 >
 ${xmlItems}
 </urlset>`;

@@ -7,26 +7,30 @@ import { SITE_URL } from "../layout";
 
 export const revalidate = 300;
 
-export const metadata = {
-  title: "EV Blogs & Guides – Electric Vehicle Tips, Buying Guides & Analysis India",
-  description:
-    "In-depth electric vehicle guides, buying tips, cost analysis, and EV ownership advice for India. Everything you need to know about EVs in India.",
-  keywords: ["EV guides India", "electric vehicle tips", "EV buying guide", "EV blogs India 2026"],
-  alternates: { canonical: `${SITE_URL}/blogs` },
-  openGraph: {
-    title: "EV Blogs & Guides – Electric Vehicle Tips for India",
-    description: "In-depth EV guides, buying tips, and ownership advice for Indian EV buyers.",
-    url: `${SITE_URL}/blogs`,
-    type: "website",
-    images: [{ url: `${SITE_URL}/api/og?title=EV Blogs %26 Guides India&subtitle=Buying tips, cost analysis %26 EV ownership advice&tag=default&type=page`, width: 1200, height: 630, alt: "EV Blogs & Guides India" }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "EV Blogs & Guides – Electric Vehicle Tips for India",
-    description: "In-depth EV guides, buying tips, and ownership advice for Indian EV buyers.",
-    images: [`${SITE_URL}/api/og?title=EV Blogs %26 Guides India&subtitle=Buying tips, cost analysis %26 EV ownership advice&tag=default&type=page`],
-  },
-};
+export async function generateMetadata({ searchParams }) {
+  const sp   = await searchParams;
+  const page = Math.max(1, parseInt(sp?.page || "1", 10));
+  return {
+    title: "EV Blogs & Guides – Electric Vehicle Tips, Buying Guides & Analysis India",
+    description:
+      "In-depth electric vehicle guides, buying tips, cost analysis, and EV ownership advice for India. Everything you need to know about EVs in India.",
+    keywords: ["EV guides India", "electric vehicle tips", "EV buying guide", "EV blogs India 2026"],
+    alternates: { canonical: page > 1 ? `${SITE_URL}/blogs?page=${page}` : `${SITE_URL}/blogs` },
+    openGraph: {
+      title: "EV Blogs & Guides – Electric Vehicle Tips for India",
+      description: "In-depth EV guides, buying tips, and ownership advice for Indian EV buyers.",
+      url: page > 1 ? `${SITE_URL}/blogs?page=${page}` : `${SITE_URL}/blogs`,
+      type: "website",
+      images: [{ url: `${SITE_URL}/api/og?title=EV Blogs %26 Guides India&subtitle=Buying tips, cost analysis %26 EV ownership advice&tag=default&type=page`, width: 1200, height: 630, alt: "EV Blogs & Guides India" }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "EV Blogs & Guides – Electric Vehicle Tips for India",
+      description: "In-depth EV guides, buying tips, and ownership advice for Indian EV buyers.",
+      images: [`${SITE_URL}/api/og?title=EV Blogs %26 Guides India&subtitle=Buying tips, cost analysis %26 EV ownership advice&tag=default&type=page`],
+    },
+  };
+}
 
 const BLOGS_PER_PAGE = 12;
 

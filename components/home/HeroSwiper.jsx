@@ -7,7 +7,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay, Pagination } from 'swiper/modules'
 import {
   Search, Car, Bike, BarChart2, Zap,
-  Truck, BatteryCharging, ChevronRight, Newspaper,
+  Truck, BatteryCharging, ChevronRight, Newspaper, Building2,
 } from 'lucide-react'
 
 import 'swiper/css'
@@ -69,6 +69,7 @@ const QUICK_LINKS = [
   { label: 'EV Charging',   href: '/electric-vehicles', Icon: BatteryCharging, color: 'text-purple-600 bg-purple-50 border-purple-100' },
   { label: 'Commercial',    href: '/commercial',        Icon: Truck,           color: 'text-red-600 bg-red-50 border-red-100' },
   { label: 'EV News',       href: '/news',              Icon: Zap,             color: 'text-yellow-600 bg-yellow-50 border-yellow-100' },
+  { label: 'Brands',        href: '/brands',            Icon: Building2,       color: 'text-indigo-600 bg-indigo-50 border-indigo-100' },
 ]
 
 /* Budget keys — hrefs are built dynamically based on active vehicleType tab */

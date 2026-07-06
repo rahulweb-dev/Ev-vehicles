@@ -207,11 +207,52 @@ export default async function Home() {
       }
     : null;
 
+  const webPageJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": `${SITE_URL}/#webpage`,
+    url: SITE_URL,
+    name: "EV News India – India's #1 Electric Vehicle News Platform",
+    description: "India's most trusted electric vehicle news platform. Get latest EV news, reviews, prices, and buying guides for electric cars, bikes, scooters, and commercial vehicles in India.",
+    isPartOf: { "@type": "WebSite", "@id": `${SITE_URL}/#website`, name: "EV News India", url: SITE_URL },
+    about: { "@type": "Thing", name: "Electric Vehicles India" },
+    breadcrumb: { "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Home", item: SITE_URL }] },
+  };
+
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "Which is the best electric car in India in 2026?",
+        acceptedAnswer: { "@type": "Answer", text: "The best electric cars in India in 2026 include the Tata Nexon EV, Mahindra BE 6, MG Windsor EV, and Hyundai Creta Electric. The Tata Nexon EV is the best seller offering a range of up to 489 km, while the Mahindra BE 6 leads on performance with 682 km range." },
+      },
+      {
+        "@type": "Question",
+        name: "What is the cheapest electric car in India in 2026?",
+        acceptedAnswer: { "@type": "Answer", text: "The most affordable electric cars in India in 2026 start from around ₹6–9 lakh. The Tata Tiago EV starts at approximately ₹7.99 lakh, making it one of the cheapest electric cars in India with a range of up to 315 km." },
+      },
+      {
+        "@type": "Question",
+        name: "How much does it cost to charge an electric car at home in India?",
+        acceptedAnswer: { "@type": "Answer", text: "Charging an electric car at home in India costs ₹6–9 per kWh depending on your state's electricity tariff. A full charge for a 40 kWh battery (like the Tata Nexon EV) costs ₹240–360, compared to ₹2,500–3,000 for an equivalent petrol fill-up — saving around 80–90% on fuel costs." },
+      },
+      {
+        "@type": "Question",
+        name: "What government subsidies are available for EVs in India?",
+        acceptedAnswer: { "@type": "Answer", text: "India offers EV subsidies under the PM E-Drive scheme (2024–2026), providing up to ₹50,000 off on electric two-wheelers and ₹25,000 on electric three-wheelers. Several states like Delhi, Maharashtra, and Gujarat offer additional state subsidies and road tax exemptions, making the effective cost of EVs significantly lower." },
+      },
+    ],
+  };
+
   return (
     <>
       {itemListJsonLd && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       )}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <EVHomepage />
 
       <div className="bg-white py-2">

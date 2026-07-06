@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 import VehicleDetailPage from "@/components/vehicles/VehicleDetailPage";
 import { SITE_URL } from "@/app/layout";
 
@@ -280,6 +281,37 @@ export default async function CarDetailPage({ params }) {
       </p>
 
       <VehicleDetailPage vehicle={car} relatedVehicles={related} vehicleType="car" />
+
+      {/* City on-road price links — server-rendered for SEO */}
+      <section className="border-t border-gray-100 bg-gray-50 py-10">
+        <div className="mx-auto max-w-7xl px-4">
+          <h2 className="mb-4 text-xl font-black text-gray-900">{car.name} On-Road Price by City</h2>
+          <p className="mb-5 text-sm text-gray-500">Check the exact on-road price of {car.name} in your city, including RTO, insurance, and state taxes.</p>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+            {[
+              { slug: "mumbai",     name: "Mumbai" },
+              { slug: "delhi",      name: "Delhi" },
+              { slug: "bangalore",  name: "Bangalore" },
+              { slug: "chennai",    name: "Chennai" },
+              { slug: "hyderabad",  name: "Hyderabad" },
+              { slug: "pune",       name: "Pune" },
+              { slug: "ahmedabad",  name: "Ahmedabad" },
+              { slug: "kolkata",    name: "Kolkata" },
+              { slug: "jaipur",     name: "Jaipur" },
+              { slug: "lucknow",    name: "Lucknow" },
+              { slug: "chandigarh", name: "Chandigarh" },
+              { slug: "bhopal",     name: "Bhopal" },
+            ].map((city) => (
+              <Link key={city.slug}
+                href={`/cars/${car.slug}/price-in-${city.slug}`}
+                className="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-800 hover:border-green-400 hover:text-green-700 transition">
+                {car.name} Price in {city.name}
+                <ChevronRight size={14} className="text-gray-300 shrink-0" />
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {relatedNews.length > 0 && (
         <section className="border-t border-gray-100 bg-gray-50 py-12">
