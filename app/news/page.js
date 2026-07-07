@@ -37,24 +37,36 @@ async function getArticles(category, page = 1) {
   }
 }
 
+function buildNewsCanonical(cat, page) {
+  const p = new URLSearchParams();
+  if (cat)    p.set("category", cat);
+  if (page > 1) p.set("page", String(page));
+  const qs = p.toString();
+  return `${SITE_URL}/news${qs ? `?${qs}` : ""}`;
+}
+
 export async function generateMetadata({ searchParams }) {
   const sp   = await searchParams;
   const cat  = sp?.category || null;
   const page = Math.max(1, parseInt(sp?.page || "1", 10));
   const label = CAT_LABELS[cat] || "All";
+  const canonical = buildNewsCanonical(cat, page);
   return {
-    title: `${label} News – Electric Vehicle Updates India 2026`,
+    title: cat
+      ? `${label} News India 2026 – Latest ${label} Updates | EV News India`
+      : `Latest EV News India 2026 – Electric Vehicle Updates`,
     description:
-      "Get the latest electric vehicle news from India and worldwide. EV launches, reviews, price updates, government policies, and charging infrastructure news updated daily.",
-    alternates: {
-      canonical: page > 1
-        ? `${SITE_URL}/news?page=${page}`
-        : `${SITE_URL}/news`,
-    },
+      cat
+        ? `Latest ${label.toLowerCase()} news from India. New ${label.toLowerCase()} launches, prices, range, and reviews updated daily.`
+        : "Get the latest electric vehicle news from India. EV launches, reviews, price updates, government policies, and charging infrastructure news updated daily.",
+    keywords: cat
+      ? `${label.toLowerCase()} news india, ${label.toLowerCase()} 2026, ev ${label.toLowerCase()} india, latest ${label.toLowerCase()} updates`
+      : undefined,
+    alternates: { canonical },
     openGraph: {
       title: `${label} EV News – Electric Vehicle Updates India 2026`,
       description: "Get the latest electric vehicle news, launches, reviews, and price updates from India.",
-      url: `${SITE_URL}/news`,
+      url: canonical,
       type: "website",
       images: [{ url: `${SITE_URL}/api/og?title=${encodeURIComponent(label + " EV News India")}&subtitle=Latest launches, reviews %26 price updates&tag=news&type=page`, width: 1200, height: 630, alt: `${label} EV News India` }],
     },

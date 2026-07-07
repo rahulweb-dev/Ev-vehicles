@@ -279,7 +279,7 @@ export default function EVChargingGuide() {
             {[
               { href: "/range-calculator",   title: "EV Range Calculator",     desc: "Real-world range estimator" },
               { href: "/charging-stations",  title: "Find Charging Stations",  desc: "Map of chargers near you" },
-              { href: "/tco-calculator",     title: "EV vs Petrol Savings",     desc: "Calculate your savings" },
+              { href: "/ev-savings-calculator", title: "EV vs Petrol Savings",    desc: "Calculate your savings" },
             ].map(l=>(
               <Link key={l.href} href={l.href} className="rounded-2xl bg-white border border-gray-200 p-4 hover:border-green-400 transition shadow-sm">
                 <p className="font-bold text-gray-800 text-sm">{l.title}</p>

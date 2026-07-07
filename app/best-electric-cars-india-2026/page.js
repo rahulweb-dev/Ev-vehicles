@@ -439,7 +439,7 @@ export default function BestElectricCars2026() {
             {[
               { href: "/electric-cars-under-10-lakh", title: "Best EVs Under ₹10 Lakh", desc: "Budget-friendly picks" },
               { href: "/upcoming-electric-cars-india", title: "Upcoming EVs 2026–27", desc: "What's coming next" },
-              { href: "/tco-calculator", title: "EV vs Petrol Calculator", desc: "Total cost comparison" },
+              { href: "/ev-savings-calculator", title: "EV vs Petrol Calculator", desc: "Total cost comparison" },
             ].map(l => (
               <Link key={l.href} href={l.href} className="rounded-2xl bg-white border border-gray-200 p-4 hover:border-green-400 transition shadow-sm">
                 <p className="font-bold text-gray-800 text-sm">{l.title}</p>

@@ -8,7 +8,19 @@ const STATIC_PAGES = [
   { url: `${SITE_URL}/compare`,                       priority: 0.85, freq: "weekly"  },
   { url: `${SITE_URL}/faq`,                           priority: 0.7,  freq: "monthly", since: "2024-06-01" },
   { url: `${SITE_URL}/commercial`,                    priority: 0.75, freq: "daily"   },
-  { url: `${SITE_URL}/electric-vehicles`,             priority: 0.75, freq: "daily"   },
+  { url: `${SITE_URL}/electric-vehicles`,             priority: 0.95, freq: "daily"   },
+  /* News category archive pages — each has its own canonical now */
+  { url: `${SITE_URL}/news?category=cars`,            priority: 0.82, freq: "daily"   },
+  { url: `${SITE_URL}/news?category=bikes`,           priority: 0.82, freq: "daily"   },
+  { url: `${SITE_URL}/news?category=commercial`,      priority: 0.75, freq: "daily"   },
+  { url: `${SITE_URL}/news?category=charging`,        priority: 0.75, freq: "daily"   },
+  /* Popular compare pages — high-intent "X vs Y" queries */
+  { url: `${SITE_URL}/compare/tata-nexon-ev-vs-tata-punch-ev`,         priority: 0.78, freq: "monthly" },
+  { url: `${SITE_URL}/compare/hyundai-creta-electric-vs-tata-nexon-ev`,priority: 0.78, freq: "monthly" },
+  { url: `${SITE_URL}/compare/mahindra-be-6-vs-tata-nexon-ev`,         priority: 0.78, freq: "monthly" },
+  { url: `${SITE_URL}/compare/ola-s1-pro-vs-ather-450x`,               priority: 0.78, freq: "monthly" },
+  { url: `${SITE_URL}/compare/tata-punch-ev-vs-mg-windsor-ev`,         priority: 0.75, freq: "monthly" },
+  { url: `${SITE_URL}/compare/tvs-iqube-vs-bajaj-chetak`,              priority: 0.75, freq: "monthly" },
   { url: `${SITE_URL}/blogs`,                         priority: 0.8,  freq: "weekly"  },
   { url: `${SITE_URL}/brands`,                        priority: 0.7,  freq: "weekly"  },
   { url: `${SITE_URL}/authors`,                       priority: 0.6,  freq: "weekly"  },
@@ -54,7 +66,10 @@ async function getDbEntries() {
 
     const Blog = (await import("@/lib/models/Blog")).default;
 
-    const [articles, vehicles, blogs] = await Promise.all([
+    const NEWS_CATS = ["cars", "bikes", "commercial", "charging"];
+    const NEWS_LIMIT = 20;
+
+    const [articles, vehicles, blogs, totalNewsCount, ...catCounts] = await Promise.all([
       Article.find({ status: "published" })
         .select("slug publishedAt updatedAt author tags image")
         .lean(),
@@ -64,6 +79,8 @@ async function getDbEntries() {
       Blog.find({ status: "published" })
         .select("slug publishedAt updatedAt featured")
         .lean(),
+      Article.countDocuments({ status: "published" }),
+      ...NEWS_CATS.map(cat => Article.countDocuments({ status: "published", category: cat })),
     ]);
 
     /* ── Article pages ────────────────────────────────────────────── */
@@ -146,7 +163,35 @@ async function getDbEntries() {
       priority:        b.featured ? 0.82 : 0.72,
     }));
 
-    return [...articleUrls, ...vehicleUrls, ...authorUrls, ...tagUrls, ...brandUrls, ...cityPriceUrls, ...blogUrls];
+    /* ── Paginated /news pages — pages 2-N (up to 10) ───────────────── */
+    const totalNewsPages = Math.ceil(totalNewsCount / NEWS_LIMIT);
+    const newsPaginatedUrls = Array.from(
+      { length: Math.min(totalNewsPages - 1, 9) },
+      (_, i) => ({
+        url:             `${SITE_URL}/news?page=${i + 2}`,
+        lastModified:    new Date(),
+        changeFrequency: "daily",
+        priority:        0.7,
+      })
+    );
+
+    /* ── Paginated category pages — pages 2-N per category ──────────── */
+    const catPaginatedUrls = NEWS_CATS.flatMap((cat, idx) => {
+      const count = catCounts[idx] || 0;
+      const pages = Math.ceil(count / NEWS_LIMIT);
+      return Array.from({ length: Math.min(pages - 1, 4) }, (_, i) => ({
+        url:             `${SITE_URL}/news?category=${cat}&page=${i + 2}`,
+        lastModified:    new Date(),
+        changeFrequency: "daily",
+        priority:        0.65,
+      }));
+    });
+
+    return [
+      ...articleUrls, ...vehicleUrls, ...authorUrls, ...tagUrls,
+      ...brandUrls, ...cityPriceUrls, ...blogUrls,
+      ...newsPaginatedUrls, ...catPaginatedUrls,
+    ];
   } catch {
     return [];
   }

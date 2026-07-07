@@ -271,7 +271,7 @@ export default function GovernmentEVPolicyPage() {
             {[
               { href: "/subsidy-calculator",       title: "Subsidy Calculator",    desc: "Calculate your savings" },
               { href: "/electric-cars-under-10-lakh", title: "Budget EVs Under ₹10L", desc: "Affordable EVs list" },
-              { href: "/tco-calculator",            title: "Total Cost Calculator", desc: "5-year EV vs Petrol" },
+              { href: "/ev-savings-calculator",     title: "Total Cost Calculator", desc: "5-year EV vs Petrol" },
             ].map(l=>(
               <Link key={l.href} href={l.href} className="rounded-2xl bg-white border border-gray-200 p-4 hover:border-green-400 transition shadow-sm">
                 <p className="font-bold text-gray-800 text-sm">{l.title}</p>

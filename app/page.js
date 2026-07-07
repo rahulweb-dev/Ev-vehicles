@@ -207,6 +207,23 @@ export default async function Home() {
       }
     : null;
 
+  const webSiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${SITE_URL}/#website`,
+    url: SITE_URL,
+    name: "EV News India",
+    alternateName: ["EVRadar", "evradar.in", "EV News India"],
+    description: "India's #1 electric vehicle news, reviews, prices, and buying guides platform.",
+    inLanguage: "en-IN",
+    publisher: { "@id": `${SITE_URL}/#organization` },
+    potentialAction: {
+      "@type": "SearchAction",
+      target: { "@type": "EntryPoint", urlTemplate: `${SITE_URL}/search?q={search_term_string}` },
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   const webPageJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebPage",
@@ -214,7 +231,7 @@ export default async function Home() {
     url: SITE_URL,
     name: "EV News India – India's #1 Electric Vehicle News Platform",
     description: "India's most trusted electric vehicle news platform. Get latest EV news, reviews, prices, and buying guides for electric cars, bikes, scooters, and commercial vehicles in India.",
-    isPartOf: { "@type": "WebSite", "@id": `${SITE_URL}/#website`, name: "EV News India", url: SITE_URL },
+    isPartOf: { "@id": `${SITE_URL}/#website` },
     about: { "@type": "Thing", name: "Electric Vehicles India" },
     breadcrumb: { "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Home", item: SITE_URL }] },
   };
@@ -248,6 +265,7 @@ export default async function Home() {
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteJsonLd) }} />
       {itemListJsonLd && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       )}
