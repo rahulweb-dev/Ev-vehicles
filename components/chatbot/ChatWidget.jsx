@@ -11,22 +11,34 @@ const ChatWindow = dynamic(() => import("./ChatWindow"), {
 });
 
 export default function ChatWidget() {
-  const [open, setOpen] = useState(false);
-  const [pulse, setPulse] = useState(false);
+  const [open,     setOpen]     = useState(false);
+  const [pulse,    setPulse]    = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
+  // Detect mobile once on mount — never read window during render
   useEffect(() => {
-    const t = setTimeout(() => setPulse(true), 4000);
-    return () => clearTimeout(t);
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // Show pulse for 6 seconds then stop — no infinite animation
+  useEffect(() => {
+    const show = setTimeout(() => setPulse(true),  4000);
+    const hide = setTimeout(() => setPulse(false), 10000);
+    return () => { clearTimeout(show); clearTimeout(hide); };
   }, []);
 
   const handleOpen = () => {
     setOpen(true);
     setPulse(false);
   };
+
   const fabStyle = {
     position: "fixed",
-    bottom: window.innerWidth < 768 ? "100px" : "20px",
-    right: window.innerWidth < 768 ? "34px" : "20px",
+    bottom: isMobile ? "100px" : "20px",
+    right:  isMobile ? "34px"  : "20px",
     zIndex: 9999,
   };
 

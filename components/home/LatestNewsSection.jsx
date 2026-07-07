@@ -182,7 +182,7 @@ export default function LatestNews({ initialArticles = null }) {
               className={`flex shrink-0 items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-semibold transition-all duration-300 md:rounded-2xl md:px-5 md:py-2.5 md:text-sm ${
                 active === tab.id
                   ? "border-green-500 bg-green-50 text-green-700 shadow-sm"
-                  : "border-gray-200 bg-white text-gray-600 hover:border-green-400 hover:bg-green-50 hover:text-green-700"
+                  : "border-gray-300 bg-gray-100 text-gray-700 hover:border-green-500 hover:bg-green-50 hover:text-green-700"
               }`}
             >
               {tab.icon}
