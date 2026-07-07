@@ -52,9 +52,9 @@ const footerLinks = {
 
 const socialLinks = [
   { icon: FacebookIcon,  href: "https://www.facebook.com/profile.php?id=61588864517346",   label: "Facebook"  },
-  { icon: TwitterIcon,   href: "https://twitter.com/evradar_in",         label: "Twitter"   },
-  { icon: InstagramIcon, href: "https://www.instagram.com/evradar.in",   label: "Instagram" },
-  { icon: YoutubeIcon,   href: "https://www.youtube.com/@evradar",        label: "YouTube"   },
+  { icon: TwitterIcon,   href: "https://x.com/evradarin",         label: "Twitter"   },
+  { icon: InstagramIcon, href: "https://www.instagram.com/radarelectricvehicles/",   label: "Instagram" },
+  { icon: YoutubeIcon,   href: "https://www.youtube.com/@EVRadarIndia",        label: "YouTube"   },
 ];
 
 export default function Footer() {
