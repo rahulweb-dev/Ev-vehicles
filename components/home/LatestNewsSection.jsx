@@ -156,15 +156,15 @@ export default function LatestNews({ initialArticles = null }) {
   const featHref = `/news/${feat?.slug}`;
 
   return (
-    <section ref={sectionRef} className="bg-gray-950 py-10 md:py-16">
+    <section ref={sectionRef} className="py-10 md:py-16">
       <div className="mx-auto max-w-7xl px-4">
 
         {/* Heading */}
         <div ref={headingRef} className="mb-5 md:mb-8">
-          <h2 className="text-3xl font-black text-white md:text-5xl">
-            Latest <span className="text-green-400">EV News</span>
+          <h2 className="text-3xl font-black text-gray-900 md:text-5xl">
+            Latest <span className="text-green-600">EV News</span>
           </h2>
-          <p className="mt-2 text-sm text-gray-400 md:mt-3 md:text-base">
+          <p className="mt-2 text-sm text-gray-500 md:mt-3 md:text-base">
             Breaking electric vehicle updates &amp; future mobility trends.
           </p>
         </div>
@@ -181,8 +181,8 @@ export default function LatestNews({ initialArticles = null }) {
               onClick={() => setActive(tab.id)}
               className={`flex shrink-0 items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-semibold transition-all duration-300 md:rounded-2xl md:px-5 md:py-2.5 md:text-sm ${
                 active === tab.id
-                  ? "border-green-400 bg-green-500/20 text-green-400 shadow-lg shadow-green-500/20"
-                  : "border-white/10 bg-white/5 text-gray-300 hover:border-green-400/30 hover:bg-white/10"
+                  ? "border-green-500 bg-green-50 text-green-700 shadow-sm"
+                  : "border-gray-200 bg-white text-gray-600 hover:border-green-400 hover:bg-green-50 hover:text-green-700"
               }`}
             >
               {tab.icon}
@@ -197,7 +197,7 @@ export default function LatestNews({ initialArticles = null }) {
           {/* Featured card */}
           <div
             ref={featuredRef}
-            className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 md:rounded-3xl"
+            className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm md:rounded-3xl"
           >
             <div className="relative h-65 sm:h-90 lg:h-125">
               {feat?.image && (
@@ -255,7 +255,7 @@ export default function LatestNews({ initialArticles = null }) {
               <Link
                 key={index}
                 href={`/news/${item.slug}`}
-                className="group flex gap-2.5 rounded-2xl border border-white/10 bg-white/5 p-2.5 transition hover:border-green-400/30 hover:bg-white/10 sm:gap-3 sm:p-3"
+                className="group flex gap-2.5 rounded-2xl border border-gray-100 bg-white p-2.5 shadow-sm transition hover:border-green-400 hover:shadow-md sm:gap-3 sm:p-3"
               >
                 {/* Thumbnail */}
                 <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl sm:h-18 sm:w-18 lg:h-20 lg:w-20">
@@ -271,10 +271,10 @@ export default function LatestNews({ initialArticles = null }) {
                 {/* Text */}
                 <div className="flex min-w-0 flex-1 flex-col justify-between">
                   <div>
-                    <span className="mb-1 inline-block rounded-full bg-green-500/20 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-green-400">
+                    <span className="mb-1 inline-block rounded-full bg-green-100 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-green-700">
                       {item.category}
                     </span>
-                    <h4 className="line-clamp-2 text-[11px] font-bold leading-snug text-gray-100 transition group-hover:text-green-400 sm:text-xs lg:text-[13px]">
+                    <h4 className="line-clamp-2 text-[11px] font-bold leading-snug text-gray-800 transition group-hover:text-green-600 sm:text-xs lg:text-[13px]">
                       {item.title}
                     </h4>
                   </div>

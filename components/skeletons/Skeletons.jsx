@@ -531,7 +531,7 @@ export function VehicleSliderSkeleton({ count = 4 }) {
 /* ─── Latest news section skeleton (dark bg) ─────────────────── */
 export function LatestNewsSectionSkeleton() {
   return (
-    <section className="bg-gray-950 py-16">
+    <section className="py-16">
       <div className="mx-auto max-w-7xl px-4">
         <DarkTheme>
           <div className="mb-10">
