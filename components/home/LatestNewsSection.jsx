@@ -156,12 +156,12 @@ export default function LatestNews({ initialArticles = null }) {
   const featHref = `/news/${feat?.slug}`;
 
   return (
-    <section ref={sectionRef} className="py-10 md:py-16">
+    <section ref={sectionRef} className="bg-gray-950 py-10 md:py-16">
       <div className="mx-auto max-w-7xl px-4">
 
         {/* Heading */}
         <div ref={headingRef} className="mb-5 md:mb-8">
-          <h2 className="text-3xl font-black md:text-5xl">
+          <h2 className="text-3xl font-black text-white md:text-5xl">
             Latest <span className="text-green-400">EV News</span>
           </h2>
           <p className="mt-2 text-sm text-gray-400 md:mt-3 md:text-base">
@@ -182,7 +182,7 @@ export default function LatestNews({ initialArticles = null }) {
               className={`flex shrink-0 items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-semibold transition-all duration-300 md:rounded-2xl md:px-5 md:py-2.5 md:text-sm ${
                 active === tab.id
                   ? "border-green-400 bg-green-500/20 text-green-400 shadow-lg shadow-green-500/20"
-                  : "border-white/10 bg-white/5 text-gray-900 hover:border-green-400/30 hover:bg-white/10"
+                  : "border-white/10 bg-white/5 text-gray-300 hover:border-green-400/30 hover:bg-white/10"
               }`}
             >
               {tab.icon}
@@ -274,7 +274,7 @@ export default function LatestNews({ initialArticles = null }) {
                     <span className="mb-1 inline-block rounded-full bg-green-500/20 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-green-400">
                       {item.category}
                     </span>
-                    <h4 className="line-clamp-2 text-[11px] font-bold leading-snug  transition group-hover:text-green-400 sm:text-xs lg:text-[13px]">
+                    <h4 className="line-clamp-2 text-[11px] font-bold leading-snug text-gray-100 transition group-hover:text-green-400 sm:text-xs lg:text-[13px]">
                       {item.title}
                     </h4>
                   </div>
