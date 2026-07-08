@@ -24,14 +24,14 @@ const nextConfig = {
       "default-src 'self'",
       // Scripts: Next.js hydration needs unsafe-inline; AdSense/GA/SWG need these domains
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://pagead2.googlesyndication.com https://partner.googleadservices.com https://www.googletagmanager.com https://www.google-analytics.com https://news.google.com https://www.google.com https://www.gstatic.com https://apis.google.com https://adservice.google.com https://tpc.googlesyndication.com",
-      // Styles: inline styles used by Tailwind/components
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      // Styles: inline styles + Google Fonts + Subscribe with Google stylesheets
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://news.google.com",
       // Fonts
       "font-src 'self' data: https://fonts.gstatic.com",
       // Images: allow all HTTPS (vehicle/news images come from many CDNs)
       "img-src 'self' data: blob: https: http:",
-      // Fetch/XHR: GA, our own API, AdSense reporting
-      "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://pagead2.googlesyndication.com https://region1.analytics.google.com https://firestore.googleapis.com",
+      // Fetch/XHR: GA, our own API, AdSense reporting, Subscribe with Google
+      "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://pagead2.googlesyndication.com https://region1.analytics.google.com https://firestore.googleapis.com https://news.google.com",
       // Frames: YouTube embeds + AdSense iframes
       "frame-src https://www.youtube.com https://player.vimeo.com https://www.google.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://news.google.com",
       // Media: audio player uses blob URLs
