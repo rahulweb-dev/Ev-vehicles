@@ -59,13 +59,14 @@ export async function generateMetadata({ params }) {
         url: bike.ogImage || bike.featuredImage ||
           `${SITE_URL}/api/og?title=${encodeURIComponent(bike.name)}&subtitle=${encodeURIComponent(`${price ? price + " onwards" : ""}${range ? " · Range " + range : ""}`)}&type=vehicle&tag=bikes${bike.featuredImage ? "&image=" + encodeURIComponent(bike.featuredImage) : ""}`,
         width: 1200, height: 630,
+        alt: `${bike.name} – Price, Range & Specs`,
       }],
     },
     twitter: {
       card: "summary_large_image",
       title: bike.ogTitle || bike.metaTitle || `${bike.name} – Price, Range & Specs`,
       description: bike.ogDescription || bike.metaDescription || `${bike.name}${price ? ` starts at ${price}` : ""}${range ? `. Range: ${range}` : ""}.`,
-      images: [bike.ogImage || bike.featuredImage || `${SITE_URL}/api/og?title=${encodeURIComponent(bike.name)}&subtitle=${encodeURIComponent(`${price ? price + " onwards" : ""}${range ? " · Range " + range : ""}`)}&type=vehicle&tag=bikes${bike.featuredImage ? "&image=" + encodeURIComponent(bike.featuredImage) : ""}`],
+      images: [{ url: bike.ogImage || bike.featuredImage || `${SITE_URL}/api/og?title=${encodeURIComponent(bike.name)}&subtitle=${encodeURIComponent(`${price ? price + " onwards" : ""}${range ? " · Range " + range : ""}`)}&type=vehicle&tag=bikes${bike.featuredImage ? "&image=" + encodeURIComponent(bike.featuredImage) : ""}`, alt: `${bike.name} – Price, Range & Specs` }],
     },
   };
 }

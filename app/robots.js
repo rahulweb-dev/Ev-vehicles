@@ -23,6 +23,7 @@ export default function robots() {
       { userAgent: "anthropic-ai",   allow: "/" },   // Claude web search
       { userAgent: "YouBot",         allow: "/" },   // You.com AI search
       { userAgent: "DuckAssistBot",  allow: "/" },   // DuckDuckGo AI answers
+      { userAgent: "Google-Extended", allow: "/" },  // Google Gemini + AI Overviews
 
       // ── Training-only scrapers (BLOCK) ─────────────────────────────
       // These bots harvest content for model training without citation.
@@ -37,6 +38,7 @@ export default function robots() {
     sitemap: [
       "https://www.evradar.in/sitemap.xml",
       "https://www.evradar.in/news-sitemap.xml",
+      "https://www.evradar.in/image-sitemap.xml",
     ],
     host: "https://www.evradar.in",
   };

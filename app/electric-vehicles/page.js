@@ -26,7 +26,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "Electric Vehicles India 2026 – Complete Guide",
     description: "Everything about electric vehicles in India — prices, range, charging, subsidies, and expert comparisons.",
-    images: [`${SITE_URL}/api/og?title=Electric Vehicles India 2026&subtitle=Complete Guide – Cars, Bikes, Prices %26 News&tag=cars&type=page`],
+    images: [{ url: `${SITE_URL}/api/og?title=Electric Vehicles India 2026&subtitle=Complete Guide – Cars, Bikes, Prices %26 News&tag=cars&type=page`, alt: "Electric Vehicles India 2026 – Complete Guide" }],
   },
 };
 

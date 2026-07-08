@@ -87,7 +87,7 @@ export const metadata = {
     title: `${SITE_NAME} – ${SITE_TAGLINE}`,
     description:
       "Stay updated with the latest electric vehicle news, reviews, and launches in India.",
-    images: [`${SITE_URL.replace(/\/$/, "")}/images/og-default.jpg`],
+    images: [{ url: `${SITE_URL.replace(/\/$/, "")}/images/og-default.jpg`, alt: `${SITE_NAME} – India's #1 EV News Platform` }],
   },
   icons: {
     icon: [
@@ -114,8 +114,13 @@ export const metadata = {
     "apple-mobile-web-app-title": "EVRadar",
     "msapplication-TileColor": "#16a34a",
     "msapplication-tap-highlight": "no",
-    "theme-color": "#16a34a",
   },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#16a34a",
 };
 
 const websiteJsonLd = {
@@ -201,8 +206,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en-IN" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <head>
-        {/* Hreflang — geo-targets India English for Google, helps rank in Indian SERPs */}
+        {/* Hreflang — geo-targets India English + Hindi for Google */}
         <link rel="alternate" hrefLang="en-IN" href={SITE_URL} />
+        <link rel="alternate" hrefLang="hi-IN" href={`${SITE_URL}/hi`} />
         <link rel="alternate" hrefLang="x-default" href={SITE_URL} />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
@@ -217,6 +223,8 @@ export default function RootLayout({ children }) {
 
         {/* llms.txt — AI/LLM site description for generative engine optimization (GEO) */}
         <link rel="llms" href="/llms.txt" type="text/plain" />
+        {/* OKF bundle — structured machine-readable site index for AI agents */}
+        <link rel="okf" href="/okf/index.md" type="text/markdown" />
 
         {/* Preconnect to speed up third-party resource loading */}
         <link rel="preconnect" href="https://ik.imagekit.io" />

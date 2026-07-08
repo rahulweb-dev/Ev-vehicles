@@ -76,6 +76,7 @@ export async function generateMetadata({ params }) {
     alternates: { canonical: `${SITE_URL}/news/${article.slug}` },
     other: {
       "news_keywords": article.tags?.join(", ") || "",
+      "article:publisher": "https://www.facebook.com/EVNewsIndia",
     },
     openGraph: {
       title: article.title,
@@ -95,7 +96,7 @@ export async function generateMetadata({ params }) {
       card: "summary_large_image",
       title: article.title,
       description: article.excerpt,
-      images: [article.image || `${SITE_URL}/api/og?title=${encodeURIComponent(article.title)}&tag=${encodeURIComponent(article.category)}`],
+      images: [{ url: article.image || `${SITE_URL}/api/og?title=${encodeURIComponent(article.title)}&tag=${encodeURIComponent(article.category)}`, alt: article.title }],
     },
   };
 }

@@ -7,7 +7,7 @@ export const revalidate = 86400;
 
 export const metadata = {
   title: "Best Electric Cars in India 2026 – Top 10 EVs by Price, Range & Value",
-  description: "The definitive guide to the best electric cars in India 2026. Compare top EVs by price, range, features, and value — from ₹7 lakh to ₹70 lakh. Updated June 2026.",
+  description: "The definitive guide to the best electric cars in India 2026. Compare top EVs by price, range, features, and value — from ₹7 lakh to ₹70 lakh. Updated July 2026.",
   keywords: "best electric cars india 2026, best ev india, top electric cars india, best electric suv india, best ev under 15 lakh india",
   alternates: { canonical: `${SITE_URL}/best-electric-cars-india-2026` },
   openGraph: {
@@ -15,7 +15,19 @@ export const metadata = {
     description: "Our expert-ranked guide to the best EVs you can buy in India right now. Every budget covered.",
     url: `${SITE_URL}/best-electric-cars-india-2026`,
     type: "article",
-    images: [{ url: `${SITE_URL}/api/og?title=Best Electric Cars India 2026&subtitle=Top 10 Ranked by Experts&tag=cars&type=article`, width: 1200, height: 630 }],
+    publishedTime: "2026-01-01T00:00:00Z",
+    modifiedTime:  "2026-07-08T00:00:00Z",
+    images: [{ url: `${SITE_URL}/api/og?title=Best Electric Cars India 2026&subtitle=Top 10 Ranked by Experts&tag=cars&type=article`, width: 1200, height: 630, alt: "Best Electric Cars India 2026" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Best Electric Cars in India 2026 – Expert Ranked Top 10",
+    description: "Our expert-ranked guide to the best EVs you can buy in India right now. Every budget covered.",
+    images: [{ url: `${SITE_URL}/api/og?title=Best Electric Cars India 2026&subtitle=Top 10 Ranked by Experts&tag=cars&type=article`, alt: "Best Electric Cars India 2026 – Top 10" }],
+  },
+  other: {
+    "article:published_time": "2026-01-01T00:00:00Z",
+    "article:modified_time":  "2026-07-08T00:00:00Z",
   },
 };
 

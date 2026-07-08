@@ -87,7 +87,7 @@ export async function generateMetadata({ params }) {
       card: "summary_large_image",
       title: blog.title,
       description: blog.excerpt,
-      images: [blog.image],
+      images: [{ url: blog.image, alt: blog.title }],
     },
   };
 }

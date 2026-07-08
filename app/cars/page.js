@@ -5,7 +5,7 @@ import ArticlesFeed from "@/components/skeletons/ArticlesFeed";
 import { SITE_URL } from "../layout";
 import CarsClient from "./CarsClient";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 async function getInitialCars() {
   try {

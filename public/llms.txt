@@ -89,3 +89,9 @@ Our vehicle database includes authoritative data on:
 
 - https://www.evradar.in/sitemap.xml
 - https://www.evradar.in/news-sitemap.xml
+- https://www.evradar.in/image-sitemap.xml
+
+## Machine-Readable Files
+
+- /okf/index.md — Open Knowledge Format bundle (structured site index for AI agents)
+- /feed.xml — RSS feed for latest EV news

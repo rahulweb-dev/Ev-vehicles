@@ -20,7 +20,11 @@ export const metadata = {
     card: "summary_large_image",
     title: "EV Charging Guide India 2026 – Complete How-To",
     description: "Everything you need to know about charging your EV in India — home charging, public networks, costs, and tips.",
-    images: [`${SITE_URL}/api/og?title=EV Charging Guide India 2026&subtitle=Home, Public & Fast Charging Explained&tag=charging`],
+    images: [{ url: `${SITE_URL}/api/og?title=EV Charging Guide India 2026&subtitle=Home, Public & Fast Charging Explained&tag=charging`, alt: "EV Charging Guide India 2026" }],
+  },
+  other: {
+    "article:published_time": "2026-01-01T00:00:00Z",
+    "article:modified_time":  "2026-07-08T00:00:00Z",
   },
 };
 

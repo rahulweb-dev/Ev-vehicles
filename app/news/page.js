@@ -74,7 +74,7 @@ export async function generateMetadata({ searchParams }) {
       card: "summary_large_image",
       title: `${label} EV News – Electric Vehicle Updates India 2026`,
       description: "Get the latest EV news, launches, reviews, and price updates from India.",
-      images: [`${SITE_URL}/api/og?title=${encodeURIComponent(label + " EV News India")}&subtitle=Latest launches, reviews %26 price updates&tag=news&type=page`],
+      images: [{ url: `${SITE_URL}/api/og?title=${encodeURIComponent(label + " EV News India")}&subtitle=Latest launches, reviews %26 price updates&tag=news&type=page`, alt: `${label} EV News India` }],
     },
   };
 }

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import EVHomepage from "@/components/home/HeroSection";
 import LatestNewsSection from "@/components/home/LatestNewsSection";
 import HomeCompareWidget from "@/components/home/HomeCompareWidget";
@@ -265,7 +266,6 @@ export default async function Home() {
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteJsonLd) }} />
       {itemListJsonLd && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       )}
@@ -317,11 +317,12 @@ export default async function Home() {
                   <article className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
                     <div className="relative h-44 overflow-hidden bg-gray-100">
                       {blog.image && (
-                        <img
+                        <Image
                           src={blog.image}
                           alt={blog.title}
-                          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                          loading="lazy"
+                          fill
+                          className="object-cover transition duration-500 group-hover:scale-105"
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         />
                       )}
                       <div className="absolute left-3 top-3">

@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  compress: true,
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "ik.imagekit.io" },
@@ -49,6 +50,20 @@ const nextConfig = {
     ].join("; ");
 
     return [
+      {
+        // Long-lived cache for immutable Next.js static assets (hashed filenames)
+        source: "/_next/static/(.*)",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      {
+        // Cache public images and icons for 30 days
+        source: "/images/(.*)",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=2592000, stale-while-revalidate=86400" },
+        ],
+      },
       {
         source: "/(.*)",
         headers: [

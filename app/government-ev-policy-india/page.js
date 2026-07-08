@@ -20,7 +20,11 @@ export const metadata = {
     card: "summary_large_image",
     title: "India Government EV Policy 2026 – Complete Guide",
     description: "FAME III, PM E-DRIVE, PLI, GST cuts, tax benefits and state policies — everything you need to know.",
-    images: [`${SITE_URL}/api/og?title=India EV Policy 2026&subtitle=FAME III, PM E-DRIVE & Subsidies&tag=policy`],
+    images: [{ url: `${SITE_URL}/api/og?title=India EV Policy 2026&subtitle=FAME III, PM E-DRIVE & Subsidies&tag=policy`, alt: "India Government EV Policy 2026" }],
+  },
+  other: {
+    "article:published_time": "2026-01-01T00:00:00Z",
+    "article:modified_time":  "2026-07-08T00:00:00Z",
   },
 };
 

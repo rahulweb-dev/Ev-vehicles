@@ -38,10 +38,10 @@ const PLATFORMS = [
     label: "Pinterest Board",
     emoji: "📌",
     color: "red",
-    docs:  "https://developers.pinterest.com/docs/api/v5/",
+    docs:  "https://developers.pinterest.com/tools/oauth-token",
     fields: [
-      { key: "accessToken", label: "Access Token", hint: "Pinterest OAuth 2.0 access token", secret: true },
-      { key: "boardId",     label: "Board ID",     hint: "ID of the board to pin to" },
+      { key: "accessToken", label: "Access Token", hint: "OAuth token — must have scopes: pins:read, pins:write, boards:read", secret: true },
+      { key: "boardId",     label: "Board ID",     hint: "Numeric board ID (get from developers.pinterest.com/tools/oauth-token → GET /boards)" },
     ],
   },
   {
