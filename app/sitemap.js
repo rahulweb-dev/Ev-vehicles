@@ -66,10 +66,9 @@ async function getDbEntries() {
 
     const Blog = (await import("@/lib/models/Blog")).default;
 
-    const NEWS_CATS = ["cars", "bikes", "commercial", "charging"];
     const NEWS_LIMIT = 20;
 
-    const [articles, vehicles, blogs, totalNewsCount, ...catCounts] = await Promise.all([
+    const [articles, vehicles, blogs, totalNewsCount] = await Promise.all([
       Article.find({ status: "published" })
         .select("slug publishedAt updatedAt author tags image")
         .lean(),
@@ -80,7 +79,6 @@ async function getDbEntries() {
         .select("slug publishedAt updatedAt featured")
         .lean(),
       Article.countDocuments({ status: "published" }),
-      ...NEWS_CATS.map(cat => Article.countDocuments({ status: "published", category: cat })),
     ]);
 
     /* ── Article pages ────────────────────────────────────────────── */
@@ -175,22 +173,10 @@ async function getDbEntries() {
       })
     );
 
-    /* ── Paginated category pages — pages 2-N per category ──────────── */
-    const catPaginatedUrls = NEWS_CATS.flatMap((cat, idx) => {
-      const count = catCounts[idx] || 0;
-      const pages = Math.ceil(count / NEWS_LIMIT);
-      return Array.from({ length: Math.min(pages - 1, 4) }, (_, i) => ({
-        url:             `${SITE_URL}/news?category=${cat}&page=${i + 2}`,
-        lastModified:    new Date(),
-        changeFrequency: "daily",
-        priority:        0.65,
-      }));
-    });
-
     return [
       ...articleUrls, ...vehicleUrls, ...authorUrls, ...tagUrls,
       ...brandUrls, ...cityPriceUrls, ...blogUrls,
-      ...newsPaginatedUrls, ...catPaginatedUrls,
+      ...newsPaginatedUrls,
     ];
   } catch {
     return [];
