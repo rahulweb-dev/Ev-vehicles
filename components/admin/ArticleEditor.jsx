@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   Save, Send, X, AlertCircle, CheckCircle2,
   Loader2, Eye, EyeOff, Upload, ChevronRight,
-  Star, Clock, Hash, Search,
+  Star, Clock, Hash, Search, Share2,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 
@@ -82,13 +82,14 @@ export default function ArticleEditor({ initialData = null }) {
     metaKeywords: initialData?.metaKeywords || "",
   });
 
-  const [tagInput, setTagInput]     = useState("");
-  const [uploading, setUploading]   = useState(false);
-  const [saving, setSaving]         = useState(false);
-  const [toast, setToast]           = useState(null);
-  const [preview, setPreview]       = useState(false);
-  const [autoSavedAt, setAutoSavedAt] = useState(null);
-  const [scheduledAt, setScheduledAt] = useState(initialData?.scheduledAt ? new Date(initialData.scheduledAt).toISOString().slice(0, 16) : "");
+  const [tagInput, setTagInput]         = useState("");
+  const [uploading, setUploading]       = useState(false);
+  const [saving, setSaving]             = useState(false);
+  const [toast, setToast]               = useState(null);
+  const [preview, setPreview]           = useState(false);
+  const [autoSavedAt, setAutoSavedAt]   = useState(null);
+  const [scheduledAt, setScheduledAt]   = useState(initialData?.scheduledAt ? new Date(initialData.scheduledAt).toISOString().slice(0, 16) : "");
+  const [socialTargets, setSocialTargets] = useState(initialData?.socialTargets ?? []);
   const autoSaveKey = `ev-draft-${isEdit ? initialData._id : "new"}`;
 
   /* Autosave to localStorage every 30 seconds if content changed */
@@ -168,15 +169,26 @@ export default function ArticleEditor({ initialData = null }) {
     }
   }
 
-  async function handleSave(publishStatus) {
+  function toggleSocialTarget(platform) {
+    setSocialTargets((prev) =>
+      prev.includes(platform) ? prev.filter((p) => p !== platform) : [...prev, platform]
+    );
+  }
+
+  async function handleSave(publishStatus, targets) {
     if (!form.title || !form.slug || !form.excerpt || !form.content || !form.image) {
       showToast("Title, slug, excerpt, content and image are required", "error");
       return;
     }
     setSaving(true);
     try {
-      const payload = { ...form, status: publishStatus, scheduledAt: scheduledAt || null };
-      const url = isEdit ? `/api/articles/${initialData._id}` : "/api/articles";
+      const payload = {
+        ...form,
+        status:        publishStatus,
+        scheduledAt:   scheduledAt || null,
+        socialTargets: targets ?? socialTargets,
+      };
+      const url    = isEdit ? `/api/articles/${initialData._id}` : "/api/articles";
       const method = isEdit ? "PUT" : "POST";
       const res = await fetch(url, {
         method,
@@ -186,9 +198,14 @@ export default function ArticleEditor({ initialData = null }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Save failed");
       localStorage.removeItem(autoSaveKey);
-      showToast(publishStatus === "published"
-        ? "Published! Search engines notified ⚡"
-        : "Draft saved ✓"
+
+      const hasSocial = (targets ?? socialTargets).length > 0;
+      showToast(
+        publishStatus === "published"
+          ? hasSocial
+            ? "Published! Posting to social media… ⚡"
+            : "Published! Search engines notified ⚡"
+          : "Draft saved ✓"
       );
       setTimeout(() => router.push("/admin/articles"), 1500);
     } catch (err) {
@@ -291,6 +308,18 @@ export default function ArticleEditor({ initialData = null }) {
             {saving ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
             {isEdit && form.status === "published" ? "Update" : "Publish"}
           </button>
+
+          {/* Publish Everywhere — only shown when social targets are selected */}
+          {socialTargets.length > 0 && (
+            <button
+              onClick={() => handleSave("published", socialTargets)}
+              disabled={saving}
+              className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-blue-500 transition disabled:opacity-50"
+            >
+              {saving ? <Loader2 size={13} className="animate-spin" /> : <Share2 size={13} />}
+              Publish Everywhere
+            </button>
+          )}
         </div>
       </header>
       {/* ══════════ End Top Bar ══════════ */}
@@ -582,6 +611,40 @@ export default function ArticleEditor({ initialData = null }) {
                 </p>
               </div>
             )}
+          </SideSection>
+
+          {/* ── Social Media ── */}
+          <SideSection title="Auto-Publish to Social">
+            {[
+              { id: "facebook",  label: "Facebook Page",        emoji: "📘" },
+              { id: "linkedin",  label: "LinkedIn Company Page", emoji: "💼" },
+              { id: "pinterest", label: "Pinterest Board",       emoji: "📌" },
+              { id: "telegram",  label: "Telegram Channel",      emoji: "✈️" },
+            ].map(({ id, label, emoji }) => (
+              <label key={id} className="flex cursor-pointer items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 mb-1.5 hover:border-blue-200 hover:bg-blue-50 transition">
+                <span className="flex items-center gap-2 text-xs font-medium text-gray-700">
+                  <span>{emoji}</span>
+                  {label}
+                </span>
+                <input
+                  type="checkbox"
+                  checked={socialTargets.includes(id)}
+                  onChange={() => toggleSocialTarget(id)}
+                  className="h-4 w-4 rounded border-gray-300 accent-blue-600"
+                />
+              </label>
+            ))}
+            {socialTargets.length > 0 && (
+              <p className="mt-1 text-[10px] text-blue-600 font-medium">
+                🚀 Will post to {socialTargets.length} platform{socialTargets.length > 1 ? "s" : ""} on publish
+              </p>
+            )}
+            <p className="mt-2 text-[10px] text-gray-400 leading-snug">
+              Configure credentials in{" "}
+              <a href="/admin/social-settings" target="_blank" className="text-blue-500 hover:underline">
+                Social Settings ↗
+              </a>
+            </p>
           </SideSection>
 
           {/* ── IndexNow ── */}

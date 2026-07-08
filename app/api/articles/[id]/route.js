@@ -1,9 +1,10 @@
-import { NextResponse } from "next/server";
-import dbConnect from "@/lib/mongodb";
-import Article from "@/lib/models/Article";
-import { requireAuth } from "@/lib/auth";
+import { NextResponse }         from "next/server";
+import dbConnect                 from "@/lib/mongodb";
+import Article                   from "@/lib/models/Article";
+import { requireAuth }           from "@/lib/auth";
 import { pingIndexNow, buildArticleUrl } from "@/lib/indexnow";
 import { notifyArticlePublished } from "@/lib/notifications";
+import { publishToSocial }       from "@/lib/social/publisher";
 
 // GET /api/articles/[id] — public, by id or slug
 export async function GET(request, context) {
@@ -48,16 +49,26 @@ export async function PUT(request, context) {
       body.publishedAt = new Date();
     }
 
-    const updated = await Article.findByIdAndUpdate(id, body, { returnDocument: "after", runValidators: true });
+    // Preserve socialTargets from body if provided
+    const socialTargets = Array.isArray(body.socialTargets) ? body.socialTargets : existing.socialTargets ?? [];
+
+    const updated = await Article.findByIdAndUpdate(
+      id,
+      { ...body, socialTargets },
+      { returnDocument: "after", runValidators: true }
+    );
 
     // Ping search engines if publishing or updating a published article
     if (isPublishingNow || existing.status === "published") {
       pingIndexNow(buildArticleUrl(updated.slug)).catch(console.error);
     }
 
-    // Send email + WhatsApp notification on first publish
+    // On first publish: send email/WhatsApp + post to social media
     if (isPublishingNow) {
       notifyArticlePublished(updated).catch(console.error);
+      if (socialTargets.length > 0) {
+        publishToSocial(String(updated._id), socialTargets).catch(console.error);
+      }
     }
 
     return NextResponse.json({ success: true, article: updated });

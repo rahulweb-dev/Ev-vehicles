@@ -8,6 +8,7 @@ import {
   LayoutDashboard, Newspaper, LogOut,
   Menu, X, ExternalLink, Settings,
   Users, Building2, MapPin, ShieldCheck, Car, LayoutTemplate, MessageSquare, Radio, MessagesSquare, BookOpen, Bell, SearchCheck, UserCircle, Tag, Star, Mail,
+  Share2, BarChart3,
 } from "lucide-react";
 import { getPusherClient } from "@/lib/pusherClient";
 
@@ -26,6 +27,8 @@ const ADMIN_NAV = [
   { href: "/admin/subscribers",         label: "Subscribers",        icon: Mail },
   { href: "/admin/push-notifications", label: "Push Notifications", icon: Bell },
   { href: "/admin/seo-audit",          label: "SEO Audit",          icon: SearchCheck },
+  { href: "/admin/social-settings",   label: "Social Settings",    icon: Share2 },
+  { href: "/admin/social-report",     label: "Social Report",      icon: BarChart3 },
   { href: "/admin/authors",            label: "Authors",            icon: UserCircle },
   { href: "/admin/dealers",            label: "Dealers",            icon: Building2 },
   { href: "/admin/settings",           label: "Settings",           icon: Settings },

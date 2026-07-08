@@ -1,9 +1,10 @@
-import { NextResponse } from "next/server";
-import dbConnect from "@/lib/mongodb";
-import Article from "@/lib/models/Article";
-import { requireAuth } from "@/lib/auth";
+import { NextResponse }      from "next/server";
+import dbConnect              from "@/lib/mongodb";
+import Article                from "@/lib/models/Article";
+import { requireAuth }        from "@/lib/auth";
 import { pingIndexNow, buildArticleUrl } from "@/lib/indexnow";
-import { sendPushToAll } from "@/lib/pushNotify";
+import { sendPushToAll }      from "@/lib/pushNotify";
+import { publishToSocial }    from "@/lib/social/publisher";
 
 // GET /api/articles — public, supports ?category=&status=&featured=&limit=&page=
 export async function GET(request) {
@@ -54,6 +55,7 @@ export async function POST(request) {
       title, slug, excerpt, content, image, imageAlt,
       category, author, tags, readTime, featured, status,
       metaTitle, metaDescription, metaKeywords,
+      socialTargets,
     } = body;
 
     if (!title || !slug || !excerpt || !content || !image || !category) {
@@ -64,6 +66,8 @@ export async function POST(request) {
     if (existing) {
       return NextResponse.json({ error: "Slug already exists" }, { status: 409 });
     }
+
+    const targets = Array.isArray(socialTargets) ? socialTargets : [];
 
     const article = await Article.create({
       title, slug, excerpt, content, image,
@@ -77,19 +81,23 @@ export async function POST(request) {
       metaDescription: metaDescription || excerpt,
       metaKeywords: metaKeywords || "",
       publishedAt: status === "published" ? new Date() : undefined,
+      socialTargets: targets,
     });
 
-    // Ping search engines and push browser notifications when publishing
+    // Ping search engines, push notifications, and social media on publish
     if (status === "published") {
       pingIndexNow(buildArticleUrl(slug)).catch(console.error);
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.evradar.in/";
       sendPushToAll({
         title: "EV News India – New Article",
-        body: title,
-        icon: "/images/logo.png",
+        body:  title,
+        icon:  "/images/logo.png",
         image: image || undefined,
-        url: `${siteUrl}/news/${slug}`,
+        url:   `${siteUrl}/news/${slug}`,
       }).catch(console.error);
+      if (targets.length > 0) {
+        publishToSocial(String(article._id), targets).catch(console.error);
+      }
     }
 
     return NextResponse.json({ success: true, article }, { status: 201 });
