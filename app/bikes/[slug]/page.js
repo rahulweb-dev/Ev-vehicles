@@ -259,6 +259,26 @@ export default async function BikeDetailPage({ params }) {
             : `The ${bike.name} is expected to launch soon in India. You can register your interest at the official brand website.`,
         },
       },
+      ...(bike.specs?.kerbWeight ? [{
+        "@type": "Question",
+        name: `What is the kerb weight of ${bike.name}?`,
+        acceptedAnswer: { "@type": "Answer", text: `The kerb weight of the ${bike.name} is ${bike.specs.kerbWeight}.` },
+      }] : []),
+      ...(bike.performance?.topSpeed ? [{
+        "@type": "Question",
+        name: `What is the top speed of ${bike.name}?`,
+        acceptedAnswer: { "@type": "Answer", text: `The ${bike.name} has a top speed of ${bike.performance.topSpeed}.` },
+      }] : []),
+      ...(bike.performance?.batteryCapacity ? [{
+        "@type": "Question",
+        name: `What is the battery capacity of ${bike.name}?`,
+        acceptedAnswer: { "@type": "Answer", text: `The ${bike.name} is equipped with a ${bike.performance.batteryCapacity} battery pack.` },
+      }] : []),
+      ...(bike.specs?.groundClearance ? [{
+        "@type": "Question",
+        name: `What is the ground clearance of ${bike.name}?`,
+        acceptedAnswer: { "@type": "Answer", text: `The ${bike.name} has a ground clearance of ${bike.specs.groundClearance}.` },
+      }] : []),
     ],
   };
 

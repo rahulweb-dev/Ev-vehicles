@@ -62,7 +62,10 @@ export async function generateMetadata({ searchParams }) {
     keywords: cat
       ? `${label.toLowerCase()} news india, ${label.toLowerCase()} 2026, ev ${label.toLowerCase()} india, latest ${label.toLowerCase()} updates`
       : undefined,
-    alternates: { canonical },
+    alternates: {
+      canonical,
+      ...(page > 1 && { prev: buildNewsCanonical(cat, page - 1) }),
+    },
     openGraph: {
       title: `${label} EV News – Electric Vehicle Updates India 2026`,
       description: "Get the latest electric vehicle news, launches, reviews, and price updates from India.",

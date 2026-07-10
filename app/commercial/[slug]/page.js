@@ -78,9 +78,23 @@ export async function generateMetadata({ params }) {
   const range = vehicle.performance?.drivingRange || "";
   const year  = new Date().getFullYear();
 
+  const payload  = vehicle.specs?.payloadCapacity || "";
+  const battery  = vehicle.performance?.batteryCapacity || "";
+
+  const titleSuffix = [price && price, range && `${range} Range`].filter(Boolean).join(" | ");
+  const defaultTitle = `${vehicle.name} Price in India${titleSuffix ? ` – ${titleSuffix}` : ""} | ${year} Specs`;
+
+  const defaultDesc = [
+    `${vehicle.name} electric commercial vehicle price starts at ${price || "TBA"} ex-showroom.`,
+    range   && `Range: ${range}.`,
+    payload && `Payload: ${payload}.`,
+    battery && `Battery: ${battery}.`,
+    `Full specs, variants & on-road price.`,
+  ].filter(Boolean).join(" ");
+
   return {
-    title:       vehicle.metaTitle       || `${vehicle.name} Price in India ${year} – Range, Specs & Features`,
-    description: vehicle.metaDescription || `${vehicle.name} electric commercial vehicle${price ? ` price starts at ${price} ex-showroom` : ""}${range ? `. Range: ${range}` : ""}. Full specs and variants.`,
+    title:       vehicle.metaTitle       || defaultTitle,
+    description: vehicle.metaDescription || defaultDesc,
     keywords:    vehicle.keywords?.join(", "),
     alternates:  { canonical: vehicle.canonicalUrl || `${SITE_URL}/commercial/${slug}` },
     openGraph: {
