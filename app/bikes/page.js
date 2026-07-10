@@ -104,10 +104,43 @@ export default async function BikesPage({ searchParams }) {
     },
   };
 
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "Which is the best electric scooter in India in 2026?",
+        acceptedAnswer: { "@type": "Answer", text: "The best electric scooters in India in 2026 are the Ola S1 Pro Gen 2 (195 km range, ₹1.47L), Ather 450X Gen 3 (146 km, ₹1.50L), TVS iQube S (100 km, ₹98K), and Bajaj Chetak (126 km, ₹95K). The Ola S1 Pro leads on range and features, while the Ather 450X is the top pick for build quality and fast-charging network access." },
+      },
+      {
+        "@type": "Question",
+        name: "What is the cheapest electric scooter in India in 2026?",
+        acceptedAnswer: { "@type": "Answer", text: "The most affordable electric scooters in India in 2026 start from around ₹44,000. Options include the Ampere Nexus (₹44,400), Hero Electric Optima ER (₹45,990), and Okinawa Ridge+ (₹47,990) for under ₹50,000. For better range and features, the Ola S1 Air (₹84,999) and Hero Vida V1 Lite (₹89,994) are the top picks under ₹1 lakh." },
+      },
+      {
+        "@type": "Question",
+        name: "What is the range of electric scooters available in India?",
+        acceptedAnswer: { "@type": "Answer", text: "Electric scooters in India in 2026 offer a certified range of 60 km to 212 km per charge. The Simple One leads with 212 km ARAI range, followed by the Ola S1 Pro Gen 2 (195 km) and Ola S1 Air (101 km). Mid-range scooters like TVS iQube and Bajaj Chetak offer 100–140 km range, which is sufficient for most daily urban commutes." },
+      },
+      {
+        "@type": "Question",
+        name: "Can I charge an electric scooter at home?",
+        acceptedAnswer: { "@type": "Answer", text: "Yes — all electric scooters include a portable home charger that works with a standard 5A or 15A socket. A full charge costs ₹10–20 depending on your state's electricity tariff. Charging time is 4–8 hours overnight. Some premium scooters like Ola S1 Pro support fast charging at dedicated charger networks." },
+      },
+      {
+        "@type": "Question",
+        name: "Are electric scooters better than petrol scooters in India?",
+        acceptedAnswer: { "@type": "Answer", text: "For daily city commutes, electric scooters are more economical than petrol scooters. Running cost is ₹0.15–₹0.30 per km vs ₹2.50–₹3.50 per km for petrol. Annual savings for a 40 km/day commute can be ₹30,000–₹50,000. Electric scooters also need less maintenance (no oil changes, fewer moving parts) and benefit from government subsidies and lower road tax." },
+      },
+    ],
+  };
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionPageJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <div className="min-h-screen bg-gray-50">
 
         <div className="bg-linear-to-br from-green-900 to-green-950 py-14">

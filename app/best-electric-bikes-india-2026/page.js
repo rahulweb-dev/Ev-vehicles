@@ -419,6 +419,29 @@ export default function BestElectricBikesPage() {
             </div>
           </section>
 
+          {/* City price links — internal linking to bike city pages */}
+          <section className="rounded-3xl bg-white border border-gray-200 shadow-sm p-6">
+            <h2 className="font-black text-gray-900 mb-1">Check On-Road Price by City</h2>
+            <p className="text-sm text-gray-500 mb-4">Get the exact on-road price for any of these bikes in your city — including RTO, insurance, and all charges.</p>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {[
+                { slug: "ola-s1-pro",   name: "Ola S1 Pro",     city: "mumbai",    cityName: "Mumbai" },
+                { slug: "ather-450x",   name: "Ather 450X",     city: "bangalore", cityName: "Bangalore" },
+                { slug: "tvs-iqube",    name: "TVS iQube",      city: "chennai",   cityName: "Chennai" },
+                { slug: "bajaj-chetak", name: "Bajaj Chetak",   city: "pune",      cityName: "Pune" },
+                { slug: "hero-vida-v1", name: "Hero Vida V1",   city: "delhi",     cityName: "Delhi" },
+                { slug: "ola-s1-air",   name: "Ola S1 Air",     city: "hyderabad", cityName: "Hyderabad" },
+              ].map(item => (
+                <Link key={`${item.slug}-${item.city}`}
+                  href={`/bikes/${item.slug}/price-in-${item.city}`}
+                  className="flex items-center justify-between rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-xs font-semibold text-gray-700 hover:border-orange-400 hover:text-orange-700 transition">
+                  <span>{item.name} in {item.cityName}</span>
+                  <ChevronRight size={12} className="text-gray-300 shrink-0" />
+                </Link>
+              ))}
+            </div>
+          </section>
+
           {/* Related links */}
           <section className="rounded-3xl bg-gray-50 border border-gray-100 p-6">
             <h2 className="font-black text-gray-900 mb-4">Related EV Guides</h2>

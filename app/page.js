@@ -8,12 +8,15 @@ import { AdBannerHorizontal } from "@/components/ads/AdBanner";
 import { SITE_URL } from "./layout";
 
 const GUIDE_LINKS = [
-  { href: "/best-electric-cars-india-2026", title: "Best EVs 2026", desc: "Expert-ranked top 10", emoji: "🏆" },
-  { href: "/upcoming-electric-cars-india",  title: "Upcoming EVs",   desc: "Launching soon in India", emoji: "🚀" },
-  { href: "/electric-cars-under-10-lakh",   title: "Under ₹10 Lakh", desc: "Budget EV picks", emoji: "💰" },
-  { href: "/ev-charging-guide",             title: "Charging Guide",  desc: "Everything about EV charging", emoji: "⚡" },
-  { href: "/subsidy-calculator",            title: "Subsidy Calculator", desc: "Check your EV savings", emoji: "🧮" },
-  { href: "/government-ev-policy-india",    title: "EV Policy India", desc: "FAME, PM E-Drive & more", emoji: "📋" },
+  { href: "/best-electric-cars-india-2026",  title: "Best EVs 2026",       desc: "Expert-ranked top 10",       emoji: "🏆" },
+  { href: "/best-electric-bikes-india-2026", title: "Best Bikes 2026",      desc: "Top 10 electric scooters",   emoji: "🛵" },
+  { href: "/upcoming-electric-cars-india",   title: "Upcoming Cars",        desc: "Launching soon in India",    emoji: "🚀" },
+  { href: "/upcoming-electric-bikes-india",  title: "Upcoming Bikes",       desc: "New electric scooters 2026", emoji: "⚡" },
+  { href: "/electric-cars-under-10-lakh",    title: "Cars Under ₹10L",      desc: "Budget electric cars",       emoji: "💰" },
+  { href: "/electric-bikes-under-1-lakh",    title: "Bikes Under ₹1L",      desc: "Budget electric scooters",   emoji: "🤑" },
+  { href: "/ev-charging-guide",              title: "Charging Guide",        desc: "Everything about EV charging", emoji: "🔋" },
+  { href: "/subsidy-calculator",             title: "Subsidy Calculator",    desc: "Check your EV savings",      emoji: "🧮" },
+  { href: "/government-ev-policy-india",     title: "EV Policy India",       desc: "FAME, PM E-Drive & more",    emoji: "📋" },
 ];
 
 export const revalidate = 120; // re-fetch from DB every 2 minutes
@@ -208,6 +211,25 @@ export default async function Home() {
       }
     : null;
 
+  const organizationJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": `${SITE_URL}/#organization`,
+    name: "EV News India",
+    alternateName: ["EVRadar", "evradar.in"],
+    url: SITE_URL,
+    logo: { "@type": "ImageObject", url: `${SITE_URL}/images/logo.png`, width: 200, height: 60 },
+    sameAs: [
+      "https://www.facebook.com/EVNewsIndia",
+      "https://twitter.com/EVNewsIndia",
+      "https://www.instagram.com/evnewsindia",
+      "https://www.youtube.com/@evnewsindia",
+    ],
+    contactPoint: { "@type": "ContactPoint", contactType: "customer service", availableLanguage: "en", url: `${SITE_URL}/contact` },
+    areaServed: { "@type": "Country", name: "India" },
+    knowsAbout: ["Electric Vehicles", "EV News India", "Electric Cars India", "Electric Bikes India", "EV Charging India"],
+  };
+
   const webSiteJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -269,6 +291,8 @@ export default async function Home() {
       {itemListJsonLd && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       )}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <EVHomepage />
@@ -283,7 +307,7 @@ export default async function Home() {
       <section className="bg-gray-50 py-8">
         <div className="mx-auto max-w-7xl px-4">
           <h2 className="mb-4 text-xl font-black text-gray-900">EV Buying Guides</h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-3">
             {GUIDE_LINKS.map(g => (
               <Link key={g.href} href={g.href}
                 className="flex flex-col rounded-2xl border border-gray-200 bg-white p-4 shadow-sm hover:border-green-400 hover:shadow-md transition">
