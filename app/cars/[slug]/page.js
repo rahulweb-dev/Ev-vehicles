@@ -54,14 +54,29 @@ export async function generateMetadata({ params }) {
   const car = await getVehicle(slug);
   if (!car) return { title: "Car Not Found" };
 
-  const price = car.variants?.[0]?.exShowroomPrice || "";
-  const range = car.performance?.drivingRange || "";
-  const year  = new Date().getFullYear();
+  const price    = car.variants?.[0]?.exShowroomPrice || "";
+  const range    = car.performance?.drivingRange || "";
+  const battery  = car.performance?.batteryCapacity || "";
+  const weight   = car.specs?.kerbWeight || "";
+  const variants = car.variants?.length || 0;
+  const year     = new Date().getFullYear();
+
+  const titleSuffix = [price && price, range && `${range} Range`].filter(Boolean).join(" | ");
+  const defaultTitle = `${car.name} Price in India${titleSuffix ? ` – ${titleSuffix}` : ""} | ${year} Specs`;
+
+  const defaultDesc = [
+    `${car.name} price starts at ${price || "TBA"} ex-showroom in India.`,
+    range  && `ARAI range: ${range}.`,
+    battery && `Battery: ${battery}.`,
+    weight  && `Kerb weight: ${weight}.`,
+    variants > 1 && `${variants} variants available.`,
+    `Check on-road price, EMI, full specs & colours.`,
+  ].filter(Boolean).join(" ");
 
   return {
-    title:       car.metaTitle       || `${car.name} Price in India ${year} – Range, Specs & Colors`,
-    description: car.metaDescription || `${car.name} electric car${price ? ` price starts at ${price} ex-showroom` : ""}${range ? `. ARAI range: ${range}` : ""}. Full specs, colors, and variants.`,
-    keywords:    car.keywords?.join(", ") || `${car.name} price india, ${car.name} on road price, ${car.name} range, ${car.name} specs, ${car.brand} electric car india, ${car.name} review`,
+    title:       car.metaTitle       || defaultTitle,
+    description: car.metaDescription || defaultDesc,
+    keywords:    car.keywords?.join(", ") || `${car.name} price india, ${car.name} on road price, ${car.name} range, ${car.name} specs, ${car.brand} electric car india, ${car.name} kerb weight, ${car.name} battery capacity, ${car.name} review`,
     alternates:  { canonical: car.canonicalUrl || `${SITE_URL}/cars/${slug}` },
     openGraph: {
       title:       car.ogTitle       || car.metaTitle       || `${car.name} – Price, Range & Specs`,
@@ -247,6 +262,38 @@ export default async function CarDetailPage({ params }) {
             : `The ${car.name} is expected to launch soon in India. You can register your interest at the official brand website.`,
         },
       },
+      ...(car.specs?.kerbWeight ? [{
+        "@type": "Question",
+        name: `What is the kerb weight of ${car.name}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `The kerb weight of the ${car.name} is ${car.specs.kerbWeight}.`,
+        },
+      }] : []),
+      ...(car.specs?.groundClearance ? [{
+        "@type": "Question",
+        name: `What is the ground clearance of ${car.name}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `The ${car.name} has a ground clearance of ${car.specs.groundClearance}.`,
+        },
+      }] : []),
+      ...(car.performance?.topSpeed ? [{
+        "@type": "Question",
+        name: `What is the top speed of ${car.name}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `The ${car.name} has a top speed of ${car.performance.topSpeed}.`,
+        },
+      }] : []),
+      ...(car.performance?.batteryCapacity ? [{
+        "@type": "Question",
+        name: `What is the battery capacity of ${car.name}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `The ${car.name} is equipped with a ${car.performance.batteryCapacity} battery pack.`,
+        },
+      }] : []),
     ],
   };
 

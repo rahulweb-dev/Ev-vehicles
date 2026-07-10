@@ -61,9 +61,19 @@ export async function generateMetadata({ params }) {
   const [vA, vB] = await Promise.all([getVehicle(pair[0]), getVehicle(pair[1])]);
   if (!vA || !vB) return { title: "EV Comparison" };
 
-  const year  = new Date().getFullYear();
-  const title = `${vA.name} vs ${vB.name} – Comparison, Price, Range & Specs ${year} | EV News India`;
-  const desc  = `Compare ${vA.name} and ${vB.name} side by side. Check price, range, battery, specs and features. ${vA.name} starts at ${vA.variants?.[0]?.exShowroomPrice || "TBA"} and ${vB.name} starts at ${vB.variants?.[0]?.exShowroomPrice || "TBA"}.`;
+  const year   = new Date().getFullYear();
+  const priceA = vA.variants?.[0]?.exShowroomPrice || "TBA";
+  const priceB = vB.variants?.[0]?.exShowroomPrice || "TBA";
+  const rangeA = vA.performance?.drivingRange || "";
+  const rangeB = vB.performance?.drivingRange || "";
+
+  const title = `${vA.name} vs ${vB.name} ${year} – Price, Range & Specs Compared | EV News India`;
+  const desc  = [
+    `${vA.name} vs ${vB.name}: Which is better in ${year}?`,
+    `${vA.name} starts at ${priceA}${rangeA ? ` with ${rangeA} range` : ""}.`,
+    `${vB.name} starts at ${priceB}${rangeB ? ` with ${rangeB} range` : ""}.`,
+    `Full specs, charging, features & verdict.`,
+  ].join(" ");
 
   return {
     title,

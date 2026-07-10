@@ -41,13 +41,28 @@ export async function generateMetadata({ params }) {
   const bike = await getVehicle(slug);
   if (!bike) return { title: "Bike Not Found" };
 
-  const price = bike.variants?.[0]?.exShowroomPrice || "";
-  const range = bike.performance?.drivingRange || "";
-  const year  = new Date().getFullYear();
+  const price    = bike.variants?.[0]?.exShowroomPrice || "";
+  const range    = bike.performance?.drivingRange || "";
+  const battery  = bike.performance?.batteryCapacity || "";
+  const topSpeed = bike.performance?.topSpeed || "";
+  const variants = bike.variants?.length || 0;
+  const year     = new Date().getFullYear();
+
+  const titleSuffix = [price && price, range && `${range} Range`].filter(Boolean).join(" | ");
+  const defaultTitle = `${bike.name} Price in India${titleSuffix ? ` – ${titleSuffix}` : ""} | ${year} Specs`;
+
+  const defaultDesc = [
+    `${bike.name} price starts at ${price || "TBA"} ex-showroom in India.`,
+    range    && `Range: ${range}.`,
+    battery  && `Battery: ${battery}.`,
+    topSpeed && `Top speed: ${topSpeed}.`,
+    variants > 1 && `${variants} variants available.`,
+    `Check on-road price, EMI, full specs & colours.`,
+  ].filter(Boolean).join(" ");
 
   return {
-    title:       bike.metaTitle       || `${bike.name} Price in India ${year} – Range, Specs & Colors`,
-    description: bike.metaDescription || `${bike.name} electric scooter/bike${price ? ` price starts at ${price} ex-showroom` : ""}${range ? `. Range: ${range}` : ""}. Full specs, colors, and variants.`,
+    title:       bike.metaTitle       || defaultTitle,
+    description: bike.metaDescription || defaultDesc,
     keywords:    bike.keywords?.join(", "),
     alternates:  { canonical: bike.canonicalUrl || `${SITE_URL}/bikes/${slug}` },
     openGraph: {

@@ -63,8 +63,8 @@ export async function generateMetadata({ params }) {
   const price = vehicle.variants?.[0]?.exShowroomPrice || "";
 
   return {
-    title:       `${vehicle.name} Price in ${cityData.name} ${year} – On-Road Price & EMI`,
-    description: `${vehicle.name} on-road price in ${cityData.name} ${year}. Includes RTO, insurance, and state taxes.${price ? ` Ex-showroom starts at ${price}.` : ""} Compare variants and check EMI options.`,
+    title:       `${vehicle.name} On-Road Price in ${cityData.name} ${year} – RTO, Insurance & EMI`,
+    description: `${vehicle.name} on-road price in ${cityData.name} ${year}${price ? ` – ex-showroom starts at ${price}` : ""}. Includes RTO registration (${Math.round(cityData.regPct * 100)}%), insurance & state charges. Check exact on-road price, all variants & EMI.`,
     keywords:    `${vehicle.name} price in ${cityData.name}, ${vehicle.name} on road price ${cityData.name}, ${vehicle.name} ${cityData.name}, EV price ${cityData.name}`,
     alternates:  { canonical: `${SITE_URL}/cars/${slug}/price-in-${city}` },
     openGraph: {
