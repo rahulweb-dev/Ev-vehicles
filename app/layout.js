@@ -169,7 +169,6 @@ const websiteJsonLd = {
         name: "India",
         sameAs: "https://www.wikidata.org/wiki/Q668",
       },
-      inLanguage: "en-IN",
       publishingPrinciples: `${SITE_URL}/about`,
       contactPoint: {
         "@type": "ContactPoint",
