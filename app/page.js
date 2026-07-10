@@ -211,42 +211,6 @@ export default async function Home() {
       }
     : null;
 
-  const organizationJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "@id": `${SITE_URL}/#organization`,
-    name: "EV News India",
-    alternateName: ["EVRadar", "evradar.in"],
-    url: SITE_URL,
-    logo: { "@type": "ImageObject", url: `${SITE_URL}/images/logo.png`, width: 200, height: 60 },
-    sameAs: [
-      "https://www.facebook.com/EVNewsIndia",
-      "https://twitter.com/EVNewsIndia",
-      "https://www.instagram.com/evnewsindia",
-      "https://www.youtube.com/@evnewsindia",
-    ],
-    contactPoint: { "@type": "ContactPoint", contactType: "customer service", availableLanguage: "en", url: `${SITE_URL}/contact` },
-    areaServed: { "@type": "Country", name: "India" },
-    knowsAbout: ["Electric Vehicles", "EV News India", "Electric Cars India", "Electric Bikes India", "EV Charging India"],
-  };
-
-  const webSiteJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "@id": `${SITE_URL}/#website`,
-    url: SITE_URL,
-    name: "EV News India",
-    alternateName: ["EVRadar", "evradar.in", "EV News India"],
-    description: "India's #1 electric vehicle news, reviews, prices, and buying guides platform.",
-    inLanguage: "en-IN",
-    publisher: { "@id": `${SITE_URL}/#organization` },
-    potentialAction: {
-      "@type": "SearchAction",
-      target: { "@type": "EntryPoint", urlTemplate: `${SITE_URL}/search?q={search_term_string}` },
-      "query-input": "required name=search_term_string",
-    },
-  };
-
   const webPageJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebPage",
@@ -291,8 +255,6 @@ export default async function Home() {
       {itemListJsonLd && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }} />
       )}
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webSiteJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <EVHomepage />

@@ -20,6 +20,18 @@ const nextConfig = {
   turbopack: {
     root: import.meta.dirname,
   },
+  async redirects() {
+    return [
+      // Redirect non-www to www (permanent 301)
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "evradar.in" }],
+        destination: "https://www.evradar.in/:path*",
+        permanent: true,
+      },
+    ];
+  },
+
   async headers() {
     const csp = [
       "default-src 'self'",

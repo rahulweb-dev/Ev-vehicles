@@ -29,7 +29,7 @@ export default function robots() {
       // These bots harvest content for model training without citation.
       { userAgent: "GPTBot",         disallow: "/" }, // OpenAI training
       { userAgent: "CCBot",          disallow: "/" }, // Common Crawl training
-      { userAgent: "ClaudeBot",      disallow: "/" }, // Anthropic training
+      { userAgent: "ClaudeBot",      allow: "/" },    // Anthropic — allow for citations
       { userAgent: "Bytespider",     disallow: "/" }, // ByteDance/TikTok training
       { userAgent: "Diffbot",        disallow: "/" }, // Diffbot training
       { userAgent: "Omgilibot",      disallow: "/" }, // Social media scraper

@@ -195,11 +195,22 @@ export default async function ArticlePage({ params }) {
     ],
   };
 
+  const faqJsonLd = article.faqs?.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: article.faqs.map(({ question, answer }) => ({
+      "@type": "Question",
+      name: question,
+      acceptedAnswer: { "@type": "Answer", text: answer },
+    })),
+  } : null;
+
   return (
     <>
       <ReadingProgress />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      {faqJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />}
 
       <div className="bg-white">
         <div className="mx-auto max-w-7xl px-4 py-8">
@@ -225,7 +236,10 @@ export default async function ArticlePage({ params }) {
                 <h1 className="text-3xl font-black leading-tight text-gray-900 md:text-4xl lg:text-5xl">
                   {article.title}
                 </h1>
-                <p className="article-lede mt-4 text-lg leading-relaxed text-gray-600">{article.excerpt}</p>
+                <div className="article-lede mt-4 rounded-xl border-l-4 border-green-500 bg-green-50 px-5 py-4">
+                  <p className="mb-1 text-xs font-bold uppercase tracking-wider text-green-700">Quick Summary</p>
+                  <p className="text-lg leading-relaxed text-gray-700">{article.excerpt}</p>
+                </div>
                 <div className="mt-6 flex flex-wrap items-center gap-4 border-y border-gray-100 py-4 text-sm text-gray-500">
                   <Link href={`/authors/${encodeURIComponent(article.author?.toLowerCase().replace(/\s+/g, "-") || "")}`} className="flex items-center gap-2 hover:opacity-80 transition">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-600 text-xs font-bold text-white">
@@ -276,6 +290,23 @@ export default async function ArticlePage({ params }) {
               />
 
               <AdBannerInArticle slot="5678901234" />
+
+              {article.faqs?.length > 0 && (
+                <section className="mt-10 rounded-2xl border border-gray-100 bg-gray-50 p-6">
+                  <h2 className="mb-4 text-xl font-black text-gray-900">Frequently Asked Questions</h2>
+                  <div className="space-y-3">
+                    {article.faqs.map(({ question, answer }, i) => (
+                      <details key={i} className="group rounded-xl border border-gray-200 bg-white">
+                        <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4 text-base font-semibold text-gray-900">
+                          {question}
+                          <span className="ml-2 shrink-0 text-gray-400 transition-transform group-open:rotate-180">▾</span>
+                        </summary>
+                        <p className="px-5 pb-4 text-sm leading-relaxed text-gray-600">{answer}</p>
+                      </details>
+                    ))}
+                  </div>
+                </section>
+              )}
 
               <ArticleComments slug={article.slug} />
 
