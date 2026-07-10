@@ -141,17 +141,18 @@ async function getDbEntries() {
      * manually to STATIC_PAGES above (e.g. nexon-ev-vs-punch-ev).
      */
 
-    /* ── City price pages — inherit vehicle's updatedAt ──────────── */
+    /* ── City price pages — cars + bikes ─────────────────────────── */
     const cityPriceUrls = vehicles
-      .filter(v => v.vehicleType === "car")
-      .flatMap(v =>
-        TOP_CITIES.map(city => ({
-          url:             `${SITE_URL}/cars/${v.slug}/price-in-${city}`,
+      .filter(v => v.vehicleType === "car" || v.vehicleType === "bike")
+      .flatMap(v => {
+        const base = v.vehicleType === "car" ? "cars" : "bikes";
+        return TOP_CITIES.map(city => ({
+          url:             `${SITE_URL}/${base}/${v.slug}/price-in-${city}`,
           lastModified:    v.updatedAt || new Date(),
           changeFrequency: "monthly",
           priority:        0.7,
-        }))
-      );
+        }));
+      });
 
     /* ── Blog pages ──────────────────────────────────────────────── */
     const blogUrls = blogs.map(b => ({
