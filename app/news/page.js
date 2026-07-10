@@ -4,7 +4,7 @@ import { SITE_URL } from "../layout";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60; // refresh every 60 seconds — fresh enough for news
 
 const LIMIT = 20;
 

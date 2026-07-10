@@ -1,4 +1,5 @@
 import { NextResponse }         from "next/server";
+import { revalidatePath }        from "next/cache";
 import dbConnect                 from "@/lib/mongodb";
 import Article                   from "@/lib/models/Article";
 import { requireAuth }           from "@/lib/auth";
@@ -60,7 +61,17 @@ export async function PUT(request, context) {
 
     // Ping search engines if publishing or updating a published article
     if (isPublishingNow || existing.status === "published") {
-      pingIndexNow(buildArticleUrl(updated.slug)).catch(console.error);
+      // Bust ISR cache immediately so Googlebot sees fresh content on next crawl
+      revalidatePath("/");
+      revalidatePath("/news");
+      revalidatePath(`/news/${updated.slug}`);
+
+      // Notify Bing + Yandex via IndexNow (article URL + homepage + news listing)
+      pingIndexNow([
+        buildArticleUrl(updated.slug),
+        "https://www.evradar.in/",
+        "https://www.evradar.in/news",
+      ]).catch(console.error);
     }
 
     // On first publish: send email/WhatsApp + post to social media
