@@ -43,8 +43,10 @@ export default function AdminSubscribersPage() {
   const [subject,     setSubject]     = useState("");
   const [html,        setHtml]        = useState("");
   const [testEmail,   setTestEmail]   = useState("");
-  const [sending,     setSending]     = useState(false);
-  const [sendResult,  setSendResult]  = useState(null);
+  const [sending,       setSending]       = useState(false);
+  const [sendResult,    setSendResult]    = useState(null);
+  const [digestSending, setDigestSending] = useState(false);
+  const [digestResult,  setDigestResult]  = useState(null);
 
   const fetchSubscribers = useCallback(async () => {
     setLoading(true);
@@ -104,6 +106,22 @@ export default function AdminSubscribersPage() {
     setSending(false);
   }
 
+  async function sendWeeklyDigest() {
+    if (!confirm(`Send weekly digest to ${stats.active} subscribers?`)) return;
+    setDigestSending(true);
+    setDigestResult(null);
+    try {
+      const secret = prompt("Enter DIGEST_SECRET:");
+      if (!secret) { setDigestSending(false); return; }
+      const res  = await fetch(`/api/digest/weekly?secret=${encodeURIComponent(secret)}`);
+      const data = await res.json();
+      setDigestResult(data);
+    } catch {
+      setDigestResult({ error: "Network error" });
+    }
+    setDigestSending(false);
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -121,6 +139,10 @@ export default function AdminSubscribersPage() {
             className="flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-50 transition">
             <Download size={14} /> Export CSV
           </button>
+          <button onClick={sendWeeklyDigest} disabled={digestSending}
+            className="flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700 hover:bg-blue-100 transition disabled:opacity-60">
+            <Mail size={14} /> {digestSending ? "Sending…" : "Weekly Digest"}
+          </button>
           <button onClick={() => setShowCompose(!showCompose)}
             className="flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2 text-sm font-bold text-white hover:bg-green-700 transition">
             <Send size={14} /> Send Newsletter
@@ -129,6 +151,14 @@ export default function AdminSubscribersPage() {
       </div>
 
       {/* Stats */}
+      {digestResult && (
+        <div className={`rounded-2xl border p-4 text-sm font-semibold ${digestResult.error ? "border-red-200 bg-red-50 text-red-700" : "border-green-200 bg-green-50 text-green-700"}`}>
+          {digestResult.error
+            ? `Error: ${digestResult.error}`
+            : `Weekly digest sent! ${digestResult.sent}/${digestResult.subscribers} delivered, covering ${digestResult.articles} articles.`}
+        </div>
+      )}
+
       <div className="grid grid-cols-3 gap-4">
         {[
           { label: "Total Subscribers", value: stats.total,        icon: <Users size={20} className="text-blue-500" />,  bg: "bg-blue-50" },

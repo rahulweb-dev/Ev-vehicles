@@ -32,6 +32,13 @@ const nextConfig = {
     ];
   },
 
+  async rewrites() {
+    return [
+      // Serve Google News sitemap at the conventional .xml URL
+      { source: "/sitemap-news.xml", destination: "/sitemap-news" },
+    ];
+  },
+
   async headers() {
     const csp = [
       "default-src 'self'",

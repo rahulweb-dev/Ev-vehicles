@@ -467,8 +467,8 @@ function CarCard({ car, brandLogos = {} }) {
   const brandSlug = car.brand?.toLowerCase().replace(/\s+/g, '-')
   const logo = brandLogos[brandSlug] || ''
   return (
-    <Link href={`/cars/${car.slug}`} className="group block">
-      <div className="overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+    <div className="group overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+      <Link href={`/cars/${car.slug}`} className="block">
         <div className="relative h-48 overflow-hidden bg-gray-100">
           {car.image ? (
             <Image src={car.image} alt={car.name} fill
@@ -488,7 +488,7 @@ function CarCard({ car, brandLogos = {} }) {
             </div>
           )}
         </div>
-        <div className="p-4">
+        <div className="p-4 pb-3">
           <div className="flex items-center gap-1.5">
             {logo && (
               <div className="flex h-5 w-5 items-center justify-center overflow-hidden rounded-sm border border-gray-100">
@@ -518,18 +518,24 @@ function CarCard({ car, brandLogos = {} }) {
               ))}
             </div>
           )}
-          <div className="mt-3 flex items-center justify-between">
-            <div className="flex items-center gap-1">
-              <Star size={12} className="fill-yellow-400 text-yellow-400" />
-              <span className="text-xs font-bold text-gray-700">—</span>
-            </div>
-            <span className="rounded-xl bg-green-600 px-3 py-1.5 text-xs font-bold text-white group-hover:bg-green-500 transition">
-              Details →
-            </span>
-          </div>
         </div>
+      </Link>
+      <div className="flex items-center justify-between gap-2 px-4 pb-4 pt-0">
+        <Link
+          href={`/compare?v1=${car.slug}`}
+          onClick={e => e.stopPropagation()}
+          className="flex-1 rounded-xl border border-gray-200 py-1.5 text-center text-xs font-semibold text-gray-600 hover:border-green-500 hover:text-green-700 transition"
+        >
+          + Compare
+        </Link>
+        <Link
+          href={`/cars/${car.slug}`}
+          className="flex-1 rounded-xl bg-green-600 py-1.5 text-center text-xs font-bold text-white hover:bg-green-500 transition"
+        >
+          Details →
+        </Link>
       </div>
-    </Link>
+    </div>
   )
 }
 

@@ -48,19 +48,47 @@ async function getFeaturedVehicle(tags = []) {
   }
 }
 
-async function getRelated(category, currentSlug) {
+async function getRelated(category, currentSlug, tags = []) {
   try {
     const dbConnect = (await import("@/lib/mongodb")).default;
     const Article = (await import("@/lib/models/Article")).default;
     await dbConnect();
+
+    // First try tag-based matching for higher relevance
+    if (tags.length > 0) {
+      const byTags = await Article.find({
+        status: "published",
+        slug: { $ne: currentSlug },
+        tags: { $in: tags },
+      })
+        .sort({ publishedAt: -1 })
+        .limit(6)
+        .lean();
+      if (byTags.length >= 3) return byTags;
+    }
+
+    // Fall back to category
     const articles = await Article.find({ category, status: "published", slug: { $ne: currentSlug } })
       .sort({ publishedAt: -1 })
-      .limit(3)
+      .limit(6)
       .lean();
     return articles;
   } catch {
     const { getRelatedArticles } = await import("@/data/newsArticles");
-    return getRelatedArticles(currentSlug, category, 3);
+    return getRelatedArticles(currentSlug, category, 6);
+  }
+}
+
+async function getAuthorProfile(authorName) {
+  if (!authorName) return null;
+  try {
+    const dbConnect = (await import("@/lib/mongodb")).default;
+    const Author    = (await import("@/lib/models/Author")).default;
+    await dbConnect();
+    const slug = authorName.toLowerCase().replace(/\s+/g, "-");
+    return await Author.findOne({ slug }).lean();
+  } catch {
+    return null;
   }
 }
 
@@ -111,9 +139,10 @@ export default async function ArticlePage({ params }) {
   const article = await getArticle(slug);
   if (!article) notFound();
 
-  const [related, featuredVehicle] = await Promise.all([
-    getRelated(article.category, slug),
+  const [related, featuredVehicle, authorProfile] = await Promise.all([
+    getRelated(article.category, slug, article.tags || []),
     getFeaturedVehicle(article.tags || []),
+    getAuthorProfile(article.author),
   ]);
 
   const safeContent = sanitizeHtml(article.content || "", {
@@ -196,6 +225,21 @@ export default async function ArticlePage({ params }) {
     ],
   };
 
+  // Extract first YouTube embed from article content for VideoObject schema
+  const videoIdMatch = safeContent.match(/youtube\.com\/embed\/([^"?/]{11})/);
+  const articleVideoId = videoIdMatch?.[1] || null;
+  const articleVideoJsonLd = articleVideoId ? {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    name: article.title,
+    description: article.excerpt || article.title,
+    thumbnailUrl: `https://img.youtube.com/vi/${articleVideoId}/maxresdefault.jpg`,
+    uploadDate: article.publishedAt ? new Date(article.publishedAt).toISOString() : new Date().toISOString(),
+    contentUrl: `https://www.youtube.com/watch?v=${articleVideoId}`,
+    embedUrl: `https://www.youtube.com/embed/${articleVideoId}`,
+    publisher: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+  } : null;
+
   const faqJsonLd = article.faqs?.length > 0 ? {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -212,6 +256,7 @@ export default async function ArticlePage({ params }) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       {faqJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />}
+      {articleVideoJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleVideoJsonLd) }} />}
 
       <div className="bg-white">
         <div className="mx-auto max-w-7xl px-4 py-8">
@@ -414,9 +459,9 @@ export default async function ArticlePage({ params }) {
 
           {related.length > 0 && (
             <section className="mt-16 border-t border-gray-100 pt-10">
-              <h2 className="mb-6 text-2xl font-black text-gray-900">More Stories You May Like</h2>
+              <h2 className="mb-6 text-2xl font-black text-gray-900">You May Also Like</h2>
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {related.map((a) => (
+                {related.slice(0, 6).map((a) => (
                   <NewsCard key={a._id || a.id} article={a} />
                 ))}
               </div>
@@ -428,30 +473,77 @@ export default async function ArticlePage({ params }) {
         {article.author && (
           <div className="mx-auto max-w-7xl px-4 pb-10">
             <div className="rounded-2xl border border-gray-100 bg-gray-50 p-6">
+              <p className="mb-4 text-[10px] font-bold uppercase tracking-widest text-green-600">Written by</p>
               <div className="flex items-start gap-4">
                 <Link
                   href={`/authors/${encodeURIComponent((article.author || "").toLowerCase().replace(/\s+/g, "-"))}`}
-                  className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-green-600 text-2xl font-black text-white hover:opacity-90 transition"
+                  className="shrink-0 hover:opacity-90 transition"
                 >
-                  {article.author.charAt(0).toUpperCase()}
+                  {authorProfile?.photo ? (
+                    <Image
+                      src={authorProfile.photo}
+                      alt={article.author}
+                      width={72}
+                      height={72}
+                      className="h-16 w-16 rounded-2xl object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-green-600 text-2xl font-black text-white">
+                      {article.author.charAt(0).toUpperCase()}
+                    </div>
+                  )}
                 </Link>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-green-600">Written by</p>
-                  <Link
-                    href={`/authors/${encodeURIComponent((article.author || "").toLowerCase().replace(/\s+/g, "-"))}`}
-                    className="text-lg font-black text-gray-900 hover:text-green-700 transition"
-                  >
-                    {article.author}
-                  </Link>
-                  <p className="mt-1 text-sm text-gray-500">
-                    EV journalist at EV News India — covering electric cars, bikes, and India&apos;s EV revolution.
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Link
+                      href={`/authors/${encodeURIComponent((article.author || "").toLowerCase().replace(/\s+/g, "-"))}`}
+                      className="text-lg font-black text-gray-900 hover:text-green-700 transition"
+                    >
+                      {article.author}
+                    </Link>
+                    {authorProfile?.title && (
+                      <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-[11px] font-bold text-green-700">
+                        {authorProfile.title}
+                      </span>
+                    )}
+                    {authorProfile?.yearsExp > 0 && (
+                      <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-[11px] font-semibold text-gray-600">
+                        {authorProfile.yearsExp}+ yrs exp
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-1.5 text-sm leading-relaxed text-gray-600">
+                    {authorProfile?.bio || "EV journalist at EV News India — covering electric cars, bikes, and India's EV revolution."}
                   </p>
-                  <Link
-                    href={`/authors/${encodeURIComponent((article.author || "").toLowerCase().replace(/\s+/g, "-"))}`}
-                    className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-green-600 px-4 py-2 text-xs font-bold text-white hover:bg-green-700 transition"
-                  >
-                    View all articles by {article.author} →
-                  </Link>
+                  {authorProfile?.expertise?.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {authorProfile.expertise.slice(0, 4).map((e) => (
+                        <span key={e} className="rounded-lg bg-white border border-gray-200 px-2.5 py-1 text-[11px] font-semibold text-gray-700">
+                          {e}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <div className="mt-3 flex items-center gap-3 flex-wrap">
+                    <Link
+                      href={`/authors/${encodeURIComponent((article.author || "").toLowerCase().replace(/\s+/g, "-"))}`}
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-green-600 px-4 py-2 text-xs font-bold text-white hover:bg-green-700 transition"
+                    >
+                      View all articles by {article.author} →
+                    </Link>
+                    {authorProfile?.twitter && (
+                      <a href={`https://twitter.com/${authorProfile.twitter.replace(/^@/, "")}`} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 hover:border-gray-300 transition">
+                        Twitter/X
+                      </a>
+                    )}
+                    {authorProfile?.linkedin && (
+                      <a href={authorProfile.linkedin} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 hover:border-gray-300 transition">
+                        LinkedIn
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

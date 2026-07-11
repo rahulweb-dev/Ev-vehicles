@@ -2,11 +2,9 @@
 
 import { useEffect, useRef } from "react";
 
-// IMPORTANT: Replace with your actual AdSense publisher ID and slot IDs
-// Publisher ID format: ca-pub-XXXXXXXXXXXXXXXXX
-// Get ad slot IDs from your AdSense dashboard after creating ad units
-
-const PUBLISHER_ID = "ca-pub-XXXXXXXXXXXXXXXXX";
+// Set NEXT_PUBLIC_ADSENSE_PUBLISHER_ID in your .env.local to your real publisher ID
+// Format: ca-pub-XXXXXXXXXXXXXXXXX (from Google AdSense dashboard)
+const PUBLISHER_ID = process.env.NEXT_PUBLIC_ADSENSE_ID || "ca-pub-XXXXXXXXXXXXXXXXX";
 
 export default function AdBanner({
   slot,

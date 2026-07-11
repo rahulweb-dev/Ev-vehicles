@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import VehicleDetailPage from "@/components/vehicles/VehicleDetailPage";
 import VehicleCTABar from "@/components/VehicleCTABar";
+import PriceHistoryChart from "@/components/vehicles/PriceHistoryChart";
 import { SITE_URL } from "@/app/layout";
 
 export const revalidate = 3600;
@@ -367,6 +368,12 @@ export default async function CarDetailPage({ params }) {
       <VehicleDetailPage vehicle={car} relatedVehicles={related} vehicleType="car" />
 
       {/* Pros & Cons — server-rendered for content richness and AEO */}
+      <PriceHistoryChart
+        priceHistory={car.priceHistory || []}
+        currentPrice={firstVariant?.exShowroomPrice || ""}
+        vehicleName={car.name}
+      />
+
       {(car.pros?.length > 0 || car.cons?.length > 0) && (
         <section className="border-t border-gray-100 bg-white py-10">
           <div className="mx-auto max-w-7xl px-4">

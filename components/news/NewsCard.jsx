@@ -10,6 +10,18 @@ function fmtViews(n) {
   return String(n);
 }
 
+function relativeDate(dateStr) {
+  if (!dateStr) return "";
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins  = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days  = Math.floor(diff / 86400000);
+  if (mins  < 60)  return `${mins  < 1 ? "Just now" : `${mins}m ago`}`;
+  if (hours < 24)  return `${hours}h ago`;
+  if (days  < 7)   return `${days}d ago`;
+  return new Date(dateStr).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+}
+
 const categoryColors = {
   cars: "bg-blue-100 text-blue-700",
   bikes: "bg-orange-100 text-orange-700",
@@ -71,10 +83,8 @@ function DefaultNewsCard({ article }) {
                 {fmtViews(article.views)}
               </span>
             )}
-            <span>
-              {new Date(article.publishedAt).toLocaleDateString("en-IN", {
-                day: "numeric", month: "short", year: "numeric",
-              })}
+            <span title={new Date(article.publishedAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}>
+              {relativeDate(article.publishedAt)}
             </span>
           </div>
         </div>
@@ -173,10 +183,8 @@ function HorizontalNewsCard({ article }) {
             <Clock3 size={11} />
             <span>{article.readTime}</span>
             <span>·</span>
-            <span>
-              {new Date(article.publishedAt).toLocaleDateString("en-IN", {
-                day: "numeric", month: "short",
-              })}
+            <span title={new Date(article.publishedAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}>
+              {relativeDate(article.publishedAt)}
             </span>
           </div>
         </div>

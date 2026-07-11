@@ -4,7 +4,7 @@ import "./globals.css";
 import "react-loading-skeleton/dist/skeleton.css";
 import ConditionalShell from "@/components/ConditionalShell";
 import CookieConsent from "@/components/CookieConsent";
-import PushNotificationPrompt from "@/components/PushNotificationPrompt";
+// import PushNotificationPrompt from "@/components/PushNotificationPrompt";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import ChatWidgetLoader from "@/components/chatbot/ChatWidgetLoader";
 import ScrollRestorer from "@/components/ScrollRestorer";
@@ -12,6 +12,7 @@ import BackToTop from "@/components/BackToTop";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import ContentProtection from "@/components/ContentProtection";
 import WebVitals from "@/components/WebVitals";
+import PWAInstallBanner from "@/components/PWAInstallBanner";
 const ADSENSE_PUBLISHER_ID = process.env.NEXT_PUBLIC_ADSENSE_ID || "ca-pub-XXXXXXXXXXXXXXXXX";
 
 export const SITE_URL = "https://www.evradar.in";
@@ -256,7 +257,8 @@ export default function RootLayout({ children }) {
         <ScrollRestorer />
         <ConditionalShell>{children}</ConditionalShell>
         <CookieConsent />
-        <PushNotificationPrompt />
+        {/* <PushNotificationPrompt /> */}
+        <PWAInstallBanner />
         <ChatWidgetLoader />
         <BackToTop />
         </ThemeProvider>

@@ -259,14 +259,14 @@ export default async function Home() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
       <EVHomepage />
 
-      <div className="bg-white py-2">
+      {/* <div className="bg-white py-2">
         <div className="mx-auto max-w-7xl px-4">
           <AdBannerHorizontal slot="1234567890" />
         </div>
-      </div>
+      </div> */}
 
       {/* Popular Guides — internal links to high-value SEO pages */}
-      <section className="bg-gray-50 py-8">
+      {/* <section className="bg-gray-50 py-8">
         <div className="mx-auto max-w-7xl px-4">
           <h2 className="mb-4 text-xl font-black text-gray-900">EV Buying Guides</h2>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-3">
@@ -280,60 +280,10 @@ export default async function Home() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       <LatestNewsSection initialArticles={initialNews} />
 
-      {/* Latest Blog Posts */}
-      {latestBlogs.length > 0 && (
-        <section className="bg-gray-50 py-12">
-          <div className="mx-auto max-w-7xl px-4">
-            <div className="mb-6 flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-black text-gray-900">EV Guides & Blogs</h2>
-                <p className="mt-1 text-sm text-gray-500">In-depth tips and analysis for Indian EV buyers</p>
-              </div>
-              <Link href="/blogs" className="flex items-center gap-1 text-sm font-bold text-green-600 hover:text-green-700 transition">
-                View all →
-              </Link>
-            </div>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {latestBlogs.map(blog => (
-                <Link key={blog._id?.toString()} href={`/blogs/${blog.slug}`} className="group block">
-                  <article className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
-                    <div className="relative h-44 overflow-hidden bg-gray-100">
-                      {blog.image && (
-                        <Image
-                          src={blog.image}
-                          alt={blog.title}
-                          fill
-                          className="object-cover transition duration-500 group-hover:scale-105"
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        />
-                      )}
-                      <div className="absolute left-3 top-3">
-                        <span className="rounded-full bg-green-100 px-2.5 py-1 text-[11px] font-bold capitalize text-green-700">
-                          {blog.category}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="p-4">
-                      <h3 className="line-clamp-2 text-sm font-bold leading-snug text-gray-900 group-hover:text-green-600">
-                        {blog.title}
-                      </h3>
-                      <p className="mt-1.5 line-clamp-2 text-xs text-gray-500">{blog.excerpt}</p>
-                      <div className="mt-3 flex items-center justify-between text-xs text-gray-400">
-                        <span>{blog.author}</span>
-                        <span>{blog.readTime}</span>
-                      </div>
-                    </div>
-                  </article>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
 
       <HomeCompareWidget />
 
@@ -422,6 +372,56 @@ export default async function Home() {
           vehicles={uCommercial}
           vehicleType="commercial"
         />
+      )}
+
+         {latestBlogs.length > 0 && (
+        <section className="bg-gray-50 py-12">
+          <div className="mx-auto max-w-7xl px-4">
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-black text-gray-900">EV Guides & Blogs</h2>
+                <p className="mt-1 text-sm text-gray-500">In-depth tips and analysis for Indian EV buyers</p>
+              </div>
+              <Link href="/blogs" className="flex items-center gap-1 text-sm font-bold text-green-600 hover:text-green-700 transition">
+                View all →
+              </Link>
+            </div>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {latestBlogs.map(blog => (
+                <Link key={blog._id?.toString()} href={`/blogs/${blog.slug}`} className="group block">
+                  <article className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
+                    <div className="relative h-44 overflow-hidden bg-gray-100">
+                      {blog.image && (
+                        <Image
+                          src={blog.image}
+                          alt={blog.title}
+                          fill
+                          className="object-cover transition duration-500 group-hover:scale-105"
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        />
+                      )}
+                      <div className="absolute left-3 top-3">
+                        <span className="rounded-full bg-green-100 px-2.5 py-1 text-[11px] font-bold capitalize text-green-700">
+                          {blog.category}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="p-4">
+                      <h3 className="line-clamp-2 text-sm font-bold leading-snug text-gray-900 group-hover:text-green-600">
+                        {blog.title}
+                      </h3>
+                      <p className="mt-1.5 line-clamp-2 text-xs text-gray-500">{blog.excerpt}</p>
+                      <div className="mt-3 flex items-center justify-between text-xs text-gray-400">
+                        <span>{blog.author}</span>
+                        <span>{blog.readTime}</span>
+                      </div>
+                    </div>
+                  </article>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
       )}
     </>
   );

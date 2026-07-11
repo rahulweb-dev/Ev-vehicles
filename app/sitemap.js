@@ -39,7 +39,10 @@ const STATIC_PAGES = [
   { url: `${SITE_URL}/ev-charging-guide`,             priority: 0.85, freq: "monthly", since: "2025-03-01" },
   { url: `${SITE_URL}/government-ev-policy-india`,    priority: 0.8,  freq: "monthly", since: "2025-03-01" },
   { url: `${SITE_URL}/ev-glossary`,                   priority: 0.82, freq: "monthly", since: "2025-04-01" },
-  /* Interactive tools */
+  /* Interactive tools — built and live */
+  { url: `${SITE_URL}/emi-calculator`,                priority: 0.88, freq: "monthly", since: "2026-07-01" },
+  { url: `${SITE_URL}/ev-vs-petrol`,                  priority: 0.87, freq: "monthly", since: "2026-07-01" },
+  { url: `${SITE_URL}/ev-subsidy`,                    priority: 0.88, freq: "weekly",  since: "2026-07-01" },
   { url: `${SITE_URL}/range-calculator`,              priority: 0.8,  freq: "monthly", since: "2025-01-01" },
   { url: `${SITE_URL}/resale-calculator`,             priority: 0.78, freq: "monthly", since: "2025-01-01" },
   { url: `${SITE_URL}/subsidy-calculator`,            priority: 0.8,  freq: "monthly", since: "2025-01-01" },

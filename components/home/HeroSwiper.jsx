@@ -13,54 +13,61 @@ import {
 import 'swiper/css'
 import 'swiper/css/pagination'
 
-/* ─── Static fallback slides ─────────────────────────────────────── */
+/* ─── Fallback slides (shown until API banners load) ─────────────── */
 const SLIDES = [
   {
-    image: 'https://images.unsplash.com/photo-1617788138017-80ad40651399?q=80&w=1600&auto=format&fit=crop',
-    tag: 'Best Seller 2026', tagColor: 'bg-green-500',
-    title: "India's #1 Electric Vehicle Platform",
-    subtitle: 'Compare 50+ EV Cars & Bikes · Real Prices · Expert Reviews',
-    cta: { label: 'Explore Cars', href: '/cars' },
+    image:    'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?q=80&w=1600&auto=format&fit=crop',
+    tag:      '⚡ EV News India',
+    tagColor: 'bg-green-600',
+    title:    "India's #1 Electric Vehicle News Platform",
+    subtitle: 'Latest EV prices, reviews, launches and subsidies — all in one place.',
+    cta:      { label: 'Explore EVs', href: '/electric-vehicles' },
   },
   {
-    image: 'https://images.unsplash.com/photo-1619767886558-efdc259cde1a?q=80&w=1600&auto=format&fit=crop',
-    tag: 'New Launch', tagColor: 'bg-blue-500',
-    title: 'Mahindra BE 6 — 682 km Range',
-    subtitle: "India's most powerful electric SUV. Starting ₹18.90 Lakh.",
-    cta: { label: 'View Details', href: '/cars/mahindra-be6' },
+    image:    'https://images.unsplash.com/photo-1617788138017-80ad40651399?q=80&w=1600&auto=format&fit=crop',
+    tag:      '🚗 Electric Cars',
+    tagColor: 'bg-blue-600',
+    title:    'Compare All Electric Cars in India 2026',
+    subtitle: 'Filter by price, range and battery. Find your perfect EV.',
+    cta:      { label: 'Browse Cars', href: '/cars' },
   },
   {
-    image: 'https://images.unsplash.com/photo-1620891549027-942fdc95d3f5?q=80&w=1600&auto=format&fit=crop',
-    tag: "Editor's Pick", tagColor: 'bg-purple-500',
-    title: 'Best Electric Scooters of 2026',
-    subtitle: 'Ather, Ola, TVS — compare range, price & features in seconds.',
-    cta: { label: 'Browse Bikes', href: '/bikes' },
+    image:    'https://images.unsplash.com/photo-1558981806-ec527fa84c39?q=80&w=1600&auto=format&fit=crop',
+    tag:      '🛵 Electric Bikes',
+    tagColor: 'bg-orange-500',
+    title:    'Top Electric Scooters & Bikes in India',
+    subtitle: 'Ola, Ather, TVS, Bajaj and more — compare range, price and specs.',
+    cta:      { label: 'Browse Bikes', href: '/bikes' },
   },
 ]
 
 const MOBILE_SLIDES = [
   {
-    image: 'https://images.unsplash.com/photo-1617788138017-80ad40651399?q=80&w=800&auto=format&fit=crop',
-    tag: 'Best Seller 2026', tagColor: 'bg-green-500',
-    title: 'Find Your Perfect Electric Vehicle',
-    subtitle: '50+ EV models · Live prices · Expert reviews',
-    cta: { label: 'Explore Cars', href: '/cars' },
+    image:    'https://images.unsplash.com/photo-1593941707882-a5bba14938c7?q=80&w=800&auto=format&fit=crop',
+    tag:      '⚡ EV News',
+    tagColor: 'bg-green-600',
+    title:    "India's #1 EV News Platform",
+    subtitle: 'Latest launches, prices & reviews.',
+    cta:      { label: 'Explore', href: '/electric-vehicles' },
   },
   {
-    image: 'https://images.unsplash.com/photo-1619767886558-efdc259cde1a?q=80&w=800&auto=format&fit=crop',
-    tag: 'New Launch', tagColor: 'bg-blue-500',
-    title: 'Mahindra BE 6 — 682 km Range',
-    subtitle: 'Starting ₹18.90 Lakh.',
-    cta: { label: 'View Details', href: '/cars/mahindra-be6' },
+    image:    'https://images.unsplash.com/photo-1617788138017-80ad40651399?q=80&w=800&auto=format&fit=crop',
+    tag:      '🚗 Electric Cars',
+    tagColor: 'bg-blue-600',
+    title:    'Compare Electric Cars 2026',
+    subtitle: 'All EVs, all prices, one place.',
+    cta:      { label: 'Browse Cars', href: '/cars' },
   },
   {
-    image: 'https://images.unsplash.com/photo-1620891549027-942fdc95d3f5?q=80&w=800&auto=format&fit=crop',
-    tag: "Editor's Pick", tagColor: 'bg-purple-500',
-    title: 'Best Electric Scooters of 2026',
-    subtitle: 'Ather, Ola, TVS — compare now.',
-    cta: { label: 'Browse Bikes', href: '/bikes' },
+    image:    'https://images.unsplash.com/photo-1558981806-ec527fa84c39?q=80&w=800&auto=format&fit=crop',
+    tag:      '🛵 Electric Bikes',
+    tagColor: 'bg-orange-500',
+    title:    'Top Electric Bikes in India',
+    subtitle: 'Ola, Ather, TVS and more.',
+    cta:      { label: 'Browse Bikes', href: '/bikes' },
   },
 ]
+
 
 const QUICK_LINKS = [
   { label: 'New Cars',      href: '/cars',              Icon: Car,             color: 'text-blue-600 bg-blue-50 border-blue-100' },
@@ -357,7 +364,7 @@ function DesktopHero({ slides }) {
       </div>
 
       {/* Quick Links row */}
-      <div className="border-b border-gray-200 bg-white">
+      {/* <div className="border-b border-gray-200 bg-white">
         <div className="mx-auto max-w-7xl px-4 lg:px-8">
           <div className="grid grid-cols-6">
             {QUICK_LINKS.map(({ label, href, Icon, color }) => (
@@ -373,7 +380,7 @@ function DesktopHero({ slides }) {
             ))}
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Budget + Brand filter bar */}
       <div className="bg-gray-50 border-b border-gray-200">
