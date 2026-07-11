@@ -6,7 +6,8 @@ import { useState, useEffect, useRef } from 'react'
 import {
   Menu, X, ChevronDown, Search, Car, Bike,
   BarChart2, Newspaper, Home, BookOpen, Mail,
-  Info, ArrowRight, Zap, ChevronRight,
+  Info, ArrowRight, Zap, ChevronRight, Wrench, Calculator,
+  Leaf, MapPin,
 } from 'lucide-react'
 import SearchModal from './SearchModal'
 import DarkModeToggle from './DarkModeToggle'
@@ -34,6 +35,16 @@ const DESKTOP_NAV = [
     ],
   },
   { title: 'Compare', link: '/compare' },
+  {
+    title: 'Tools',
+    link: '/emi-calculator',
+    dropdown: [
+      { name: 'EMI Calculator',         href: '/emi-calculator',  icon: Calculator },
+      { name: 'EV vs Petrol Savings',   href: '/ev-vs-petrol',    icon: Leaf       },
+      { name: 'State EV Subsidies',     href: '/ev-subsidy',      icon: MapPin     },
+      { name: 'EV Glossary',            href: '/ev-glossary',     icon: BookOpen   },
+    ],
+  },
   { title: 'Blogs',   link: '/blogs'   },
   { title: 'About',   link: '/about'   },
   { title: 'Contact', link: '/contact' },
@@ -52,6 +63,10 @@ const MOBILE_NAV = [
   { title: 'Electric Bikes', href: '/bikes', icon: Bike },
   { title: 'Compare Vehicles', href: '/compare', icon: BarChart2 },
   { title: 'Latest News', href: '/news', icon: Newspaper },
+  { title: 'EMI Calculator', href: '/emi-calculator', icon: Calculator },
+  { title: 'EV vs Petrol', href: '/ev-vs-petrol', icon: Leaf },
+  { title: 'State Subsidies', href: '/ev-subsidy', icon: MapPin },
+  { title: 'EV Glossary', href: '/ev-glossary', icon: BookOpen },
   { title: 'Blogs', href: '/blogs', icon: BookOpen },
   { title: 'About Us', href: '/about', icon: Info },
   { title: 'Contact', href: '/contact', icon: Mail },

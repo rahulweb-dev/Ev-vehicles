@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import VehicleDetailPage from "@/components/vehicles/VehicleDetailPage";
+import VehicleCTABar from "@/components/VehicleCTABar";
 import { SITE_URL } from "@/app/layout";
 
 export const revalidate = 3600;
@@ -362,6 +363,7 @@ export default async function CarDetailPage({ params }) {
         {car.availability === "available" ? " Currently available at authorised dealerships across India." : " Expected to launch in India soon."}
       </p>
 
+      <VehicleCTABar vehicleName={car.name} vehicleSlug={car.slug} vehicleType="car" />
       <VehicleDetailPage vehicle={car} relatedVehicles={related} vehicleType="car" />
 
       {/* Pros & Cons — server-rendered for content richness and AEO */}

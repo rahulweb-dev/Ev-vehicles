@@ -205,9 +205,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en-IN" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <head>
-        {/* Hreflang — geo-targets India English + Hindi for Google */}
+        {/* Hreflang — geo-targets India English */}
         <link rel="alternate" hrefLang="en-IN" href={SITE_URL} />
-        <link rel="alternate" hrefLang="hi-IN" href={`${SITE_URL}/hi`} />
         <link rel="alternate" hrefLang="x-default" href={SITE_URL} />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
