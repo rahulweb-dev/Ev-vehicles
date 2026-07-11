@@ -49,22 +49,21 @@ export async function generateMetadata({ params }) {
   const variants = bike.variants?.length || 0;
   const year     = new Date().getFullYear();
 
-  const titleSuffix = [price && price, range && `${range} Range`].filter(Boolean).join(" | ");
-  const defaultTitle = `${bike.name} Price in India${titleSuffix ? ` – ${titleSuffix}` : ""} | ${year} Specs`;
+  const defaultTitle = `${bike.name} Price in India ${year}${price ? ` – ${price}` : ""}${range ? `, ${range} Range` : ""} | Specs & Review`;
 
   const defaultDesc = [
     `${bike.name} price starts at ${price || "TBA"} ex-showroom in India.`,
-    range    && `Range: ${range}.`,
-    battery  && `Battery: ${battery}.`,
+    range    && `Certified range: ${range}.`,
+    battery  && `Battery capacity: ${battery}.`,
     topSpeed && `Top speed: ${topSpeed}.`,
     variants > 1 && `${variants} variants available.`,
-    `Check on-road price, EMI, full specs & colours.`,
+    `Compare on-road price, EMI, full specs, colours & expert review.`,
   ].filter(Boolean).join(" ");
 
   return {
     title:       bike.metaTitle       || defaultTitle,
     description: bike.metaDescription || defaultDesc,
-    keywords:    bike.keywords?.join(", "),
+    keywords:    bike.keywords?.join(", ") || `${bike.name} price india ${year}, ${bike.name} on road price, ${bike.name} price in delhi, ${bike.name} price in mumbai, ${bike.name} range, ${bike.name} specs, ${bike.name} review, ${bike.brand} electric scooter india, ${bike.name} battery, ${bike.name} vs, best electric scooter india ${year}`,
     alternates:  { canonical: bike.canonicalUrl || `${SITE_URL}/bikes/${slug}` },
     openGraph: {
       title:       bike.ogTitle       || bike.metaTitle       || `${bike.name} – Price, Range & Specs`,
@@ -151,10 +150,11 @@ export default async function BikeDetailPage({ params }) {
     "@type": "Motorcycle",
     name:   bike.name,
     brand:  { "@type": "Brand", name: bike.brand },
-    description: bike.shortDescription || bike.metaDescription || `${bike.name} electric scooter/bike`,
-    image:  bike.featuredImage || "",
+    manufacturer: { "@type": "Organization", name: bike.brand },
+    model: bike.name,
+    description: bike.shortDescription || bike.metaDescription || `${bike.name} electric scooter`,
+    image:  bike.featuredImage ? [bike.featuredImage, ...(bike.gallery || [])].filter(Boolean) : [],
     url: `${SITE_URL}/bikes/${slug}`,
-    inLanguage: "en-IN",
     fuelType: "Electric",
     vehicleTransmission: "Automatic",
     ...(bike.performance?.power && {
@@ -198,7 +198,7 @@ export default async function BikeDetailPage({ params }) {
       ...(bike.performance?.batteryCapacity ? [{ "@type": "PropertyValue", name: "Battery Capacity", value: bike.performance.batteryCapacity, unitText: "kWh" }] : []),
       ...(bike.performance?.power ? [{ "@type": "PropertyValue", name: "Motor Power", value: bike.performance.power }] : []),
       ...(bike.performance?.topSpeed ? [{ "@type": "PropertyValue", name: "Top Speed", value: bike.performance.topSpeed, unitText: "km/h" }] : []),
-      ...(bike.charging?.fastChargingTime ? [{ "@type": "PropertyValue", name: "Fast Charge Time (10–80%)", value: bike.charging.fastChargingTime }] : []),
+      ...(bike.charging?.dcChargingTime ? [{ "@type": "PropertyValue", name: "Fast Charge Time (10–80%)", value: bike.charging.dcChargingTime }] : []),
     ],
   };
 
@@ -212,9 +212,9 @@ export default async function BikeDetailPage({ params }) {
     ],
   };
 
-  const price = firstVariant?.exShowroomPrice;
-  const range = bike.performance?.drivingRange;
-  const charging = bike.charging?.fastChargingTime;
+  const price    = firstVariant?.exShowroomPrice;
+  const range    = bike.performance?.drivingRange;
+  const charging = bike.charging?.dcChargingTime || bike.charging?.acChargingTime;
 
   const faqJsonLd = {
     "@context": "https://schema.org",
@@ -280,6 +280,25 @@ export default async function BikeDetailPage({ params }) {
         name: `What is the ground clearance of ${bike.name}?`,
         acceptedAnswer: { "@type": "Answer", text: `The ${bike.name} has a ground clearance of ${bike.specs.groundClearance}.` },
       }] : []),
+      ...(bike.warranty?.battery ? [{
+        "@type": "Question",
+        name: `What is the battery warranty of ${bike.name}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `The ${bike.name} comes with a ${bike.warranty.battery} battery warranty${bike.warranty.vehicle ? `, and ${bike.warranty.vehicle} vehicle warranty` : ""}.`,
+        },
+      }] : []),
+      ...((bike.pros?.length > 0 || bike.cons?.length > 0) ? [{
+        "@type": "Question",
+        name: `What are the pros and cons of ${bike.name}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: [
+            bike.pros?.length ? `Pros: ${bike.pros.join(". ")}.` : "",
+            bike.cons?.length ? `Cons: ${bike.cons.join(". ")}.` : "",
+          ].filter(Boolean).join(" "),
+        },
+      }] : []),
     ],
   };
 
@@ -314,6 +333,59 @@ export default async function BikeDetailPage({ params }) {
       </p>
 
       <VehicleDetailPage vehicle={bike} relatedVehicles={related} vehicleType="bike" />
+
+      {/* Pros & Cons — server-rendered for content richness and AEO */}
+      {(bike.pros?.length > 0 || bike.cons?.length > 0) && (
+        <section className="border-t border-gray-100 bg-white py-10">
+          <div className="mx-auto max-w-7xl px-4">
+            <h2 className="mb-6 text-xl font-black text-gray-900">{bike.name} – Pros &amp; Cons</h2>
+            <div className="grid gap-5 sm:grid-cols-2">
+              {bike.pros?.length > 0 && (
+                <div className="rounded-2xl border border-green-100 bg-green-50 p-5">
+                  <p className="mb-3 text-xs font-bold uppercase tracking-wider text-green-700">What We Like</p>
+                  <ul className="space-y-2">
+                    {bike.pros.map((pro, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                        <span className="mt-0.5 shrink-0 font-bold text-green-600">✓</span>{pro}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {bike.cons?.length > 0 && (
+                <div className="rounded-2xl border border-red-100 bg-red-50 p-5">
+                  <p className="mb-3 text-xs font-bold uppercase tracking-wider text-red-700">What Could Be Better</p>
+                  <ul className="space-y-2">
+                    {bike.cons.map((con, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                        <span className="mt-0.5 shrink-0 font-bold text-red-500">✗</span>{con}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Visible FAQ — People Also Ask content and AEO signal */}
+      <section className="border-t border-gray-100 bg-gray-50 py-10">
+        <div className="mx-auto max-w-7xl px-4">
+          <h2 className="mb-5 text-xl font-black text-gray-900">{bike.name} – Frequently Asked Questions</h2>
+          <div className="space-y-3">
+            {faqJsonLd.mainEntity.slice(0, 6).map((q, i) => (
+              <details key={i} className="group rounded-xl border border-gray-200 bg-white">
+                <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4 text-sm font-semibold text-gray-900">
+                  {q.name}
+                  <span className="ml-2 shrink-0 text-gray-400 transition-transform group-open:rotate-180">▾</span>
+                </summary>
+                <p className="px-5 pb-4 text-sm leading-relaxed text-gray-600">{q.acceptedAnswer.text}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* City on-road price links — server-rendered for SEO */}
       <section className="border-t border-gray-100 bg-gray-50 py-10">
@@ -381,7 +453,7 @@ export default async function BikeDetailPage({ params }) {
             </div>
             <div className="mt-6 text-center">
               <Link
-                href={`/news?q=${encodeURIComponent(bike.brand)}`}
+                href={`/news?category=bikes`}
                 className="inline-flex items-center gap-2 rounded-full border border-green-600 px-6 py-2.5 text-sm font-bold text-green-700 transition hover:bg-green-600 hover:text-white"
               >
                 View All {bike.brand} News →

@@ -61,22 +61,21 @@ export async function generateMetadata({ params }) {
   const variants = car.variants?.length || 0;
   const year     = new Date().getFullYear();
 
-  const titleSuffix = [price && price, range && `${range} Range`].filter(Boolean).join(" | ");
-  const defaultTitle = `${car.name} Price in India${titleSuffix ? ` – ${titleSuffix}` : ""} | ${year} Specs`;
+  const defaultTitle = `${car.name} Price in India ${year}${price ? ` – ${price}` : ""}${range ? `, ${range} Range` : ""} | Specs & Review`;
 
   const defaultDesc = [
     `${car.name} price starts at ${price || "TBA"} ex-showroom in India.`,
-    range  && `ARAI range: ${range}.`,
-    battery && `Battery: ${battery}.`,
+    range   && `ARAI certified range: ${range}.`,
+    battery && `Battery capacity: ${battery}.`,
     weight  && `Kerb weight: ${weight}.`,
     variants > 1 && `${variants} variants available.`,
-    `Check on-road price, EMI, full specs & colours.`,
+    `Compare on-road price, EMI, full specs, colours & expert review.`,
   ].filter(Boolean).join(" ");
 
   return {
     title:       car.metaTitle       || defaultTitle,
     description: car.metaDescription || defaultDesc,
-    keywords:    car.keywords?.join(", ") || `${car.name} price india, ${car.name} on road price, ${car.name} range, ${car.name} specs, ${car.brand} electric car india, ${car.name} kerb weight, ${car.name} battery capacity, ${car.name} review`,
+    keywords:    car.keywords?.join(", ") || `${car.name} price india ${year}, ${car.name} on road price, ${car.name} price in delhi, ${car.name} price in mumbai, ${car.name} range, ${car.name} specs, ${car.name} review, ${car.brand} electric car india, ${car.name} battery capacity, ${car.name} vs, best electric car india ${year}`,
     alternates:  { canonical: car.canonicalUrl || `${SITE_URL}/cars/${slug}` },
     openGraph: {
       title:       car.ogTitle       || car.metaTitle       || `${car.name} – Price, Range & Specs`,
@@ -145,18 +144,26 @@ export default async function CarDetailPage({ params }) {
   ]);
 
   const firstVariant = car.variants?.[0];
+  const driveConfig = (() => {
+    const d = (car.performance?.driveType || "").toLowerCase();
+    if (d.includes("awd") || d.includes("all")) return "AllWheelDriveConfiguration";
+    if (d.includes("rwd") || d.includes("rear")) return "RearWheelDriveConfiguration";
+    return "FrontWheelDriveConfiguration";
+  })();
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Car",
     name:   car.name,
     brand:  { "@type": "Brand", name: car.brand },
+    manufacturer: { "@type": "Organization", name: car.brand },
+    model: car.name,
     description: car.shortDescription || car.metaDescription || `${car.name} electric car`,
-    image:  car.featuredImage || "",
+    image:  car.featuredImage ? [car.featuredImage, ...(car.gallery || [])].filter(Boolean) : [],
     url: `${SITE_URL}/cars/${slug}`,
-    inLanguage: "en-IN",
     fuelType: "Electric",
     vehicleTransmission: "Automatic",
-    driveWheelConfiguration: car.performance?.driveType || "FrontWheelDriveConfiguration",
+    driveWheelConfiguration: driveConfig,
     ...(car.specs?.seatingCapacity && { vehicleSeatingCapacity: parseInt(car.specs.seatingCapacity) || undefined }),
     ...(car.performance?.power && {
       vehicleEngine: {
@@ -214,9 +221,9 @@ export default async function CarDetailPage({ params }) {
     ],
   };
 
-  const price = firstVariant?.exShowroomPrice;
-  const range = car.performance?.drivingRange;
-  const charging = car.charging?.fastChargingTime;
+  const price    = firstVariant?.exShowroomPrice;
+  const range    = car.performance?.drivingRange;
+  const charging = car.charging?.dcChargingTime || car.charging?.acChargingTime;
 
   const faqJsonLd = {
     "@context": "https://schema.org",
@@ -294,6 +301,33 @@ export default async function CarDetailPage({ params }) {
           text: `The ${car.name} is equipped with a ${car.performance.batteryCapacity} battery pack.`,
         },
       }] : []),
+      ...(car.warranty?.battery ? [{
+        "@type": "Question",
+        name: `What is the battery warranty of ${car.name}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `The ${car.name} comes with a ${car.warranty.battery} battery warranty${car.warranty.vehicle ? `, and ${car.warranty.vehicle} vehicle warranty` : ""}.`,
+        },
+      }] : []),
+      ...(car.performance?.acceleration ? [{
+        "@type": "Question",
+        name: `What is the 0–100 km/h acceleration of ${car.name}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `The ${car.name} accelerates from 0 to 100 km/h in ${car.performance.acceleration}.`,
+        },
+      }] : []),
+      ...((car.pros?.length > 0 || car.cons?.length > 0) ? [{
+        "@type": "Question",
+        name: `What are the pros and cons of ${car.name}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: [
+            car.pros?.length  ? `Pros: ${car.pros.join(". ")}.`  : "",
+            car.cons?.length  ? `Cons: ${car.cons.join(". ")}.`  : "",
+          ].filter(Boolean).join(" "),
+        },
+      }] : []),
     ],
   };
 
@@ -329,6 +363,59 @@ export default async function CarDetailPage({ params }) {
       </p>
 
       <VehicleDetailPage vehicle={car} relatedVehicles={related} vehicleType="car" />
+
+      {/* Pros & Cons — server-rendered for content richness and AEO */}
+      {(car.pros?.length > 0 || car.cons?.length > 0) && (
+        <section className="border-t border-gray-100 bg-white py-10">
+          <div className="mx-auto max-w-7xl px-4">
+            <h2 className="mb-6 text-xl font-black text-gray-900">{car.name} – Pros &amp; Cons</h2>
+            <div className="grid gap-5 sm:grid-cols-2">
+              {car.pros?.length > 0 && (
+                <div className="rounded-2xl border border-green-100 bg-green-50 p-5">
+                  <p className="mb-3 text-xs font-bold uppercase tracking-wider text-green-700">What We Like</p>
+                  <ul className="space-y-2">
+                    {car.pros.map((pro, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                        <span className="mt-0.5 shrink-0 font-bold text-green-600">✓</span>{pro}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {car.cons?.length > 0 && (
+                <div className="rounded-2xl border border-red-100 bg-red-50 p-5">
+                  <p className="mb-3 text-xs font-bold uppercase tracking-wider text-red-700">What Could Be Better</p>
+                  <ul className="space-y-2">
+                    {car.cons.map((con, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                        <span className="mt-0.5 shrink-0 font-bold text-red-500">✗</span>{con}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Visible FAQ — doubles as People Also Ask content and AEO signal */}
+      <section className="border-t border-gray-100 bg-gray-50 py-10">
+        <div className="mx-auto max-w-7xl px-4">
+          <h2 className="mb-5 text-xl font-black text-gray-900">{car.name} – Frequently Asked Questions</h2>
+          <div className="space-y-3">
+            {faqJsonLd.mainEntity.slice(0, 6).map((q, i) => (
+              <details key={i} className="group rounded-xl border border-gray-200 bg-white">
+                <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4 text-sm font-semibold text-gray-900">
+                  {q.name}
+                  <span className="ml-2 shrink-0 text-gray-400 transition-transform group-open:rotate-180">▾</span>
+                </summary>
+                <p className="px-5 pb-4 text-sm leading-relaxed text-gray-600">{q.acceptedAnswer.text}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* City on-road price links — server-rendered for SEO */}
       <section className="border-t border-gray-100 bg-gray-50 py-10">
@@ -396,7 +483,7 @@ export default async function CarDetailPage({ params }) {
             </div>
             <div className="mt-6 text-center">
               <Link
-                href={`/news?q=${encodeURIComponent(car.brand)}`}
+                href={`/news?category=cars`}
                 className="inline-flex items-center gap-2 rounded-full border border-green-600 px-6 py-2.5 text-sm font-bold text-green-700 transition hover:bg-green-600 hover:text-white"
               >
                 View All {car.brand} News →
