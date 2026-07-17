@@ -4,10 +4,10 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
 import {
-  Menu, X, ChevronDown, Search, Car, Bike,
+  Menu, X, ChevronDown, Search, Car, Bike, Truck,
   BarChart2, Newspaper, Home, BookOpen, Mail,
   Info, ArrowRight, Zap, ChevronRight, Wrench, Calculator,
-  Leaf, MapPin,
+  Leaf, MapPin, TrendingUp,
 } from 'lucide-react'
 import SearchModal from './SearchModal'
 import DarkModeToggle from './DarkModeToggle'
@@ -36,6 +36,19 @@ const DESKTOP_NAV = [
   },
   { title: 'Compare', link: '/compare' },
   {
+    title: 'EV Sales',
+    link: '/ev-sales',
+    dropdown: [
+      { name: 'EV Sales Dashboard',   href: '/ev-sales',            icon: TrendingUp },
+      { name: 'Electric Car Sales',   href: '/ev-sales/cars',       icon: Car        },
+      { name: 'Two-Wheeler Sales',    href: '/ev-sales/two-wheelers', icon: Bike     },
+      { name: 'Commercial EV Sales',  href: '/ev-sales/commercial', icon: Truck      },
+      { name: 'EV Market Share',      href: '/ev-market-share',     icon: BarChart2  },
+      { name: 'Top Selling EVs',      href: '/top-selling-evs',     icon: Zap        },
+      { name: 'State Adoption',       href: '/ev-adoption-states',  icon: MapPin     },
+    ],
+  },
+  {
     title: 'Tools',
     link: '/emi-calculator',
     dropdown: [
@@ -51,10 +64,10 @@ const DESKTOP_NAV = [
 ]
 
 const MOBILE_QUICK = [
-  { label: 'Cars', href: '/cars', icon: Car, color: 'bg-blue-50 text-blue-600' },
-  { label: 'Bikes', href: '/bikes', icon: Bike, color: 'bg-orange-50 text-orange-600' },
-  { label: 'Compare', href: '/compare', icon: BarChart2, color: 'bg-green-50 text-green-600' },
-  { label: 'News', href: '/news', icon: Newspaper, color: 'bg-red-50 text-red-600' },
+  { label: 'Cars',     href: '/cars',      icon: Car,        color: 'bg-blue-50 text-blue-600'   },
+  { label: 'Bikes',    href: '/bikes',     icon: Bike,       color: 'bg-orange-50 text-orange-600' },
+  { label: 'EV Sales', href: '/ev-sales',  icon: TrendingUp, color: 'bg-green-50 text-green-600' },
+  { label: 'News',     href: '/news',      icon: Newspaper,  color: 'bg-red-50 text-red-600'     },
 ]
 
 const MOBILE_NAV = [
@@ -62,6 +75,9 @@ const MOBILE_NAV = [
   { title: 'Electric Cars', href: '/cars', icon: Car },
   { title: 'Electric Bikes', href: '/bikes', icon: Bike },
   { title: 'Compare Vehicles', href: '/compare', icon: BarChart2 },
+  { title: 'EV Sales Data',   href: '/ev-sales', icon: TrendingUp },
+  { title: 'EV Market Share', href: '/ev-market-share', icon: BarChart2 },
+  { title: 'Top Selling EVs', href: '/top-selling-evs', icon: Zap },
   { title: 'Latest News', href: '/news', icon: Newspaper },
   { title: 'EMI Calculator', href: '/emi-calculator', icon: Calculator },
   { title: 'EV vs Petrol', href: '/ev-vs-petrol', icon: Leaf },
@@ -231,20 +247,23 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Nav Links */}
-          <div className="hidden items-center gap-6 lg:flex">
+          <div className="hidden items-center gap-3 xl:flex">
             {DESKTOP_NAV.map((item, i) => (
               <div key={i} className="group relative">
                 <Link
                   href={item.link}
-                  className={`flex items-center gap-1 text-[13.5px] font-semibold transition
+                  className={`flex items-center gap-1 text-[12.5px] font-semibold transition
                     ${item.title === 'Compare'
                       ? 'rounded-full border border-green-200 bg-green-50 px-3 py-1.5 text-green-700 hover:bg-green-100'
+                      : item.title === 'EV Sales'
+                      ? 'text-green-700 hover:text-green-800'
                       : 'text-gray-700 hover:text-green-600'
                     }`}
                 >
                   {item.title === 'Compare' && <BarChart2 size={13} />}
+                  {item.title === 'EV Sales' && <TrendingUp size={13} />}
                   {item.title}
-                  {item.dropdown && (
+                  {item.dropdown && item.title !== 'Compare' && (
                     <ChevronDown size={13} className="transition duration-300 group-hover:rotate-180" />
                   )}
                 </Link>
@@ -254,7 +273,8 @@ export default function Navbar() {
                 )}
 
                 {item.dropdown && (
-                  <div className="invisible absolute left-0 top-9 w-58 translate-y-2 rounded-2xl border border-gray-100 bg-white p-2 opacity-0 shadow-2xl transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100">
+                  <div className={`invisible absolute top-9 translate-y-2 rounded-2xl border border-gray-100 bg-white p-2 opacity-0 shadow-2xl transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 z-50
+                    ${item.title === 'EV Sales' ? 'left-0 w-64' : 'left-0 w-58'}`}>
                     {item.dropdown.map((drop, di) => (
                       <Link
                         key={di}
@@ -272,7 +292,7 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Right */}
-          <div className="hidden items-center gap-2.5 lg:flex">
+          <div className="hidden items-center gap-2.5 xl:flex">
             <SearchModal />
             <DarkModeToggle />
             <Link
@@ -284,7 +304,7 @@ export default function Navbar() {
           </div>
 
           {/* Mobile Right Buttons */}
-          <div className="flex items-center gap-2 lg:hidden">
+          <div className="flex items-center gap-2 xl:hidden">
             <DarkModeToggle />
             {/* Mobile Search Icon */}
             <button
@@ -309,7 +329,7 @@ export default function Navbar() {
 
       {/* ── Mobile Drawer ────────────────────────────────────────────── */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-150 lg:hidden">
+        <div className="fixed inset-0 z-150 xl:hidden">
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={closeMenu} />
 

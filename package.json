@@ -48,7 +48,8 @@
     "sanitize-html": "^2.17.5",
     "sharp": "^0.35.2",
     "swiper": "^12.1.4",
-    "web-push": "^3.6.7"
+    "web-push": "^3.6.7",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
