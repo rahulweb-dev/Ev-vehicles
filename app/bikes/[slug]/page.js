@@ -191,6 +191,7 @@ export default async function BikeDetailPage({ params }) {
         worstRating:   "1",
       },
     }),
+    dateModified: bike.updatedAt ? new Date(bike.updatedAt).toISOString() : undefined,
     speakable: {
       "@type": "SpeakableSpecification",
       cssSelector: ["h1", "[data-speakable]"],

@@ -46,6 +46,7 @@ export async function GET() {
       <description>${cdataWrap(a.excerpt || "")}</description>
       <content:encoded>${cdataWrap(fullHtml)}</content:encoded>
       <pubDate>${pubDate}</pubDate>
+      <atom:updated>${new Date(a.dateModified || a.updatedAt || a.publishedAt).toISOString()}</atom:updated>
       <dc:creator>${esc(a.author || "Editorial Team")}</dc:creator>
       <category>${esc(a.category || "")}</category>
       ${a.image ? `<media:content url="${esc(a.image)}" medium="image" type="image/jpeg"/>` : ""}

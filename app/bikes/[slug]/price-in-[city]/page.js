@@ -74,6 +74,7 @@ export async function generateMetadata({ params }) {
     title,
     description: desc,
     alternates: { canonical: `${SITE_URL}/bikes/${slug}/price-in-${city}` },
+    ...(!price && { robots: { index: false, follow: true } }),
     openGraph: { title, description: desc, url: `${SITE_URL}/bikes/${slug}/price-in-${city}`, type: "website", images: bike.featuredImage ? [{ url: bike.featuredImage }] : [] },
   };
 }

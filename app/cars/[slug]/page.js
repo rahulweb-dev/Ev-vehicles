@@ -199,6 +199,7 @@ export default async function CarDetailPage({ params }) {
         worstRating:   "1",
       },
     }),
+    dateModified: car.updatedAt ? new Date(car.updatedAt).toISOString() : undefined,
     speakable: {
       "@type": "SpeakableSpecification",
       cssSelector: ["h1", "[data-speakable]"],

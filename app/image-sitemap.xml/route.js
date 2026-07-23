@@ -24,17 +24,18 @@ export async function GET() {
       Article.find({ status: "published", image: { $exists: true, $ne: "" } })
         .sort({ publishedAt: -1 })
         .limit(1000)
-        .select("slug title image imageAlt publishedAt category")
+        .select("slug title image imageAlt publishedAt updatedAt category")
         .lean(),
       Vehicle.find({ status: "published", featuredImage: { $exists: true, $ne: "" } })
         .limit(500)
-        .select("slug name brand featuredImage vehicleType")
+        .select("slug name brand featuredImage vehicleType updatedAt")
         .lean(),
     ]);
 
     const articleEntries = articles.map((a) => `
   <url>
     <loc>${SITE_URL}/news/${escapeXml(a.slug)}</loc>
+    <lastmod>${new Date(a.updatedAt || a.publishedAt).toISOString().split("T")[0]}</lastmod>
     <image:image>
       <image:loc>${escapeXml(a.image)}</image:loc>
       <image:title>${escapeXml(a.imageAlt || a.title)}</image:title>
@@ -47,6 +48,7 @@ export async function GET() {
       return `
   <url>
     <loc>${SITE_URL}/${type}/${escapeXml(v.slug)}</loc>
+    <lastmod>${new Date(v.updatedAt || Date.now()).toISOString().split("T")[0]}</lastmod>
     <image:image>
       <image:loc>${escapeXml(v.featuredImage)}</image:loc>
       <image:title>${escapeXml(`${v.brand} ${v.name}`)}</image:title>

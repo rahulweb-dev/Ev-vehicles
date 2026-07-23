@@ -91,6 +91,7 @@ export async function generateMetadata({ params }) {
     title,
     description: desc,
     alternates: { canonical: `${SITE_URL}/cars/${slug}/price-in-${city}` },
+    ...(!price && { robots: { index: false, follow: true } }),
     openGraph: {
       title,
       description: desc,

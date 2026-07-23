@@ -142,8 +142,20 @@ export default function ArticleEditor({ initialData = null }) {
   function addTag(e) {
     if (e.key === "Enter" || e.key === ",") {
       e.preventDefault();
-      const tag = tagInput.trim().replace(/,/g, "");
-      if (tag && !form.tags.includes(tag)) setForm((f) => ({ ...f, tags: [...f.tags, tag] }));
+      const parts = tagInput.split(",").map((t) => t.trim()).filter(Boolean);
+      const newTags = parts.filter((t) => !form.tags.includes(t));
+      if (newTags.length) setForm((f) => ({ ...f, tags: [...f.tags, ...newTags] }));
+      setTagInput("");
+    }
+  }
+
+  function handleTagPaste(e) {
+    const pasted = e.clipboardData.getData("text");
+    if (pasted.includes(",")) {
+      e.preventDefault();
+      const parts = pasted.split(",").map((t) => t.trim()).filter(Boolean);
+      const newTags = parts.filter((t) => !form.tags.includes(t));
+      if (newTags.length) setForm((f) => ({ ...f, tags: [...f.tags, ...newTags] }));
       setTagInput("");
     }
   }
@@ -546,7 +558,8 @@ export default function ArticleEditor({ initialData = null }) {
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={addTag}
-                placeholder="Type tag, press Enter"
+                onPaste={handleTagPaste}
+                placeholder="Type tag + Enter, or paste comma-separated"
                 className={`${INPUT} pl-8`}
               />
             </div>
