@@ -8,9 +8,97 @@ import {
   LayoutDashboard, Newspaper, LogOut,
   Menu, X, ExternalLink, Settings,
   Users, Building2, MapPin, ShieldCheck, Car, LayoutTemplate, MessageSquare, Radio, MessagesSquare, BookOpen, Bell, SearchCheck, UserCircle, Tag, Star, Mail,
-  Share2, BarChart3,
+  Share2, BarChart3, HardDrive, Database, Image as ImageIcon,
 } from "lucide-react";
 import { getPusherClient } from "@/lib/pusherClient";
+
+function fmtBytes(b) {
+  if (!b) return "0 B";
+  const u = ["B", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(b) / Math.log(1024));
+  return `${(b / Math.pow(1024, i)).toFixed(1)} ${u[i]}`;
+}
+
+function MiniStorageBar({ used, total, color }) {
+  const pct = total > 0 ? Math.min((used / total) * 100, 100) : 0;
+  return (
+    <div className="mt-1 h-1.5 w-full rounded-full bg-gray-200 overflow-hidden">
+      <div
+        className={`h-full rounded-full ${pct >= 85 ? "bg-red-500" : color}`}
+        style={{ width: `${pct}%` }}
+      />
+    </div>
+  );
+}
+
+function SidebarStorageWidget() {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    fetch("/api/admin/storage")
+      .then(r => r.ok ? r.json() : null)
+      .then(d => { if (d) setData(d); })
+      .catch(() => {});
+  }, []);
+
+  if (!data) return null;
+
+  const mongo  = data.mongo;
+  const imgkit = data.imagekit;
+
+  const mongoTotal = mongo?.fsTotalSize  || 512 * 1024 * 1024;
+  const mongoUsed  = mongo?.fsUsedSize   || mongo?.storageSize || 0;
+  const mongoPct   = mongoTotal > 0 ? Math.min((mongoUsed / mongoTotal) * 100, 100) : 0;
+
+  const ikTotal = 20 * 1024 * 1024 * 1024;
+  const ikUsed  = imgkit?.totalSize || 0;
+  const ikPct   = ikTotal > 0 ? Math.min((ikUsed / ikTotal) * 100, 100) : 0;
+
+  return (
+    <div className="mx-3 mb-2 rounded-xl border border-gray-100 bg-gray-50 p-3">
+      <div className="flex items-center gap-1.5 mb-2">
+        <HardDrive size={12} className="text-gray-400" />
+        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Storage</span>
+      </div>
+
+      {/* MongoDB */}
+      {mongo && (
+        <div className="mb-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1">
+              <Database size={10} className="text-emerald-600" />
+              <span className="text-[10px] font-semibold text-gray-600">MongoDB</span>
+            </div>
+            <span className="text-[10px] text-gray-400">{mongoPct.toFixed(0)}%</span>
+          </div>
+          <MiniStorageBar used={mongoUsed} total={mongoTotal} color="bg-emerald-500" />
+          <div className="mt-0.5 flex justify-between text-[9px] text-gray-400">
+            <span>{fmtBytes(mongoUsed)} used</span>
+            <span>{fmtBytes(mongoTotal - mongoUsed)} free</span>
+          </div>
+        </div>
+      )}
+
+      {/* ImageKit */}
+      {imgkit && (
+        <div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1">
+              <ImageIcon size={10} className="text-violet-600" />
+              <span className="text-[10px] font-semibold text-gray-600">ImageKit</span>
+            </div>
+            <span className="text-[10px] text-gray-400">{ikPct.toFixed(0)}%</span>
+          </div>
+          <MiniStorageBar used={ikUsed} total={ikTotal} color="bg-violet-500" />
+          <div className="mt-0.5 flex justify-between text-[9px] text-gray-400">
+            <span>{fmtBytes(ikUsed)} used</span>
+            <span>{fmtBytes(ikTotal - ikUsed)} free</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 const ADMIN_NAV = [
   { href: "/admin",                 label: "Dashboard",    icon: LayoutDashboard, exact: true },
@@ -203,7 +291,9 @@ export default function AdminSidebar() {
         </nav>
 
         {/* Bottom — always visible */}
-        <div className="p-3 border-t border-gray-200 space-y-1">
+        <div className="border-t border-gray-200">
+          {!collapsed && isAdmin && <SidebarStorageWidget />}
+          <div className="p-3 space-y-1">
           {isAdmin && (
             <a
               href="/"
@@ -224,6 +314,7 @@ export default function AdminSidebar() {
             <LogOut size={18} className="shrink-0" />
             {!collapsed && <span>{loggingOut ? "Logging out…" : "Logout"}</span>}
           </button>
+          </div>
         </div>
       </aside>
 
