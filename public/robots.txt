@@ -1,0 +1,43 @@
+User-agent: *
+Allow: /
+
+# Block admin, API, and internal routes
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /offline/
+Disallow: /saved/
+Disallow: /search?
+Disallow: /*?*utm_
+Disallow: /*?*fbclid=
+Disallow: /*?*gclid=
+
+# Allow specific API endpoints that serve public content
+Allow: /api/og/
+
+# Sitemaps
+Sitemap: https://www.evradar.in/sitemap.xml
+Sitemap: https://www.evradar.in/news-sitemap.xml
+Sitemap: https://www.evradar.in/image-sitemap.xml
+
+# Crawl-delay hint for well-behaved bots (Googlebot ignores this, uses GSC settings)
+User-agent: Bingbot
+Crawl-delay: 1
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Applebot
+Allow: /

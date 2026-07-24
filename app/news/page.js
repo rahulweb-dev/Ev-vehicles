@@ -9,11 +9,11 @@ export const revalidate = 60; // refresh every 60 seconds — fresh enough for n
 const LIMIT = 20;
 
 const CATEGORY_PILLS = [
-  { label: "All News",       href: "/news",                     cat: null         },
-  { label: "Electric Cars",  href: "/news?category=cars",       cat: "cars"       },
-  { label: "Electric Bikes", href: "/news?category=bikes",      cat: "bikes"      },
-  { label: "Commercial EVs", href: "/news?category=commercial", cat: "commercial" },
-  { label: "EV Charging",    href: "/news?category=charging",   cat: "charging"   },
+  { label: "All News",       href: "/news",                          cat: null         },
+  { label: "Electric Cars",  href: "/news/category/cars",            cat: "cars"       },
+  { label: "Electric Bikes", href: "/news/category/bikes",           cat: "bikes"      },
+  { label: "Commercial EVs", href: "/news/category/commercial",      cat: "commercial" },
+  { label: "EV Charging",    href: "/news/category/charging",        cat: "charging"   },
 ];
 
 const CAT_LABELS = { cars: "Electric Cars", bikes: "Electric Bikes", commercial: "Commercial EVs", charging: "EV Charging" };

@@ -6,7 +6,8 @@ import Link from "next/link";
 import {
   Newspaper, Eye, Plus, CheckCircle2, FileText,
   BarChart2, Zap, Users, Car, Bike, Truck, ArrowRight,
-  Clock, Star, Mail, BellRing,
+  Clock, Star, Mail, BellRing, HardDrive, Image as ImageIcon,
+  Database, RefreshCw, AlertCircle,
 } from "lucide-react";
 import { getPusherClient } from "@/lib/pusherClient";
 
@@ -98,6 +99,145 @@ function ArticleCard({ article }) {
   );
 }
 
+function fmtBytes(bytes) {
+  if (!bytes || bytes === 0) return "0 B";
+  const units = ["B", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  return `${(bytes / Math.pow(1024, i)).toFixed(i > 0 ? 1 : 0)} ${units[i]}`;
+}
+
+function StorageBar({ used, total, color = "bg-green-500" }) {
+  const pct = total > 0 ? Math.min((used / total) * 100, 100) : 0;
+  const danger = pct >= 85;
+  return (
+    <div className="mt-1.5">
+      <div className="h-2 w-full rounded-full bg-gray-100 overflow-hidden">
+        <div
+          className={`h-full rounded-full transition-all ${danger ? "bg-red-500" : color}`}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      <p className="mt-1 text-[10px] text-gray-400">{pct.toFixed(1)}% used</p>
+    </div>
+  );
+}
+
+function StorageWidget({ storage, loading, onRefresh, refreshing }) {
+  if (loading) {
+    return (
+      <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+        <div className="flex items-center gap-2 mb-4">
+          <HardDrive size={16} className="text-blue-600" />
+          <span className="font-bold text-gray-800 text-sm">Storage Usage</span>
+        </div>
+        <div className="space-y-3">
+          {[1,2].map(i => (
+            <div key={i} className="animate-pulse space-y-1.5">
+              <div className="h-3 w-1/2 rounded bg-gray-100" />
+              <div className="h-2 w-full rounded-full bg-gray-100" />
+              <div className="h-2 w-1/3 rounded bg-gray-100" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const mongo   = storage?.mongo;
+  const imgkit  = storage?.imagekit;
+  const fetchedAt = storage?.fetchedAt
+    ? new Date(storage.fetchedAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })
+    : null;
+
+  // MongoDB Atlas free tier = 512 MB; paid tiers expose fsTotalSize
+  const mongoTotal = mongo?.fsTotalSize || 512 * 1024 * 1024;
+  const mongoUsed  = mongo?.fsUsedSize  || mongo?.storageSize || 0;
+
+  // ImageKit free = 20 GB
+  const ikTotal = 20 * 1024 * 1024 * 1024;
+  const ikUsed  = imgkit?.totalSize || 0;
+
+  return (
+    <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <HardDrive size={16} className="text-blue-600" />
+          <span className="font-bold text-gray-800 text-sm">Storage Usage</span>
+        </div>
+        <button
+          onClick={onRefresh}
+          disabled={refreshing}
+          title="Refresh storage stats"
+          className="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition disabled:opacity-40"
+        >
+          <RefreshCw size={13} className={refreshing ? "animate-spin" : ""} />
+        </button>
+      </div>
+
+      <div className="space-y-4">
+        {/* MongoDB */}
+        <div className="rounded-xl bg-gray-50 p-3">
+          <div className="flex items-center gap-2 mb-1">
+            <Database size={13} className="text-emerald-600" />
+            <span className="text-xs font-bold text-gray-700">MongoDB Atlas</span>
+          </div>
+          {mongo ? (
+            <>
+              <div className="flex justify-between text-[11px] text-gray-500 mt-1">
+                <span>Used: <b className="text-gray-800">{fmtBytes(mongoUsed)}</b></span>
+                <span>Total: <b className="text-gray-800">{fmtBytes(mongoTotal)}</b></span>
+              </div>
+              <StorageBar used={mongoUsed} total={mongoTotal} color="bg-emerald-500" />
+              <div className="mt-2 flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-gray-400">
+                <span>Data: {fmtBytes(mongo.dataSize)}</span>
+                <span>Indexes: {fmtBytes(mongo.indexSize)}</span>
+                <span>Collections: {mongo.collections}</span>
+                <span>Documents: {(mongo.objects || 0).toLocaleString("en-IN")}</span>
+              </div>
+            </>
+          ) : (
+            <p className="mt-1 flex items-center gap-1 text-[11px] text-red-500">
+              <AlertCircle size={11} /> Could not fetch MongoDB stats
+            </p>
+          )}
+        </div>
+
+        {/* ImageKit */}
+        <div className="rounded-xl bg-gray-50 p-3">
+          <div className="flex items-center gap-2 mb-1">
+            <ImageIcon size={13} className="text-violet-600" />
+            <span className="text-xs font-bold text-gray-700">ImageKit CDN</span>
+          </div>
+          {imgkit ? (
+            <>
+              <div className="flex justify-between text-[11px] text-gray-500 mt-1">
+                <span>Used: <b className="text-gray-800">{fmtBytes(ikUsed)}</b></span>
+                <span>Plan: <b className="text-gray-800">{fmtBytes(ikTotal)}</b></span>
+              </div>
+              <StorageBar used={ikUsed} total={ikTotal} color="bg-violet-500" />
+              <div className="mt-2 flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-gray-400">
+                <span>Files: {(imgkit.totalFiles || 0).toLocaleString("en-IN")}</span>
+                <span>Free: {fmtBytes(ikTotal - ikUsed)}</span>
+                {imgkit.truncated && <span className="text-amber-500">* counted first 5000 files</span>}
+              </div>
+            </>
+          ) : (
+            <p className="mt-1 flex items-center gap-1 text-[11px] text-red-500">
+              <AlertCircle size={11} /> Could not fetch ImageKit stats
+            </p>
+          )}
+        </div>
+      </div>
+
+      {fetchedAt && (
+        <p className="mt-3 text-[10px] text-gray-400 text-right">
+          {storage?.cached ? "Cached · " : ""}Last updated {fetchedAt}
+        </p>
+      )}
+    </div>
+  );
+}
+
 export default function AdminDashboard() {
   const [stats, setStats]           = useState(null);
   const [recent, setRecent]         = useState([]);
@@ -111,6 +251,9 @@ export default function AdminDashboard() {
   const [newChats, setNewChats]     = useState(0);
   const [reindexing, setReindexing] = useState(false);
   const [reindexResult, setReindexResult] = useState(null);
+  const [storage, setStorage]       = useState(null);
+  const [storageLoading, setStorageLoading] = useState(true);
+  const [storageRefreshing, setStorageRefreshing] = useState(false);
   const soundOnRef                  = useRef(true);
   useEffect(() => { soundOnRef.current = soundOn; }, [soundOn]);
 
@@ -134,6 +277,18 @@ export default function AdminDashboard() {
     });
     return () => { ch.unbind_all(); pusher.unsubscribe("admin-notifications"); };
   }, []);
+
+  async function fetchStorage(force = false) {
+    const url = force ? "/api/admin/storage?bust=" + Date.now() : "/api/admin/storage";
+    try {
+      const res = await fetch(url);
+      if (res.ok) setStorage(await res.json());
+    } catch {}
+    setStorageLoading(false);
+    setStorageRefreshing(false);
+  }
+
+  useEffect(() => { fetchStorage(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     async function load() {
@@ -597,6 +752,17 @@ export default function AdminDashboard() {
               ))}
             </div>
           </div>
+
+          {/* Storage usage */}
+          <StorageWidget
+            storage={storage}
+            loading={storageLoading}
+            refreshing={storageRefreshing}
+            onRefresh={() => {
+              setStorageRefreshing(true);
+              fetchStorage(true);
+            }}
+          />
 
           {/* SEO checklist */}
           <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">

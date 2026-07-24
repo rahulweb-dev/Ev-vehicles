@@ -65,6 +65,7 @@ export async function PUT(request, context) {
       revalidatePath("/");
       revalidatePath("/news");
       revalidatePath(`/news/${updated.slug}`);
+      if (updated.category) revalidatePath(`/news/category/${updated.category}`);
 
       // Notify Bing + Yandex via IndexNow (article URL + homepage + news listing)
       pingIndexNow([

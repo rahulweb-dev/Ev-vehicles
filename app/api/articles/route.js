@@ -1,4 +1,5 @@
 import { NextResponse }      from "next/server";
+import { revalidatePath }     from "next/cache";
 import dbConnect              from "@/lib/mongodb";
 import Article                from "@/lib/models/Article";
 import { requireAuth }        from "@/lib/auth";
@@ -84,8 +85,12 @@ export async function POST(request) {
       socialTargets: targets,
     });
 
-    // Ping search engines, push notifications, and social media on publish
+    // Bust ISR cache and notify search engines on publish
     if (status === "published") {
+      revalidatePath("/");
+      revalidatePath("/news");
+      revalidatePath(`/news/${slug}`);
+      revalidatePath(`/news/category/${category}`);
       pingIndexNow(buildArticleUrl(slug)).catch(console.error);
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.evradar.in/";
       sendPushToAll({
