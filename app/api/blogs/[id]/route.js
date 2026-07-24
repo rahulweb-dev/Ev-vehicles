@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import dbConnect from "@/lib/mongodb";
 import Blog from "@/lib/models/Blog";
 import { requireAuth } from "@/lib/auth";
@@ -36,6 +37,8 @@ export async function PATCH(request, { params }) {
 
     if (isPublishingNow || existing.status === "published") {
       pingIndexNow(buildBlogUrl(blog.slug)).catch(console.error);
+      revalidatePath("/blogs");
+      revalidatePath(`/blogs/${blog.slug}`);
     }
 
     return NextResponse.json({ success: true, blog });

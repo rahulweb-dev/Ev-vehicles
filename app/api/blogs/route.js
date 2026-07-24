@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import dbConnect from "@/lib/mongodb";
 import Blog from "@/lib/models/Blog";
 import { requireAuth } from "@/lib/auth";
@@ -47,6 +48,10 @@ export async function POST(request) {
     if (existing) return NextResponse.json({ error: "Slug already exists" }, { status: 409 });
 
     const blog = await Blog.create(body);
+    if (blog.status === "published") {
+      revalidatePath("/blogs");
+      revalidatePath(`/blogs/${blog.slug}`);
+    }
     return NextResponse.json({ success: true, blog }, { status: 201 });
   } catch (err) {
     console.error("[POST /api/blogs]", err);
