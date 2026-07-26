@@ -1,19 +1,20 @@
-import { NextResponse } from "next/server";
-import { Resend }       from "resend";
-import { requireAuth }  from "@/lib/auth";
-import dbConnect        from "@/lib/mongodb";
-import Campaign         from "@/lib/models/Campaign";
-import Subscriber       from "@/lib/models/Subscriber";
+import { NextResponse }  from "next/server";
+import { requireAuth }   from "@/lib/auth";
+import dbConnect         from "@/lib/mongodb";
+import Campaign          from "@/lib/models/Campaign";
+import Subscriber        from "@/lib/models/Subscriber";
+import { sendMail, broadcastMail } from "@/lib/mailer";
 
 export async function POST(request, { params }) {
   const auth = await requireAuth();
   if (auth.error) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return NextResponse.json({ error: "RESEND_API_KEY not configured" }, { status: 503 });
+  if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    return NextResponse.json({ error: "SMTP_USER / SMTP_PASS not configured in .env.local" }, { status: 503 });
+  }
 
-  const { id } = await params;
-  const body   = await request.json().catch(() => ({}));
+  const { id }  = await params;
+  const body    = await request.json().catch(() => ({}));
   const { testEmail } = body;
 
   await dbConnect();
@@ -21,49 +22,31 @@ export async function POST(request, { params }) {
   if (!campaign) return NextResponse.json({ error: "Campaign not found" }, { status: 404 });
   if (campaign.status === "sent") return NextResponse.json({ error: "Already sent" }, { status: 400 });
 
-  const resend  = new Resend(apiKey);
-  const from    = process.env.RESEND_FROM || "EV Radar <newsletter@evradar.in>";
-
-  // ── Test send ─────────────────────────────────────────────────────────
+  // ── Test send ─────────────────────────────────────────────────
   if (testEmail) {
     try {
-      const { error } = await resend.emails.send({
-        from, to: testEmail,
-        subject: `[TEST] ${campaign.subject}`,
-        html:    campaign.html,
-      });
-      if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+      await sendMail({ to: testEmail, subject: `[TEST] ${campaign.subject}`, html: campaign.html });
       return NextResponse.json({ success: true, mode: "test", sent: 1 });
-    } catch (e) {
-      return NextResponse.json({ error: e.message }, { status: 500 });
+    } catch (err) {
+      return NextResponse.json({ error: err.message }, { status: 400 });
     }
   }
 
-  // ── Full send ─────────────────────────────────────────────────────────
+  // ── Full send ─────────────────────────────────────────────────
   const subscribers = await Subscriber.find({ status: "active" }).select("email").lean();
   if (!subscribers.length) return NextResponse.json({ error: "No active subscribers" }, { status: 400 });
 
   await Campaign.findByIdAndUpdate(id, { status: "sending", recipientCount: subscribers.length });
 
-  const BATCH = 50;
-  let sent = 0, failed = 0;
-
-  for (let i = 0; i < subscribers.length; i += BATCH) {
-    const batch = subscribers.slice(i, i + BATCH);
-    const results = await Promise.allSettled(
-      batch.map(s =>
-        resend.emails.send({ from, to: s.email, subject: campaign.subject, html: campaign.html })
-      )
-    );
-    results.forEach(r => { r.status === "fulfilled" ? sent++ : failed++; });
-  }
+  const emails = subscribers.map(s => s.email);
+  const { sent, failed } = await broadcastMail({ emails, subject: campaign.subject, html: campaign.html });
 
   await Campaign.findByIdAndUpdate(id, {
-    status:    failed === subscribers.length ? "failed" : "sent",
-    sentCount: sent,
+    status:      failed === emails.length ? "failed" : "sent",
+    sentCount:   sent,
     failedCount: failed,
-    sentAt:    new Date(),
+    sentAt:      new Date(),
   });
 
-  return NextResponse.json({ success: true, total: subscribers.length, sent, failed });
+  return NextResponse.json({ success: true, total: emails.length, sent, failed });
 }
