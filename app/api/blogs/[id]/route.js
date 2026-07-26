@@ -4,6 +4,7 @@ import dbConnect from "@/lib/mongodb";
 import Blog from "@/lib/models/Blog";
 import { requireAuth } from "@/lib/auth";
 import { pingIndexNow, buildBlogUrl } from "@/lib/indexnow";
+import { sendBlogPublishedEmail } from "@/lib/notifications";
 
 export async function GET(_, { params }) {
   try {
@@ -39,6 +40,10 @@ export async function PATCH(request, { params }) {
       pingIndexNow(buildBlogUrl(blog.slug)).catch(console.error);
       revalidatePath("/blogs");
       revalidatePath(`/blogs/${blog.slug}`);
+    }
+
+    if (isPublishingNow) {
+      sendBlogPublishedEmail(blog).catch(console.error);
     }
 
     return NextResponse.json({ success: true, blog });

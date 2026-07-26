@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import dbConnect from "@/lib/mongodb";
 import Blog from "@/lib/models/Blog";
 import { requireAuth } from "@/lib/auth";
+import { sendBlogPublishedEmail } from "@/lib/notifications";
 
 export async function GET(request) {
   try {
@@ -51,6 +52,7 @@ export async function POST(request) {
     if (blog.status === "published") {
       revalidatePath("/blogs");
       revalidatePath(`/blogs/${blog.slug}`);
+      sendBlogPublishedEmail(blog).catch(console.error);
     }
     return NextResponse.json({ success: true, blog }, { status: 201 });
   } catch (err) {
