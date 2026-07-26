@@ -1,12 +1,256 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Mail, Plus, Send, Trash2, Eye, ChevronLeft, Zap, Clock,
   CheckCircle2, XCircle, Loader2, Copy, MessageSquare,
   Megaphone, Newspaper, Tag, Star, Gift, AlertCircle,
-  Users, ArrowRight, X, TestTube,
+  Users, ArrowRight, X, TestTube, Upload, FileText,
+  ClipboardList, ChevronDown, UserCheck,
 } from "lucide-react";
+
+// ─── Email utilities ────────────────────────────────────────────────────────
+
+const EMAIL_RE = /[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g;
+
+function extractEmails(text) {
+  const found = text.match(EMAIL_RE) || [];
+  return [...new Set(found.map(e => e.toLowerCase()))];
+}
+
+async function parseFileEmails(file) {
+  const name = file.name.toLowerCase();
+
+  // CSV / TXT — read as text and regex-extract
+  if (name.endsWith(".csv") || name.endsWith(".txt")) {
+    const text = await file.text();
+    return extractEmails(text);
+  }
+
+  // Excel — use xlsx (already installed)
+  if (name.endsWith(".xlsx") || name.endsWith(".xls")) {
+    try {
+      const XLSX = (await import("xlsx")).default;
+      const buf  = await file.arrayBuffer();
+      const wb   = XLSX.read(buf, { type: "array" });
+      let all    = "";
+      wb.SheetNames.forEach(sn => {
+        all += XLSX.utils.sheet_to_csv(wb.Sheets[sn]) + "\n";
+      });
+      return extractEmails(all);
+    } catch {
+      return [];
+    }
+  }
+
+  return [];
+}
+
+// ─── Send Modal ─────────────────────────────────────────────────────────────
+
+function SendModal({ campaign, subscriberCount, onClose, onSent, showToast }) {
+  const [recipients,   setRecipients]   = useState("subscribers"); // subscribers | custom | both
+  const [pasteText,    setPasteText]    = useState("");
+  const [uploadEmails, setUploadEmails] = useState([]);
+  const [uploading,    setUploading]    = useState(false);
+  const [fileName,     setFileName]     = useState("");
+  const [testEmail,    setTestEmail]    = useState("");
+  const [testing,      setTesting]      = useState(false);
+  const [sending,      setSending]      = useState(false);
+  const fileRef = useRef();
+
+  // merge pasted + uploaded emails
+  const pastedEmails  = extractEmails(pasteText);
+  const customEmails  = [...new Set([...uploadEmails, ...pastedEmails])];
+  const customCount   = customEmails.length;
+
+  const totalCount =
+    recipients === "subscribers" ? subscriberCount :
+    recipients === "custom"      ? customCount :
+    subscriberCount + customCount;
+
+  async function handleFile(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setFileName(file.name);
+    const emails = await parseFileEmails(file);
+    setUploadEmails(emails);
+    setUploading(false);
+    e.target.value = "";
+  }
+
+  async function handleTest() {
+    if (!testEmail) return showToast("Enter a test email", "error");
+    setTesting(true);
+    try {
+      const res  = await fetch(`/api/admin/marketing/campaigns/${campaign._id}/send`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ testEmail }),
+      });
+      const data = await res.json();
+      if (!res.ok) return showToast(data.error || "Test failed", "error");
+      showToast(`Test sent to ${testEmail}`);
+    } catch { showToast("Network error", "error"); }
+    setTesting(false);
+  }
+
+  async function handleSend() {
+    if (recipients !== "subscribers" && customCount === 0) {
+      return showToast("No emails in your custom list", "error");
+    }
+    if (!confirm(`Send to ${totalCount.toLocaleString("en-IN")} recipient${totalCount !== 1 ? "s" : ""}?`)) return;
+    setSending(true);
+    try {
+      const res  = await fetch(`/api/admin/marketing/campaigns/${campaign._id}/send`, {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ recipients, customEmails: recipients !== "subscribers" ? customEmails : [] }),
+      });
+      const data = await res.json();
+      if (!res.ok) return showToast(data.error || "Send failed", "error");
+      showToast(`Sent to ${data.sent} recipients!`);
+      onSent();
+      onClose();
+    } catch { showToast("Network error", "error"); }
+    setSending(false);
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+      <div className="w-full max-w-lg rounded-2xl bg-white shadow-2xl overflow-hidden">
+
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+          <div>
+            <h2 className="font-black text-gray-900">Send Campaign</h2>
+            <p className="text-xs text-gray-400 truncate max-w-xs mt-0.5">{campaign.name}</p>
+          </div>
+          <button onClick={onClose} className="rounded-xl p-2 hover:bg-gray-100"><X size={18} /></button>
+        </div>
+
+        <div className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
+
+          {/* Recipient type selector */}
+          <div>
+            <p className="mb-2 text-xs font-bold text-gray-600 uppercase tracking-wide">Send To</p>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { id: "subscribers", label: "Subscribers", icon: Users,        desc: `${subscriberCount} active` },
+                { id: "custom",      label: "Custom List", icon: ClipboardList, desc: "Upload / Paste" },
+                { id: "both",        label: "Both",        icon: UserCheck,     desc: "Merge all" },
+              ].map(opt => (
+                <button
+                  key={opt.id}
+                  onClick={() => setRecipients(opt.id)}
+                  className={`flex flex-col items-center gap-1.5 rounded-xl border-2 p-3 text-center transition ${
+                    recipients === opt.id
+                      ? "border-green-600 bg-green-50"
+                      : "border-gray-200 hover:border-green-300"
+                  }`}
+                >
+                  <opt.icon size={18} className={recipients === opt.id ? "text-green-700" : "text-gray-400"} />
+                  <span className={`text-xs font-bold ${recipients === opt.id ? "text-green-800" : "text-gray-700"}`}>{opt.label}</span>
+                  <span className="text-[10px] text-gray-400">{opt.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Custom list input — shown when custom or both */}
+          {recipients !== "subscribers" && (
+            <div className="space-y-3 rounded-xl border border-gray-200 bg-gray-50 p-4">
+              <p className="text-xs font-bold text-gray-600">Upload Email List</p>
+
+              {/* File upload */}
+              <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls,.txt" className="hidden" onChange={handleFile} />
+              <button
+                onClick={() => fileRef.current?.click()}
+                disabled={uploading}
+                className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-300 bg-white py-4 text-sm font-semibold text-gray-500 hover:border-green-400 hover:text-green-700 transition disabled:opacity-50"
+              >
+                {uploading
+                  ? <><Loader2 size={16} className="animate-spin" /> Parsing file…</>
+                  : <><Upload size={16} /> Upload CSV, Excel or TXT file</>
+                }
+              </button>
+
+              {fileName && (
+                <div className="flex items-center gap-2 rounded-xl bg-green-50 border border-green-200 px-3 py-2">
+                  <FileText size={14} className="text-green-700" />
+                  <span className="text-xs font-semibold text-green-800 flex-1 truncate">{fileName}</span>
+                  <span className="text-xs font-black text-green-700">{uploadEmails.length} emails found</span>
+                </div>
+              )}
+
+              {/* Paste area */}
+              <div>
+                <p className="mb-1.5 text-xs font-semibold text-gray-500">Or paste emails (comma / newline separated)</p>
+                <textarea
+                  value={pasteText}
+                  onChange={e => setPasteText(e.target.value)}
+                  placeholder={"email1@example.com, email2@example.com\nor one per line"}
+                  rows={4}
+                  className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs focus:border-green-500 focus:outline-none resize-none"
+                />
+              </div>
+
+              {/* Email count summary */}
+              <div className="flex items-center justify-between rounded-xl bg-white border border-gray-200 px-3 py-2">
+                <span className="text-xs text-gray-500">Total unique emails detected</span>
+                <span className="text-sm font-black text-green-700">{customCount.toLocaleString("en-IN")}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Total recipients */}
+          <div className="flex items-center justify-between rounded-xl bg-gray-900 px-4 py-3">
+            <span className="text-sm font-semibold text-gray-300">Total recipients</span>
+            <span className="text-lg font-black text-white">{totalCount.toLocaleString("en-IN")}</span>
+          </div>
+
+          {/* Test send */}
+          <div>
+            <p className="mb-2 text-xs font-bold text-gray-600 uppercase tracking-wide">Send Test First</p>
+            <div className="flex gap-2">
+              <input
+                type="email"
+                value={testEmail}
+                onChange={e => setTestEmail(e.target.value)}
+                placeholder="your@email.com"
+                className="flex-1 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm focus:border-green-500 focus:outline-none"
+              />
+              <button
+                onClick={handleTest}
+                disabled={testing}
+                className="flex items-center gap-1.5 rounded-xl border border-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 hover:border-blue-400 hover:text-blue-700 transition disabled:opacity-50"
+              >
+                {testing ? <Loader2 size={13} className="animate-spin" /> : <TestTube size={13} />}
+                {testing ? "Sending…" : "Test"}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex gap-3 border-t border-gray-100 px-6 py-4">
+          <button onClick={onClose} className="flex-1 rounded-xl border border-gray-200 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+            Cancel
+          </button>
+          <button
+            onClick={handleSend}
+            disabled={sending || totalCount === 0}
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-green-700 py-2.5 text-sm font-bold text-white hover:bg-green-800 transition disabled:opacity-50"
+          >
+            {sending ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
+            {sending ? "Sending…" : `Send to ${totalCount.toLocaleString("en-IN")}`}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ─── Email templates ───────────────────────────────────────────────────────
 
@@ -337,19 +581,18 @@ function fmt(d) {
 // ─── Main page ─────────────────────────────────────────────────────────────
 
 export default function CampaignsPage() {
-  const [campaigns, setCampaigns]   = useState([]);
-  const [loading, setLoading]       = useState(true);
-  const [view, setView]             = useState("list"); // list | picker | compose
+  const [campaigns, setCampaigns]     = useState([]);
+  const [loading, setLoading]         = useState(true);
+  const [subscriberCount, setSubscriberCount] = useState(0);
+  const [view, setView]               = useState("list"); // list | picker | compose
   const [selectedTpl, setSelectedTpl] = useState(null);
-  const [form, setForm]             = useState({ name: "", subject: "", previewText: "", html: "" });
-  const [saving, setSaving]         = useState(false);
-  const [sendingId, setSendingId]   = useState(null);
-  const [testEmail, setTestEmail]   = useState("");
-  const [testingId, setTestingId]   = useState(null);
-  const [previewId, setPreviewId]   = useState(null);
-  const [toast, setToast]           = useState(null);
-  const [deleteId, setDeleteId]     = useState(null);
-  const [tab, setTab]               = useState("email"); // email | whatsapp
+  const [form, setForm]               = useState({ name: "", subject: "", previewText: "", html: "" });
+  const [saving, setSaving]           = useState(false);
+  const [sendModal, setSendModal]     = useState(null); // campaign object or null
+  const [previewId, setPreviewId]     = useState(null);
+  const [toast, setToast]             = useState(null);
+  const [deleteId, setDeleteId]       = useState(null);
+  const [tab, setTab]                 = useState("email"); // email | whatsapp
 
   const showToast = (msg, type = "success") => {
     setToast({ msg, type });
@@ -359,9 +602,14 @@ export default function CampaignsPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/marketing/campaigns");
-      const data = await res.json();
-      setCampaigns(data.campaigns || []);
+      const [campRes, subRes] = await Promise.all([
+        fetch("/api/admin/marketing/campaigns"),
+        fetch("/api/subscribe?limit=1"),
+      ]);
+      const campData = await campRes.json();
+      const subData  = await subRes.json();
+      setCampaigns(campData.campaigns || []);
+      setSubscriberCount(subData.total || 0);
     } catch { /* ignore */ }
     setLoading(false);
   }, []);
@@ -392,28 +640,6 @@ export default function CampaignsPage() {
     setSaving(false);
   }
 
-  async function sendCampaign(id, test = false) {
-    if (test) {
-      if (!testEmail) return showToast("Enter a test email address", "error");
-      setTestingId(id);
-    } else {
-      if (!confirm("Send this campaign to ALL active subscribers?")) return;
-      setSendingId(id);
-    }
-    try {
-      const res = await fetch(`/api/admin/marketing/campaigns/${id}/send`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(test ? { testEmail } : {}),
-      });
-      const data = await res.json();
-      if (!res.ok) return showToast(data.error || "Send failed", "error");
-      showToast(test ? `Test sent to ${testEmail}` : `Sent to ${data.sent} subscribers!`);
-      if (!test) { setTestEmail(""); await load(); }
-    } catch { showToast("Network error", "error"); }
-    setTestingId(null);
-    setSendingId(null);
-  }
 
   async function deleteCampaign(id) {
     setDeleteId(null);
@@ -437,6 +663,17 @@ export default function CampaignsPage() {
           {toast.type === "error" ? <XCircle size={16} /> : <CheckCircle2 size={16} />}
           {toast.msg}
         </div>
+      )}
+
+      {/* Send modal */}
+      {sendModal && (
+        <SendModal
+          campaign={sendModal}
+          subscriberCount={subscriberCount}
+          onClose={() => setSendModal(null)}
+          onSent={load}
+          showToast={showToast}
+        />
       )}
 
       {/* Delete confirm modal */}
@@ -574,13 +811,10 @@ export default function CampaignsPage() {
                           </button>
                           {c.status === "draft" && (
                             <button
-                              onClick={() => sendCampaign(c._id)}
-                              disabled={sendingId === c._id}
-                              title="Send to all subscribers"
-                              className="flex items-center gap-1.5 rounded-xl bg-green-700 px-3 py-2 text-xs font-bold text-white hover:bg-green-800 transition disabled:opacity-50"
+                              onClick={() => setSendModal(c)}
+                              className="flex items-center gap-1.5 rounded-xl bg-green-700 px-3 py-2 text-xs font-bold text-white hover:bg-green-800 transition"
                             >
-                              {sendingId === c._id ? <Loader2 size={13} className="animate-spin" /> : <Send size={13} />}
-                              {sendingId === c._id ? "Sending…" : "Send"}
+                              <Send size={13} /> Send
                             </button>
                           )}
                           <button onClick={() => setDeleteId(c._id)} title="Delete"
@@ -590,26 +824,6 @@ export default function CampaignsPage() {
                         </div>
                       </div>
 
-                      {/* Test send row */}
-                      {c.status === "draft" && (
-                        <div className="mt-3 flex items-center gap-2 border-t border-gray-50 pt-3">
-                          <TestTube size={13} className="text-gray-400 shrink-0" />
-                          <input
-                            type="email"
-                            placeholder="test@example.com"
-                            value={testEmail}
-                            onChange={e => setTestEmail(e.target.value)}
-                            className="flex-1 rounded-lg border border-gray-200 bg-gray-50 px-3 py-1.5 text-xs focus:border-green-500 focus:outline-none"
-                          />
-                          <button
-                            onClick={() => sendCampaign(c._id, true)}
-                            disabled={testingId === c._id}
-                            className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:border-blue-300 hover:text-blue-700 transition disabled:opacity-50"
-                          >
-                            {testingId === c._id ? "Sending…" : "Test Send"}
-                          </button>
-                        </div>
-                      )}
                     </div>
                   ))}
                 </div>
