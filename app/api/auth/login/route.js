@@ -71,13 +71,14 @@ export async function POST(request) {
     await User.findByIdAndUpdate(user._id, { lastLogin: new Date() });
 
     const token = signToken({
-      id:         user._id.toString(),
-      email:      user.email,
-      name:       user.name,
-      role:       user.role,
-      city:       user.city || "",
-      state:      user.state || "",
-      dealerCode: user.dealerCode || "",
+      id:           user._id.toString(),
+      email:        user.email,
+      name:         user.name,
+      role:         user.role,
+      city:         user.city || "",
+      state:        user.state || "",
+      dealerCode:   user.dealerCode || "",
+      tokenVersion: user.tokenVersion ?? 0,
     });
     const cookie = createAuthCookie(token);
 

@@ -1,7 +1,67 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { MessageSquare, Send, Loader2, User } from "lucide-react";
+import { MessageSquare, Send, Loader2 } from "lucide-react";
+
+const REACTIONS = [
+  { type: "like",    emoji: "👍", label: "Like" },
+  { type: "love",    emoji: "❤️", label: "Love" },
+  { type: "fire",    emoji: "🔥", label: "Fire" },
+  { type: "insight", emoji: "💡", label: "Insightful" },
+];
+
+function CommentReactions({ commentId, initial }) {
+  const storageKey = `_ev_react_${commentId}`;
+  const [reactions, setReactions] = useState(initial || { like: 0, love: 0, fire: 0, insight: 0 });
+  const [voted, setVoted] = useState(() => {
+    try { return JSON.parse(localStorage.getItem(storageKey) || "null"); } catch { return null; }
+  });
+  const [pending, setPending] = useState(null);
+
+  async function react(type) {
+    if (voted || pending) return;
+    setPending(type);
+    try {
+      const res = await fetch(`/api/comments/${commentId}/react`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setReactions(data.reactions);
+        setVoted(type);
+        localStorage.setItem(storageKey, JSON.stringify(type));
+      }
+    } catch {}
+    setPending(null);
+  }
+
+  return (
+    <div className="flex items-center gap-1 mt-2 flex-wrap">
+      {REACTIONS.map(r => {
+        const count = reactions?.[r.type] || 0;
+        const isVoted = voted === r.type;
+        return (
+          <button
+            key={r.type}
+            onClick={() => react(r.type)}
+            disabled={!!voted || !!pending}
+            title={r.label}
+            className={`flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium transition ${
+              isVoted
+                ? "border-green-300 bg-green-50 text-green-700"
+                : "border-gray-200 bg-white text-gray-500 hover:border-green-200 hover:bg-green-50 disabled:cursor-default"
+            } ${pending === r.type ? "opacity-60" : ""}`}
+          >
+            <span>{r.emoji}</span>
+            {count > 0 && <span>{count}</span>}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function ArticleComments({ slug }) {
   const [comments, setComments] = useState([]);
@@ -114,6 +174,7 @@ export default function ArticleComments({ slug }) {
                   </span>
                 </div>
                 <p className="text-sm text-gray-700 leading-relaxed">{c.content}</p>
+                <CommentReactions commentId={c._id} initial={c.reactions} />
               </div>
             </div>
           ))}

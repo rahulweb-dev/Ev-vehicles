@@ -1,15 +1,21 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import {
   Newspaper, Eye, Plus, CheckCircle2, FileText,
   BarChart2, Zap, Users, Car, Bike, Truck, ArrowRight,
   Clock, Star, Mail, BellRing, HardDrive, Image as ImageIcon,
-  Database, RefreshCw, AlertCircle,
+  Database, RefreshCw, AlertCircle, TrendingUp, Monitor, Smartphone, Tablet,
 } from "lucide-react";
 import { getPusherClient } from "@/lib/pusherClient";
+import ArticleImage from "@/components/news/ArticleImage";
+
+function articleImageFallback(article) {
+  const title = encodeURIComponent(article?.title || "EV News India");
+  const tag = encodeURIComponent(article?.category || "news");
+  return `/api/og?title=${title}&tag=${tag}&type=article`;
+}
 
 function playSound(type = "chat") {
   try {
@@ -63,14 +69,12 @@ function ArticleCard({ article }) {
   return (
     <div className="group flex gap-3 rounded-xl border border-gray-200 bg-white p-3 hover:border-green-200 hover:shadow-sm transition">
       <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-gray-100">
-        {article.image ? (
-          <Image src={article.image} alt={article.imageAlt || article.title} fill
-            className="object-cover transition group-hover:scale-105" sizes="80px" />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center">
-            <Newspaper size={18} className="text-gray-300" />
-          </div>
-        )}
+        <ArticleImage
+          src={article.image}
+          fallbackSrc={articleImageFallback(article)}
+          alt={article.imageAlt || article.title}
+          className="h-full w-full object-cover transition group-hover:scale-105"
+        />
         <span className={`absolute left-1 top-1 rounded px-1 py-0.5 text-[8px] font-black text-white uppercase ${catColor}`}>
           {article.category.slice(0, 3)}
         </span>
@@ -238,6 +242,177 @@ function StorageWidget({ storage, loading, onRefresh, refreshing }) {
   );
 }
 
+// ─── 7-day bar chart (inline SVG) ─────────────────────────────────────────
+function TrafficBars({ data }) {
+  if (!data || data.length === 0) return (
+    <div className="flex h-16 items-center justify-center text-xs text-gray-300">No data yet</div>
+  );
+  const max = Math.max(...data.map(d => d.views), 1);
+  const W = 280, H = 52;
+  const barW = Math.floor(W / data.length) - 3;
+  const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  return (
+    <div className="space-y-1">
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" preserveAspectRatio="none">
+        {data.map((d, i) => {
+          const h = Math.max(3, (d.views / max) * H);
+          const x = i * (barW + 3);
+          const y = H - h;
+          return (
+            <g key={d.date}>
+              <rect x={x} y={0} width={barW} height={H} rx={2} fill="#f0fdf4" />
+              <rect x={x} y={y} width={barW} height={h} rx={2} fill="#16a34a" />
+            </g>
+          );
+        })}
+      </svg>
+      <div className="flex justify-between px-0.5">
+        {data.map(d => {
+          const day = new Date(d.date + "T00:00:00").getDay();
+          return (
+            <span key={d.date} className="text-[9px] text-gray-400">{days[day]}</span>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function SiteTrafficWidget({ pv, pvLoading, onRefresh, refreshing }) {
+  if (pvLoading) {
+    return (
+      <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <div className="mb-4 flex items-center gap-2">
+          <TrendingUp size={18} className="text-green-700" />
+          <h2 className="font-bold text-gray-800">Website Traffic</h2>
+        </div>
+        <div className="grid gap-3 grid-cols-2 sm:grid-cols-4 mb-4">
+          {[1,2,3,4].map(i => (
+            <div key={i} className="animate-pulse rounded-xl bg-gray-100 h-20" />
+          ))}
+        </div>
+        <div className="animate-pulse rounded-xl bg-gray-100 h-16" />
+      </div>
+    );
+  }
+
+  const today     = pv?.today     || { views: 0, unique: 0 };
+  const yesterday = pv?.yesterday || { views: 0, unique: 0 };
+  const month     = pv?.month     || { views: 0 };
+  const topPages  = pv?.topPages  || [];
+  const devices   = pv?.devices   || {};
+  const totalToday = today.views;
+  const viewDelta  = today.views - yesterday.views;
+  const mob = devices.mobile  || 0;
+  const desk= devices.desktop || 0;
+  const tab = devices.tablet  || 0;
+  const devTotal = mob + desk + tab || 1;
+
+  const fetchedAt = pv?.fetchedAt
+    ? new Date(pv.fetchedAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })
+    : null;
+
+  return (
+    <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <TrendingUp size={18} className="text-green-700" />
+          <h2 className="font-bold text-gray-800">Website Traffic</h2>
+          {pv?.cached && <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] text-gray-400">cached</span>}
+        </div>
+        <div className="flex items-center gap-2">
+          {fetchedAt && <span className="text-[10px] text-gray-400">{fetchedAt}</span>}
+          <button
+            onClick={onRefresh}
+            disabled={refreshing}
+            title="Refresh traffic stats"
+            className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition disabled:opacity-40"
+          >
+            <RefreshCw size={13} className={refreshing ? "animate-spin" : ""} />
+          </button>
+        </div>
+      </div>
+
+      {/* Stat tiles */}
+      <div className="grid gap-3 grid-cols-2 sm:grid-cols-4 mb-5">
+        {[
+          { label: "Today's Views",    value: today.views,     sub: viewDelta >= 0 ? `+${viewDelta} vs yesterday` : `${viewDelta} vs yesterday`, positive: viewDelta >= 0, bg: "bg-green-50 border-green-100", num: "text-green-700" },
+          { label: "Today's Visitors", value: today.unique,    sub: "unique sessions",   positive: true, bg: "bg-blue-50 border-blue-100",   num: "text-blue-700" },
+          { label: "Yesterday Views",  value: yesterday.views, sub: `${yesterday.unique} visitors`, positive: null, bg: "bg-gray-50 border-gray-200",  num: "text-gray-700" },
+          { label: "This Month",       value: month.views,     sub: "last 30 days",      positive: null, bg: "bg-purple-50 border-purple-100", num: "text-purple-700" },
+        ].map(({ label, value, sub, positive, bg, num }) => (
+          <div key={label} className={`rounded-xl border ${bg} p-3`}>
+            <p className="text-[11px] font-medium text-gray-500">{label}</p>
+            <p className={`text-2xl font-black mt-0.5 ${num}`}>{(value ?? 0).toLocaleString("en-IN")}</p>
+            {sub && (
+              <p className={`text-[10px] mt-0.5 ${positive === true ? "text-green-600" : positive === false ? "text-red-500" : "text-gray-400"}`}>
+                {sub}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        {/* 7-day bar chart */}
+        <div className="rounded-xl bg-gray-50 p-3">
+          <p className="text-[11px] font-bold text-gray-600 mb-2">Last 7 Days</p>
+          <TrafficBars data={pv?.last7days} />
+          {pv?.last7days?.length > 0 && (
+            <p className="text-[10px] text-gray-400 mt-1 text-right">
+              {pv.last7days.reduce((s, d) => s + d.views, 0).toLocaleString("en-IN")} total views
+            </p>
+          )}
+        </div>
+
+        {/* Right column: top pages + device split */}
+        <div className="space-y-3">
+          {/* Top pages */}
+          <div className="rounded-xl bg-gray-50 p-3">
+            <p className="text-[11px] font-bold text-gray-600 mb-2">Top Pages Today</p>
+            {topPages.length === 0 ? (
+              <p className="text-[11px] text-gray-400">No visits tracked yet</p>
+            ) : (
+              <div className="space-y-1.5">
+                {topPages.slice(0, 5).map(p => (
+                  <div key={p.path} className="flex items-center gap-2">
+                    <span className="min-w-0 flex-1 truncate text-[11px] text-gray-600" title={p.path}>
+                      {p.path === "/" ? "Home" : p.path}
+                    </span>
+                    <span className="shrink-0 rounded bg-green-100 px-1.5 py-0.5 text-[10px] font-bold text-green-700">
+                      {p.views}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Device split */}
+          {totalToday > 0 && (
+            <div className="rounded-xl bg-gray-50 p-3">
+              <p className="text-[11px] font-bold text-gray-600 mb-2">Devices Today</p>
+              <div className="flex items-center gap-3">
+                {[
+                  { icon: Smartphone, label: "Mobile",  count: mob,  color: "text-blue-600" },
+                  { icon: Monitor,    label: "Desktop", count: desk, color: "text-green-700" },
+                  { icon: Tablet,     label: "Tablet",  count: tab,  color: "text-purple-600" },
+                ].map(({ icon: Icon, label, count, color }) => (
+                  <div key={label} className="flex flex-col items-center gap-0.5 flex-1">
+                    <Icon size={14} className={color} />
+                    <p className={`text-sm font-bold ${color}`}>{Math.round((count / devTotal) * 100)}%</p>
+                    <p className="text-[9px] text-gray-400">{label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminDashboard() {
   const [stats, setStats]           = useState(null);
   const [recent, setRecent]         = useState([]);
@@ -254,6 +429,9 @@ export default function AdminDashboard() {
   const [storage, setStorage]       = useState(null);
   const [storageLoading, setStorageLoading] = useState(true);
   const [storageRefreshing, setStorageRefreshing] = useState(false);
+  const [pv, setPv]                 = useState(null);
+  const [pvLoading, setPvLoading]   = useState(true);
+  const [pvRefreshing, setPvRefreshing] = useState(false);
   const soundOnRef                  = useRef(true);
   useEffect(() => { soundOnRef.current = soundOn; }, [soundOn]);
 
@@ -288,7 +466,17 @@ export default function AdminDashboard() {
     setStorageRefreshing(false);
   }
 
-  useEffect(() => { fetchStorage(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  async function fetchPageviews(force = false) {
+    const url = force ? "/api/admin/pageviews?bust=" + Date.now() : "/api/admin/pageviews";
+    try {
+      const res = await fetch(url);
+      if (res.ok) setPv(await res.json());
+    } catch {}
+    setPvLoading(false);
+    setPvRefreshing(false);
+  }
+
+  useEffect(() => { fetchStorage(); fetchPageviews(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     async function load() {
@@ -405,6 +593,14 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {/* Site Traffic */}
+      <SiteTrafficWidget
+        pv={pv}
+        pvLoading={pvLoading}
+        refreshing={pvRefreshing}
+        onRefresh={() => { setPvRefreshing(true); fetchPageviews(true); }}
+      />
+
       {/* Stat cards */}
       <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard icon={Newspaper}    label="Total Articles" value={stats?.total}
@@ -493,11 +689,12 @@ export default function AdminDashboard() {
                     <Link key={a._id} href={`/admin/articles/${a._id}/edit`}
                       className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white hover:border-green-200 hover:shadow-md transition">
                       <div className="relative h-32 w-full bg-gray-100">
-                        {a.image && (
-                          <Image src={a.image} alt={a.imageAlt || a.title} fill
-                            className="object-cover transition group-hover:scale-105"
-                            sizes="(max-width: 768px) 100vw, 33vw" />
-                        )}
+                        <ArticleImage
+                          src={a.image}
+                          fallbackSrc={articleImageFallback(a)}
+                          alt={a.imageAlt || a.title}
+                          className="h-full w-full object-cover transition group-hover:scale-105"
+                        />
                         <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
                         <span className="absolute right-2 top-2 flex items-center gap-0.5 rounded-full bg-yellow-400/90 px-2 py-0.5 text-[9px] font-black text-yellow-900">
                           <Star size={8} fill="currentColor" /> Featured

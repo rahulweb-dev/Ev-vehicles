@@ -1,7 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Clock3, ArrowRight, Eye } from "lucide-react";
 import ShareLikeButtons from "./ShareLikeButtons";
+import ArticleImage from "./ArticleImage";
 
 function fmtViews(n) {
   if (!n || n < 100) return null;
@@ -29,6 +29,12 @@ const categoryColors = {
   charging: "bg-green-100 text-green-700",
 };
 
+function articleImageFallback(article) {
+  const title = encodeURIComponent(article?.title || "EV News India");
+  const tag = encodeURIComponent(article?.category || "news");
+  return `/api/og?title=${title}&tag=${tag}&type=article`;
+}
+
 export default function NewsCard({ article, variant = "default" }) {
   if (variant === "featured") {
     return <FeaturedNewsCard article={article} />;
@@ -48,12 +54,11 @@ function DefaultNewsCard({ article }) {
     <article className="group overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
       <Link href={`/news/${article.slug}`} className="block">
         <div className="relative h-44 overflow-hidden">
-          <Image
+          <ArticleImage
             src={article.image}
+            fallbackSrc={articleImageFallback(article)}
             alt={article.title}
-            fill
-            className="object-cover transition duration-500 group-hover:scale-105"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
           />
           <div className="absolute left-3 top-3">
             <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold capitalize ${colorClass}`}>
@@ -101,12 +106,11 @@ function FeaturedNewsCard({ article }) {
     <article className="group relative overflow-hidden rounded-3xl">
       <Link href={`/news/${article.slug}`} className="block">
         <div className="relative h-[400px] md:h-[500px]">
-          <Image
+          <ArticleImage
             src={article.image}
+            fallbackSrc={articleImageFallback(article)}
             alt={article.title}
-            fill
-            className="object-cover transition duration-700 group-hover:scale-105"
-            sizes="(max-width: 768px) 100vw, 60vw"
+            className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
@@ -163,12 +167,11 @@ function HorizontalNewsCard({ article }) {
     <article className="group rounded-2xl border border-gray-100 bg-white p-3 shadow-sm transition hover:shadow-md">
       <Link href={`/news/${article.slug}`} className="flex gap-4">
         <div className="relative h-24 w-32 flex-shrink-0 overflow-hidden rounded-xl">
-          <Image
+          <ArticleImage
             src={article.image}
+            fallbackSrc={articleImageFallback(article)}
             alt={article.title}
-            fill
-            className="object-cover transition duration-500 group-hover:scale-110"
-            sizes="128px"
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
           />
         </div>
 

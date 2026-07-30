@@ -11,6 +11,13 @@ import {
 } from 'lucide-react'
 import SearchModal from './SearchModal'
 import DarkModeToggle from './DarkModeToggle'
+import ArticleImage from '@/components/news/ArticleImage'
+
+function articleImageFallback(result) {
+  const title = encodeURIComponent(result?.name || 'EV News India')
+  const tag = encodeURIComponent(result?.brand || 'news')
+  return `/api/og?title=${title}&tag=${tag}&type=article`
+}
 
 const DESKTOP_NAV = [
   { title: 'Home', link: '/' },
@@ -148,9 +155,18 @@ function MobileSearch({ onClose }) {
               onClick={onClose}
               className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-50 last:border-0 transition">
               <div className="relative h-11 w-16 shrink-0 overflow-hidden rounded-xl bg-gray-100">
-                {v.image
-                  ? <Image src={v.image} alt={v.name} fill className="object-cover" sizes="64px" />
-                  : <div className="flex h-full items-center justify-center text-xl text-gray-300">⚡</div>}
+                {v.kind === 'article' ? (
+                  <ArticleImage
+                    src={v.image}
+                    fallbackSrc={articleImageFallback(v)}
+                    alt={v.name}
+                    className="h-full w-full object-cover"
+                  />
+                ) : v.image ? (
+                  <Image src={v.image} alt={v.name} fill className="object-cover" sizes="64px" />
+                ) : (
+                  <div className="flex h-full items-center justify-center text-xl text-gray-300">⚡</div>
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-semibold text-green-600 capitalize">{v.brand}</p>

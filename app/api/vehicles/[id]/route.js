@@ -4,14 +4,22 @@ import Vehicle from "@/lib/models/Vehicle";
 import { requireAuth } from "@/lib/auth";
 import { pingIndexNow, buildVehicleUrl } from "@/lib/indexnow";
 
-// GET /api/vehicles/:id
+// GET /api/vehicles/:id — ETag-aware (304 on unchanged data)
 export async function GET(request, { params }) {
   try {
     await dbConnect();
     const { id } = await params;
     const vehicle = await Vehicle.findById(id).lean();
     if (!vehicle) return NextResponse.json({ error: "Not found" }, { status: 404 });
-    return NextResponse.json({ vehicle });
+
+    // ETag from updatedAt — browsers 304 on repeated requests for the same version
+    const etag    = `"${vehicle.updatedAt?.getTime() ?? Date.now()}"`;
+    const ifNone  = request.headers.get("if-none-match");
+    if (ifNone === etag) return new Response(null, { status: 304 });
+
+    return NextResponse.json({ vehicle }, {
+      headers: { "ETag": etag, "Cache-Control": "public, max-age=60, stale-while-revalidate=300" },
+    });
   } catch (error) {
     console.error("[GET /api/vehicles/:id]", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });

@@ -1,7 +1,20 @@
 export const runtime = "nodejs";
 
+import { rateLimit, getIp } from "@/lib/rateLimit";
+const chatLimiter = rateLimit({ windowMs: 60_000, max: 15 });
+
 const GEMINI_API = "https://generativelanguage.googleapis.com/v1beta/models";
 const GEMINI_MODEL = "gemini-flash-latest";
+
+// 5-minute in-memory context cache keyed by query hash
+const contextCache = new Map();
+const CTX_TTL = 5 * 60_000;
+
+function hashQuery(q) {
+  let h = 0;
+  for (let i = 0; i < q.length; i++) { h = Math.imul(31, h) + q.charCodeAt(i) | 0; }
+  return h.toString(36);
+}
 
 /* ─── Build system prompt with DB context ──────────────────────── */
 function buildSystemPrompt(context) {
@@ -37,6 +50,10 @@ Today: ${new Date().toLocaleDateString("en-IN", { dateStyle: "long" })}`;
 
 /* ─── Fetch relevant content from MongoDB ───────────────────────── */
 async function getDbContext(query) {
+  const key = hashQuery(query.toLowerCase().slice(0, 120));
+  const cached = contextCache.get(key);
+  if (cached && cached.expiresAt > Date.now()) return cached.ctx;
+
   try {
     const dbConnect = (await import("@/lib/mongodb")).default;
     const Article   = (await import("@/lib/models/Article")).default;
@@ -113,7 +130,9 @@ async function getDbContext(query) {
       }
     }
 
-    return ctx || "";
+    const result = ctx || "";
+    contextCache.set(key, { ctx: result, expiresAt: Date.now() + CTX_TTL });
+    return result;
   } catch (err) {
     console.error("[chat] DB context error:", err.message);
     return "";
@@ -122,6 +141,14 @@ async function getDbContext(query) {
 
 /* ─── POST /api/chat ────────────────────────────────────────────── */
 export async function POST(req) {
+  const rl = chatLimiter.check(getIp(req));
+  if (!rl.ok) {
+    return Response.json(
+      { error: "Too many messages. Please wait a moment." },
+      { status: 429, headers: { "Retry-After": String(rl.retryAfter) } }
+    );
+  }
+
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return Response.json(

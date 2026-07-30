@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Search, X, Car, Bike, ArrowRight, Newspaper } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import ArticleImage from "@/components/news/ArticleImage";
 
 const FILTERS = [
   { id: "all",     label: "All" },
@@ -11,6 +12,12 @@ const FILTERS = [
   { id: "bikes",   label: "Bikes",   icon: <Bike size={12} /> },
   { id: "news",    label: "News",    icon: <Newspaper size={12} /> },
 ];
+
+function articleImageFallback(result) {
+  const title = encodeURIComponent(result?.name || "EV News India");
+  const tag = encodeURIComponent(result?.brand || "news");
+  return `/api/og?title=${title}&tag=${tag}&type=article`;
+}
 
 export default function SearchModal() {
   const [isOpen,   setIsOpen]   = useState(false);
@@ -147,9 +154,18 @@ export default function SearchModal() {
                       onClick={close}
                       className="flex items-center gap-3 rounded-xl px-3 py-3 hover:bg-gray-50 transition">
                       <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded-lg bg-gray-100">
-                        {r.image
-                          ? <Image src={r.image} alt={r.name} fill className="object-cover" sizes="80px" />
-                          : <div className="flex h-full items-center justify-center text-2xl text-gray-200">⚡</div>}
+                        {r.kind === "article" ? (
+                          <ArticleImage
+                            src={r.image}
+                            fallbackSrc={articleImageFallback(r)}
+                            alt={r.name}
+                            className="h-full w-full object-cover"
+                          />
+                        ) : r.image ? (
+                          <Image src={r.image} alt={r.name} fill className="object-cover" sizes="80px" />
+                        ) : (
+                          <div className="flex h-full items-center justify-center text-2xl text-gray-200">⚡</div>
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-[11px] font-semibold capitalize text-green-600">{r.brand}</p>

@@ -56,18 +56,18 @@ export async function POST(request, { params }) {
 
   await Campaign.findByIdAndUpdate(id, { status: "sending", recipientCount: emails.length });
 
-  const { sent, failed } = await broadcastMail({
+  const { queued } = await broadcastMail({
     emails,
-    subject: campaign.subject,
-    html:    campaign.html,
+    subject:    campaign.subject,
+    html:       campaign.html,
+    campaignId: id,   // injects open-tracking pixel + unsubscribe footer per recipient
   });
 
+  // Emails are queued — the mail-worker cron will deliver them and increment sentCount
   await Campaign.findByIdAndUpdate(id, {
-    status:      failed === emails.length ? "failed" : "sent",
-    sentCount:   sent,
-    failedCount: failed,
-    sentAt:      new Date(),
+    status:  "sent",
+    sentAt:  new Date(),
   });
 
-  return NextResponse.json({ success: true, total: emails.length, sent, failed });
+  return NextResponse.json({ success: true, total: emails.length, queued });
 }

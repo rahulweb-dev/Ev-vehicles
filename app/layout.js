@@ -13,6 +13,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import ContentProtection from "@/components/ContentProtection";
 import WebVitals from "@/components/WebVitals";
 import PWAInstallBanner from "@/components/PWAInstallBanner";
+import PageViewTracker from "@/components/PageViewTracker";
 const ADSENSE_PUBLISHER_ID = process.env.NEXT_PUBLIC_ADSENSE_ID || "ca-pub-XXXXXXXXXXXXXXXXX";
 
 export const SITE_URL = "https://www.evradar.in";
@@ -249,6 +250,7 @@ export default function RootLayout({ children }) {
           strategy="afterInteractive"
         />
 
+        <PageViewTracker />
         <WebVitals />
         <ThemeProvider>
         <ContentProtection />

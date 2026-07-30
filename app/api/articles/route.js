@@ -1,6 +1,9 @@
 import { NextResponse }      from "next/server";
 import { revalidatePath }     from "next/cache";
 import dbConnect              from "@/lib/mongodb";
+import { sanitizeArticleContent } from "@/lib/sanitize";
+
+export const revalidate = 60; // cache article list for 60s — revalidated on publish/delete
 import Article                from "@/lib/models/Article";
 import { requireAuth }        from "@/lib/auth";
 import { pingIndexNow, buildArticleUrl } from "@/lib/indexnow";
@@ -32,7 +35,9 @@ export async function GET(request) {
 
     const skip = (page - 1) * limit;
     const [articles, total] = await Promise.all([
-      Article.find(filter).sort({ publishedAt: -1 }).skip(skip).limit(limit).lean(),
+      Article.find(filter)
+        .select("-content") // content only needed on detail page — saves ~10× bandwidth on lists
+        .sort({ publishedAt: -1 }).skip(skip).limit(limit).lean(),
       Article.countDocuments(filter),
     ]);
 
@@ -64,6 +69,8 @@ export async function POST(request) {
     }
 
     const existing = await Article.findOne({ slug });
+    // Sanitize content before storing
+    const safeContent = sanitizeArticleContent(content);
     if (existing) {
       return NextResponse.json({ error: "Slug already exists" }, { status: 409 });
     }
@@ -71,7 +78,7 @@ export async function POST(request) {
     const targets = Array.isArray(socialTargets) ? socialTargets : [];
 
     const article = await Article.create({
-      title, slug, excerpt, content, image,
+      title, slug, excerpt, content: safeContent, image,
       imageAlt: imageAlt || title,
       category, author: author || "EV News India Team",
       tags: tags || [],

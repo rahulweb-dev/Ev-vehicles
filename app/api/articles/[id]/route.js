@@ -6,6 +6,8 @@ import { requireAuth }           from "@/lib/auth";
 import { pingIndexNow, buildArticleUrl } from "@/lib/indexnow";
 import { notifyArticlePublished } from "@/lib/notifications";
 import { publishToSocial }       from "@/lib/social/publisher";
+import { sanitizeArticleContent } from "@/lib/sanitize";
+import { logError } from "@/lib/logger";
 
 // GET /api/articles/[id] — public, by id or slug
 export async function GET(request, context) {
@@ -36,6 +38,9 @@ export async function PUT(request, context) {
     const { id } = await context.params;
     await dbConnect();
     const body = await request.json();
+
+    // Sanitize HTML content before saving — strips XSS vectors
+    if (body.content) body.content = sanitizeArticleContent(body.content);
 
     const existing = await Article.findById(id);
     if (!existing) {
@@ -85,7 +90,7 @@ export async function PUT(request, context) {
 
     return NextResponse.json({ success: true, article: updated });
   } catch (error) {
-    console.error("[PUT /api/articles]", error);
+    logError("PUT /api/articles", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

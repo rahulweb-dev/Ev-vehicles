@@ -108,7 +108,7 @@ async function getInitialNews() {
     const dbConnect = (await import("@/lib/mongodb")).default;
     const Article   = (await import("@/lib/models/Article")).default;
     await dbConnect();
-    const articles = await Article.find({ status: "published", category: "cars", image: { $exists: true, $nin: [null, ""] } })
+    const articles = await Article.find({ status: "published", category: "cars" })
       .sort({ publishedAt: -1 })
       .limit(6)
       .select("slug title image excerpt category readTime")

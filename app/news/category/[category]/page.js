@@ -23,7 +23,6 @@ async function getArticles(category, page = 1) {
     await dbConnect();
     const filter = {
       status:   "published",
-      image:    { $exists: true, $nin: [null, ""] },
       category,
     };
     const skip = (page - 1) * LIMIT;

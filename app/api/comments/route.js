@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Comment from "@/lib/models/Comment";
+import { commentLimiter, getIp } from "@/lib/rateLimit";
 
 // GET /api/comments?slug=xxx
 export async function GET(request) {
@@ -21,9 +22,15 @@ export async function GET(request) {
 
 // POST /api/comments
 export async function POST(request) {
+  const rl = commentLimiter.check(getIp(request));
+  if (!rl.ok) return NextResponse.json({ error: "Too many requests. Please slow down." }, { status: 429 });
+
   try {
     await dbConnect();
-    const { articleSlug, name, content } = await request.json();
+    const { articleSlug, name, content, website } = await request.json();
+
+    // Honeypot — bots fill hidden fields, humans never do
+    if (website) return NextResponse.json({ comment: null, pending: true }, { status: 201 });
 
     if (!articleSlug || !name?.trim() || !content?.trim()) {
       return NextResponse.json({ error: "All fields are required." }, { status: 400 });

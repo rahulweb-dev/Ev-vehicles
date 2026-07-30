@@ -88,66 +88,35 @@ const BUDGET_KEYS = [
   { label: 'Above ₹50L',  key: 'above50l' },
 ]
 
-/* Brand → filters by brand name; logo with fallback initial */
+/* Brand → filters by brand name; styled initial badge (no external logo URLs) */
 const BRANDS = [
-  {
-    name: 'Tata',     type: 'car',  initial: 'T', bg: '#00356b', text: '#fff',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Tata_logo.svg/100px-Tata_logo.svg.png',
-  },
-  {
-    name: 'Mahindra', type: 'car',  initial: 'M', bg: '#c00000', text: '#fff',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Mahindra_Logo.svg/100px-Mahindra_Logo.svg.png',
-  },
-  {
-    name: 'Ather',    type: 'bike', initial: 'A', bg: '#1a1a2e', text: '#00e5ff',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Ather_Energy_wordmark.svg/100px-Ather_Energy_wordmark.svg.png',
-  },
-  {
-    name: 'Ola EV',   type: 'bike', initial: 'O', bg: '#00b0ff', text: '#fff',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Ola_Electric_Logo.svg/100px-Ola_Electric_Logo.svg.png',
-  },
-  {
-    name: 'BYD',      type: 'car',  initial: 'B', bg: '#1e3f6f', text: '#fff',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/BYD_logo.svg/100px-BYD_logo.svg.png',
-  },
-  {
-    name: 'MG',       type: 'car',  initial: 'MG', bg: '#c00000', text: '#fff',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/MG_logo.svg/100px-MG_logo.svg.png',
-  },
-  {
-    name: 'Hyundai',  type: 'car',  initial: 'H', bg: '#002c5f', text: '#fff',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Hyundai_Motor_Company_logo.svg/100px-Hyundai_Motor_Company_logo.svg.png',
-  },
-  {
-    name: 'TVS',      type: 'bike', initial: 'TVS', bg: '#e31837', text: '#fff',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/TVS_Motors_Logo.svg/100px-TVS_Motors_Logo.svg.png',
-  },
+  { name: 'Tata',     type: 'car',  initial: 'T',   bg: '#00356b', text: '#fff'     },
+  { name: 'Mahindra', type: 'car',  initial: 'M',   bg: '#c00000', text: '#fff'     },
+  { name: 'Ather',    type: 'bike', initial: 'A',   bg: '#1a1a2e', text: '#00e5ff'  },
+  { name: 'Ola EV',   type: 'bike', initial: 'O',   bg: '#00b0ff', text: '#fff'     },
+  { name: 'BYD',      type: 'car',  initial: 'B',   bg: '#1e3f6f', text: '#fff'     },
+  { name: 'MG',       type: 'car',  initial: 'MG',  bg: '#c00000', text: '#fff'     },
+  { name: 'Hyundai',  type: 'car',  initial: 'H',   bg: '#002c5f', text: '#fff'     },
+  { name: 'TVS',      type: 'bike', initial: 'TVS', bg: '#e31837', text: '#fff'     },
 ]
 
 function brandHref(b) {
   return `/${b.type === 'car' ? 'cars' : 'bikes'}?brand=${encodeURIComponent(b.name)}`
 }
 
-/* ─── Brand Logo (img with initial fallback) ─────────────────────── */
+/* ─── Brand Logo (styled initial badge) ─────────────────────────── */
 function BrandLogo({ brand, size = 28 }) {
-  const [imgFailed, setImgFailed] = useState(false)
-  return imgFailed ? (
+  return (
     <span
-      className="flex items-center justify-center rounded-full text-[10px] font-black"
-      style={{ width: size, height: size, background: brand.bg, color: brand.text }}
+      className="flex items-center justify-center rounded-full font-black"
+      style={{
+        width: size, height: size,
+        background: brand.bg, color: brand.text,
+        fontSize: size <= 28 ? 10 : 13,
+      }}
     >
       {brand.initial}
     </span>
-  ) : (
-    <img
-      src={brand.logo}
-      alt={brand.name}
-      width={size}
-      height={size}
-      className="rounded-full object-contain bg-white border border-gray-100"
-      style={{ width: size, height: size }}
-      onError={() => setImgFailed(true)}
-    />
   )
 }
 

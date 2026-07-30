@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Car, Bike, Truck, BatteryCharging, Clock3, ArrowRight } from "lucide-react";
 import { LatestNewsSectionSkeleton } from "@/components/skeletons/Skeletons";
 import ShareLikeButtons from "@/components/news/ShareLikeButtons";
+import ArticleImage from "@/components/news/ArticleImage";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -99,6 +99,12 @@ function articleToFeatured(a) {
 }
 function articleToSide(a) {
   return { image: a.image, title: a.title, category: a.category, slug: a.slug, readTime: a.readTime || "4 min", publishedAt: a.publishedAt };
+}
+
+function articleImageFallback(article, category = "news") {
+  const title = encodeURIComponent(article?.title || "EV News India");
+  const tag = encodeURIComponent(article?.category || category || "news");
+  return `/api/og?title=${title}&tag=${tag}&type=article`;
 }
 
 export default function LatestNews({ initialArticles = null }) {
@@ -228,16 +234,13 @@ export default function LatestNews({ initialArticles = null }) {
             className="group relative overflow-hidden rounded-2xl border border-gray-200 shadow-sm md:rounded-3xl"
           >
             <div className="relative h-65 sm:h-90 lg:h-125">
-              {feat?.image && (
-                <Image
-                  src={feat.image}
-                  alt={feat.title || "Featured EV News"}
-                  fill
-                  priority
-                  className="object-cover transition duration-700 group-hover:scale-105"
-                  sizes="(max-width: 1024px) 100vw, 65vw"
-                />
-              )}
+              <ArticleImage
+                src={feat?.image}
+                fallbackSrc={articleImageFallback(feat, active)}
+                alt={feat?.title || "Featured EV News"}
+                priority
+                className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+              />
               <div className="absolute inset-0 bg-linear-to-t from-black via-black/50 to-transparent" />
 
               {/* Badge */}
@@ -295,12 +298,11 @@ export default function LatestNews({ initialArticles = null }) {
               >
                 {/* Thumbnail */}
                 <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl sm:h-18 sm:w-18 lg:h-20 lg:w-20">
-                  <Image
+                  <ArticleImage
                     src={item.image}
+                    fallbackSrc={articleImageFallback(item, active)}
                     alt={item.title}
-                    fill
-                    className="object-cover transition duration-500 group-hover:scale-110"
-                    sizes="80px"
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-110"
                   />
                 </div>
 

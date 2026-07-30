@@ -1,15 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { TrendingUp, Eye } from "lucide-react";
+import ArticleImage from "@/components/news/ArticleImage";
 
 function fmtViews(n) {
   if (!n) return "";
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1_000)     return `${(n / 1_000).toFixed(1)}K`;
   return String(n);
+}
+
+function articleImageFallback(article) {
+  const title = encodeURIComponent(article?.title || "EV News India");
+  const tag = encodeURIComponent(article?.category || "news");
+  return `/api/og?title=${title}&tag=${tag}&type=article`;
 }
 
 export default function TrendingWidget() {
@@ -55,15 +61,12 @@ export default function TrendingWidget() {
             >
               {/* Thumbnail with rank badge */}
               <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-gray-100">
-                {a.image && (
-                  <Image
-                    src={a.image}
-                    alt={a.title}
-                    fill
-                    className="object-cover"
-                    sizes="56px"
-                  />
-                )}
+                <ArticleImage
+                  src={a.image}
+                  fallbackSrc={articleImageFallback(a)}
+                  alt={a.title}
+                  className="h-full w-full object-cover"
+                />
                 <span className="absolute -top-1 -left-1 flex h-5 w-5 items-center justify-center rounded-full bg-green-600 text-[9px] font-black text-white shadow">
                   {i + 1}
                 </span>

@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { sendMail } from "@/lib/mailer";
+import { formLimiter, getIp } from "@/lib/rateLimit";
 
 async function verifyRecaptcha(token) {
   const secret = process.env.RECAPTCHA_SECRET_KEY;
-  if (!secret || secret === "YOUR_RECAPTCHA_SECRET_KEY") return true; // skip in dev
-
+  if (!secret || secret === "YOUR_RECAPTCHA_SECRET_KEY") return true;
   const res = await fetch("https://www.google.com/recaptcha/api/siteverify", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -17,6 +15,9 @@ async function verifyRecaptcha(token) {
 }
 
 export async function POST(request) {
+  const rl = formLimiter.check(getIp(request));
+  if (!rl.ok) return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+
   try {
     const { name, email, subject, message, recaptchaToken } = await request.json();
 
@@ -29,13 +30,11 @@ export async function POST(request) {
       return NextResponse.json({ error: "reCAPTCHA verification failed. Please try again." }, { status: 400 });
     }
 
-    const contactEmail = process.env.CONTACT_EMAIL || "broaddcast@gmail.com";
+    const to = process.env.ADMIN_EMAIL || process.env.SMTP_USER || "contact@evradar.in";
 
-    await resend.emails.send({
-      from: "EV News India <onboarding@resend.dev>",
-      to: contactEmail,
-      replyTo: email,
-      subject: `[Contact Form] ${subject} — from ${name}`,
+    await sendMail({
+      to,
+      subject: `[Contact] ${subject} — from ${name}`,
       html: `
         <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
           <h2 style="color:#16a34a">New Contact Form Submission</h2>
@@ -48,14 +47,14 @@ export async function POST(request) {
             <p style="font-weight:bold;color:#374151;margin:0 0 8px">Message</p>
             <p style="color:#111827;white-space:pre-line;margin:0">${message}</p>
           </div>
-          <p style="margin-top:16px;font-size:12px;color:#9ca3af">Sent from evradar.in contact form</p>
+          <p style="margin-top:16px;font-size:12px;color:#9ca3af">Sent from evradar.in contact form · Reply-To: ${email}</p>
         </div>
       `,
     });
 
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("[POST /api/contact]", error);
+  } catch (err) {
+    console.error("[POST /api/contact]", err);
     return NextResponse.json({ error: "Failed to send message. Please try again." }, { status: 500 });
   }
 }

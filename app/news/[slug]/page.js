@@ -16,6 +16,7 @@ import ArticleViewCounter from "@/components/ArticleViewCounter";
 import ArticleComments from "@/components/ArticleComments";
 import TrendingWidget from "@/components/TrendingWidget";
 import ArticleStickyBar from "@/components/ArticleStickyBar";
+import ArticleImage from "@/components/news/ArticleImage";
 
 export const revalidate = 300;
 
@@ -92,10 +93,22 @@ async function getAuthorProfile(authorName) {
   }
 }
 
+function toAbsoluteImageUrl(src, fallbackUrl) {
+  const clean = typeof src === "string" ? src.trim() : "";
+  if (!clean) return fallbackUrl;
+  try {
+    return new URL(clean, SITE_URL).toString();
+  } catch {
+    return fallbackUrl;
+  }
+}
+
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const article = await getArticle(slug);
   if (!article) return { title: "Article Not Found" };
+  const fallbackImage = `${SITE_URL}/api/og?title=${encodeURIComponent(article.title)}&tag=${encodeURIComponent(article.category)}&type=article`;
+  const metadataImage = toAbsoluteImageUrl(article.image, fallbackImage);
 
   return {
     title: article.metaTitle || article.title,
@@ -121,7 +134,7 @@ export async function generateMetadata({ params }) {
       authors: [article.author],
       tags: article.tags,
       images: [{
-        url: article.image || `${SITE_URL}/api/og?title=${encodeURIComponent(article.title)}&tag=${encodeURIComponent(article.category)}&type=article`,
+        url: metadataImage,
         width: 1200, height: 630, alt: article.title,
       }],
     },
@@ -129,7 +142,7 @@ export async function generateMetadata({ params }) {
       card: "summary_large_image",
       title: article.title,
       description: article.excerpt,
-      images: [{ url: article.image || `${SITE_URL}/api/og?title=${encodeURIComponent(article.title)}&tag=${encodeURIComponent(article.category)}`, alt: article.title }],
+      images: [{ url: metadataImage, alt: article.title }],
     },
   };
 }
@@ -169,13 +182,16 @@ export default async function ArticlePage({ params }) {
     .trim()
     .split(/\s+/)
     .filter(Boolean).length;
+  const imageFallbackPath = `/api/og?title=${encodeURIComponent(article.title || "EV News India")}&tag=${encodeURIComponent(article.category || "news")}&type=article`;
+  const imageFallbackUrl = `${SITE_URL}${imageFallbackPath}`;
+  const articleImage = toAbsoluteImageUrl(article.image, imageFallbackUrl);
 
   const articleJsonLd = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
     headline: article.title,
     description: article.excerpt,
-    image: [article.image],
+    image: [articleImage],
     url: `${SITE_URL}/news/${slug}`,
     datePublished: article.publishedAt,
     dateModified: article.updatedAt || article.publishedAt,
@@ -206,7 +222,7 @@ export default async function ArticlePage({ params }) {
       mentions: article.tags.map(tag => ({ "@type": "Thing", name: tag })),
     }),
     copyrightHolder: { "@id": `${SITE_URL}/#organization` },
-    copyrightYear: new Date(article.publishedAt || Date.now()).getFullYear(),
+    ...(article.publishedAt && { copyrightYear: new Date(article.publishedAt).getFullYear() }),
     isPartOf: {
       "@type": "WebSite",
       "@id": `${SITE_URL}/#website`,
@@ -259,11 +275,11 @@ export default async function ArticlePage({ params }) {
       {articleVideoJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleVideoJsonLd) }} />}
 
       <div className="bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-8">
-          <div className="grid gap-10 lg:grid-cols-[1fr_340px]">
-            <article>
+        <div className="mx-auto max-w-7xl px-4 py-5 sm:py-8">
+          <div className="grid gap-8 lg:grid-cols-[1fr_320px] xl:grid-cols-[1fr_340px]">
+            <article className="min-w-0">
               {/* Breadcrumb */}
-              <nav className="mb-6 flex items-center gap-1 text-sm text-gray-500">
+              <nav className="mb-4 flex items-center gap-1 text-xs sm:text-sm text-gray-500 overflow-hidden">
                 <Link href="/" className="hover:text-green-600">Home</Link>
                 <ChevronRight size={14} />
                 <Link href="/news" className="hover:text-green-600">News</Link>
@@ -279,12 +295,12 @@ export default async function ArticlePage({ params }) {
                     </Link>
                   ))}
                 </div>
-                <h1 className="text-3xl font-black leading-tight text-gray-900 md:text-4xl lg:text-5xl">
+                <h1 className="text-2xl font-black leading-tight text-gray-900 sm:text-3xl md:text-4xl">
                   {article.title}
                 </h1>
-                <div className="article-lede mt-4 rounded-xl border-l-4 border-green-500 bg-green-50 px-5 py-4">
+                <div className="article-lede mt-4 rounded-xl border-l-4 border-green-500 bg-green-50 px-4 py-3 sm:px-5 sm:py-4">
                   <p className="mb-1 text-xs font-bold uppercase tracking-wider text-green-700">Quick Summary</p>
-                  <p className="text-lg leading-relaxed text-gray-700">{article.excerpt}</p>
+                  <p className="text-base sm:text-lg leading-relaxed text-gray-700">{article.excerpt}</p>
                 </div>
                 <div className="mt-6 flex flex-wrap items-center gap-4 border-y border-gray-100 py-4 text-sm text-gray-500">
                   <Link href={`/authors/${encodeURIComponent(article.author?.toLowerCase().replace(/\s+/g, "-") || "")}`} className="flex items-center gap-2 hover:opacity-80 transition">
@@ -311,27 +327,31 @@ export default async function ArticlePage({ params }) {
               </header>
 
               {/* Share & Like bar */}
-              <div className="my-6 flex items-center justify-between rounded-2xl bg-gray-50 px-5 py-4">
+              <div className="my-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-gray-50 px-4 py-3 sm:px-5 sm:py-4">
                 <p className="text-sm font-semibold text-gray-600">Enjoyed this article?</p>
-                <div className="flex items-center gap-2">
-                  <BookmarkButton slug={article.slug} title={article.title} image={article.image} excerpt={article.excerpt} />
-                  <ShareLikeButtons slug={article.slug} title={article.title} url={`${SITE_URL.replace(/\/$/, "")}/news/${article.slug}`} image={article.image} initialLikes={article.likes || 0} />
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <BookmarkButton slug={article.slug} title={article.title} image={articleImage} excerpt={article.excerpt} />
+                  <ShareLikeButtons slug={article.slug} title={article.title} url={`${SITE_URL.replace(/\/$/, "")}/news/${article.slug}`} image={articleImage} initialLikes={article.likes || 0} />
                 </div>
               </div>
 
               {/* Audio Player */}
               <ArticleAudioPlayer title={article.title} content={article.content} />
 
-              {article.image && (
-                <div className="relative my-8 h-62.5 overflow-hidden rounded-2xl sm:h-87.5 md:h-112.5">
-                  <Image src={article.image} alt={article.imageAlt || article.title} fill className="object-cover" priority sizes="800px" />
-                </div>
-              )}
+              <div className="relative my-6 w-full aspect-video overflow-hidden rounded-xl sm:rounded-2xl bg-gray-100">
+                <ArticleImage
+                  src={article.image}
+                  fallbackSrc={imageFallbackPath}
+                  alt={article.imageAlt || article.title}
+                  className="absolute inset-0 h-full w-full object-cover"
+                  priority
+                />
+              </div>
 
               <AdBannerInArticle slot="4567890123" />
 
               <div
-                className="prose prose-lg max-w-none prose-headings:font-black prose-headings:text-gray-900 prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4 prose-p:text-gray-700 prose-p:leading-relaxed prose-strong:text-gray-900 prose-ul:text-gray-700 prose-li:my-1"
+                className="prose prose-base max-w-none overflow-x-auto prose-headings:font-black prose-headings:text-gray-900 prose-h2:text-xl prose-h2:mt-7 prose-h2:mb-3 sm:prose-h2:text-2xl sm:prose-h2:mt-8 sm:prose-h2:mb-4 prose-h3:text-lg prose-p:text-gray-700 prose-p:leading-relaxed prose-p:text-[15px] sm:prose-p:text-base prose-strong:text-gray-900 prose-ul:text-gray-700 prose-li:my-1 prose-img:rounded-xl prose-img:w-full prose-a:text-green-700 prose-a:no-underline hover:prose-a:underline"
                 dangerouslySetInnerHTML={{ __html: safeContent }}
               />
 
@@ -355,17 +375,17 @@ export default async function ArticlePage({ params }) {
               )}
 
               {/* Prominent WhatsApp share CTA */}
-              <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-green-200 bg-green-50 p-5">
+              <div className="mt-8 flex flex-col gap-4 rounded-2xl border border-green-200 bg-green-50 p-4 sm:p-5">
                 <div>
                   <p className="font-black text-gray-900 text-base">Found this helpful?</p>
                   <p className="text-sm text-gray-600">Share with your friends &amp; EV community</p>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex flex-wrap items-center gap-2">
                   <a
                     href={`https://wa.me/?text=${encodeURIComponent(article.title + "\n\nRead more: " + SITE_URL + "/news/" + article.slug)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 rounded-xl bg-[#25D366] px-5 py-3 text-sm font-black text-white shadow hover:bg-[#20bd5b] transition active:scale-95"
+                    className="flex flex-1 sm:flex-none items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-2.5 text-sm font-black text-white shadow hover:bg-[#20bd5b] transition active:scale-95"
                   >
                     <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                     Share on WhatsApp
@@ -374,7 +394,7 @@ export default async function ArticlePage({ params }) {
                     href={`https://t.me/share/url?url=${encodeURIComponent(SITE_URL + "/news/" + article.slug)}&text=${encodeURIComponent(article.title)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 rounded-xl bg-[#2AABEE] px-4 py-3 text-sm font-bold text-white shadow hover:bg-[#229ed9] transition active:scale-95"
+                    className="flex items-center justify-center gap-2 rounded-xl bg-[#2AABEE] px-4 py-2.5 text-sm font-bold text-white shadow hover:bg-[#229ed9] transition active:scale-95"
                   >
                     <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" xmlns="http://www.w3.org/2000/svg"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.96 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
                     Telegram
@@ -404,8 +424,8 @@ export default async function ArticlePage({ params }) {
               )}
             </article>
 
-            <aside className="space-y-8">
-              <div className="sticky top-24 space-y-8">
+            <aside className="hidden lg:block space-y-6">
+              <div className="sticky top-24 space-y-6 max-h-[calc(100vh-6rem)] overflow-y-auto scrollbar-hide">
                 <AdBannerInArticle slot="6789012345" />
                 <TrendingWidget />
                 {featuredVehicle && (
@@ -458,9 +478,9 @@ export default async function ArticlePage({ params }) {
           </div>
 
           {related.length > 0 && (
-            <section className="mt-16 border-t border-gray-100 pt-10">
-              <h2 className="mb-6 text-2xl font-black text-gray-900">You May Also Like</h2>
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <section className="mt-10 sm:mt-16 border-t border-gray-100 pt-6 sm:pt-10">
+              <h2 className="mb-5 text-xl sm:text-2xl font-black text-gray-900">You May Also Like</h2>
+              <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 {related.slice(0, 6).map((a) => (
                   <NewsCard key={a._id || a.id} article={a} />
                 ))}
@@ -471,10 +491,10 @@ export default async function ArticlePage({ params }) {
 
         {/* Author Bio */}
         {article.author && (
-          <div className="mx-auto max-w-7xl px-4 pb-10">
-            <div className="rounded-2xl border border-gray-100 bg-gray-50 p-6">
-              <p className="mb-4 text-[10px] font-bold uppercase tracking-widest text-green-600">Written by</p>
-              <div className="flex items-start gap-4">
+          <div className="mx-auto max-w-7xl px-4 pb-8 sm:pb-10">
+            <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4 sm:p-6">
+              <p className="mb-3 text-[10px] font-bold uppercase tracking-widest text-green-600">Written by</p>
+              <div className="flex items-start gap-3 sm:gap-4">
                 <Link
                   href={`/authors/${encodeURIComponent((article.author || "").toLowerCase().replace(/\s+/g, "-"))}`}
                   className="shrink-0 hover:opacity-90 transition"
@@ -483,12 +503,12 @@ export default async function ArticlePage({ params }) {
                     <Image
                       src={authorProfile.photo}
                       alt={article.author}
-                      width={72}
-                      height={72}
-                      className="h-16 w-16 rounded-2xl object-cover"
+                      width={56}
+                      height={56}
+                      className="h-12 w-12 sm:h-16 sm:w-16 rounded-xl sm:rounded-2xl object-cover"
                     />
                   ) : (
-                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-green-600 text-2xl font-black text-white">
+                    <div className="flex h-12 w-12 sm:h-16 sm:w-16 items-center justify-center rounded-xl sm:rounded-2xl bg-green-600 text-xl sm:text-2xl font-black text-white">
                       {article.author.charAt(0).toUpperCase()}
                     </div>
                   )}

@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Vehicle from "@/lib/models/Vehicle";
 import { requireAuth } from "@/lib/auth";
+import { logError } from "@/lib/logger";
+
+export const revalidate = 60;
 
 // GET /api/vehicles
 // ?vehicleType=car|bike  &category=upcoming|popular  &status=published|draft
@@ -43,14 +46,18 @@ export async function GET(request) {
     const sortQuery = sortMap[sort] || { createdAt: -1 };
 
     const skip = (page - 1) * limit;
+    // Select only fields needed for listing — omit description, gallery, specs, colors, faqs
+    const LIST_FIELDS = "name brand slug vehicleType featuredImage variants performance charging " +
+      "category availability status featured views launchDate createdAt updatedAt shortDescription " +
+      "keyFeatures pros cons priceHistory";
     const [vehicles, total] = await Promise.all([
-      Vehicle.find(filter).sort(sortQuery).skip(skip).limit(limit).lean(),
+      Vehicle.find(filter).select(LIST_FIELDS).sort(sortQuery).skip(skip).limit(limit).lean(),
       Vehicle.countDocuments(filter),
     ]);
 
     return NextResponse.json({ vehicles, total, page, pages: Math.ceil(total / limit) });
   } catch (error) {
-    console.error("[GET /api/vehicles]", error);
+    logError("GET /api/vehicles", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
@@ -88,7 +95,7 @@ export async function POST(request) {
     const vehicle = await Vehicle.create(body);
     return NextResponse.json({ success: true, vehicle }, { status: 201 });
   } catch (error) {
-    console.error("[POST /api/vehicles]", error);
+    logError("POST /api/vehicles", error);
     if (error.code === 11000) {
       return NextResponse.json({ error: "Slug already exists" }, { status: 409 });
     }

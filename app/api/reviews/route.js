@@ -1,6 +1,7 @@
 import { requireAuth } from "@/lib/auth";
 import dbConnect     from "@/lib/mongodb";
 import VehicleReview from "@/lib/models/VehicleReview";
+import { formLimiter, getIp } from "@/lib/rateLimit";
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -54,8 +55,14 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
+  const rl = formLimiter.check(getIp(request));
+  if (!rl.ok) return Response.json({ error: "Too many requests. Please wait." }, { status: 429 });
+
   const body = await request.json();
-  const { vehicleSlug, vehicleName, vehicleType, name, rating, body: reviewBody } = body;
+  const { vehicleSlug, vehicleName, vehicleType, name, rating, body: reviewBody, website } = body;
+
+  // Honeypot — bots fill hidden fields, humans never do
+  if (website) return Response.json({ success: true, id: null }, { status: 201 });
 
   if (!vehicleSlug || !name?.trim() || !rating || !reviewBody?.trim())
     return Response.json({ error: "vehicleSlug, name, rating, and body are required" }, { status: 400 });

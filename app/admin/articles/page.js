@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import {
   Plus, Pencil, Trash2, Eye, Search, ExternalLink,
   Newspaper, CheckCircle2, FileText, LayoutGrid, List,
-  Star, Calendar, TrendingUp, Upload,
+  Star, Calendar, TrendingUp, Upload, Square, CheckSquare, X,
+  Globe, EyeOff, Copy,
 } from "lucide-react";
+import ArticleImage from "@/components/news/ArticleImage";
 
 const CAT_STYLE = {
   cars:       { label: "Cars",       dot: "bg-blue-500",   badge: "bg-blue-50 text-blue-700 border-blue-200" },
@@ -21,17 +22,26 @@ const STATUS_STYLE = {
   draft:     "bg-yellow-100 text-yellow-700 border border-yellow-200",
 };
 
+function articleImageFallback(article) {
+  const title = encodeURIComponent(article?.title || "EV News India");
+  const tag = encodeURIComponent(article?.category || "news");
+  return `/api/og?title=${title}&tag=${tag}&type=article`;
+}
+
 /* ── Grid card ──────────────────────────────────────────────── */
-function ArticleGridCard({ article, onDelete, deleting }) {
+function ArticleGridCard({ article, onDelete, deleting, onDuplicate, duplicating, isSelected, onSelect }) {
   const cat = CAT_STYLE[article.category] || { label: article.category, dot: "bg-gray-400", badge: "bg-gray-100 text-gray-600 border-gray-200" };
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm hover:border-green-200 hover:shadow-md transition">
+    <div className={`group relative flex flex-col overflow-hidden rounded-2xl border shadow-sm hover:shadow-md transition ${isSelected ? "border-green-500 ring-2 ring-green-300" : "border-gray-200 bg-white hover:border-green-200"}`}>
       {/* Thumbnail */}
       <div className="relative h-44 w-full shrink-0 bg-gray-100">
         {article.image ? (
-          <Image src={article.image} alt={article.imageAlt || article.title} fill
-            className="object-cover transition duration-300 group-hover:scale-105"
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+          <ArticleImage
+            src={article.image}
+            fallbackSrc={articleImageFallback(article)}
+            alt={article.imageAlt || article.title}
+            className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+          />
         ) : (
           <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-gray-50">
             <Newspaper size={28} className="text-gray-300" />
@@ -40,8 +50,20 @@ function ArticleGridCard({ article, onDelete, deleting }) {
         )}
         <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent" />
 
+        {/* Select checkbox */}
+        <button
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); onSelect(article._id); }}
+          className="absolute left-2 top-2 z-10 flex h-6 w-6 items-center justify-center rounded-md transition"
+          title={isSelected ? "Deselect" : "Select"}
+        >
+          {isSelected
+            ? <CheckSquare size={20} className="text-green-600 drop-shadow" fill="white" />
+            : <Square size={20} className="text-white drop-shadow opacity-70 group-hover:opacity-100" />
+          }
+        </button>
+
         {/* Badges */}
-        <div className="absolute left-3 top-3 flex items-center gap-1.5">
+        <div className="absolute left-9 top-3 flex items-center gap-1.5">
           <span className={`rounded-lg border px-2 py-0.5 text-[10px] font-bold ${cat.badge}`}>
             {cat.label}
           </span>
@@ -63,6 +85,10 @@ function ArticleGridCard({ article, onDelete, deleting }) {
               <ExternalLink size={14} />
             </a>
           )}
+          <button onClick={() => onDuplicate(article._id)} disabled={duplicating === article._id}
+            className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/90 text-gray-600 shadow hover:bg-purple-600 hover:text-white transition disabled:opacity-40" title="Duplicate">
+            <Copy size={14} />
+          </button>
           <Link href={`/admin/articles/${article._id}/edit`}
             className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/90 text-gray-600 shadow hover:bg-blue-600 hover:text-white transition" title="Edit">
             <Pencil size={14} />
@@ -93,13 +119,22 @@ function ArticleGridCard({ article, onDelete, deleting }) {
 }
 
 /* ── List row ───────────────────────────────────────────────── */
-function ArticleListRow({ article, onDelete, deleting }) {
+function ArticleListRow({ article, onDelete, deleting, onDuplicate, duplicating, isSelected, onSelect }) {
   const cat = CAT_STYLE[article.category] || { label: article.category, dot: "bg-gray-400", badge: "bg-gray-100 text-gray-600 border-gray-200" };
   return (
-    <div className="group flex items-center gap-4 rounded-xl border border-gray-200 bg-white px-4 py-3 shadow-sm hover:border-green-200 hover:shadow-md transition">
+    <div className={`group flex items-center gap-3 rounded-xl border px-4 py-3 shadow-sm transition ${isSelected ? "border-green-500 bg-green-50 ring-1 ring-green-300" : "border-gray-200 bg-white hover:border-green-200 hover:shadow-md"}`}>
+      {/* Checkbox */}
+      <button onClick={() => onSelect(article._id)} className="shrink-0 text-gray-400 hover:text-green-600 transition">
+        {isSelected ? <CheckSquare size={18} className="text-green-600" /> : <Square size={18} />}
+      </button>
       <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded-lg bg-gray-100">
         {article.image ? (
-          <Image src={article.image} alt={article.imageAlt || article.title} fill className="object-cover" sizes="80px" />
+          <ArticleImage
+            src={article.image}
+            fallbackSrc={articleImageFallback(article)}
+            alt={article.imageAlt || article.title}
+            className="h-full w-full object-cover"
+          />
         ) : (
           <div className="flex h-full items-center justify-center"><Newspaper size={16} className="text-gray-300" /></div>
         )}
@@ -132,6 +167,10 @@ function ArticleListRow({ article, onDelete, deleting }) {
             <ExternalLink size={14} />
           </a>
         )}
+        <button onClick={() => onDuplicate(article._id)} disabled={duplicating === article._id}
+          className="p-1.5 rounded-lg text-gray-400 hover:text-purple-600 hover:bg-purple-50 transition disabled:opacity-40" title="Duplicate">
+          <Copy size={14} />
+        </button>
         <Link href={`/admin/articles/${article._id}/edit`}
           className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition" title="Edit">
           <Pencil size={14} />
@@ -154,6 +193,9 @@ export default function AdminArticlesPage() {
   const [catFilter, setCatFilter]       = useState("all");
   const [view, setView]                 = useState("grid");
   const [deleting, setDeleting]         = useState(null);
+  const [duplicating, setDuplicating]   = useState(null);
+  const [selected, setSelected]         = useState(new Set());
+  const [bulkLoading, setBulkLoading]   = useState(false);
 
   async function loadArticles() {
     setLoading(true);
@@ -176,12 +218,50 @@ export default function AdminArticlesPage() {
 
   useEffect(() => { loadArticles(); }, []);
 
+  async function handleDuplicate(id) {
+    setDuplicating(id);
+    try {
+      const res = await fetch(`/api/articles/${id}/duplicate`, { method: "POST" });
+      if (res.ok) loadArticles();
+    } finally {
+      setDuplicating(null);
+    }
+  }
+
   async function handleDelete(id, title) {
     if (!confirm(`Delete "${title}"?\nThis cannot be undone.`)) return;
     setDeleting(id);
     await fetch(`/api/articles/${id}`, { method: "DELETE" });
     setDeleting(null);
     loadArticles();
+  }
+
+  function toggleSelect(id) {
+    setSelected(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+
+  function selectAll()    { setSelected(new Set(filtered.map(a => a._id))); }
+  function clearSelected(){ setSelected(new Set()); }
+
+  async function handleBulkAction(action) {
+    const ids = [...selected];
+    if (!ids.length) return;
+    if (action === "delete" && !confirm(`Delete ${ids.length} article${ids.length > 1 ? "s" : ""}? This cannot be undone.`)) return;
+    setBulkLoading(true);
+    try {
+      const res = await fetch("/api/articles/bulk", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ action, ids }),
+      });
+      if (res.ok) { clearSelected(); loadArticles(); }
+    } finally {
+      setBulkLoading(false);
+    }
   }
 
   const filtered = articles.filter((a) => {
@@ -279,11 +359,44 @@ export default function AdminArticlesPage() {
         </div>
       </div>
 
-      {/* Result count */}
-      {!loading && (search || statusFilter !== "all" || catFilter !== "all") && (
-        <p className="mb-3 text-xs text-gray-500">
-          Showing <span className="font-semibold text-gray-900">{filtered.length}</span> of {articles.length} articles
-        </p>
+      {/* Bulk action bar */}
+      {selected.size > 0 && (
+        <div className="mb-4 flex items-center gap-2 rounded-xl bg-green-700 px-4 py-3 text-white shadow-lg">
+          <button onClick={clearSelected} className="rounded p-0.5 hover:bg-white/20 transition">
+            <X size={16} />
+          </button>
+          <span className="flex-1 text-sm font-semibold">{selected.size} selected</span>
+          <button onClick={() => handleBulkAction("publish")} disabled={bulkLoading}
+            className="flex items-center gap-1.5 rounded-lg bg-white/20 px-3 py-1.5 text-xs font-bold hover:bg-white/30 transition disabled:opacity-50">
+            <Globe size={13} /> Publish
+          </button>
+          <button onClick={() => handleBulkAction("unpublish")} disabled={bulkLoading}
+            className="flex items-center gap-1.5 rounded-lg bg-white/20 px-3 py-1.5 text-xs font-bold hover:bg-white/30 transition disabled:opacity-50">
+            <EyeOff size={13} /> Unpublish
+          </button>
+          <button onClick={() => handleBulkAction("delete")} disabled={bulkLoading}
+            className="flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-bold hover:bg-red-700 transition disabled:opacity-50">
+            <Trash2 size={13} /> Delete
+          </button>
+        </div>
+      )}
+
+      {/* Select-all row */}
+      {!loading && filtered.length > 0 && (
+        <div className="mb-3 flex items-center gap-3">
+          <button onClick={selected.size === filtered.length ? clearSelected : selectAll}
+            className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-green-700 transition font-medium">
+            {selected.size === filtered.length && filtered.length > 0
+              ? <><CheckSquare size={14} className="text-green-600" /> Deselect all</>
+              : <><Square size={14} /> Select all ({filtered.length})</>
+            }
+          </button>
+          {!loading && (search || statusFilter !== "all" || catFilter !== "all") && (
+            <span className="text-xs text-gray-400">
+              Showing <span className="font-semibold text-gray-700">{filtered.length}</span> of {articles.length}
+            </span>
+          )}
+        </div>
       )}
 
       {/* Content */}
@@ -326,13 +439,17 @@ export default function AdminArticlesPage() {
       ) : view === "grid" ? (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((a) => (
-            <ArticleGridCard key={a._id} article={a} onDelete={handleDelete} deleting={deleting} />
+            <ArticleGridCard key={a._id} article={a} onDelete={handleDelete} deleting={deleting}
+              onDuplicate={handleDuplicate} duplicating={duplicating}
+              isSelected={selected.has(a._id)} onSelect={toggleSelect} />
           ))}
         </div>
       ) : (
         <div className="space-y-2">
           {filtered.map((a) => (
-            <ArticleListRow key={a._id} article={a} onDelete={handleDelete} deleting={deleting} />
+            <ArticleListRow key={a._id} article={a} onDelete={handleDelete} deleting={deleting}
+              onDuplicate={handleDuplicate} duplicating={duplicating}
+              isSelected={selected.has(a._id)} onSelect={toggleSelect} />
           ))}
         </div>
       )}

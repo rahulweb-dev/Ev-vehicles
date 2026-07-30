@@ -23,7 +23,7 @@ async function getArticles(category, page = 1) {
     const dbConnect = (await import("@/lib/mongodb")).default;
     const Article   = (await import("@/lib/models/Article")).default;
     await dbConnect();
-    const filter = { status: "published", image: { $exists: true, $nin: [null, ""] }, ...(category ? { category } : {}) };
+    const filter = { status: "published", ...(category ? { category } : {}) };
     const skip   = (page - 1) * LIMIT;
     const [articles, total] = await Promise.all([
       Article.find(filter).sort({ publishedAt: -1 }).skip(skip).limit(LIMIT)

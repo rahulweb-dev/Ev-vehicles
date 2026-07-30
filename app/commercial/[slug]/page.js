@@ -3,20 +3,9 @@ import Image from "next/image";
 import Link from "next/link";
 import VehicleDetailPage from "@/components/vehicles/VehicleDetailPage";
 import { SITE_URL } from "@/app/layout";
+import { parsePrice } from "@/lib/priceUtils";
 
 export const revalidate = 3600;
-
-function parsePriceToINR(str) {
-  if (!str) return "0";
-  const cleaned = String(str).replace(/[₹,\s]/g, "").toLowerCase();
-  const m = cleaned.match(/([\d.]+)\s*(lakh|l|cr|crore)?/);
-  if (!m) return "0";
-  const num = parseFloat(m[1]);
-  const unit = m[2] || "";
-  if (unit.startsWith("cr")) return String(Math.round(num * 10000000));
-  if (unit === "lakh" || unit === "l") return String(Math.round(num * 100000));
-  return String(Math.round(num));
-}
 
 async function getVehicle(slug) {
   try {
@@ -166,7 +155,7 @@ export default async function CommercialDetailPage({ params }) {
       offers: {
         "@type":       "Offer",
         priceCurrency: "INR",
-        price:         parsePriceToINR(firstVariant.exShowroomPrice),
+        price:         parsePrice(firstVariant.exShowroomPrice),
         priceValidUntil: `${new Date().getFullYear() + 1}-12-31`,
         availability:  vehicle.availability === "available"
           ? "https://schema.org/InStock"

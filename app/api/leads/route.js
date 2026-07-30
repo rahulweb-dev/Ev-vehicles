@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Lead from "@/lib/models/Lead";
 import { getAuthUser } from "@/lib/auth";
+import { formLimiter, getIp } from "@/lib/rateLimit";
 
 const SITE_URL = "https://www.evradar.in";
 
@@ -57,6 +58,9 @@ function escapeRegExp(str) {
 }
 
 export async function POST(request) {
+  const rl = formLimiter.check(getIp(request));
+  if (!rl.ok) return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+
   try {
     const body = await request.json();
     const { name, phone, email, city, state, vehicleName, vehicleSlug, vehicleType, intent } = body;

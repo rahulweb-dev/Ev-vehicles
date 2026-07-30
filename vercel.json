@@ -1,0 +1,16 @@
+{
+  "crons": [
+    {
+      "path": "/api/admin/scheduler",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/admin/drip",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/admin/mail-worker",
+      "schedule": "* * * * *"
+    }
+  ]
+}

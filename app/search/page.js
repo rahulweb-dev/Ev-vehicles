@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Search, Car, Bike, Newspaper, ArrowRight, ChevronRight } from "lucide-react";
 import { SITE_URL } from "@/app/layout";
+import ArticleImage from "@/components/news/ArticleImage";
 
 export const revalidate = 0; // always fresh — search results must not be cached
 
@@ -280,17 +281,19 @@ function ArticleCard({ article }) {
   const date = article.publishedAt
     ? new Date(article.publishedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
     : "";
+  const fallbackSrc = `/api/og?title=${encodeURIComponent(article.title || "EV News India")}&tag=${encodeURIComponent(article.category || "news")}&type=article`;
   return (
     <Link
       href={`/news/${article.slug}`}
       className="group flex gap-4 overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition hover:shadow-lg hover:border-green-200"
     >
       <div className="relative h-24 w-32 shrink-0 overflow-hidden rounded-xl bg-gray-100">
-        {article.image ? (
-          <Image src={article.image} alt={article.title} fill className="object-cover transition duration-500 group-hover:scale-105" sizes="128px" />
-        ) : (
-          <div className="flex h-full items-center justify-center text-2xl text-gray-200">⚡</div>
-        )}
+        <ArticleImage
+          src={article.image}
+          fallbackSrc={fallbackSrc}
+          alt={article.title}
+          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+        />
       </div>
       <div className="flex min-w-0 flex-col justify-between py-0.5">
         {article.category && (

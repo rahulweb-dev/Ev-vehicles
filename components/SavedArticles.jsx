@@ -1,9 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { Bookmark, Trash2, ArrowRight } from "lucide-react";
+import ArticleImage from "@/components/news/ArticleImage";
+
+function articleImageFallback(item) {
+  const title = encodeURIComponent(item?.title || "EV News India");
+  return `/api/og?title=${title}&tag=news&type=article`;
+}
 
 export default function SavedArticles() {
   const [items, setItems] = useState([]);
@@ -50,11 +55,12 @@ export default function SavedArticles() {
             {items.map((item) => (
               <article key={item.slug} className="group flex gap-4 rounded-2xl bg-white p-4 shadow-sm transition hover:shadow-md">
                 <Link href={`/news/${item.slug}`} className="relative h-24 w-36 shrink-0 overflow-hidden rounded-xl">
-                  {item.image ? (
-                    <Image src={item.image} alt={item.title} fill className="object-cover transition duration-500 group-hover:scale-105" sizes="144px" />
-                  ) : (
-                    <div className="flex h-full items-center justify-center bg-gray-100 text-3xl">⚡</div>
-                  )}
+                  <ArticleImage
+                    src={item.image}
+                    fallbackSrc={articleImageFallback(item)}
+                    alt={item.title}
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                  />
                 </Link>
                 <div className="flex flex-1 flex-col justify-between min-w-0">
                   <Link href={`/news/${item.slug}`}>
