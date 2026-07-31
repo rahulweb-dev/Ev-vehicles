@@ -2,15 +2,15 @@
   "crons": [
     {
       "path": "/api/admin/scheduler",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 0 * * *"
     },
     {
       "path": "/api/admin/drip",
-      "schedule": "0 * * * *"
+      "schedule": "0 1 * * *"
     },
     {
       "path": "/api/admin/mail-worker",
-      "schedule": "* * * * *"
+      "schedule": "0 2 * * *"
     }
   ]
 }
