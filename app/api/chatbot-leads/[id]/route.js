@@ -10,8 +10,12 @@ export async function PATCH(request, { params }) {
   try {
     const { id } = await params;
     const body   = await request.json();
+    const { status, notes } = body;
+    const update = {};
+    if (status !== undefined) update.status = status;
+    if (notes  !== undefined) update.notes  = notes;
     await dbConnect();
-    const lead = await ChatLead.findByIdAndUpdate(id, { $set: body }, { new: true }).lean();
+    const lead = await ChatLead.findByIdAndUpdate(id, { $set: update }, { new: true }).lean();
     if (!lead) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ success: true, lead });
   } catch (err) {

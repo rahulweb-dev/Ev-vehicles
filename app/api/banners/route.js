@@ -3,6 +3,9 @@ import dbConnect from "@/lib/mongodb";
 import Banner from "@/lib/models/Banner";
 import { requireAuth } from "@/lib/auth";
 
+// ISR: regenerate banner list at most every 5 minutes server-side
+export const revalidate = 300;
+
 // GET /api/banners — public
 // ?status=active  &platform=desktop|mobile
 export async function GET(request) {
@@ -15,7 +18,10 @@ export async function GET(request) {
     if (status)   filter.status   = status;
     if (platform) filter.platform = platform;
     const banners = await Banner.find(filter).sort({ order: 1, createdAt: -1 }).lean();
-    return NextResponse.json({ banners });
+    return NextResponse.json(
+      { banners },
+      { headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600" } }
+    );
   } catch (error) {
     console.error("[GET /api/banners]", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });

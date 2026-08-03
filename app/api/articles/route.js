@@ -3,6 +3,10 @@ import { revalidatePath }     from "next/cache";
 import dbConnect              from "@/lib/mongodb";
 import { sanitizeArticleContent } from "@/lib/sanitize";
 
+function escapeRegExp(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 export const revalidate = 60; // cache article list for 60s — revalidated on publish/delete
 import Article                from "@/lib/models/Article";
 import { requireAuth }        from "@/lib/auth";
@@ -16,22 +20,37 @@ export async function GET(request) {
     await dbConnect();
     const { searchParams } = new URL(request.url);
 
-    const filter = {};
-    const category = searchParams.get("category");
-    const status   = searchParams.get("status") || "published";
-    const featured = searchParams.get("featured");
-    const search   = searchParams.get("search");
-    const limit    = parseInt(searchParams.get("limit") || "20");
-    const page     = parseInt(searchParams.get("page")  || "1");
+    const category  = searchParams.get("category");
+    const rawStatus = searchParams.get("status") || "published";
+    const featured  = searchParams.get("featured");
+    const search    = searchParams.get("search");
+    const limit     = parseInt(searchParams.get("limit") || "20");
+    const page      = parseInt(searchParams.get("page")  || "1");
 
+    // Only authenticate when the caller explicitly requests non-published articles.
+    // Public reads (status=published, the default) skip the cookie read + JWT verify
+    // entirely, making the response cacheable at the CDN layer and restoring the
+    // effectiveness of `export const revalidate = 60` above.
+    let status = "published";
+    let isPublicRead = true;
+    if (rawStatus !== "published") {
+      const isAdmin = !!(await (await import("@/lib/auth")).getAuthUser());
+      status = isAdmin ? rawStatus : "published";
+      isPublicRead = false;
+    }
+
+    const filter = {};
     if (category) filter.category = category;
     filter.status = status;
     if (featured === "true") filter.featured = true;
-    if (search) filter.$or = [
-      { title:   { $regex: search, $options: "i" } },
-      { excerpt: { $regex: search, $options: "i" } },
-      { tags:    { $elemMatch: { $regex: search, $options: "i" } } },
-    ];
+    if (search) {
+      const safe = escapeRegExp(search);
+      filter.$or = [
+        { title:   { $regex: safe, $options: "i" } },
+        { excerpt: { $regex: safe, $options: "i" } },
+        { tags:    { $elemMatch: { $regex: safe, $options: "i" } } },
+      ];
+    }
 
     const skip = (page - 1) * limit;
     const [articles, total] = await Promise.all([
@@ -41,7 +60,16 @@ export async function GET(request) {
       Article.countDocuments(filter),
     ]);
 
-    return NextResponse.json({ articles, total, page, pages: Math.ceil(total / limit) });
+    // Public reads are identical for all users — safe to cache at the CDN edge.
+    // Admin reads (drafts etc.) must not be cached to prevent data leaks.
+    const cacheHeader = isPublicRead
+      ? "public, s-maxage=60, stale-while-revalidate=300"
+      : "private, no-store";
+
+    return NextResponse.json(
+      { articles, total, page, pages: Math.ceil(total / limit) },
+      { headers: { "Cache-Control": cacheHeader } }
+    );
   } catch (error) {
     console.error("[GET /api/articles]", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });

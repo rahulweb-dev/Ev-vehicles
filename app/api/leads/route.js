@@ -3,8 +3,9 @@ import dbConnect from "@/lib/mongodb";
 import Lead from "@/lib/models/Lead";
 import { getAuthUser } from "@/lib/auth";
 import { formLimiter, getIp } from "@/lib/rateLimit";
+import { escapeHtml } from "@/lib/sanitize";
 
-const SITE_URL = "https://www.evradar.in";
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.evradar.in").replace(/\/$/, "");
 
 async function sendLeadNotification(lead) {
   const apiKey   = process.env.SENDGRID_API_KEY;
@@ -19,8 +20,8 @@ async function sendLeadNotification(lead) {
 <!DOCTYPE html><html><body style="font-family:sans-serif;background:#f9fafb;padding:24px">
 <div style="max-width:520px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.07)">
   <div style="background:linear-gradient(135deg,#16a34a,#059669);padding:24px 28px">
-    <h2 style="color:#fff;margin:0;font-size:20px">🔔 New Lead — ${lead.vehicleName}</h2>
-    <p style="color:#d1fae5;margin:4px 0 0;font-size:13px">Intent: <strong style="color:#fff">${intentLabel}</strong></p>
+    <h2 style="color:#fff;margin:0;font-size:20px">🔔 New Lead — ${escapeHtml(lead.vehicleName)}</h2>
+    <p style="color:#d1fae5;margin:4px 0 0;font-size:13px">Intent: <strong style="color:#fff">${escapeHtml(intentLabel)}</strong></p>
   </div>
   <div style="padding:28px">
     <table style="width:100%;border-collapse:collapse;font-size:14px">
@@ -32,7 +33,7 @@ async function sendLeadNotification(lead) {
         ["Vehicle", lead.vehicleName],
         ["Type",    lead.vehicleType],
         ["Intent",  intentLabel],
-      ].map(([k, v]) => `<tr><td style="padding:8px 0;color:#6b7280;width:90px">${k}</td><td style="padding:8px 0;font-weight:600;color:#111">${v}</td></tr>`).join("")}
+      ].map(([k, v]) => `<tr><td style="padding:8px 0;color:#6b7280;width:90px">${escapeHtml(k)}</td><td style="padding:8px 0;font-weight:600;color:#111">${escapeHtml(String(v))}</td></tr>`).join("")}
     </table>
     <a href="${SITE_URL}/admin/leads" style="display:inline-block;margin-top:16px;background:#16a34a;color:#fff;font-weight:700;padding:12px 24px;border-radius:10px;text-decoration:none;font-size:13px">
       View in Admin →
@@ -99,6 +100,7 @@ export async function GET(request) {
   try {
     await dbConnect();
     const user = await getAuthUser();
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { searchParams } = new URL(request.url);
     const vehicleSlug  = searchParams.get("vehicleSlug");
@@ -124,8 +126,10 @@ export async function GET(request) {
     if (status)       filter.status       = status;
     if (vehicleType)  filter.vehicleType  = vehicleType;
 
-    const leads = await Lead.find(filter).sort({ createdAt: -1 }).limit(limit).lean();
-    const total = await Lead.countDocuments(filter);
+    const [leads, total] = await Promise.all([
+      Lead.find(filter).sort({ createdAt: -1 }).limit(limit).lean(),
+      Lead.countDocuments(filter),
+    ]);
     return NextResponse.json({ leads, total });
   } catch (err) {
     console.error("[GET /api/leads]", err);

@@ -4,29 +4,31 @@ import { FALLBACK_ANALYTICS } from "@/lib/ev-sales-fallback";
 
 export const revalidate = 3600;
 
+const DATA_YEAR = new Date().getFullYear();
+
 export const metadata = {
-  title: `EV Sales Intelligence India 2025 – Monthly EV Market Data | ${SITE_NAME}`,
+  title: `EV Sales Intelligence India ${DATA_YEAR} – Monthly EV Market Data | ${SITE_NAME}`,
   description: "India EV sales data, market share, brand rankings, state-wise EV adoption and monthly trends for electric cars, two-wheelers and commercial vehicles.",
-  keywords: "EV sales India 2025, electric vehicle sales data India, EV market share India, top selling EV India, EV monthly sales",
+  keywords: `EV sales India ${DATA_YEAR}, electric vehicle sales data India, EV market share India, top selling EV India, EV monthly sales`,
   alternates: { canonical: `${SITE_URL}/ev-sales` },
   openGraph: {
-    title: "EV Sales Intelligence India 2025 – Market Data & Insights",
+    title: `EV Sales Intelligence India ${DATA_YEAR} – Market Data & Insights`,
     description: "Comprehensive EV sales analytics — brand rankings, segment breakdown, state adoption, monthly growth trends.",
     url: `${SITE_URL}/ev-sales`,
     type: "website",
-    images: [{ url: `${SITE_URL}/api/og?title=EV Sales Intelligence&subtitle=India Monthly EV Market Data 2025&tag=analytics&type=page`, width: 1200, height: 630 }],
+    images: [{ url: `${SITE_URL}/api/og?title=EV Sales Intelligence&subtitle=India Monthly EV Market Data ${DATA_YEAR}&tag=analytics&type=page`, width: 1200, height: 630 }],
   },
-  twitter: { card: "summary_large_image", title: "India EV Sales Data 2025 | EV News India" },
+  twitter: { card: "summary_large_image", title: `India EV Sales Data ${DATA_YEAR} | EV News India` },
 };
 
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Dataset",
-  name: "India EV Sales Intelligence 2025",
+  name: `India EV Sales Intelligence ${DATA_YEAR}`,
   description: "Monthly electric vehicle sales data for India including cars, two-wheelers, commercial vehicles — brand rankings, market share, state-wise adoption.",
   url: `${SITE_URL}/ev-sales`,
   publisher: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
-  temporalCoverage: "2025",
+  temporalCoverage: String(DATA_YEAR),
   spatialCoverage: { "@type": "Country", name: "India" },
   keywords: ["EV sales", "Electric vehicles", "India market data", "EV market share"],
 };

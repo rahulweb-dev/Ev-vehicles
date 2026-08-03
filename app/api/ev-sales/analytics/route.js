@@ -58,33 +58,38 @@ export async function GET(req) {
     // If no data in DB, return fallback
     const hasData = totals.length > 0 || brandRankings.length > 0;
     if (!hasData) {
-      return NextResponse.json(FALLBACK_ANALYTICS(year));
+      return NextResponse.json(FALLBACK_ANALYTICS(year), {
+        headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=7200" },
+      });
     }
 
     // Compute grand total
     const grandTotal = totals.reduce((s, t) => s + t.totalUnits, 0);
     const segMap = Object.fromEntries(totals.map((t) => [t._id, t]));
 
-    return NextResponse.json({
-      year,
-      grandTotal,
-      totals: {
-        car:         segMap.car?.totalUnits || 0,
-        "two-wheeler": segMap["two-wheeler"]?.totalUnits || 0,
-        commercial:  segMap.commercial?.totalUnits || 0,
+    return NextResponse.json(
+      {
+        year,
+        grandTotal,
+        totals: {
+          car:           segMap.car?.totalUnits || 0,
+          "two-wheeler": segMap["two-wheeler"]?.totalUnits || 0,
+          commercial:    segMap.commercial?.totalUnits || 0,
+        },
+        avgGrowth: totals.reduce((s, t) => s + (t.avgGrowth || 0), 0) / (totals.length || 1),
+        marketShare: { car: 0, "two-wheeler": 0, commercial: 0 },
+        brandRankings,
+        monthlyTrend,
+        segmentBreakdown: segmentBreakdown.map((s) => ({
+          segment: s._id,
+          totalUnits: s.totalUnits,
+          share: grandTotal > 0 ? ((s.totalUnits / grandTotal) * 100).toFixed(1) : 0,
+        })),
+        stateSales,
+        isFallback: false,
       },
-      avgGrowth: totals.reduce((s, t) => s + (t.avgGrowth || 0), 0) / (totals.length || 1),
-      marketShare: { car: 0, "two-wheeler": 0, commercial: 0 },
-      brandRankings,
-      monthlyTrend,
-      segmentBreakdown: segmentBreakdown.map((s) => ({
-        segment: s._id,
-        totalUnits: s.totalUnits,
-        share: grandTotal > 0 ? ((s.totalUnits / grandTotal) * 100).toFixed(1) : 0,
-      })),
-      stateSales,
-      isFallback: false,
-    });
+      { headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=7200" } }
+    );
   } catch (err) {
     return NextResponse.json({ ...FALLBACK_ANALYTICS(new Date().getFullYear()), error: err.message });
   }

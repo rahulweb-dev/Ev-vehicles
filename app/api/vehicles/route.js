@@ -6,6 +6,10 @@ import { logError } from "@/lib/logger";
 
 export const revalidate = 60;
 
+function escapeRegExp(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 // GET /api/vehicles
 // ?vehicleType=car|bike  &category=upcoming|popular  &status=published|draft
 // &featured=true  &search=  &sort=launchDate|price|brand  &limit=  &page=
@@ -31,11 +35,14 @@ export async function GET(request) {
     if (status)               filter.status       = status;
     if (featured === "true")  filter.featured     = true;
     if (availability)         filter.availability = availability;
-    if (brand)                filter.brand        = { $regex: brand, $options: "i" };
-    if (search)               filter.$or = [
-      { name:  { $regex: search, $options: "i" } },
-      { brand: { $regex: search, $options: "i" } },
-    ];
+    if (brand)                filter.brand        = { $regex: escapeRegExp(brand), $options: "i" };
+    if (search) {
+      const safe = escapeRegExp(search);
+      filter.$or = [
+        { name:  { $regex: safe, $options: "i" } },
+        { brand: { $regex: safe, $options: "i" } },
+      ];
+    }
 
     const sortMap = {
       launchDate: { launchDate: -1 },
@@ -55,7 +62,11 @@ export async function GET(request) {
       Vehicle.countDocuments(filter),
     ]);
 
-    return NextResponse.json({ vehicles, total, page, pages: Math.ceil(total / limit) });
+    // Vehicle listings are identical for all users — safe to cache at the CDN edge.
+    return NextResponse.json(
+      { vehicles, total, page, pages: Math.ceil(total / limit) },
+      { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" } }
+    );
   } catch (error) {
     logError("GET /api/vehicles", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });

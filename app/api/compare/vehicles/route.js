@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Vehicle from "@/lib/models/Vehicle";
 
+// ISR: popular/featured vehicles don't change more than once every 2 minutes
+export const revalidate = 120;
+
 /**
  * GET /api/compare/vehicles
  *
@@ -62,7 +65,10 @@ export async function GET(request) {
         .limit(6)
         .lean();
 
-      return NextResponse.json({ vehicles: vehicles.map(shape) });
+      return NextResponse.json(
+        { vehicles: vehicles.map(shape) },
+        { headers: { "Cache-Control": "public, s-maxage=120, stale-while-revalidate=300" } }
+      );
     }
 
     /* ── Search ── */
@@ -81,7 +87,11 @@ export async function GET(request) {
         .limit(10)
         .lean();
 
-      return NextResponse.json({ vehicles: vehicles.map(shape) });
+      // Search results vary per query — shorter cache window
+      return NextResponse.json(
+        { vehicles: vehicles.map(shape) },
+        { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120" } }
+      );
     }
 
     /* ── Default: return 6 featured/popular (same as popular=1) ── */
@@ -91,7 +101,10 @@ export async function GET(request) {
       .limit(6)
       .lean();
 
-    return NextResponse.json({ vehicles: vehicles.map(shape) });
+    return NextResponse.json(
+      { vehicles: vehicles.map(shape) },
+      { headers: { "Cache-Control": "public, s-maxage=120, stale-while-revalidate=300" } }
+    );
   } catch (err) {
     console.error("[GET /api/compare/vehicles]", err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });

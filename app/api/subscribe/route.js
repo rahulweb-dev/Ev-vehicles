@@ -114,7 +114,7 @@ export async function GET(request) {
   try {
     await dbConnect();
     const { searchParams } = new URL(request.url);
-    const limit  = parseInt(searchParams.get("limit")  || "100");
+    const limit  = Math.min(parseInt(searchParams.get("limit")  || "100"), 500);
     const page   = parseInt(searchParams.get("page")   || "1");
     const status = searchParams.get("status") || "active";
     const skip   = (page - 1) * limit;

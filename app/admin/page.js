@@ -30,12 +30,14 @@ function playSound(type = "chat") {
       osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.12);
       gain.gain.setValueAtTime(0.4, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc.onended = () => ctx.close();
       osc.start(ctx.currentTime);
       osc.stop(ctx.currentTime + 0.4);
     } else {
       osc.frequency.setValueAtTime(660, ctx.currentTime);
       gain.gain.setValueAtTime(0.2, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+      osc.onended = () => ctx.close();
       osc.start(ctx.currentTime);
       osc.stop(ctx.currentTime + 0.25);
     }
@@ -481,16 +483,16 @@ export default function AdminDashboard() {
   useEffect(() => {
     async function load() {
       try {
-        const [pubRes, draftRes, latestRes, leadsRes, featRes, vehRes] = await Promise.all([
+        const [pubRes, draftRes, latestRes, leadsRes, featRes, vehRes, subRes, analyticsRes] = await Promise.all([
           fetch("/api/articles?status=published&limit=100"),
           fetch("/api/articles?status=draft&limit=100"),
           fetch("/api/articles?status=published&limit=6"),
           fetch("/api/leads?limit=200"),
           fetch("/api/articles?status=published&featured=true&limit=3"),
           fetch("/api/vehicles?limit=200"),
+          fetch("/api/subscribe?limit=50"),
+          fetch("/api/admin/analytics"),
         ]);
-        const subRes = await fetch("/api/subscribe?limit=50");
-        const analyticsRes = await fetch("/api/admin/analytics");
         const [pub, draft, latest, leadsData, feat, vehData, subData, analyticsData] = await Promise.all([
           pubRes.json(), draftRes.json(), latestRes.json(), leadsRes.json(), featRes.json(), vehRes.json(), subRes.json(), analyticsRes.json(),
         ]);

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import ChatLead from "@/lib/models/ChatLead";
+import { requireAuth } from "@/lib/auth";
 
 export async function POST(request) {
   try {
@@ -29,6 +30,9 @@ export async function POST(request) {
 }
 
 export async function GET(request) {
+  const auth = await requireAuth();
+  if (auth.error) return NextResponse.json({ error: auth.error }, { status: auth.status });
+
   try {
     await dbConnect();
     const { searchParams } = new URL(request.url);

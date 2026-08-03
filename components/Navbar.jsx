@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from 'react'
 import {
   Menu, X, ChevronDown, Search, Car, Bike, Truck,
   BarChart2, Newspaper, Home, BookOpen, Mail,
-  Info, ArrowRight, Zap, ChevronRight, Wrench, Calculator,
+  Info, ArrowRight, Zap, ChevronRight, Calculator,
   Leaf, MapPin, TrendingUp,
 } from 'lucide-react'
 import SearchModal from './SearchModal'
@@ -142,7 +142,7 @@ function MobileSearch({ onClose }) {
         <input ref={inputRef} type="text" value={query} onChange={handleChange}
           placeholder="Search EV cars, bikes, news…"
           className="flex-1 bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-400" />
-        {query && <button onClick={() => { setQuery(''); setResults([]) }} className="shrink-0 text-gray-400"><X size={15} /></button>}
+        {query && <button aria-label="Clear search" onClick={() => { setQuery(''); setResults([]) }} className="shrink-0 text-gray-400"><X size={15} /></button>}
       </div>
 
       {busy && <p className="mt-2 text-center text-xs text-gray-400">Searching…</p>}
@@ -361,7 +361,7 @@ export default function Navbar() {
                   </div>
                   <span className="text-base font-black text-white">EV News India</span>
                 </Link>
-                <button onClick={closeMenu}
+                <button onClick={closeMenu} aria-label="Close menu"
                   className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 active:scale-95 transition">
                   <X size={17} />
                 </button>

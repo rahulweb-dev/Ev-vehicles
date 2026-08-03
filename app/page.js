@@ -7,17 +7,6 @@ import VehicleSlider from "@/components/home/VehicleSlider";
 import { AdBannerHorizontal } from "@/components/ads/AdBanner";
 import { SITE_URL } from "./layout";
 
-const GUIDE_LINKS = [
-  { href: "/best-electric-cars-india-2026",  title: "Best EVs 2026",       desc: "Expert-ranked top 10",       emoji: "🏆" },
-  { href: "/best-electric-bikes-india-2026", title: "Best Bikes 2026",      desc: "Top 10 electric scooters",   emoji: "🛵" },
-  { href: "/upcoming-electric-cars-india",   title: "Upcoming Cars",        desc: "Launching soon in India",    emoji: "🚀" },
-  { href: "/upcoming-electric-bikes-india",  title: "Upcoming Bikes",       desc: "New electric scooters 2026", emoji: "⚡" },
-  { href: "/electric-cars-under-10-lakh",    title: "Cars Under ₹10L",      desc: "Budget electric cars",       emoji: "💰" },
-  { href: "/electric-bikes-under-1-lakh",    title: "Bikes Under ₹1L",      desc: "Budget electric scooters",   emoji: "🤑" },
-  { href: "/ev-charging-guide",              title: "Charging Guide",        desc: "Everything about EV charging", emoji: "🔋" },
-  { href: "/subsidy-calculator",             title: "Subsidy Calculator",    desc: "Check your EV savings",      emoji: "🧮" },
-  { href: "/government-ev-policy-india",     title: "EV Policy India",       desc: "FAME, PM E-Drive & more",    emoji: "📋" },
-];
 
 export const revalidate = 120; // re-fetch from DB every 2 minutes
 
@@ -142,19 +131,22 @@ async function getBrandLogos() {
 
 /* ── Fetch a section from MongoDB ────────────────────────────────── */
 async function getVehicles({ category, vehicleType, featured }) {
-  const dbConnect = (await import("@/lib/mongodb")).default;
-  const Vehicle   = (await import("@/lib/models/Vehicle")).default;
-  await dbConnect();
-  const filter = { vehicleType, status: "published" };
-  if (category) filter.category = category;
-  if (featured) filter.featured = true;
-  const docs = await Vehicle.find(filter)
-    .sort({ createdAt: -1 })
-    .limit(12)
-    .select("slug name brand vehicleType category featured featuredImage performance variants colors")
-    .lean();
-  /* brandLogoMap is applied separately after all parallel fetches */
-  return docs;
+  try {
+    const dbConnect = (await import("@/lib/mongodb")).default;
+    const Vehicle   = (await import("@/lib/models/Vehicle")).default;
+    await dbConnect();
+    const filter = { vehicleType, status: "published" };
+    if (category) filter.category = category;
+    if (featured) filter.featured = true;
+    const docs = await Vehicle.find(filter)
+      .sort({ createdAt: -1 })
+      .limit(12)
+      .select("slug name brand vehicleType category featured featuredImage performance variants colors")
+      .lean();
+    return docs;
+  } catch {
+    return [];
+  }
 }
 
 function applyLogos(docs, brandLogoMap) {

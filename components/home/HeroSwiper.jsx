@@ -121,8 +121,8 @@ function BrandLogo({ brand, size = 28 }) {
 }
 
 /* ─── Search with live suggestions ──────────────────────────────── */
-function SearchBar({ vehicleType, setVehicleType, mobile = false }) {
-  const [query, setSuggestions_query] = useState('')
+function SearchBar({ vehicleType, setVehicleType, mobile = false, onQueryChange }) {
+  const [query, setQuery] = useState('')
   const [suggestions, setSuggestions] = useState([])
   const [showSug, setShowSug]         = useState(false)
   const [busy, setBusy]               = useState(false)
@@ -171,7 +171,8 @@ function SearchBar({ vehicleType, setVehicleType, mobile = false }) {
 
   function handleChange(e) {
     const val = e.target.value
-    setSuggestions_query(val)
+    setQuery(val)
+    onQueryChange?.(val)
     fetchSuggestions(val)
   }
 
@@ -247,6 +248,7 @@ function SearchBar({ vehicleType, setVehicleType, mobile = false }) {
 /* ─── Desktop Hero ────────────────────────────────────────────────── */
 function DesktopHero({ slides }) {
   const [vehicleType, setVehicleType] = useState('cars')
+  const [searchQuery, setSearchQuery] = useState('')
 
   return (
     <div className="hidden md:block bg-white">
@@ -265,21 +267,20 @@ function DesktopHero({ slides }) {
               <div className="relative h-full w-full overflow-hidden">
                 <Image src={slide.image} alt={slide.title} fill priority={i === 0}
                   className="object-cover" sizes="100vw" />
-                {/* <div className="absolute inset-0 bg-linear-to-r from-black/85 via-black/55 to-black/20" /> */}
-                {/* <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent" /> */}
+                <div className="absolute inset-0 bg-linear-to-r from-black/80 via-black/50 to-black/10" />
                 <div className="absolute inset-0 flex items-center">
                   <div className="mx-auto w-full max-w-7xl px-6 lg:px-10">
-                    {/* <span className={`inline-block rounded-full ${slide.tagColor} px-4 py-1 text-xs font-black text-white mb-4 shadow`}>
+                    <span className={`inline-block rounded-full ${slide.tagColor} px-4 py-1 text-xs font-black text-white mb-4 shadow`}>
                       {slide.tag}
-                    </span> */}
-                    {/* <h1 className="text-3xl lg:text-5xl font-black text-white leading-tight max-w-2xl">
+                    </span>
+                    <h1 className="text-3xl lg:text-5xl font-black text-white leading-tight max-w-2xl">
                       {slide.title}
-                    </h1> */}
-                    {/* <p className="mt-3 text-base lg:text-lg text-white/70 max-w-xl">{slide.subtitle}</p> */}
-                    {/* <Link href={slide.cta.href}
+                    </h1>
+                    <p className="mt-3 text-base lg:text-lg text-white/70 max-w-xl">{slide.subtitle}</p>
+                    <Link href={slide.cta.href}
                       className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#00a651] px-6 py-3 text-sm font-black text-white shadow-lg hover:bg-[#009245] hover:scale-105 transition-all">
                       {slide.cta.label} <ChevronRight size={15} />
-                    </Link> */}
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -312,14 +313,13 @@ function DesktopHero({ slides }) {
             <div className="w-px h-8 bg-gray-200 shrink-0" />
 
             {/* Live search */}
-            <SearchBar vehicleType={vehicleType} setVehicleType={setVehicleType} />
+            <SearchBar vehicleType={vehicleType} setVehicleType={setVehicleType} onQueryChange={setSearchQuery} />
 
             {/* Search CTA */}
             <button
               onClick={() => {
-                const input = document.querySelector('input[autocomplete=off]')
-                if (input?.value?.trim()) {
-                  window.location.href = `/${vehicleType}?search=${encodeURIComponent(input.value.trim())}`
+                if (searchQuery.trim()) {
+                  window.location.href = `/${vehicleType}?search=${encodeURIComponent(searchQuery.trim())}`
                 } else {
                   window.location.href = `/${vehicleType}`
                 }
@@ -409,19 +409,19 @@ function MobileHero({ mobileSlides }) {
               <div className="relative h-full w-full overflow-hidden">
                 <Image src={slide.image} alt={slide.title} fill priority={i === 0}
                   className="object-cover" sizes="100vw" />
-                {/* <div className="absolute inset-0 bg-linear-to-b from-black/30 via-black/40 to-black/85" /> */}
+                <div className="absolute inset-0 bg-linear-to-b from-black/20 via-black/40 to-black/80" />
                 <div className="absolute inset-0 flex flex-col items-center justify-end px-5 pb-12 text-center">
-                  {/* {slide.tag && (
+                  {slide.tag && (
                     <span className={`mb-3 inline-block rounded-full px-3 py-1 text-[11px] font-black text-white shadow ${slide.tagColor}`}>
                       {slide.tag}
                     </span>
-                  )} */}
-                  {/* <h2 className="text-xl font-black leading-tight text-white sm:text-2xl">{slide.title}</h2>
-                  {slide.subtitle && <p className="mt-1.5 text-xs text-white/70 max-w-xs">{slide.subtitle}</p>} */}
-                  {/* <Link href={slide.cta.href}
+                  )}
+                  <h2 className="text-xl font-black leading-tight text-white sm:text-2xl">{slide.title}</h2>
+                  {slide.subtitle && <p className="mt-1.5 text-xs text-white/70 max-w-xs">{slide.subtitle}</p>}
+                  <Link href={slide.cta.href}
                     className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-[#00a651] px-5 py-2.5 text-sm font-black text-white shadow-lg hover:bg-[#009245] active:scale-95 transition-all">
                     {slide.cta.label} <ChevronRight size={14} />
-                  </Link> */}
+                  </Link>
                 </div>
               </div>
             </SwiperSlide>

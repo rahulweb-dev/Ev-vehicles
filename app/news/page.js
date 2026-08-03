@@ -65,6 +65,14 @@ export async function generateMetadata({ searchParams }) {
     alternates: {
       canonical,
       ...(page > 1 && { prev: buildNewsCanonical(cat, page - 1) }),
+      ...(await (async () => {
+        try {
+          const Article = (await import("@/lib/models/Article")).default;
+          const total = await Article.countDocuments({ status: "published", ...(cat ? { category: cat } : {}) });
+          const pages = Math.ceil(total / LIMIT) || 1;
+          return page < pages ? { next: buildNewsCanonical(cat, page + 1) } : {};
+        } catch { return {}; }
+      })()),
     },
     openGraph: {
       title: `${label} EV News – Electric Vehicle Updates India 2026`,
