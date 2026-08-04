@@ -166,41 +166,40 @@ export default async function AuthorPage({ params }) {
               </div>
             </div>
 
-            {/* Bio + credentials */}
-            {(profile?.bio || profile?.credentials?.length || profile?.expertise?.length) && (
-              <div className="border-t border-gray-100 px-6 py-5 grid sm:grid-cols-3 gap-6">
-                {profile?.bio && (
-                  <div className="sm:col-span-2">
-                    <p className="text-sm font-bold text-gray-700 mb-1.5">About</p>
-                    <p className="text-sm text-gray-600 leading-relaxed">{profile.bio}</p>
+            {/* Bio + credentials — always render a bio (fallback if no DB profile) */}
+            <div className="border-t border-gray-100 px-6 py-5 grid sm:grid-cols-3 gap-6">
+              <div className="sm:col-span-2">
+                <p className="text-sm font-bold text-gray-700 mb-1.5">About</p>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  {profile?.bio ||
+                    `${authorName} is a contributor and journalist at EV Radar — India's leading electric vehicle news and reviews platform. With ${articles.length} published article${articles.length !== 1 ? "s" : ""} covering ${categories.length > 0 ? categories.map(c => c.charAt(0).toUpperCase() + c.slice(1)).join(", ") : "electric vehicles"}, their work helps Indian readers make informed decisions about EV purchases, charging, policy, and the future of mobility.`}
+                </p>
+              </div>
+              <div className="space-y-4">
+                {profile?.credentials?.length > 0 && (
+                  <div>
+                    <p className="text-xs font-bold text-gray-700 mb-1.5 flex items-center gap-1"><Award size={12} className="text-green-600" /> Credentials</p>
+                    <ul className="space-y-1">
+                      {profile.credentials.map((c, i) => (
+                        <li key={i} className="flex items-start gap-1.5 text-xs text-gray-600">
+                          <CheckCircle size={10} className="text-green-500 shrink-0 mt-0.5" /> {c}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 )}
-                <div className="space-y-4">
-                  {profile?.credentials?.length > 0 && (
-                    <div>
-                      <p className="text-xs font-bold text-gray-700 mb-1.5 flex items-center gap-1"><Award size={12} className="text-green-600" /> Credentials</p>
-                      <ul className="space-y-1">
-                        {profile.credentials.map((c, i) => (
-                          <li key={i} className="flex items-start gap-1.5 text-xs text-gray-600">
-                            <CheckCircle size={10} className="text-green-500 shrink-0 mt-0.5" /> {c}
-                          </li>
-                        ))}
-                      </ul>
+                {profile?.expertise?.length > 0 && (
+                  <div>
+                    <p className="text-xs font-bold text-gray-700 mb-1.5">Covers</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {profile.expertise.map((e, i) => (
+                        <span key={i} className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold text-gray-600">{e}</span>
+                      ))}
                     </div>
-                  )}
-                  {profile?.expertise?.length > 0 && (
-                    <div>
-                      <p className="text-xs font-bold text-gray-700 mb-1.5">Covers</p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {profile.expertise.map((e, i) => (
-                          <span key={i} className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold text-gray-600">{e}</span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
 
           {/* Category filters */}

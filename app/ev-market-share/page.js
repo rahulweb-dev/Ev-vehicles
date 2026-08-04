@@ -44,6 +44,27 @@ export default async function EVMarketSharePage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+
+      {/* Server-rendered editorial intro for AdSense quality and Googlebot visibility */}
+      <div className="max-w-7xl mx-auto px-4 pt-8 pb-4">
+        <h1 className="text-3xl font-black text-gray-900 mb-3">EV Market Share India 2025</h1>
+        <p className="text-gray-700 leading-relaxed mb-4">
+          This page tracks <strong>brand-wise electric vehicle market share</strong> in India for 2025, covering the car, two-wheeler, and commercial vehicle segments. Tata EV dominates the electric car segment with over 50% market share, while Ola Electric leads two-wheelers with approximately 35% share. The data is sourced from official VAHAN registration records and updated monthly. Use the charts below to compare EV brands, segment growth trends, and state-level adoption patterns across India.
+        </p>
+        <div className="mb-6 flex flex-wrap gap-4 text-sm">
+          {[
+            { label: "Cars leader", value: "Tata EV — 50%+" },
+            { label: "2-Wheeler leader", value: "Ola Electric — 35%+" },
+            { label: "Commercial leader", value: "Tata / Mahindra" },
+          ].map(({ label, value }) => (
+            <div key={label} className="rounded-xl bg-blue-50 border border-blue-100 px-4 py-3 min-w-40">
+              <p className="text-xs text-gray-500">{label}</p>
+              <p className="text-sm font-black text-blue-700">{value}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <EVMarketShareDashboard data={data} />
     </>
   );

@@ -44,6 +44,27 @@ export default async function EVAdoptionStatesPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+
+      {/* Server-rendered editorial intro for AdSense quality and Googlebot visibility */}
+      <div className="max-w-7xl mx-auto px-4 pt-8 pb-4">
+        <h1 className="text-3xl font-black text-gray-900 mb-3">EV Adoption by State — India 2025</h1>
+        <p className="text-gray-700 leading-relaxed mb-4">
+          Which Indian states are leading the electric vehicle revolution? This dashboard tracks <strong>state-wise EV registrations</strong> across India using official VAHAN data for 2025. <strong>Uttar Pradesh</strong> leads in total EV registrations followed by Maharashtra, Karnataka, Tamil Nadu, and Rajasthan. <strong>Delhi</strong> leads in EV adoption rate relative to total vehicle registrations, powered by aggressive state subsidies including complete road tax waiver, purchase incentives up to ₹30,000, and a dense public charging network. Explore state-level trends, year-over-year growth rates, and segment breakdowns below.
+        </p>
+        <div className="mb-6 flex flex-wrap gap-4 text-sm">
+          {[
+            { label: "Most registrations", value: "Uttar Pradesh" },
+            { label: "Highest adoption rate", value: "Delhi" },
+            { label: "Fastest growing", value: "Karnataka" },
+          ].map(({ label, value }) => (
+            <div key={label} className="rounded-xl bg-orange-50 border border-orange-100 px-4 py-3 min-w-40">
+              <p className="text-xs text-gray-500">{label}</p>
+              <p className="text-sm font-black text-orange-700">{value}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <StateAdoptionDashboard data={data} />
     </>
   );

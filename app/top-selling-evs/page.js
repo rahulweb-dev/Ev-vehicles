@@ -42,6 +42,15 @@ export default async function TopSellingEVsPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+
+      {/* Server-rendered editorial intro for AdSense quality and Googlebot visibility */}
+      <div className="max-w-7xl mx-auto px-4 pt-8 pb-4">
+        <h1 className="text-3xl font-black text-gray-900 mb-3">Top Selling EVs in India 2025</h1>
+        <p className="text-gray-700 leading-relaxed mb-4">
+          India&apos;s best-selling electric vehicles ranked by actual monthly VAHAN registration data. The <strong>Tata Nexon EV</strong> consistently tops the electric car segment, while <strong>Ola S1 Pro</strong> and <strong>TVS iQube</strong> lead the electric scooter rankings. This list covers the top 15 best-selling EVs across all segments — cars, two-wheelers, and commercial vehicles — updated monthly with verified government sales figures. The rankings reflect real buyer preference, not manufacturer claims, and are a reliable guide for anyone researching which EV to buy in India in 2025.
+        </p>
+      </div>
+
       <TopSellingEVsDashboard data={data} />
     </>
   );

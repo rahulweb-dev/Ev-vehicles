@@ -159,6 +159,28 @@ export default async function BikesPage({ searchParams }) {
         </div>
 
         <div className="mx-auto max-w-7xl px-4 py-8">
+
+          {/* Editorial intro — visible to Googlebot and readers */}
+          <div className="mb-8 rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
+            <p className="text-gray-700 leading-relaxed">
+              Electric scooters and bikes are transforming urban mobility in India, with two-wheelers accounting for nearly 55% of all EV sales in 2024. Brands like <strong>Ola Electric</strong>, <strong>Ather Energy</strong>, <strong>TVS</strong>, <strong>Bajaj</strong>, and <strong>Hero Vida</strong> are competing fiercely on range, features, and price — from budget scooters under ₹50,000 to performance bikes above ₹1.5 lakh. EV Radar covers every electric two-wheeler launch, long-term review, and real-world range test to help Indian riders make smarter buying decisions. Use the filters below to find the right electric scooter or bike for your daily commute or weekend ride.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="inline-block w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                <span className="text-gray-600">50+ models listed</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="inline-block w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                <span className="text-gray-600">Real-world range figures</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="inline-block w-2.5 h-2.5 rounded-full bg-orange-500"></span>
+                <span className="text-gray-600">Prices updated daily</span>
+              </div>
+            </div>
+          </div>
+
           <AdBannerHorizontal slot="8901234567" />
 
           <div className="mt-8">
@@ -171,6 +193,43 @@ export default async function BikesPage({ searchParams }) {
           </div>
 
           <div className="my-10"><AdBannerHorizontal slot="9012345678" /></div>
+
+          {/* Visible FAQ section — same content as FAQPage JSON-LD above */}
+          <section className="mb-10">
+            <h2 className="mb-6 text-2xl font-black text-gray-900">Frequently Asked Questions</h2>
+            <div className="space-y-4">
+              {[
+                {
+                  q: "Which is the best electric scooter in India in 2026?",
+                  a: "The best electric scooters in India in 2026 are the Ola S1 Pro Gen 2 (195 km range, ₹1.47L), Ather 450X Gen 3 (146 km, ₹1.50L), TVS iQube S (100 km, ₹98K), and Bajaj Chetak (126 km, ₹95K). The Ola S1 Pro leads on range and features, while the Ather 450X is the top pick for build quality and fast-charging network access.",
+                },
+                {
+                  q: "What is the cheapest electric scooter in India in 2026?",
+                  a: "The most affordable electric scooters in India in 2026 start from around ₹44,000. Options include the Ampere Nexus (₹44,400) and Hero Electric Optima ER (₹45,990) for under ₹50,000. For better range and features, the Ola S1 Air (₹84,999) and Hero Vida V1 Lite (₹89,994) are the top picks under ₹1 lakh.",
+                },
+                {
+                  q: "What is the range of electric scooters available in India?",
+                  a: "Electric scooters in India in 2026 offer a certified range of 60 km to 212 km per charge. The Simple One leads with 212 km ARAI range, followed by the Ola S1 Pro Gen 2 (195 km) and Ola S1 Air (101 km). Mid-range scooters like TVS iQube and Bajaj Chetak offer 100–140 km range, which is sufficient for most daily urban commutes.",
+                },
+                {
+                  q: "Can I charge an electric scooter at home?",
+                  a: "Yes — all electric scooters include a portable home charger that works with a standard 5A or 15A socket. A full charge costs ₹10–20 depending on your state's electricity tariff. Charging time is 4–8 hours overnight. Some premium scooters like Ola S1 Pro support fast charging at dedicated charger networks.",
+                },
+                {
+                  q: "Are electric scooters better than petrol scooters in India?",
+                  a: "For daily city commutes, electric scooters are more economical than petrol scooters. Running cost is ₹0.15–₹0.30 per km vs ₹2.50–₹3.50 per km for petrol. Annual savings for a 40 km/day commute can be ₹30,000–₹50,000. Electric scooters also need less maintenance and benefit from government subsidies and lower road tax.",
+                },
+              ].map(({ q, a }) => (
+                <details key={q} className="group rounded-2xl border border-gray-200 bg-white">
+                  <summary className="flex cursor-pointer items-center justify-between px-5 py-4 font-semibold text-gray-900 marker:hidden list-none">
+                    {q}
+                    <span className="ml-4 shrink-0 text-green-600 group-open:rotate-45 transition-transform duration-200">＋</span>
+                  </summary>
+                  <p className="px-5 pb-5 text-sm leading-relaxed text-gray-600">{a}</p>
+                </details>
+              ))}
+            </div>
+          </section>
 
           <section>
             <h2 className="mb-6 text-2xl font-black text-gray-900">Latest Electric Bike News</h2>

@@ -160,6 +160,28 @@ export default async function CarsPage({ searchParams }) {
         </div>
 
         <div className="mx-auto max-w-7xl px-4 py-8">
+
+          {/* Editorial intro — visible to Googlebot and readers */}
+          <div className="mb-8 rounded-2xl bg-white p-6 shadow-sm border border-gray-100">
+            <p className="text-gray-700 leading-relaxed">
+              India&apos;s electric car market is growing faster than ever, with over 90,000 EVs sold in 2024 and more than 30 models now available across all budgets. From affordable city EVs like the <strong>Tata Tiago EV (₹7.99L)</strong> and <strong>Tata Punch EV</strong> to premium SUVs like the <strong>Mahindra BE 6 (682 km range)</strong> and <strong>Hyundai Creta Electric</strong>, EV Radar covers every launch, price cut, and real-world review. Use the filters below to compare electric cars by brand, budget, range, and battery capacity — all data is updated in real-time from official sources.
+            </p>
+            <div className="mt-4 flex flex-wrap gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="inline-block w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                <span className="text-gray-600">30+ models listed</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="inline-block w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                <span className="text-gray-600">ARAI-certified range data</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="inline-block w-2.5 h-2.5 rounded-full bg-orange-500"></span>
+                <span className="text-gray-600">Ex-showroom prices updated daily</span>
+              </div>
+            </div>
+          </div>
+
           <AdBannerHorizontal slot="7890123456" />
 
           <div className="mt-8">
@@ -172,6 +194,43 @@ export default async function CarsPage({ searchParams }) {
           </div>
 
           <div className="my-10"><AdBannerHorizontal slot="7890123457" /></div>
+
+          {/* Visible FAQ section — same content as FAQPage JSON-LD above */}
+          <section className="mb-10">
+            <h2 className="mb-6 text-2xl font-black text-gray-900">Frequently Asked Questions</h2>
+            <div className="space-y-4">
+              {[
+                {
+                  q: "Which is the best electric car in India in 2026?",
+                  a: "The best electric cars in India in 2026 include the Tata Nexon EV (489 km range, from ₹14.49L), Mahindra BE 6 (682 km range, from ₹18.90L), MG Windsor EV (331 km, from ₹13.50L), and Hyundai Creta Electric (473 km, from ₹17.99L). The Tata Nexon EV is the best-seller thanks to its price, range, and nationwide service network.",
+                },
+                {
+                  q: "What is the cheapest electric car in India in 2026?",
+                  a: "The most affordable electric cars in India in 2026 are the MG Comet EV starting at ₹6.99 lakh and the Tata Tiago EV starting at ₹7.99 lakh (ex-showroom). Both are ideal for city driving. The Tata Punch EV at ₹9.99 lakh offers the best balance of range (421 km) and features in the budget EV segment.",
+                },
+                {
+                  q: "What is the range of electric cars available in India?",
+                  a: "Electric cars available in India in 2026 offer a certified range of 230 km to 682 km on a full charge. The Mahindra BE 6e leads with 682 km ARAI range, followed by the BYD Seal (650 km), Hyundai Ioniq 6 (631 km), and Tata Nexon EV (489 km). Most popular EVs offer 350–500 km which is sufficient for highway travel with planned charging stops.",
+                },
+                {
+                  q: "How much does it cost to charge an electric car at home in India?",
+                  a: "Charging an electric car at home in India costs ₹6–9 per unit (kWh) depending on your state electricity tariff. A full charge for a 40 kWh battery (Tata Nexon EV) costs ₹240–360, compared to ₹2,500–3,000 for a petrol equivalent — saving 80–90% on fuel costs. Charging time at home is 7–12 hours using the included 3.3 kW portable charger.",
+                },
+                {
+                  q: "What government subsidies are available for electric cars in India?",
+                  a: "In 2026, electric cars in India are eligible for subsidies under the PM E-Drive scheme, income tax deduction under Section 80EEB (up to ₹1.5 lakh interest deduction), and state-level road tax exemptions. States like Delhi, Maharashtra, Gujarat, and Rajasthan offer additional incentives.",
+                },
+              ].map(({ q, a }) => (
+                <details key={q} className="group rounded-2xl border border-gray-200 bg-white">
+                  <summary className="flex cursor-pointer items-center justify-between px-5 py-4 font-semibold text-gray-900 marker:hidden list-none">
+                    {q}
+                    <span className="ml-4 shrink-0 text-green-600 group-open:rotate-45 transition-transform duration-200">＋</span>
+                  </summary>
+                  <p className="px-5 pb-5 text-sm leading-relaxed text-gray-600">{a}</p>
+                </details>
+              ))}
+            </div>
+          </section>
 
           <section>
             <h2 className="mb-6 text-2xl font-black text-gray-900">Latest Electric Car News</h2>

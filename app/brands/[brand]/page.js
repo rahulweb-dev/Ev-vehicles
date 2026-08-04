@@ -158,9 +158,10 @@ export default async function BrandPage({ params }) {
                   </a>
                 )}
               </div>
-              {brandProfile?.description && (
-                <p className="mt-2 text-sm text-gray-600 max-w-2xl">{brandProfile.description}</p>
-              )}
+              <p className="mt-2 text-sm text-gray-600 max-w-2xl">
+                {brandProfile?.description ||
+                  `${brandName} is an electric vehicle brand available in India with ${vehicles.length > 0 ? `${vehicles.length} EV model${vehicles.length !== 1 ? "s" : ""}` : "electric vehicles"} across cars and two-wheelers. Browse all ${brandName} EVs with ex-showroom prices, ARAI-certified range, variants, colours, and the latest ${brandName} news below.`}
+              </p>
               <div className="mt-3 flex gap-2">
                 {cars.length  > 0 && <span className="flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700"><Car  size={12} />{cars.length} Car{cars.length !== 1 ? "s" : ""}</span>}
                 {bikes.length > 0 && <span className="flex items-center gap-1.5 rounded-full bg-orange-50 px-3 py-1 text-xs font-semibold text-orange-700"><Bike size={12} />{bikes.length} Bike{bikes.length !== 1 ? "s" : ""}</span>}

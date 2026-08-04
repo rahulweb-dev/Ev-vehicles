@@ -72,6 +72,13 @@ export default function EVQuizPage() {
       {jsonLd.map((schema, i) => (
         <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
       ))}
+      {/* Server-rendered intro ensures Googlebot sees substantive text, not just the interactive quiz */}
+      <div className="max-w-2xl mx-auto px-4 pt-8 pb-2">
+        <h1 className="text-2xl font-black text-gray-900 mb-2">Which EV Is Right for You?</h1>
+        <p className="text-gray-600 leading-relaxed mb-1">
+          Answer 6 quick questions about your budget, daily driving distance, and charging setup — and our EV Finder will recommend the best electric car or scooter for your needs from India&apos;s complete 2026 lineup. The quiz covers everything from entry-level EVs under ₹10 lakh to premium electric SUVs, so every type of buyer gets a personalised shortlist with real prices and verified range figures.
+        </p>
+      </div>
       <EVQuizClient />
     </>
   );

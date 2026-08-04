@@ -81,13 +81,52 @@ const jsonLd = [
   },
 ];
 
+const FAQS = [
+  {
+    q: "What is the FAME II subsidy for electric cars in India?",
+    a: "Under the FAME II scheme, electric cars priced under ₹15 lakh (ex-showroom) are eligible for a subsidy of ₹10,000 per kWh of battery capacity, up to ₹1.5 lakh. Two-wheelers get up to ₹15,000 subsidy.",
+  },
+  {
+    q: "Which state gives the highest EV subsidy in India?",
+    a: "Delhi offers the highest combined EV subsidy in India — up to ₹1.5 lakh for electric cars, plus 100% road tax waiver, zero registration fee, and additional scrappage incentive. Maharashtra and Gujarat also offer significant state subsidies.",
+  },
+  {
+    q: "Can I claim income tax benefit on EV loan in India?",
+    a: "Yes. Under Section 80EEB of the Income Tax Act, individuals can claim a deduction of up to ₹1.5 lakh on interest paid on EV loans taken between April 2019 and March 2023. This benefit applies to both two-wheelers and four-wheelers.",
+  },
+  {
+    q: "What is the PM E-Drive scheme for EVs?",
+    a: "PM E-Drive (Electric Drive Revolution in Innovative Vehicle Enhancement) replaced FAME II in 2024 with a ₹10,900 crore outlay. It supports electric two-wheelers, three-wheelers, e-buses, and charging infrastructure across India.",
+  },
+];
+
 export default function SubsidyCalculatorPage() {
   return (
     <>
       {jsonLd.map((schema, i) => (
         <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
       ))}
+      <div className="max-w-3xl mx-auto px-4 pt-8 pb-2">
+        <h1 className="text-2xl font-black text-gray-900 mb-2">EV Subsidy Calculator — India 2026</h1>
+        <p className="text-gray-600 leading-relaxed mb-6">
+          Select your state and the type of electric vehicle you plan to buy to instantly calculate your total EV subsidy in India — including PM E-Drive central benefits, state-level incentives, road tax waivers, registration fee exemptions, and income tax deductions under Section 80EEB. The calculator covers all 28 states and union territories and is updated with the latest subsidy rates for 2026.
+        </p>
+      </div>
       <SubsidyClient />
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        <h2 className="text-xl font-black text-gray-900 mb-4">Frequently Asked Questions</h2>
+        <div className="space-y-3">
+          {FAQS.map(({ q, a }) => (
+            <details key={q} className="group rounded-2xl border border-gray-200 bg-white">
+              <summary className="flex cursor-pointer items-center justify-between px-5 py-4 font-semibold text-gray-900 marker:hidden list-none">
+                {q}
+                <span className="ml-4 shrink-0 text-green-600 group-open:rotate-45 transition-transform duration-200">＋</span>
+              </summary>
+              <p className="px-5 pb-4 text-sm leading-relaxed text-gray-600">{a}</p>
+            </details>
+          ))}
+        </div>
+      </div>
     </>
   );
 }

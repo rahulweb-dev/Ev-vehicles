@@ -100,7 +100,7 @@ export default async function TagPage({ params }) {
           <span className="text-green-600">#{decodedTag}</span>
         </nav>
 
-        <div className="mb-8 flex items-center gap-3">
+        <div className="mb-6 flex items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green-100">
             <Tag size={22} className="text-green-600" />
           </div>
@@ -109,6 +109,11 @@ export default async function TagPage({ params }) {
             <p className="mt-0.5 text-sm text-gray-500">{articles.length} article{articles.length !== 1 ? "s" : ""}</p>
           </div>
         </div>
+
+        {/* Editorial intro for this tag — adds substantive visible text for AdSense quality */}
+        <p className="mb-8 rounded-2xl bg-white border border-gray-100 px-6 py-4 text-gray-700 leading-relaxed shadow-sm">
+          Explore the latest electric vehicle news, reviews, and analysis tagged with <strong>#{decodedTag}</strong> from EV Radar — India&apos;s leading EV news platform. Our team covers launches, price updates, specifications, government policies, and real-world tests related to {decodedTag} so you stay informed on every development in India&apos;s fast-moving electric vehicle industry.
+        </p>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {articles.map((a) => (

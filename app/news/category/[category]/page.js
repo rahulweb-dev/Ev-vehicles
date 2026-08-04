@@ -16,6 +16,13 @@ const VALID_CATEGORIES = {
   charging:   "EV Charging",
 };
 
+const CATEGORY_INTROS = {
+  cars:       "India's electric car market is growing faster than ever, with over 90,000 EVs sold in 2024 and more than 30 models now available across all budgets. From affordable city EVs like the Tata Tiago EV and Punch EV to premium SUVs like the Mahindra BE 6 and Hyundai Creta Electric, EV Radar covers every launch, price revision, range test, and real-world review. Our reporters track official ex-showroom prices, ARAI-certified range figures, government subsidies, and charging infrastructure changes so you always have the latest before making a buying decision.",
+  bikes:      "Electric scooters and bikes account for nearly 55% of all EV sales in India, making two-wheelers the fastest-growing EV segment in the country. Brands like Ola Electric, Ather Energy, TVS, Bajaj Chetak, and Hero Vida compete fiercely on price, range, and connected features. EV Radar covers every electric two-wheeler launch, comparison test, and charging guide. Whether you commute daily in Bengaluru, Mumbai, or Delhi, our expert team cuts through spec-sheet noise to give you real-world riding insights and honest value assessments.",
+  commercial: "Commercial electric vehicles are transforming logistics, public transport, and last-mile delivery across India. From electric buses and trucks to cargo three-wheelers and delivery vans, EV Radar tracks every fleet deal, government tender, and new model launch. India's commercial EV sector saw over 55,000 three-wheeler sales in 2024 alone, with players like Tata, Mahindra, Euler, Altigreen, and Switch Mobility leading adoption. We cover total-cost-of-ownership comparisons, charging depot deployments, and the latest policy updates relevant to fleet operators and logistics managers.",
+  charging:   "India's EV charging infrastructure is expanding rapidly, with over 12,000 public fast-charging stations now operational and the government committing ₹10,900 crore under the PM E-Drive scheme for further expansion through 2026. EV Radar covers every major charger network rollout, home charging product launch, highway fast-charging corridor announcement, and inter-operable payment standard update. Whether you are planning a cross-country drive in your Tata Nexon EV or setting up a home charger for your Ola S1 Pro, we have the guides and breaking news to help you charge smarter.",
+};
+
 async function getArticles(category, page = 1) {
   try {
     const dbConnect = (await import("@/lib/mongodb")).default;
@@ -150,6 +157,14 @@ export default async function CategoryPage({ params, searchParams }) {
         </div>
 
         <div className="mx-auto max-w-7xl px-4 py-10">
+
+          {/* Per-category editorial intro — visible to Googlebot */}
+          {CATEGORY_INTROS[category] && (
+            <p className="mb-8 rounded-2xl bg-white border border-gray-100 px-6 py-5 text-gray-700 leading-relaxed shadow-sm">
+              {CATEGORY_INTROS[category]}
+            </p>
+          )}
+
           {/* Category filter pills */}
           <div className="mb-8 flex flex-wrap gap-3">
             <Link
