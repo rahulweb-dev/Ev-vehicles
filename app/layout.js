@@ -54,9 +54,6 @@ export const metadata = {
   authors: [{ name: SITE_NAME, url: SITE_URL }],
   creator: SITE_NAME,
   publisher: SITE_NAME,
-  verification: {
-    google: "qrBg2HJdfas3gPzBHszBDwSlMvHIhww849SzZzqSdLc",
-  },
   robots: {
     index: true,
     follow: true,
@@ -109,7 +106,7 @@ export const metadata = {
     canonical: SITE_URL,
   },
   verification: {
-    google: process.env.GOOGLE_SEARCH_CONSOLE_TOKEN,
+    google: "qrBg2HJdfas3gPzBHszBDwSlMvHIhww849SzZzqSdLc",
   },
   other: {
     "p:domain_verify": "07cbf55529a481771ddbbd2ddbbeae9f",
@@ -217,6 +214,9 @@ export default function RootLayout({ children }) {
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
+
+        {/* Google Search Console verification */}
+        <meta name="google-site-verification" content="qrBg2HJdfas3gPzBHszBDwSlMvHIhww849SzZzqSdLc" />
 
         {/* Pinterest domain verification — must be in <head> JSX to appear on all pages */}
         <meta name="p:domain_verify" content="07cbf55529a481771ddbbd2ddbbeae9f" />
