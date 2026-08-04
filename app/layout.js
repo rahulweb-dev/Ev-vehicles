@@ -54,6 +54,9 @@ export const metadata = {
   authors: [{ name: SITE_NAME, url: SITE_URL }],
   creator: SITE_NAME,
   publisher: SITE_NAME,
+  verification: {
+    google: "qrBg2HJdfas3gPzBHszBDwSlMvHIhww849SzZzqSdLc",
+  },
   robots: {
     index: true,
     follow: true,
