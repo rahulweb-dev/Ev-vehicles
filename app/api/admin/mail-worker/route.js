@@ -4,8 +4,8 @@ import MailQueue    from "@/lib/models/MailQueue";
 import Campaign     from "@/lib/models/Campaign";
 import { getTransporter, FROM, withClickTracking, withOpenPixel, unsubFooter } from "@/lib/mailer";
 
-// Process up to 20 emails per invocation (runs every minute via cron)
-const BATCH = 20;
+// Process up to 50 emails per invocation — handles most subscriber lists in one shot
+const BATCH = 50;
 
 export async function GET(request) {
   // Accept Vercel Cron Authorization header or manual secret
