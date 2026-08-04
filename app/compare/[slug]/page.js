@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -41,7 +42,8 @@ function parsePair(slug) {
 }
 
 /* ─── DB helpers ────────────────────────────────────────────────── */
-async function getVehicle(slug) {
+// cache() deduplicates DB calls between generateMetadata and the page component
+const getVehicle = cache(async (slug) => {
   try {
     const dbConnect = (await import("@/lib/mongodb")).default;
     const Vehicle   = (await import("@/lib/models/Vehicle")).default;
@@ -50,7 +52,7 @@ async function getVehicle(slug) {
   } catch {
     return null;
   }
-}
+});
 
 /* ─── Metadata ──────────────────────────────────────────────────── */
 export async function generateMetadata({ params }) {

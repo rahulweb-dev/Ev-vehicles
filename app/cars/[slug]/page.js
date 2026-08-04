@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
@@ -10,7 +11,8 @@ import { parsePrice } from "@/lib/priceUtils";
 
 export const revalidate = 3600;
 
-async function getVehicle(slug) {
+// cache() deduplicates DB call between generateMetadata and CarDetailPage within one render
+const getVehicle = cache(async (slug) => {
   try {
     const dbConnect = (await import("@/lib/mongodb")).default;
     const Vehicle   = (await import("@/lib/models/Vehicle")).default;
@@ -19,7 +21,7 @@ async function getVehicle(slug) {
   } catch {
     return null;
   }
-}
+});
 
 async function getRelated(slug, brand) {
   try {

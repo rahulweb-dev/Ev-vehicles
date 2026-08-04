@@ -14,7 +14,7 @@ export async function GET(request, { params }) {
   const fontSize    = Math.round(size * 0.48);
   const borderRadius = Math.round(size * 0.22);
 
-  return new ImageResponse(
+  const img = new ImageResponse(
     (
       <div
         style={{
@@ -32,4 +32,12 @@ export async function GET(request, { params }) {
     ),
     { width: size, height: size }
   );
+
+  // Icons are static — cache at CDN edge for 1 year to eliminate redundant generation
+  return new Response(img.body, {
+    headers: {
+      "Content-Type": "image/png",
+      "Cache-Control": "public, max-age=31536000, immutable",
+    },
+  });
 }

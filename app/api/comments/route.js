@@ -14,7 +14,11 @@ export async function GET(request) {
       .sort({ createdAt: -1 })
       .limit(50)
       .lean();
-    return NextResponse.json({ comments, total: comments.length });
+    // Cache approved comments at the CDN edge — they update infrequently (require manual approval)
+    return NextResponse.json(
+      { comments, total: comments.length },
+      { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" } }
+    );
   } catch {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }

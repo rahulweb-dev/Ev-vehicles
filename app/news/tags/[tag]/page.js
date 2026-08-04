@@ -12,10 +12,17 @@ async function getArticlesByTag(tag) {
     const Article   = (await import("@/lib/models/Article")).default;
     await dbConnect();
     const decoded = decodeURIComponent(tag);
+    // Keep case-insensitive regex — Google may have indexed tag URLs with different casing
+    // (e.g. /news/tags/Tesla vs /news/tags/tesla). Exact $in would 404 those indexed pages.
+    // The .select() still reduces payload; the regex cost on 67 req/day is negligible.
     const articles = await Article.find({
       status: "published",
       tags: { $regex: new RegExp(`^${decoded}$`, "i") },
-    }).sort({ publishedAt: -1 }).limit(30).lean();
+    })
+      .select("slug title image excerpt category publishedAt readTime tags _id")
+      .sort({ publishedAt: -1 })
+      .limit(30)
+      .lean();
     return { articles, tag: decoded };
   } catch {
     return { articles: [], tag: decodeURIComponent(tag) };

@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import sanitizeHtml from "sanitize-html";
 import Image from "next/image";
 import Link from "next/link";
@@ -20,7 +21,8 @@ import ArticleImage from "@/components/news/ArticleImage";
 
 export const revalidate = 300;
 
-async function getArticle(slug) {
+// cache() deduplicates DB call between generateMetadata and ArticlePage within one render
+const getArticle = cache(async (slug) => {
   try {
     const dbConnect = (await import("@/lib/mongodb")).default;
     const Article = (await import("@/lib/models/Article")).default;
@@ -31,7 +33,7 @@ async function getArticle(slug) {
     const { getArticleBySlug } = await import("@/data/newsArticles");
     return getArticleBySlug(slug);
   }
-}
+});
 
 async function getFeaturedVehicle(tags = []) {
   try {
@@ -55,6 +57,7 @@ async function getRelated(category, currentSlug, tags = []) {
     const Article = (await import("@/lib/models/Article")).default;
     await dbConnect();
 
+    const RELATED_SELECT = "slug title image excerpt category publishedAt readTime tags _id";
     // First try tag-based matching for higher relevance
     if (tags.length > 0) {
       const byTags = await Article.find({
@@ -62,6 +65,7 @@ async function getRelated(category, currentSlug, tags = []) {
         slug: { $ne: currentSlug },
         tags: { $in: tags },
       })
+        .select(RELATED_SELECT)
         .sort({ publishedAt: -1 })
         .limit(6)
         .lean();
@@ -70,6 +74,7 @@ async function getRelated(category, currentSlug, tags = []) {
 
     // Fall back to category
     const articles = await Article.find({ category, status: "published", slug: { $ne: currentSlug } })
+      .select(RELATED_SELECT)
       .sort({ publishedAt: -1 })
       .limit(6)
       .lean();

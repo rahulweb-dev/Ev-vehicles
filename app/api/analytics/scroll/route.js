@@ -10,8 +10,8 @@ export async function POST(request) {
     if (!path || !sessionId || !depth) return NextResponse.json({ ok: false });
 
     await dbConnect();
-    // Update the most recent pageview for this session+path to record max scroll depth
-    await PageView.findOneAndUpdate(
+    // updateOne is cheaper than findOneAndUpdate — we don't use the returned document
+    await PageView.updateOne(
       { sessionId, path },
       { $max: { scrollDepth: depth } },
       { sort: { createdAt: -1 } }

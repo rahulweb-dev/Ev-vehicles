@@ -122,7 +122,7 @@ export async function GET(request) {
     const [subscribers, total, totalAll] = await Promise.all([
       Subscriber.find({ status }).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
       Subscriber.countDocuments({ status }),
-      Subscriber.countDocuments({}),
+      Subscriber.estimatedDocumentCount(), // O(1) metadata read vs O(n) full scan
     ]);
 
     return NextResponse.json({ subscribers, total, totalAll, page, pages: Math.ceil(total / limit) });

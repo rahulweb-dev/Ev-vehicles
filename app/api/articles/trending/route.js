@@ -17,7 +17,11 @@ export async function GET(request) {
       .select("title slug image views publishedAt category")
       .lean();
 
-    return NextResponse.json({ articles });
+    // Client-side fetch from TrendingWidget bypasses ISR — explicit CDN cache header needed.
+    return NextResponse.json(
+      { articles },
+      { headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600" } }
+    );
   } catch {
     return NextResponse.json({ articles: [] });
   }

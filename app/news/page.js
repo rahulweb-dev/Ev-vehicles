@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { AdBannerHorizontal } from "@/components/ads/AdBanner";
 import NewsCard from "@/components/news/NewsCard";
 import { SITE_URL } from "../layout";
@@ -18,7 +19,8 @@ const CATEGORY_PILLS = [
 
 const CAT_LABELS = { cars: "Electric Cars", bikes: "Electric Bikes", commercial: "Commercial EVs", charging: "EV Charging" };
 
-async function getArticles(category, page = 1) {
+// cache() deduplicates between generateMetadata (reads total) and NewsPage (reads articles+total)
+const getArticles = cache(async function getArticles(category, page = 1) {
   try {
     const dbConnect = (await import("@/lib/mongodb")).default;
     const Article   = (await import("@/lib/models/Article")).default;
@@ -35,7 +37,7 @@ async function getArticles(category, page = 1) {
   } catch {
     return { articles: [], total: 0, pages: 1 };
   }
-}
+});
 
 function buildNewsCanonical(cat, page) {
   const p = new URLSearchParams();
@@ -67,9 +69,8 @@ export async function generateMetadata({ searchParams }) {
       ...(page > 1 && { prev: buildNewsCanonical(cat, page - 1) }),
       ...(await (async () => {
         try {
-          const Article = (await import("@/lib/models/Article")).default;
-          const total = await Article.countDocuments({ status: "published", ...(cat ? { category: cat } : {}) });
-          const pages = Math.ceil(total / LIMIT) || 1;
+          // Reuse the cached getArticles result instead of a separate countDocuments query
+          const { pages } = await getArticles(cat, page);
           return page < pages ? { next: buildNewsCanonical(cat, page + 1) } : {};
         } catch { return {}; }
       })()),

@@ -9,19 +9,23 @@ export async function POST(request) {
 
     await dbConnect();
 
-    // One view per session + path per 30 minutes
-    const since  = new Date(Date.now() - 30 * 60 * 1000);
-    const exists = await PageView.exists({ sessionId, path, createdAt: { $gte: since } });
-    if (!exists) {
-      await PageView.create({
-        path:      path.slice(0, 500),
-        title:     (title     || "").slice(0, 300),
-        referrer:  (referrer  || "").slice(0, 200),
-        sessionId,
-        device:    device || "desktop",
-        utm:       utm || {},
-      });
-    }
+    // Single upsert: insert only when no matching view exists in the last 30 min.
+    // Uses the { sessionId, path, createdAt } compound index — halves DB round-trips vs exists()+create().
+    const since = new Date(Date.now() - 30 * 60 * 1000);
+    await PageView.updateOne(
+      { sessionId, path, createdAt: { $gte: since } },
+      {
+        $setOnInsert: {
+          path:      path.slice(0, 500),
+          title:     (title    || "").slice(0, 300),
+          referrer:  (referrer || "").slice(0, 200),
+          sessionId,
+          device:    device || "desktop",
+          utm:       utm || {},
+        },
+      },
+      { upsert: true }
+    );
 
     return NextResponse.json({ ok: true });
   } catch {

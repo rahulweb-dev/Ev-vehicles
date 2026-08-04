@@ -2,14 +2,10 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Car, Bike, Truck, BatteryCharging, Clock3, ArrowRight } from "lucide-react";
 import { LatestNewsSectionSkeleton } from "@/components/skeletons/Skeletons";
 import ShareLikeButtons from "@/components/news/ShareLikeButtons";
 import ArticleImage from "@/components/news/ArticleImage";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const tabs = [
   { id: "cars",       name: "Cars",       icon: <Car size={15} /> },
@@ -131,19 +127,26 @@ export default function LatestNews({ initialArticles = null }) {
   const sideRef     = useRef(null);
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from(headingRef.current, {
-        opacity: 0, y: 30, duration: 0.6, ease: "power3.out",
-        immediateRender: false,
-        scrollTrigger: { trigger: headingRef.current, start: "top 90%", once: true },
-      });
-      gsap.from(tabsRef.current?.children ?? [], {
-        opacity: 0, y: 16, stagger: 0.07, duration: 0.4, ease: "power2.out",
-        immediateRender: false,
-        scrollTrigger: { trigger: tabsRef.current, start: "top 90%", once: true },
-      });
-    }, sectionRef);
-    return () => ctx.revert();
+    // Lazy-load GSAP so it's excluded from the critical homepage bundle (~80 KB saved)
+    let ctx;
+    Promise.all([import("gsap"), import("gsap/ScrollTrigger")]).then(
+      ([{ gsap }, { ScrollTrigger }]) => {
+        gsap.registerPlugin(ScrollTrigger);
+        ctx = gsap.context(() => {
+          gsap.from(headingRef.current, {
+            opacity: 0, y: 30, duration: 0.6, ease: "power3.out",
+            immediateRender: false,
+            scrollTrigger: { trigger: headingRef.current, start: "top 90%", once: true },
+          });
+          gsap.from(tabsRef.current?.children ?? [], {
+            opacity: 0, y: 16, stagger: 0.07, duration: 0.4, ease: "power2.out",
+            immediateRender: false,
+            scrollTrigger: { trigger: tabsRef.current, start: "top 90%", once: true },
+          });
+        }, sectionRef);
+      }
+    );
+    return () => ctx?.revert();
   }, []);
 
   useEffect(() => {

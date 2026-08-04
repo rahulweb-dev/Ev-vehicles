@@ -21,14 +21,19 @@ export async function GET(req) {
     if (month)   query.month = parseInt(month);
     if (state)   query.state = state;
 
-    const total = await EVSale.countDocuments(query);
-    const records = await EVSale.find(query)
-      .sort({ year: -1, month: -1, unitsSold: -1 })
-      .skip((page - 1) * limit)
-      .limit(limit)
-      .lean();
+    const [total, records] = await Promise.all([
+      EVSale.countDocuments(query),
+      EVSale.find(query)
+        .sort({ year: -1, month: -1, unitsSold: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .lean(),
+    ]);
 
-    return NextResponse.json({ records, total, page, pages: Math.ceil(total / limit) });
+    return NextResponse.json(
+      { records, total, page, pages: Math.ceil(total / limit) },
+      { headers: { "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=7200" } }
+    );
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }

@@ -55,10 +55,23 @@ export function proxy(request) {
   const isLoginPage  = pathname === "/admin/login";
   const token        = request.cookies.get("admin-token")?.value;
 
-  if (isAdminRoute && !isLoginPage && !token) {
-    const loginUrl = new URL("/admin/login", request.url);
-    loginUrl.searchParams.set("from", pathname);
-    return NextResponse.redirect(loginUrl);
+  if (isAdminRoute && !isLoginPage) {
+    if (!token) {
+      const loginUrl = new URL("/admin/login", request.url);
+      loginUrl.searchParams.set("from", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+    // Validate JWT structure and expiry (signature verified by requireAuth in API routes)
+    try {
+      const parts = token.split(".");
+      if (parts.length !== 3) throw new Error("invalid");
+      const payload = JSON.parse(atob(parts[1].replace(/-/g, "+").replace(/_/g, "/")));
+      if (!payload.exp || payload.exp < Date.now() / 1000) throw new Error("expired");
+    } catch {
+      const loginUrl = new URL("/admin/login", request.url);
+      loginUrl.searchParams.set("from", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
   }
 
   if (isLoginPage && token) {

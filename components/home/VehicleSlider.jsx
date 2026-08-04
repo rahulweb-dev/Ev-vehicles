@@ -5,14 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { BatteryCharging, Zap, Gauge, ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { VehicleSliderSkeleton } from "@/components/skeletons/Skeletons";
 
 import "swiper/css";
-
-gsap.registerPlugin(ScrollTrigger);
 
 const TAG_COLORS = {
   "Featured":    "bg-green-600 text-white",
@@ -38,19 +34,26 @@ export default function VehicleSlider({
 
   useEffect(() => {
     if (!sectionRef.current) return;
-    const ctx = gsap.context(() => {
-      gsap.from(headerRef.current, {
-        opacity: 0, y: 24, duration: 0.6, ease: "power3.out",
-        immediateRender: false,
-        scrollTrigger: { trigger: headerRef.current, start: "top 90%", once: true },
-      });
-      gsap.from(".vs-slide", {
-        opacity: 0, y: 32, stagger: 0.08, duration: 0.5, ease: "power2.out",
-        immediateRender: false,
-        scrollTrigger: { trigger: sectionRef.current, start: "top 85%", once: true },
-      });
-    }, sectionRef.current);
-    return () => ctx.revert();
+    // Lazy-load GSAP so it's excluded from the critical homepage bundle (~80 KB saved)
+    let ctx;
+    Promise.all([import("gsap"), import("gsap/ScrollTrigger")]).then(
+      ([{ gsap }, { ScrollTrigger }]) => {
+        gsap.registerPlugin(ScrollTrigger);
+        ctx = gsap.context(() => {
+          gsap.from(headerRef.current, {
+            opacity: 0, y: 24, duration: 0.6, ease: "power3.out",
+            immediateRender: false,
+            scrollTrigger: { trigger: headerRef.current, start: "top 90%", once: true },
+          });
+          gsap.from(".vs-slide", {
+            opacity: 0, y: 32, stagger: 0.08, duration: 0.5, ease: "power2.out",
+            immediateRender: false,
+            scrollTrigger: { trigger: sectionRef.current, start: "top 85%", once: true },
+          });
+        }, sectionRef.current);
+      }
+    );
+    return () => ctx?.revert();
   }, []);
 
   if (!vehicles.length) return null;

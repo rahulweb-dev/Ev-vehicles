@@ -22,7 +22,7 @@ export async function GET(request) {
   };
   const tagStyle = tagColors[tag?.toLowerCase()] || tagColors.default;
 
-  return new ImageResponse(
+  const imageResponse = new ImageResponse(
     (
       <div
         style={{
@@ -171,4 +171,13 @@ export async function GET(request) {
     ),
     { width: 1200, height: 630 }
   );
+
+  // OG images are deterministic for a given URL — cache aggressively at the CDN edge.
+  // Without this, every bot/unfurl regenerates the image via Satori on every request.
+  return new Response(imageResponse.body, {
+    headers: {
+      "Content-Type": "image/png",
+      "Cache-Control": "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800",
+    },
+  });
 }
