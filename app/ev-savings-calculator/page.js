@@ -11,7 +11,14 @@ export const metadata = {
   openGraph: {
     title: "EV Savings Calculator India – Petrol vs Electric Cost",
     description: "Find out how much you save monthly by switching to an EV. Compare fuel costs vs electricity charging costs.",
+    url: `${SITE_URL}/ev-savings-calculator`,
+    type: "website",
     images: [{ url: `${SITE_URL}/api/og?title=EV Savings Calculator&subtitle=How much will you save switching to electric?&tag=tools`, width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "EV Savings Calculator India – Petrol vs Electric Cost",
+    images: [`${SITE_URL}/api/og?title=EV Savings Calculator&subtitle=How much will you save switching to electric?&tag=tools`],
   },
 };
 

@@ -14,8 +14,13 @@ export const metadata = {
     description: "Which Indian states are leading the EV revolution? State-wise sales data, growth rates, and adoption trends.",
     url: `${SITE_URL}/ev-adoption-states`,
     type: "website",
+    images: [{ url: `${SITE_URL}/api/og?title=EV Adoption by State 2025&subtitle=State-wise EV Registrations India&tag=analytics&type=page`, width: 1200, height: 630, alt: "EV Adoption by State India 2025" }],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: {
+    card: "summary_large_image",
+    title: "EV Adoption by State India 2025 – City & State Level EV Data",
+    images: [`${SITE_URL}/api/og?title=EV Adoption by State 2025&subtitle=State-wise EV Registrations India&tag=analytics&type=page`],
+  },
 };
 
 const jsonLd = {

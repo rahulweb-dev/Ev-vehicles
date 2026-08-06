@@ -11,7 +11,14 @@ export const metadata = {
   openGraph: {
     title: "EV Resale Value Calculator – India 2026",
     description: "Find out your EV's resale value and depreciation after any number of years.",
+    url: `${SITE_URL}/resale-calculator`,
+    type: "website",
     images: [{ url: `${SITE_URL}/api/og?title=EV Resale Value Calculator&subtitle=Check your EV depreciation in India&tag=tools`, width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "EV Resale Value Calculator – India 2026",
+    images: [`${SITE_URL}/api/og?title=EV Resale Value Calculator&subtitle=Check your EV depreciation in India&tag=tools`],
   },
 };
 

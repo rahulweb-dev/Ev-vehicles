@@ -5,6 +5,19 @@ export const metadata = {
   description:
     "Read EV News India's privacy policy to understand how we collect, use, and protect your personal information.",
   alternates: { canonical: `${SITE_URL}/privacy-policy` },
+  openGraph: {
+    title: "Privacy Policy – EV News India",
+    description: "Read EV News India's privacy policy to understand how we collect, use, and protect your personal information.",
+    url: `${SITE_URL}/privacy-policy`,
+    type: "website",
+    images: [{ url: `${SITE_URL}/api/og?title=Privacy Policy&subtitle=EV News India&tag=default&type=page`, width: 1200, height: 630, alt: "Privacy Policy – EV News India" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Privacy Policy – EV News India",
+    description: "Read EV News India's privacy policy.",
+    images: [`${SITE_URL}/api/og?title=Privacy Policy&subtitle=EV News India&tag=default&type=page`],
+  },
 };
 
 export default function PrivacyPolicyPage() {

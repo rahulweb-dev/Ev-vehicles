@@ -13,8 +13,13 @@ export const metadata = {
     description: "Electric scooter & bike sales intelligence — brand rankings, monthly trend, market share breakdown.",
     url: `${SITE_URL}/ev-sales/two-wheelers`,
     type: "website",
+    images: [{ url: `${SITE_URL}/api/og?title=EV Two-Wheeler Sales 2025&subtitle=Scooter %26 Bike Market Share India&tag=bikes&type=page`, width: 1200, height: 630, alt: "EV Two-Wheeler Sales India 2025" }],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: {
+    card: "summary_large_image",
+    title: "EV Two-Wheeler Sales India 2025 – Electric Scooter Market Data",
+    images: [`${SITE_URL}/api/og?title=EV Two-Wheeler Sales 2025&subtitle=Scooter %26 Bike Market Share India&tag=bikes&type=page`],
+  },
 };
 
 const jsonLd = {

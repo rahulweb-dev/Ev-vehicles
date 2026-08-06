@@ -10,7 +10,14 @@ export const metadata = {
   openGraph: {
     title: "EV Charging Stations Near Me – India",
     description: "Locate EV charging stations across all Indian cities. Filter by connector type and charging speed.",
+    url: `${SITE_URL}/charging-stations`,
+    type: "website",
     images: [{ url: `${SITE_URL}/api/og?title=EV Charging Stations India&subtitle=Find chargers near you&tag=map`, width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "EV Charging Stations Near Me – India",
+    images: [`${SITE_URL}/api/og?title=EV Charging Stations India&subtitle=Find chargers near you&tag=map`],
   },
 };
 

@@ -13,8 +13,13 @@ export const metadata = {
     description: "Electric bus, truck and fleet vehicle sales intelligence — brand rankings, monthly trend, market share.",
     url: `${SITE_URL}/ev-sales/commercial`,
     type: "website",
+    images: [{ url: `${SITE_URL}/api/og?title=Commercial EV Sales India 2025&subtitle=Bus, Truck %26 Fleet Market Data&tag=commercial&type=page`, width: 1200, height: 630, alt: "EV Commercial Vehicle Sales India 2025" }],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: {
+    card: "summary_large_image",
+    title: "EV Commercial Vehicle Sales India 2025 – Fleet & Truck Market Data",
+    images: [`${SITE_URL}/api/og?title=Commercial EV Sales India 2025&subtitle=Bus, Truck %26 Fleet Market Data&tag=commercial&type=page`],
+  },
 };
 
 const jsonLd = {

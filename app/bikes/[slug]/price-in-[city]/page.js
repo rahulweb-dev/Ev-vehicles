@@ -75,7 +75,19 @@ export async function generateMetadata({ params }) {
     description: desc,
     alternates: { canonical: `${SITE_URL}/bikes/${slug}/price-in-${city}` },
     ...(!price && { robots: { index: false, follow: true } }),
-    openGraph: { title, description: desc, url: `${SITE_URL}/bikes/${slug}/price-in-${city}`, type: "website", images: bike.featuredImage ? [{ url: bike.featuredImage }] : [] },
+    openGraph: {
+      title,
+      description: desc,
+      url: `${SITE_URL}/bikes/${slug}/price-in-${city}`,
+      type: "website",
+      images: [{ url: bike.featuredImage || `${SITE_URL}/api/og?title=${encodeURIComponent(bike.name + " Price in " + cityData.name)}&subtitle=On-Road Price %26 Breakdown&tag=bikes&type=page`, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: desc,
+      images: [bike.featuredImage || `${SITE_URL}/api/og?title=${encodeURIComponent(bike.name + " Price in " + cityData.name)}&subtitle=On-Road Price %26 Breakdown&tag=bikes&type=page`],
+    },
   };
 }
 

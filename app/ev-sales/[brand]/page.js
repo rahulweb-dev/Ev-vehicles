@@ -23,6 +23,13 @@ export async function generateMetadata({ params }) {
       description: `${name} monthly electric vehicle sales data, market share and growth for India.`,
       url: `${SITE_URL}/ev-sales/${slug}`,
       type: "website",
+      images: [{ url: `${SITE_URL}/api/og?title=${encodeURIComponent(name + " EV Sales 2025")}&subtitle=Monthly Data %26 Market Share India&tag=analytics&type=page`, width: 1200, height: 630, alt: `${name} EV Sales India 2025` }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${name} EV Sales India 2025`,
+      description: `${name} monthly electric vehicle sales data, market share and growth for India.`,
+      images: [`${SITE_URL}/api/og?title=${encodeURIComponent(name + " EV Sales 2025")}&subtitle=Monthly Data %26 Market Share India&tag=analytics&type=page`],
     },
   };
 }

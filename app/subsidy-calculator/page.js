@@ -11,7 +11,14 @@ export const metadata = {
   openGraph: {
     title: "EV Subsidy Calculator India 2026",
     description: "Calculate FAME II + state subsidies for your electric vehicle purchase.",
+    url: `${SITE_URL}/subsidy-calculator`,
+    type: "website",
     images: [{ url: `${SITE_URL}/api/og?title=EV Subsidy Calculator India 2026&subtitle=FAME II + State Incentives&tag=tools`, width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "EV Subsidy Calculator India 2026",
+    images: [`${SITE_URL}/api/og?title=EV Subsidy Calculator India 2026&subtitle=FAME II + State Incentives&tag=tools`],
   },
 };
 

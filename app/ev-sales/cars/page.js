@@ -13,8 +13,13 @@ export const metadata = {
     description: "Comprehensive electric car sales intelligence — brand rankings, monthly trend, market share breakdown.",
     url: `${SITE_URL}/ev-sales/cars`,
     type: "website",
+    images: [{ url: `${SITE_URL}/api/og?title=EV Car Sales India 2025&subtitle=Brand Rankings %26 Market Share&tag=cars&type=page`, width: 1200, height: 630, alt: "EV Car Sales India 2025" }],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: {
+    card: "summary_large_image",
+    title: "EV Car Sales India 2025 – Top Electric Cars Market Data",
+    images: [`${SITE_URL}/api/og?title=EV Car Sales India 2025&subtitle=Brand Rankings %26 Market Share&tag=cars&type=page`],
+  },
 };
 
 const jsonLd = {

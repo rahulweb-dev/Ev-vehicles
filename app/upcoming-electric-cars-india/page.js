@@ -12,7 +12,14 @@ export const metadata = {
   openGraph: {
     title: "Upcoming Electric Cars in India 2026–2027",
     description: "Every upcoming EV launch in India — expected price, range, battery, and launch date.",
+    url: `${SITE_URL}/upcoming-electric-cars-india`,
+    type: "website",
     images: [{ url: `${SITE_URL}/api/og?title=Upcoming EVs India 2026-2027&subtitle=Launch Dates, Prices & Specs&tag=cars`, width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Upcoming Electric Cars in India 2026–2027",
+    images: [`${SITE_URL}/api/og?title=Upcoming EVs India 2026-2027&subtitle=Launch Dates, Prices & Specs&tag=cars`],
   },
 };
 

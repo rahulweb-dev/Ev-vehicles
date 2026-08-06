@@ -14,8 +14,13 @@ export const metadata = {
     description: "India's best-selling electric vehicles ranked by actual monthly sales figures.",
     url: `${SITE_URL}/top-selling-evs`,
     type: "website",
+    images: [{ url: `${SITE_URL}/api/og?title=Top Selling EVs India 2025&subtitle=Best Electric Vehicles Ranked&tag=cars&type=page`, width: 1200, height: 630, alt: "Top Selling EVs India 2025" }],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: {
+    card: "summary_large_image",
+    title: "Top Selling EVs India 2025 – Best Electric Vehicles Ranked",
+    images: [`${SITE_URL}/api/og?title=Top Selling EVs India 2025&subtitle=Best Electric Vehicles Ranked&tag=cars&type=page`],
+  },
 };
 
 const jsonLd = {

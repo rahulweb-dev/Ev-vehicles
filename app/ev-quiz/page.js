@@ -11,7 +11,14 @@ export const metadata = {
   openGraph: {
     title: "Which EV is Right for You? Take the Quiz!",
     description: "Answer 6 questions and get your personalised EV recommendation for India.",
+    url: `${SITE_URL}/ev-quiz`,
+    type: "website",
     images: [{ url: `${SITE_URL}/api/og?title=Which EV is Right for You?&subtitle=Free EV Finder Quiz • India 2026&tag=quiz`, width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Which EV is Right for You? Take the Quiz!",
+    images: [`${SITE_URL}/api/og?title=Which EV is Right for You?&subtitle=Free EV Finder Quiz • India 2026&tag=quiz`],
   },
 };
 

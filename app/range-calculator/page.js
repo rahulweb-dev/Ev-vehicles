@@ -11,7 +11,14 @@ export const metadata = {
   openGraph: {
     title: "EV Range Calculator India – How Far Can Your Electric Car Go?",
     description: "Get accurate real-world range estimates for your EV based on Indian driving conditions.",
+    url: `${SITE_URL}/range-calculator`,
+    type: "website",
     images: [{ url: `${SITE_URL}/api/og?title=EV Range Calculator&subtitle=Real-world range for Indian conditions&tag=tools`, width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "EV Range Calculator India – How Far Can Your Electric Car Go?",
+    images: [`${SITE_URL}/api/og?title=EV Range Calculator&subtitle=Real-world range for Indian conditions&tag=tools`],
   },
 };
 

@@ -1,9 +1,24 @@
 import Link from "next/link";
+import { SITE_URL } from "@/app/layout";
 
 export const metadata = {
   title:       "Data Deletion Instructions | EVRadar",
   description: "How to request deletion of your personal data from EVRadar.",
+  alternates:  { canonical: `${SITE_URL}/data-deletion` },
   robots:      { index: true, follow: true },
+  openGraph: {
+    title: "Data Deletion Instructions | EVRadar",
+    description: "How to request deletion of your personal data from EVRadar.",
+    url: `${SITE_URL}/data-deletion`,
+    type: "website",
+    images: [{ url: `${SITE_URL}/api/og?title=Data Deletion&subtitle=EVRadar India&tag=default&type=page`, width: 1200, height: 630, alt: "Data Deletion – EVRadar" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Data Deletion Instructions | EVRadar",
+    description: "How to request deletion of your personal data from EVRadar.",
+    images: [`${SITE_URL}/api/og?title=Data Deletion&subtitle=EVRadar India&tag=default&type=page`],
+  },
 };
 
 export default function DataDeletionPage() {

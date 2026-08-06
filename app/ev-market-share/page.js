@@ -14,8 +14,13 @@ export const metadata = {
     description: "Comprehensive EV market share data for India — all brands, all segments.",
     url: `${SITE_URL}/ev-market-share`,
     type: "website",
+    images: [{ url: `${SITE_URL}/api/og?title=EV Market Share India 2025&subtitle=Brand Rankings %26 Segment Analysis&tag=analytics&type=page`, width: 1200, height: 630, alt: "EV Market Share India 2025" }],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: {
+    card: "summary_large_image",
+    title: "EV Market Share India 2025 – Brand Rankings & Segment Analysis",
+    images: [`${SITE_URL}/api/og?title=EV Market Share India 2025&subtitle=Brand Rankings %26 Segment Analysis&tag=analytics&type=page`],
+  },
 };
 
 const jsonLd = {

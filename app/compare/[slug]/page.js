@@ -86,9 +86,14 @@ export async function generateMetadata({ params }) {
       description: desc,
       url:  `${SITE_URL}/compare/${slug}`,
       type: "website",
-      images: [{ url: vA.featuredImage || vB.featuredImage || "", width: 1200, height: 630 }],
+      images: [{ url: vA.featuredImage || vB.featuredImage || `${SITE_URL}/api/og?title=${encodeURIComponent(vA.name + " vs " + vB.name)}&subtitle=EV Comparison India ${year}&tag=cars&type=page`, width: 1200, height: 630 }],
     },
-    twitter: { card: "summary_large_image", title, description: desc },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: desc,
+      images: [vA.featuredImage || vB.featuredImage || `${SITE_URL}/api/og?title=${encodeURIComponent(vA.name + " vs " + vB.name)}&subtitle=EV Comparison India ${year}&tag=cars&type=page`],
+    },
   };
 }
 
