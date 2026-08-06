@@ -79,7 +79,7 @@ function LogoUploader({ current, onUploaded }) {
           }
         </div>
       )}
-      <input ref={inputRef} type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml"
+      <input ref={inputRef} type="file" accept="image/png,image/jpeg,image/webp,image/avif,image/svg+xml"
         className="hidden" onChange={handleFile} />
     </div>
   );
