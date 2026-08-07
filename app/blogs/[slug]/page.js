@@ -245,7 +245,7 @@ export default async function BlogPostPage({ params }) {
           </div>
 
           {/* In-article Ad */}
-          <AdBannerInArticle slot="3579124680" />
+          <AdBannerInArticle slot="1253319567" />
 
           {/* Table of Contents */}
           <TableOfContents content={safeContent} />
@@ -257,7 +257,7 @@ export default async function BlogPostPage({ params }) {
           />
 
           {/* Second Ad */}
-          <AdBannerInArticle slot="4680235791" />
+          <AdBannerInArticle slot="1253319567" />
 
           {/* Tags — linked for internal crawl signal */}
           {blog.tags && blog.tags.length > 0 && (
@@ -317,7 +317,7 @@ export default async function BlogPostPage({ params }) {
         {related.length > 0 && (
           <div className="border-t border-gray-100 bg-gray-50 py-12">
             <div className="mx-auto max-w-7xl px-4">
-              <AdBannerHorizontal slot="5791346802" />
+              <AdBannerHorizontal slot="1253319567" />
               <h2 className="mt-8 mb-6 text-2xl font-black text-gray-900">More Articles You&apos;ll Love</h2>
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {related.map((b) => (

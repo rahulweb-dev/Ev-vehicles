@@ -353,14 +353,14 @@ export default async function ArticlePage({ params }) {
                 />
               </div>
 
-              <AdBannerInArticle slot="4567890123" />
+              <AdBannerInArticle slot="1253319567" />
 
               <div
                 className="prose prose-base max-w-none overflow-x-auto prose-headings:font-black prose-headings:text-gray-900 prose-h2:text-xl prose-h2:mt-7 prose-h2:mb-3 sm:prose-h2:text-2xl sm:prose-h2:mt-8 sm:prose-h2:mb-4 prose-h3:text-lg prose-p:text-gray-700 prose-p:leading-relaxed prose-p:text-[15px] sm:prose-p:text-base prose-strong:text-gray-900 prose-ul:text-gray-700 prose-li:my-1 prose-img:rounded-xl prose-img:w-full prose-a:text-green-700 prose-a:no-underline hover:prose-a:underline"
                 dangerouslySetInnerHTML={{ __html: safeContent }}
               />
 
-              <AdBannerInArticle slot="5678901234" />
+              <AdBannerInArticle slot="1253319567" />
 
               {article.faqs?.length > 0 && (
                 <section className="mt-10 rounded-2xl border border-gray-100 bg-gray-50 p-6">
@@ -431,7 +431,7 @@ export default async function ArticlePage({ params }) {
 
             <aside className="hidden lg:block space-y-6">
               <div className="sticky top-24 space-y-6 max-h-[calc(100vh-6rem)] overflow-y-auto scrollbar-hide">
-                <AdBannerInArticle slot="6789012345" />
+                <AdBannerInArticle slot="1253319567" />
                 <TrendingWidget />
                 {featuredVehicle && (
                   <div className="overflow-hidden rounded-2xl border border-green-100 bg-green-50">

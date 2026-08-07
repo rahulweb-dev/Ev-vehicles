@@ -188,7 +188,7 @@ export default async function NewsPage({ searchParams }) {
             })}
           </div>
 
-          <AdBannerHorizontal slot="2345678901" />
+          <AdBannerHorizontal slot="1253319567" />
 
           {/* Server-rendered article grid — fully crawlable by Googlebot */}
           <div className="mt-8">

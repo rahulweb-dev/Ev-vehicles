@@ -265,7 +265,7 @@ export default async function Home() {
 
       {/* <div className="bg-white py-2">
         <div className="mx-auto max-w-7xl px-4">
-          <AdBannerHorizontal slot="1234567890" />
+          <AdBannerHorizontal slot="1253319567" />
         </div>
       </div> */}
 
@@ -330,7 +330,7 @@ export default async function Home() {
 
       <div className="bg-white py-2">
         <div className="mx-auto max-w-7xl px-4">
-          <AdBannerHorizontal slot="0987654321" />
+          <AdBannerHorizontal slot="1253319567" />
         </div>
       </div>
 

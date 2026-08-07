@@ -9,6 +9,7 @@ const PUBLISHER_ID = process.env.NEXT_PUBLIC_ADSENSE_ID || "ca-pub-XXXXXXXXXXXXX
 export default function AdBanner({
   slot,
   format = "auto",
+  layout,
   responsive = true,
   className = "",
   style = {},
@@ -34,10 +35,11 @@ export default function AdBanner({
       <ins
         ref={adRef}
         className="adsbygoogle"
-        style={{ display: "block", ...style }}
+        style={{ display: "block", textAlign: "center", ...style }}
         data-ad-client={PUBLISHER_ID}
         data-ad-slot={slot}
         data-ad-format={format}
+        {...(layout && { "data-ad-layout": layout })}
         data-full-width-responsive={responsive ? "true" : "false"}
       />
     </div>
@@ -48,8 +50,9 @@ export default function AdBanner({
 export function AdBannerHorizontal({ slot, className }) {
   return (
     <AdBanner
-      slot={slot || "1234567890"}
-      format="horizontal"
+      slot={slot || "1253319567"}
+      format="auto"
+      responsive
       className={`my-6 ${className}`}
       style={{ minHeight: "90px" }}
     />
@@ -59,8 +62,9 @@ export function AdBannerHorizontal({ slot, className }) {
 export function AdBannerRectangle({ slot, className }) {
   return (
     <AdBanner
-      slot={slot || "0987654321"}
-      format="rectangle"
+      slot={slot || "1253319567"}
+      format="auto"
+      responsive
       className={`my-4 ${className}`}
       style={{ minHeight: "250px" }}
     />
@@ -72,8 +76,9 @@ export function AdBannerInArticle({ slot, className }) {
     <div className={`my-8 rounded-2xl bg-gray-50 p-2 text-center ${className}`}>
       <p className="mb-1 text-[10px] uppercase tracking-widest text-gray-400">Advertisement</p>
       <AdBanner
-        slot={slot || "1122334455"}
+        slot={slot || "1253319567"}
         format="fluid"
+        layout="in-article"
         style={{ minHeight: "200px" }}
       />
     </div>

@@ -181,7 +181,7 @@ export default async function BikesPage({ searchParams }) {
             </div>
           </div>
 
-          <AdBannerHorizontal slot="8901234567" />
+          <AdBannerHorizontal slot="1253319567" />
 
           <div className="mt-8">
             <BikesClient
@@ -192,7 +192,7 @@ export default async function BikesPage({ searchParams }) {
             />
           </div>
 
-          <div className="my-10"><AdBannerHorizontal slot="9012345678" /></div>
+          <div className="my-10"><AdBannerHorizontal slot="1253319567" /></div>
 
           {/* Visible FAQ section — same content as FAQPage JSON-LD above */}
           <section className="mb-10">
