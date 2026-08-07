@@ -130,7 +130,7 @@ export default async function CommercialPage() {
       </div>
 
       <div className="mx-auto max-w-7xl px-4 py-10">
-        <AdBannerHorizontal slot="1253319567" />
+        <AdBannerHorizontal slot="9176755624" />
 
         {/* Segment info cards — always visible */}
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">

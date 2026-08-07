@@ -50,7 +50,7 @@ export default function AdBanner({
 export function AdBannerHorizontal({ slot, className }) {
   return (
     <AdBanner
-      slot={slot || "1253319567"}
+      slot={slot || "9176755624"}
       format="auto"
       responsive
       className={`my-6 ${className}`}

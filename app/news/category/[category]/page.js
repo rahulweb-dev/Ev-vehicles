@@ -188,7 +188,7 @@ export default async function CategoryPage({ params, searchParams }) {
             ))}
           </div>
 
-          <AdBannerHorizontal slot="1253319567" />
+          <AdBannerHorizontal slot="9176755624" />
 
           <div className="mt-8">
             <h2 className="mb-6 text-2xl font-black text-gray-900">

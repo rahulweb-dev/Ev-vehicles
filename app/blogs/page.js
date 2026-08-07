@@ -209,7 +209,7 @@ export default async function BlogsPage({ searchParams }) {
             </section>
           )}
 
-          <AdBannerHorizontal slot="1253319567" />
+          <AdBannerHorizontal slot="9176755624" />
 
           {/* All Blogs Grid */}
           {rest.length > 0 && (

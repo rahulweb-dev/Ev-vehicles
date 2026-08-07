@@ -317,7 +317,7 @@ export default async function BlogPostPage({ params }) {
         {related.length > 0 && (
           <div className="border-t border-gray-100 bg-gray-50 py-12">
             <div className="mx-auto max-w-7xl px-4">
-              <AdBannerHorizontal slot="1253319567" />
+              <AdBannerHorizontal slot="9176755624" />
               <h2 className="mt-8 mb-6 text-2xl font-black text-gray-900">More Articles You&apos;ll Love</h2>
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {related.map((b) => (

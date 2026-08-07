@@ -215,7 +215,7 @@ export default async function ElectricVehiclesPage() {
         </div>
 
         <div className="mx-auto max-w-7xl px-4 py-10">
-          <AdBannerHorizontal slot="1253319567" />
+          <AdBannerHorizontal slot="9176755624" />
 
           {/* Top Electric Cars */}
           <section className="mt-10">
@@ -391,7 +391,7 @@ export default async function ElectricVehiclesPage() {
             </div>
           </section>
 
-          <AdBannerHorizontal slot="1253319567" />
+          <AdBannerHorizontal slot="9176755624" />
         </div>
       </div>
     </>
