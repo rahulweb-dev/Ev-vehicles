@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -12,7 +12,7 @@ import { getPusherClient } from "@/lib/pusherClient";
 import ArticleImage from "@/components/news/ArticleImage";
 
 function articleImageFallback(article) {
-  const title = encodeURIComponent(article?.title || "EV News India");
+  const title = encodeURIComponent(article?.title || "EV Radar");
   const tag = encodeURIComponent(article?.category || "news");
   return `/api/og?title=${title}&tag=${tag}&type=article`;
 }

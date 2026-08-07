@@ -1,11 +1,11 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import { broadcastMail } from "@/lib/mailer";
 import dbConnect from "@/lib/mongodb";
 import Article from "@/lib/models/Article";
 import Subscriber from "@/lib/models/Subscriber";
 
 const SITE_URL  = "https://www.evradar.in";
-const SITE_NAME = "EV News India";
+const SITE_NAME = "EV Radar";
 
 function buildDigestHtml(articles) {
   const articlesHtml = articles.map(a => {

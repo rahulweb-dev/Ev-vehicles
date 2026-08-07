@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { ChevronRight, CheckCircle, Star, Zap, BatteryCharging, IndianRupee, TrendingDown } from "lucide-react";
 import { SITE_URL } from "@/app/layout";
 
@@ -129,8 +129,8 @@ export default function ElectricCarsUnder10Lakh() {
     datePublished: "2026-01-01",
     dateModified: "2026-07-01",
     inLanguage: "en-IN",
-    author: { "@type": "Organization", name: "EV News India", url: SITE_URL },
-    publisher: { "@type": "Organization", "@id": `${SITE_URL}/#organization`, name: "EV News India", logo: { "@type": "ImageObject", url: `${SITE_URL}/images/logo.png` } },
+    author: { "@type": "Organization", name: "EV Radar", url: SITE_URL },
+    publisher: { "@type": "Organization", "@id": `${SITE_URL}/#organization`, name: "EV Radar", logo: { "@type": "ImageObject", url: `${SITE_URL}/images/logo.png` } },
     about: { "@type": "Thing", name: "Budget Electric Cars India" },
     speakable: { "@type": "SpeakableSpecification", cssSelector: ["h1"] },
   };

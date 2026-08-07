@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import Image from "next/image";
 import { AdBannerHorizontal } from "@/components/ads/AdBanner";
 import { SITE_URL } from "../layout";
@@ -147,7 +147,7 @@ export default async function CommercialPage() {
 
         {/* Articles — SSR so Bing/Yahoo/Google can read them */}
         <div className="mt-12">
-          <h2 className="mb-6 text-2xl font-black text-gray-900">Latest Commercial EV News India</h2>
+          <h2 className="mb-6 text-2xl font-black text-gray-900">Latest Commercial EV Radar</h2>
           {commercialArticles.length > 0 ? (
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {commercialArticles.map((article) => (

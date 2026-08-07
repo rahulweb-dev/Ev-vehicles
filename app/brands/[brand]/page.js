@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ChevronRight, Car, Bike, Newspaper, Globe } from "lucide-react";
 import NewsCard from "@/components/news/NewsCard";
 import { SITE_URL } from "@/app/layout";
+import { parsePrice } from "@/lib/priceUtils";
 
 export const revalidate = 300;
 
@@ -107,12 +108,17 @@ export default async function BrandPage({ params }) {
           "@type": v.vehicleType === "car" ? "Car" : "Motorcycle",
           name: v.name,
           brand: { "@type": "Brand", name: v.brand },
-          offers: {
-            "@type": "Offer",
-            priceCurrency: "INR",
-            description: v.variants[0].exShowroomPrice,
-            availability: v.availability === "available" ? "https://schema.org/InStock" : "https://schema.org/PreOrder",
-          },
+          ...(() => {
+            const p = parsePrice(v.variants[0].exShowroomPrice);
+            return p != null ? {
+              offers: {
+                "@type": "Offer",
+                priceCurrency: "INR",
+                price: p,
+                availability: v.availability === "available" ? "https://schema.org/InStock" : "https://schema.org/PreOrder",
+              },
+            } : {};
+          })(),
         },
       }),
     })),

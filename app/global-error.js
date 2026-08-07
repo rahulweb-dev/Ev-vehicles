@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect } from "react";
 
@@ -12,7 +12,7 @@ export default function GlobalError({ error, reset }) {
       <body style={{ margin: 0, fontFamily: "system-ui, sans-serif", background: "#f9fafb" }}>
         <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "2rem", textAlign: "center" }}>
           <div style={{ fontSize: "4rem", marginBottom: "1rem" }}>⚡</div>
-          <h1 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#111827", margin: "0 0 0.5rem" }}>EV News India</h1>
+          <h1 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#111827", margin: "0 0 0.5rem" }}>EV Radar</h1>
           <p style={{ color: "#6b7280", marginBottom: "2rem" }}>A critical error occurred. Please reload the page.</p>
           <button
             onClick={reset}

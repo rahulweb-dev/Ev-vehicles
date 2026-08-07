@@ -74,7 +74,7 @@ export default async function TagPage({ params }) {
     "@context": "https://schema.org",
     "@type": "ItemList",
     name: `${decodedTag} – Latest EV News`,
-    description: `All electric vehicle news articles tagged with ${decodedTag} on EV News India.`,
+    description: `All electric vehicle news articles tagged with ${decodedTag} on EV Radar.`,
     url: `${SITE_URL}/news/tags/${tag}`,
     numberOfItems: articles.length,
     itemListElement: articles.map((a, i) => ({

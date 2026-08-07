@@ -1,7 +1,7 @@
-import AdminLayoutClient from "@/components/admin/AdminLayoutClient";
+﻿import AdminLayoutClient from "@/components/admin/AdminLayoutClient";
 
 export const metadata = {
-  title:  { default: "Admin – EV News India", template: "%s | Admin" },
+  title:  { default: "Admin – EV Radar", template: "%s | Admin" },
   robots: { index: false, follow: false },
 };
 

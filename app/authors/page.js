@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import Image from "next/image";
 import { ChevronRight, Newspaper, Award, Users } from "lucide-react";
 import { FaXTwitter, FaLinkedin } from "react-icons/fa6";
@@ -15,7 +15,7 @@ export const metadata = {
     description: `Expert writers covering electric vehicles, EV news, and reviews in India.`,
     url: `${SITE_URL}/authors`,
     type: "website",
-    images: [{ url: `${SITE_URL}/api/og?title=EV Journalists %26 Authors&subtitle=Expert writers covering EVs in India&tag=default&type=page`, width: 1200, height: 630, alt: "EV Journalists & Authors – EV News India" }],
+    images: [{ url: `${SITE_URL}/api/og?title=EV Journalists %26 Authors&subtitle=Expert writers covering EVs in India&tag=default&type=page`, width: 1200, height: 630, alt: "EV Journalists & Authors – EV Radar" }],
   },
   twitter: {
     card: "summary_large_image",

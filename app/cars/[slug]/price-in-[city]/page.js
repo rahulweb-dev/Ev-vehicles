@@ -84,7 +84,7 @@ export async function generateMetadata({ params }) {
   if (!car) return { title: "Car Not Found" };
 
   const price = car.variants?.[0]?.exShowroomPrice || "";
-  const title = `${car.name} On-Road Price in ${cityData.name} ${new Date().getFullYear()} – Road Tax, Registration & Insurance | EV News India`;
+  const title = `${car.name} On-Road Price in ${cityData.name} ${new Date().getFullYear()} – Road Tax, Registration & Insurance | EV Radar`;
   const desc  = `${car.name} on-road price in ${cityData.name} (${cityData.state}). Includes ex-showroom price${price ? " starting at " + price : ""}, road tax (${cityData.roadTaxPct}%), registration fee, and insurance. Full cost breakdown for ${cityData.name} buyers.`;
 
   return {
@@ -132,15 +132,17 @@ export default async function CarCityPricePage({ params }) {
     description: `${car.name} on-road price in ${cityData.name}`,
     image:      car.featuredImage ? [car.featuredImage] : [],
     url:        `${SITE_URL}/cars/${slug}`,
-    offers: {
-      "@type":       "Offer",
-      priceCurrency: "INR",
-      price:         basePrice || undefined,
-      priceValidUntil: `${year + 1}-12-31`,
-      availability:  "https://schema.org/InStock",
-      areaServed:    { "@type": "City", name: cityData.name, addressRegion: cityData.state, addressCountry: "IN" },
-      url: `${SITE_URL}/cars/${slug}/price-in-${city}`,
-    },
+    ...(basePrice > 0 && {
+      offers: {
+        "@type":       "Offer",
+        priceCurrency: "INR",
+        price:         basePrice,
+        priceValidUntil: `${year + 1}-12-31`,
+        availability:  "https://schema.org/InStock",
+        areaServed:    { "@type": "City", name: cityData.name, addressRegion: cityData.state, addressCountry: "IN" },
+        url: `${SITE_URL}/cars/${slug}/price-in-${city}`,
+      },
+    }),
   };
 
   const faqJsonLd = {

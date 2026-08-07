@@ -1,7 +1,8 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import Image from "next/image";
 import { ChevronRight, Star, Zap, BatteryCharging, IndianRupee, CheckCircle, Award, TrendingUp } from "lucide-react";
 import { SITE_URL, SITE_NAME } from "@/app/layout";
+import { parsePrice } from "@/lib/priceUtils";
 
 export const revalidate = 86400;
 
@@ -254,12 +255,12 @@ export default function BestElectricCars2026() {
       name: ev.name,
       url: `${SITE_URL}/cars/${ev.slug}`,
       fuelType: "Electric",
-      offers: {
-        "@type": "Offer",
-        priceCurrency: "INR",
-        description: ev.price,
-        availability: "https://schema.org/InStock",
-      },
+      ...(() => {
+        const p = parsePrice(ev.price);
+        return p != null ? {
+          offers: { "@type": "Offer", priceCurrency: "INR", price: p, availability: "https://schema.org/InStock" },
+        } : {};
+      })(),
     },
   }));
 
@@ -282,8 +283,8 @@ export default function BestElectricCars2026() {
     datePublished: "2026-01-01",
     dateModified: "2026-07-01",
     inLanguage: "en-IN",
-    author: { "@type": "Organization", name: "EV News India", url: SITE_URL },
-    publisher: { "@type": "Organization", "@id": `${SITE_URL}/#organization`, name: "EV News India", logo: { "@type": "ImageObject", url: `${SITE_URL}/images/logo.png` } },
+    author: { "@type": "Organization", name: "EV Radar", url: SITE_URL },
+    publisher: { "@type": "Organization", "@id": `${SITE_URL}/#organization`, name: "EV Radar", logo: { "@type": "ImageObject", url: `${SITE_URL}/images/logo.png` } },
     about: { "@type": "Thing", name: "Best Electric Cars India 2026" },
     speakable: { "@type": "SpeakableSpecification", cssSelector: ["h1"] },
   };

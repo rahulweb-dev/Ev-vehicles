@@ -7,6 +7,7 @@ import {
   BatteryCharging, Gauge, Zap, Clock3, Shield,
 } from "lucide-react";
 import { SITE_URL, SITE_NAME } from "@/app/layout";
+import { parsePrice } from "@/lib/priceUtils";
 
 export const revalidate = 3600;
 
@@ -69,7 +70,7 @@ export async function generateMetadata({ params }) {
   const rangeA = vA.performance?.drivingRange || "";
   const rangeB = vB.performance?.drivingRange || "";
 
-  const title = `${vA.name} vs ${vB.name} ${year} – Price, Range & Specs Compared | EV News India`;
+  const title = `${vA.name} vs ${vB.name} ${year} – Price, Range & Specs Compared | EV Radar`;
   const desc  = [
     `${vA.name} vs ${vB.name}: Which is better in ${year}?`,
     `${vA.name} starts at ${priceA}${rangeA ? ` with ${rangeA} range` : ""}.`,
@@ -157,12 +158,10 @@ export default async function ComparePairPage({ params }) {
     brand: { "@type": "Brand", name: v.brand },
     image: v.featuredImage || "",
     description: v.shortDescription || v.metaDescription || `${v.name} electric vehicle`,
-    offers: v.variants?.[0]?.exShowroomPrice ? {
-      "@type": "Offer",
-      priceCurrency: "INR",
-      price: (v.variants[0].exShowroomPrice || "").replace(/[^0-9]/g, "") || "0",
-      availability: "https://schema.org/InStock",
-    } : undefined,
+    ...(() => {
+      const p = parsePrice(v.variants?.[0]?.exShowroomPrice);
+      return p != null ? { offers: { "@type": "Offer", priceCurrency: "INR", price: p, availability: "https://schema.org/InStock" } } : {};
+    })(),
   });
 
   const breadcrumbLd = {

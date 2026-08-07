@@ -45,7 +45,7 @@ export async function generateMetadata({ params }) {
       url: `${SITE_URL}/authors/${name}`,
       type: "profile",
       images: [{
-        url: profile?.photo || `${SITE_URL}/api/og?title=${encodeURIComponent(authorName)}&subtitle=${encodeURIComponent(title + " · EV News India")}&tag=default&type=page`,
+        url: profile?.photo || `${SITE_URL}/api/og?title=${encodeURIComponent(authorName)}&subtitle=${encodeURIComponent(title + " · EV Radar")}&tag=default&type=page`,
         width: 1200, height: 630,
       }],
     },
@@ -53,7 +53,7 @@ export async function generateMetadata({ params }) {
       card: "summary_large_image",
       title: `${authorName} – ${title} | ${SITE_NAME}`,
       description: profile?.bio || `Read ${authorName}'s EV articles on EVRadar India.`,
-      images: [profile?.photo || `${SITE_URL}/api/og?title=${encodeURIComponent(authorName)}&subtitle=${encodeURIComponent(title + " · EV News India")}&tag=default&type=page`],
+      images: [profile?.photo || `${SITE_URL}/api/og?title=${encodeURIComponent(authorName)}&subtitle=${encodeURIComponent(title + " · EV Radar")}&tag=default&type=page`],
     },
   };
 }
@@ -85,7 +85,7 @@ export default async function AuthorPage({ params }) {
       ].filter(Boolean),
     }),
     worksFor: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
-    knowsAbout: profile?.expertise?.length ? profile.expertise : ["Electric Vehicles", "EV News India"],
+    knowsAbout: profile?.expertise?.length ? profile.expertise : ["Electric Vehicles", "EV Radar"],
   };
 
   const breadcrumbJsonLd = {

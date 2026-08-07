@@ -110,7 +110,7 @@ export default async function CategoryPage({ params, searchParams }) {
   const collectionJsonLd = {
     "@context":   "https://schema.org",
     "@type":      "CollectionPage",
-    name:         `${label} – EV News India`,
+    name:         `${label} – EV Radar`,
     description:  `Latest ${label.toLowerCase()} news from India covering launches, prices, and reviews.`,
     url:          canonicalUrl,
     inLanguage:   "en-IN",

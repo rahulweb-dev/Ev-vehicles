@@ -214,7 +214,7 @@ export default async function BlogPostPage({ params }) {
                 </div>
                 <div>
                   <p className="font-semibold text-gray-900">{blog.author}</p>
-                  <p className="text-xs text-gray-400">EV News India</p>
+                  <p className="text-xs text-gray-400">EV Radar</p>
                 </div>
               </div>
               <div className="flex items-center gap-1.5">

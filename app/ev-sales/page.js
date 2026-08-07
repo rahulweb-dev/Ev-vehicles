@@ -1,4 +1,4 @@
-import { SITE_URL, SITE_NAME } from "@/app/layout";
+﻿import { SITE_URL, SITE_NAME } from "@/app/layout";
 import EVSalesDashboard from "./EVSalesDashboard";
 import { FALLBACK_ANALYTICS } from "@/lib/ev-sales-fallback";
 
@@ -18,7 +18,7 @@ export const metadata = {
     type: "website",
     images: [{ url: `${SITE_URL}/api/og?title=EV Sales Intelligence&subtitle=India Monthly EV Market Data ${DATA_YEAR}&tag=analytics&type=page`, width: 1200, height: 630 }],
   },
-  twitter: { card: "summary_large_image", title: `India EV Sales Data ${DATA_YEAR} | EV News India` },
+  twitter: { card: "summary_large_image", title: `India EV Sales Data ${DATA_YEAR} | EV Radar` },
 };
 
 const jsonLd = {

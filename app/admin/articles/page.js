@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -23,7 +23,7 @@ const STATUS_STYLE = {
 };
 
 function articleImageFallback(article) {
-  const title = encodeURIComponent(article?.title || "EV News India");
+  const title = encodeURIComponent(article?.title || "EV Radar");
   const tag = encodeURIComponent(article?.category || "news");
   return `/api/og?title=${title}&tag=${tag}&type=article`;
 }

@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import Image from "next/image";
 import { Search, Car, Bike, Newspaper, ArrowRight, ChevronRight } from "lucide-react";
 import { SITE_URL } from "@/app/layout";
@@ -281,7 +281,7 @@ function ArticleCard({ article }) {
   const date = article.publishedAt
     ? new Date(article.publishedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
     : "";
-  const fallbackSrc = `/api/og?title=${encodeURIComponent(article.title || "EV News India")}&tag=${encodeURIComponent(article.category || "news")}&type=article`;
+  const fallbackSrc = `/api/og?title=${encodeURIComponent(article.title || "EV Radar")}&tag=${encodeURIComponent(article.category || "news")}&type=article`;
   return (
     <Link
       href={`/news/${article.slug}`}

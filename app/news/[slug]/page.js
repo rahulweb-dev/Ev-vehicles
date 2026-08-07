@@ -187,7 +187,7 @@ export default async function ArticlePage({ params }) {
     .trim()
     .split(/\s+/)
     .filter(Boolean).length;
-  const imageFallbackPath = `/api/og?title=${encodeURIComponent(article.title || "EV News India")}&tag=${encodeURIComponent(article.category || "news")}&type=article`;
+  const imageFallbackPath = `/api/og?title=${encodeURIComponent(article.title || "EV Radar")}&tag=${encodeURIComponent(article.category || "news")}&type=article`;
   const imageFallbackUrl = `${SITE_URL}${imageFallbackPath}`;
   const articleImage = toAbsoluteImageUrl(article.image, imageFallbackUrl);
 
@@ -314,7 +314,7 @@ export default async function ArticlePage({ params }) {
                     </div>
                     <div>
                       <p className="font-semibold text-gray-900">{article.author}</p>
-                      <p className="text-xs">EV News India</p>
+                      <p className="text-xs">EV Radar</p>
                     </div>
                   </Link>
                   <div className="flex items-center gap-1.5">
@@ -538,7 +538,7 @@ export default async function ArticlePage({ params }) {
                     )}
                   </div>
                   <p className="mt-1.5 text-sm leading-relaxed text-gray-600">
-                    {authorProfile?.bio || "EV journalist at EV News India — covering electric cars, bikes, and India's EV revolution."}
+                    {authorProfile?.bio || "EV journalist at EV Radar — covering electric cars, bikes, and India's EV revolution."}
                   </p>
                   {authorProfile?.expertise?.length > 0 && (
                     <div className="mt-3 flex flex-wrap gap-1.5">

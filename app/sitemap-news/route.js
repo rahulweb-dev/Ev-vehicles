@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 
 const SITE_URL = "https://www.evradar.in";
-const SITE_NAME = "EV News India";
+const SITE_NAME = "EV Radar";
 
 // Google News sitemap — must only contain articles published in the last 2 days
 // Served at /sitemap-news.xml via this route

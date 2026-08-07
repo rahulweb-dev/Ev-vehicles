@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -48,7 +48,7 @@ function LoginForm() {
           <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-green-600 mb-4">
             <BatteryCharging size={32} className="text-white" />
           </div>
-          <h1 className="text-2xl font-black text-white">EV News India</h1>
+          <h1 className="text-2xl font-black text-white">EV Radar</h1>
           <p className="mt-1 text-gray-400 text-sm">Admin Dashboard Login</p>
         </div>
 

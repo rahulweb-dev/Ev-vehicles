@@ -1,14 +1,14 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { SITE_URL } from "@/app/layout";
 
 export const metadata = {
-  title: "Electric Vehicle FAQ India 2026 – EV Questions Answered | EV News India",
+  title: "Electric Vehicle FAQ India 2026 – EV Questions Answered | EV Radar",
   description:
     "Answers to the most common electric vehicle questions in India — EV range, charging time, cost, government subsidies, best EVs under ₹15 lakh, and battery life.",
   alternates: { canonical: `${SITE_URL}/faq` },
   openGraph: {
-    title: "Electric Vehicle FAQ India 2026 | EV News India",
+    title: "Electric Vehicle FAQ India 2026 | EV Radar",
     description:
       "Answers to the most common questions about electric vehicles in India — range, charging, cost, subsidies, and best EVs.",
     url: `${SITE_URL}/faq`,
@@ -17,7 +17,7 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Electric Vehicle FAQ India 2026 | EV News India",
+    title: "Electric Vehicle FAQ India 2026 | EV Radar",
     description: "Answers to the most common questions about EVs in India — range, charging, cost, subsidies and best models.",
     images: [`${SITE_URL}/api/og?title=EV FAQ India 2026&subtitle=Range, charging, cost, subsidies %26 best EVs answered&tag=default&type=page`],
   },

@@ -1,4 +1,4 @@
-import { NextResponse }      from "next/server";
+﻿import { NextResponse }      from "next/server";
 import { revalidatePath }     from "next/cache";
 import dbConnect              from "@/lib/mongodb";
 import { sanitizeArticleContent } from "@/lib/sanitize";
@@ -108,7 +108,7 @@ export async function POST(request) {
     const article = await Article.create({
       title, slug, excerpt, content: safeContent, image,
       imageAlt: imageAlt || title,
-      category, author: author || "EV News India Team",
+      category, author: author || "EV Radar Team",
       tags: tags || [],
       readTime: readTime || "5 min",
       featured: featured || false,
@@ -129,7 +129,7 @@ export async function POST(request) {
       pingIndexNow(buildArticleUrl(slug)).catch(console.error);
       const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.evradar.in/";
       sendPushToAll({
-        title: "EV News India – New Article",
+        title: "EV Radar – New Article",
         body:  title,
         icon:  "/images/logo.png",
         image: image || undefined,

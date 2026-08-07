@@ -1,11 +1,11 @@
-import { ImageResponse } from "next/og";
+﻿import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
 
-  const title    = searchParams.get("title")    || "EV News India";
+  const title    = searchParams.get("title")    || "EV Radar";
   const subtitle = searchParams.get("subtitle") || "India's #1 Electric Vehicle News Platform";
   const image    = searchParams.get("image")    || "";
   const tag      = searchParams.get("tag")      || "";

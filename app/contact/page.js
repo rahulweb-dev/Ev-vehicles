@@ -1,31 +1,31 @@
-import { Mail, MapPin, Clock } from "lucide-react";
+﻿import { Mail, MapPin, Clock } from "lucide-react";
 import ContactForm from "@/components/ContactForm";
 import { SITE_URL } from "../layout";
 
 export const metadata = {
-  title: "Contact EV News India – Get In Touch",
+  title: "Contact EV Radar – Get In Touch",
   description:
-    "Contact the EV News India team for editorial inquiries, press releases, advertising partnerships, or general queries about electric vehicles in India.",
+    "Contact the EV Radar team for editorial inquiries, press releases, advertising partnerships, or general queries about electric vehicles in India.",
   alternates: { canonical: `${SITE_URL}/contact` },
   openGraph: {
-    title: "Contact EV News India – Get In Touch",
-    description: "Reach the EV News India team for editorial inquiries, press releases, advertising, or general EV questions.",
+    title: "Contact EV Radar – Get In Touch",
+    description: "Reach the EV Radar team for editorial inquiries, press releases, advertising, or general EV questions.",
     url: `${SITE_URL}/contact`,
     type: "website",
-    images: [{ url: `${SITE_URL}/api/og?title=Contact EV News India&subtitle=Editorial, advertising %26 general inquiries&tag=default&type=page`, width: 1200, height: 630, alt: "Contact EV News India" }],
+    images: [{ url: `${SITE_URL}/api/og?title=Contact EV Radar&subtitle=Editorial, advertising %26 general inquiries&tag=default&type=page`, width: 1200, height: 630, alt: "Contact EV Radar" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Contact EV News India",
-    description: "Reach the EV News India team for editorial inquiries, press releases or advertising partnerships.",
-    images: [`${SITE_URL}/api/og?title=Contact EV News India&subtitle=Editorial, advertising %26 general inquiries&tag=default&type=page`],
+    title: "Contact EV Radar",
+    description: "Reach the EV Radar team for editorial inquiries, press releases or advertising partnerships.",
+    images: [`${SITE_URL}/api/og?title=Contact EV Radar&subtitle=Editorial, advertising %26 general inquiries&tag=default&type=page`],
   },
 };
 
 const contactJsonLd = {
   "@context": "https://schema.org",
   "@type": "NewsMediaOrganization",
-  name: "EV News India",
+  name: "EV Radar",
   alternateName: "EVRadar India",
   url: SITE_URL,
   logo: { "@type": "ImageObject", url: `${SITE_URL}/images/logo.png` },
@@ -61,7 +61,7 @@ export default function ContactPage() {
             <span className="text-white">Contact</span>
           </nav>
           <h1 className="text-4xl font-black text-white">Contact Us</h1>
-          <p className="mt-2 text-gray-400">Get in touch with the EV News India team</p>
+          <p className="mt-2 text-gray-400">Get in touch with the EV Radar team</p>
         </div>
       </div>
 
@@ -130,7 +130,7 @@ export default function ContactPage() {
 
             {/* Advertising CTA */}
             <div className="mt-8 rounded-2xl bg-green-600 p-6 text-white">
-              <h3 className="text-lg font-black">Advertise With EV News India</h3>
+              <h3 className="text-lg font-black">Advertise With EV Radar</h3>
               <p className="mt-2 text-sm text-green-100">
                 Reach 50,000+ monthly EV enthusiasts across India. We offer banner ads, sponsored
                 content, and newsletter placements.

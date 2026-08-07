@@ -1,24 +1,24 @@
-import Image from "next/image";
+﻿import Image from "next/image";
 import Link from "next/link";
 import { SITE_URL } from "../layout";
 
 export const metadata = {
-  title: "About EV News India – India's #1 Electric Vehicle News Platform",
+  title: "About EV Radar – India's #1 Electric Vehicle News Platform",
   description:
-    "EV News India is India's most trusted source for electric vehicle news, reviews, and buying guides. Learn about our mission to accelerate EV adoption in India.",
+    "EV Radar is India's most trusted source for electric vehicle news, reviews, and buying guides. Learn about our mission to accelerate EV adoption in India.",
   alternates: { canonical: `${SITE_URL}/about` },
   openGraph: {
-    title: "About EV News India – India's #1 Electric Vehicle News Platform",
+    title: "About EV Radar – India's #1 Electric Vehicle News Platform",
     description: "India's most trusted source for EV news, reviews, and buying guides. Our mission: accelerate EV adoption across India.",
     url: `${SITE_URL}/about`,
     type: "website",
-    images: [{ url: `${SITE_URL}/api/og?title=About EV News India&subtitle=India's %231 Electric Vehicle News Platform&tag=default&type=page`, width: 1200, height: 630, alt: "About EV News India" }],
+    images: [{ url: `${SITE_URL}/api/og?title=About EV Radar&subtitle=India's %231 Electric Vehicle News Platform&tag=default&type=page`, width: 1200, height: 630, alt: "About EV Radar" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "About EV News India",
+    title: "About EV Radar",
     description: "India's most trusted source for EV news, reviews, and buying guides.",
-    images: [`${SITE_URL}/api/og?title=About EV News India&subtitle=India's %231 Electric Vehicle News Platform&tag=default&type=page`],
+    images: [`${SITE_URL}/api/og?title=About EV Radar&subtitle=India's %231 Electric Vehicle News Platform&tag=default&type=page`],
   },
 };
 
@@ -63,7 +63,7 @@ const stats = [
 const aboutJsonLd = {
   "@context": "https://schema.org",
   "@type": "NewsMediaOrganization",
-  name: "EV News India",
+  name: "EV Radar",
   alternateName: "EVRadar India",
   url: SITE_URL,
   logo: { "@type": "ImageObject", url: `${SITE_URL}/images/logo.png`, width: 200, height: 60 },
@@ -107,7 +107,7 @@ export default function AboutPage() {
             <span className="text-green-400">News Platform</span>
           </h1>
           <p className="mt-6 text-lg leading-relaxed text-gray-400">
-            EV News India was founded with a simple mission: to provide accurate, unbiased, and
+            EV Radar was founded with a simple mission: to provide accurate, unbiased, and
             comprehensive electric vehicle information to help Indian consumers and businesses make
             informed decisions about the EV transition.
           </p>
@@ -134,7 +134,7 @@ export default function AboutPage() {
         <div className="mt-6 space-y-4 text-lg text-gray-600 leading-relaxed">
           <p>
             Electric vehicles represent the most significant shift in transportation in over a century. At
-            EV News India, we believe that accurate, timely, and comprehensive information is key to
+            EV Radar, we believe that accurate, timely, and comprehensive information is key to
             accelerating EV adoption in India.
           </p>
           <p>

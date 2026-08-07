@@ -1,8 +1,8 @@
-import SavedArticles from "@/components/SavedArticles";
+﻿import SavedArticles from "@/components/SavedArticles";
 
 export const metadata = {
-  title: "Saved Articles – EV News India",
-  description: "Your saved EV news articles on EV News India.",
+  title: "Saved Articles – EV Radar",
+  description: "Your saved EV news articles on EV Radar.",
   robots: { index: false, follow: false },
 };
 

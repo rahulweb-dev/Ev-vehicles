@@ -1,16 +1,16 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import CompareClient from "./CompareClient";
 import { SITE_URL } from "../layout";
 
 export const metadata = {
-  title: "Compare Electric Vehicles – Cars & Bikes Side by Side | EV News India",
+  title: "Compare Electric Vehicles – Cars & Bikes Side by Side | EV Radar",
   description:
     "Compare electric cars and bikes side by side. Check specs, range, motor, price and features of top EVs in India.",
   keywords: "compare electric cars india, ev comparison india, nexon ev vs punch ev, tata vs mahindra ev, electric car comparison 2026, best ev comparison india",
   alternates: { canonical: `${SITE_URL}/compare` },
   openGraph: {
-    title: "Compare Electric Vehicles Side by Side | EV News India",
+    title: "Compare Electric Vehicles Side by Side | EV Radar",
     description: "Compare specs, range, motor, price and features of top electric cars and bikes in India side by side.",
     url: `${SITE_URL}/compare`,
     type: "website",
@@ -27,13 +27,13 @@ export const metadata = {
 const compareJsonLd = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  name: "EV Comparison Tool – EV News India",
+  name: "EV Comparison Tool – EV Radar",
   url: `${SITE_URL}/compare`,
   description: "Compare electric cars and bikes side by side. Check specs, range, motor, price and features of top EVs in India.",
   applicationCategory: "UtilityApplication",
   operatingSystem: "Web",
   offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
-  publisher: { "@type": "Organization", name: "EV News India", url: SITE_URL },
+  publisher: { "@type": "Organization", name: "EV Radar", url: SITE_URL },
 };
 
 const compareFaqJsonLd = {

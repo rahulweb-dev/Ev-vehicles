@@ -1,4 +1,4 @@
-import { requireAuth } from "@/lib/auth";
+﻿import { requireAuth } from "@/lib/auth";
 import dbConnect       from "@/lib/mongodb";
 import Article         from "@/lib/models/Article";
 
@@ -67,7 +67,7 @@ export async function POST(request) {
         image:    image || "https://via.placeholder.com/1200x630",
         imageAlt: row.imageAlt?.trim() || title,
         category,
-        author:   row.author?.trim() || "EV News India Team",
+        author:   row.author?.trim() || "EV Radar Team",
         tags:     row.tags ? row.tags.split("|").map(t => t.trim()).filter(Boolean) : [],
         readTime: row.readTime?.trim() || "5 min",
         featured: row.featured === "true" || row.featured === "1",

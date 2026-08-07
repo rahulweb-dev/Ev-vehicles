@@ -68,7 +68,7 @@ export async function generateMetadata({ params }) {
   if (!bike) return { title: "Bike Not Found" };
   const price = bike.variants?.[0]?.exShowroomPrice || "";
   const year  = new Date().getFullYear();
-  const title = `${bike.name} On-Road Price in ${cityData.name} ${year} – Road Tax, Registration & Insurance | EV News India`;
+  const title = `${bike.name} On-Road Price in ${cityData.name} ${year} – Road Tax, Registration & Insurance | EV Radar`;
   const desc  = `${bike.name} on-road price in ${cityData.name}. Includes ex-showroom${price ? " " + price : ""}, road tax (${cityData.roadTaxPct}%), registration fee, and insurance. Full cost breakdown for ${cityData.name}.`;
   return {
     title,
@@ -113,13 +113,16 @@ export default async function BikeCityPricePage({ params }) {
     brand: { "@type": "Brand", name: bike.brand },
     url:  `${SITE_URL}/bikes/${slug}`,
     image: bike.featuredImage ? [bike.featuredImage] : [],
-    offers: {
-      "@type":       "Offer",
-      priceCurrency: "INR",
-      price:         basePrice || undefined,
-      availability:  "https://schema.org/InStock",
-      areaServed:    { "@type": "City", name: cityData.name, addressRegion: cityData.state, addressCountry: "IN" },
-    },
+    ...(basePrice > 0 && {
+      offers: {
+        "@type":       "Offer",
+        priceCurrency: "INR",
+        price:         basePrice,
+        priceValidUntil: `${year}-12-31`,
+        availability:  "https://schema.org/InStock",
+        areaServed:    { "@type": "City", name: cityData.name, addressRegion: cityData.state, addressCountry: "IN" },
+      },
+    }),
   };
 
   const faqJsonLd = {

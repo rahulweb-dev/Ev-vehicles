@@ -1,11 +1,11 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { ChevronRight, BookOpen } from "lucide-react";
 import { SITE_URL, SITE_NAME } from "@/app/layout";
 
 export const revalidate = 86400;
 
 export const metadata = {
-  title: "EV Glossary – Electric Vehicle Terms Explained | EV News India",
+  title: "EV Glossary – Electric Vehicle Terms Explained | EV Radar",
   description: "Complete glossary of electric vehicle terms for India. Understand ARAI range, BMS, regenerative braking, CCS2, CHAdeMO, WLTP, SOC, IP67, and every EV acronym explained simply.",
   keywords: "ev glossary india, electric vehicle terms, what is arai range, what is bms ev, ev abbreviations explained, ccs2 charger india, ev terminology",
   alternates: { canonical: `${SITE_URL}/ev-glossary` },

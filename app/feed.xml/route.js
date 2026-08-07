@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 
 const SITE_URL  = "https://www.evradar.in";
-const SITE_NAME = "EV News India";
+const SITE_NAME = "EV Radar";
 
 export const revalidate = 600;
 

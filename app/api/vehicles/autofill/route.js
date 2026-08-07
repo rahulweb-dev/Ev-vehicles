@@ -1,4 +1,4 @@
-import { requireAuth } from "@/lib/auth";
+﻿import { requireAuth } from "@/lib/auth";
 
 export const maxDuration = 60;
 
@@ -66,7 +66,7 @@ Return a JSON object with EXACTLY this structure:
   "pros": [],
   "cons": [],
   "colors": [{ "name": "", "hexCode": "#000000" }],
-  "metaTitle": "${name} Price in India 2026 – Range, Specs & Features | EV News India",
+  "metaTitle": "${name} Price in India 2026 – Range, Specs & Features | EV Radar",
   "metaDescription": "",
   "focusKeyword": "${name.toLowerCase()} price india",
   "keywords": ["${name} price", "${name} range", "${name} specs"]

@@ -1,8 +1,8 @@
-import { SITE_URL } from "@/app/layout";
+﻿import { SITE_URL } from "@/app/layout";
 import EVvsPetrolApp from "./EVvsPetrolApp";
 
 export const metadata = {
-  title: "EV vs Petrol Cost Calculator India 2026 – Monthly Savings & Break-even | EV News India",
+  title: "EV vs Petrol Cost Calculator India 2026 – Monthly Savings & Break-even | EV Radar",
   description: "Calculate how much you save by switching from petrol to electric vehicle in India. Get monthly savings, break-even point and 10-year cost comparison. Free EV savings calculator.",
   keywords: "ev vs petrol calculator india, ev savings calculator, electric vehicle vs petrol cost india, ev break even point india, petrol to ev savings 2026",
   alternates: { canonical: `${SITE_URL}/ev-vs-petrol` },

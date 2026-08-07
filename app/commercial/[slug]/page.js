@@ -151,21 +151,24 @@ export default async function CommercialDetailPage({ params }) {
         ...(vehicle.performance?.torque && { torque: { "@type": "QuantitativeValue", value: vehicle.performance.torque, unitText: "Nm" } }),
       },
     }),
-    ...(firstVariant && {
-      offers: {
-        "@type":       "Offer",
-        priceCurrency: "INR",
-        price:         parsePrice(firstVariant.exShowroomPrice),
-        priceValidUntil: `${new Date().getFullYear() + 1}-12-31`,
-        availability:  vehicle.availability === "available"
-          ? "https://schema.org/InStock"
-          : "https://schema.org/PreOrder",
-        itemCondition: "https://schema.org/NewCondition",
-        url: `${SITE_URL}/commercial/${slug}`,
-        seller: { "@id": `${SITE_URL}/#organization` },
-        areaServed: { "@type": "Country", name: "India" },
-      },
-    }),
+    ...(() => {
+      const parsedPrice = firstVariant ? parsePrice(firstVariant.exShowroomPrice) : null;
+      return parsedPrice != null ? {
+        offers: {
+          "@type":       "Offer",
+          priceCurrency: "INR",
+          price:         parsedPrice,
+          priceValidUntil: `${new Date().getFullYear() + 1}-12-31`,
+          availability:  vehicle.availability === "available"
+            ? "https://schema.org/InStock"
+            : "https://schema.org/PreOrder",
+          itemCondition: "https://schema.org/NewCondition",
+          url: `${SITE_URL}/commercial/${slug}`,
+          seller: { "@id": `${SITE_URL}/#organization` },
+          areaServed: { "@type": "Country", name: "India" },
+        },
+      } : {};
+    })(),
     ...(reviewStats?.count > 0 && {
       aggregateRating: {
         "@type":       "AggregateRating",
@@ -260,7 +263,7 @@ export default async function CommercialDetailPage({ params }) {
     uploadDate:    vehicle.createdAt ? new Date(vehicle.createdAt).toISOString() : new Date().toISOString(),
     contentUrl:    `https://www.youtube.com/watch?v=${videoId}`,
     embedUrl:      `https://www.youtube.com/embed/${videoId}`,
-    publisher:     { "@type": "Organization", name: "EV News India", url: SITE_URL },
+    publisher:     { "@type": "Organization", name: "EV Radar", url: SITE_URL },
   } : null;
 
   return (

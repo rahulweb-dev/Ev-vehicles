@@ -17,8 +17,8 @@ import PageViewTracker from "@/components/PageViewTracker";
 const ADSENSE_PUBLISHER_ID = process.env.NEXT_PUBLIC_ADSENSE_ID || "ca-pub-XXXXXXXXXXXXXXXXX";
 
 export const SITE_URL = "https://www.evradar.in";
-export const SITE_NAME = "EV News India";
-export const SITE_TAGLINE = "India's #1 Electric Vehicle News Platform";
+export const SITE_NAME = "EV Radar";
+export const SITE_TAGLINE = "India's #1 Electric Vehicle News & Reviews Platform";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,8 +39,11 @@ export const metadata = {
   description:
     "Stay updated with the latest electric vehicle news, reviews, launches, and EV prices in India. Coverage of electric cars, bikes, scooters, trucks, and charging infrastructure.",
   keywords: [
+    "EV Radar",
+    "evradar",
+    "EV Radar India",
+    "EV Radar EV news",
     "electric vehicle news India",
-    "EV news",
     "electric car India",
     "electric bike India",
     "EV launch India",
@@ -84,8 +87,8 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    site: "@EVNewsIndia",
-    creator: "@EVNewsIndia",
+    site: "@EVRadarIndia",
+    creator: "@EVRadarIndia",
     title: `${SITE_NAME} – ${SITE_TAGLINE}`,
     description:
       "Stay updated with the latest electric vehicle news, reviews, and launches in India.",
@@ -131,10 +134,10 @@ const websiteJsonLd = {
     {
       "@type": ["Organization", "NewsMediaOrganization"],
       "@id": `${SITE_URL}/#organization`,
-      name: SITE_NAME,
-      alternateName: "EV Radar India",
+      name: "EV Radar",
+      alternateName: ["EV Radar India", "EV News India", "EVRadar", "evradar.in"],
       url: SITE_URL,
-      description: "India's most trusted electric vehicle news platform publishing daily EV news, in-depth reviews, prices, specifications, and buying guides for electric cars, bikes, scooters, and commercial vehicles in India.",
+      description: "EV Radar (evradar.in) is India's most trusted electric vehicle news platform publishing daily EV news, in-depth reviews, prices, specifications, and buying guides for electric cars, bikes, scooters, and commercial vehicles in India.",
       logo: {
         "@type": "ImageObject",
         "@id": `${SITE_URL}/#logo`,
@@ -144,10 +147,10 @@ const websiteJsonLd = {
         caption: SITE_NAME,
       },
       sameAs: [
-        "https://twitter.com/EVNewsIndia",
-        "https://www.facebook.com/EVNewsIndia",
-        "https://www.instagram.com/evnewsindia",
-        "https://www.youtube.com/@EVNewsIndia",
+        "https://twitter.com/EVRadarIndia",
+        "https://www.facebook.com/EVRadarIndia",
+        "https://www.instagram.com/evradarindia",
+        "https://www.youtube.com/@EVRadarIndia",
       ],
       knowsAbout: [
         "Electric Vehicles India",
@@ -184,7 +187,8 @@ const websiteJsonLd = {
       "@type": "WebSite",
       "@id": `${SITE_URL}/#website`,
       url: SITE_URL,
-      name: SITE_NAME,
+      name: "EV Radar",
+      alternateName: "EV Radar India – EV News, Prices & Reviews",
       description: SITE_TAGLINE,
       inLanguage: "en-IN",
       publisher: { "@id": `${SITE_URL}/#organization` },
@@ -225,7 +229,7 @@ export default function RootLayout({ children }) {
         <meta name="p:domain_verify" content="07cbf55529a481771ddbbd2ddbbeae9f" />
 
         {/* RSS feed — enables Google News discovery and feed readers */}
-        <link rel="alternate" type="application/rss+xml" title="EV News India – Latest EV News Feed" href="/feed.xml" />
+        <link rel="alternate" type="application/rss+xml" title="EV Radar – Latest EV News Feed" href="/feed.xml" />
 
         {/* llms.txt — AI/LLM site description for generative engine optimization (GEO) */}
         <link rel="llms" href="/llms.txt" type="text/plain" />

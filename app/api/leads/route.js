@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+﻿import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Lead from "@/lib/models/Lead";
 import { getAuthUser } from "@/lib/auth";
@@ -47,7 +47,7 @@ async function sendLeadNotification(lead) {
     headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
       personalizations: [{ to: [{ email: toEmail }] }],
-      from:    { email: fromEmail, name: "EV News India Leads" },
+      from:    { email: fromEmail, name: "EV Radar Leads" },
       subject: `🔔 New ${intentLabel} Lead — ${lead.vehicleName} (${lead.phone})`,
       content: [{ type: "text/html", value: html }],
     }),

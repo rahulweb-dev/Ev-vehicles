@@ -1,12 +1,12 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { SITE_URL } from "../layout";
 
 export const metadata = {
-  title: "Sitemap – EV News India | All Pages & Categories",
-  description: "Complete sitemap of EV News India — news, electric cars, bikes, guides, tools and more. Browse all sections of India's #1 EV platform.",
+  title: "Sitemap – EV Radar | All Pages & Categories",
+  description: "Complete sitemap of EV Radar — news, electric cars, bikes, guides, tools and more. Browse all sections of India's #1 EV platform.",
   alternates: { canonical: `${SITE_URL}/sitemap-page` },
   openGraph: {
-    title: "Sitemap – EV News India",
+    title: "Sitemap – EV Radar",
     description: "Browse all sections of India's #1 EV platform.",
     url: `${SITE_URL}/sitemap-page`,
     type: "website",
@@ -102,7 +102,7 @@ export default function SitemapPage() {
         <div className="bg-linear-to-br from-green-900 to-green-950 py-14">
           <div className="mx-auto max-w-7xl px-4">
             <h1 className="text-4xl font-black text-white md:text-5xl">Sitemap</h1>
-            <p className="mt-2 text-green-300">All pages on EV News India</p>
+            <p className="mt-2 text-green-300">All pages on EV Radar</p>
           </div>
         </div>
 

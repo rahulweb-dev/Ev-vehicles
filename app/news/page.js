@@ -1,4 +1,4 @@
-import { cache } from "react";
+﻿import { cache } from "react";
 import { AdBannerHorizontal } from "@/components/ads/AdBanner";
 import NewsCard from "@/components/news/NewsCard";
 import { SITE_URL } from "../layout";
@@ -55,8 +55,8 @@ export async function generateMetadata({ searchParams }) {
   const canonical = buildNewsCanonical(cat, page);
   return {
     title: cat
-      ? `${label} News India 2026 – Latest ${label} Updates | EV News India`
-      : `Latest EV News India 2026 – Electric Vehicle Updates`,
+      ? `${label} News India 2026 – Latest ${label} Updates | EV Radar`
+      : `Latest EV Radar 2026 – Electric Vehicle Updates`,
     description:
       cat
         ? `Latest ${label.toLowerCase()} news from India. New ${label.toLowerCase()} launches, prices, range, and reviews updated daily.`
@@ -80,13 +80,13 @@ export async function generateMetadata({ searchParams }) {
       description: "Get the latest electric vehicle news, launches, reviews, and price updates from India.",
       url: canonical,
       type: "website",
-      images: [{ url: `${SITE_URL}/api/og?title=${encodeURIComponent(label + " EV News India")}&subtitle=Latest launches, reviews %26 price updates&tag=news&type=page`, width: 1200, height: 630, alt: `${label} EV News India` }],
+      images: [{ url: `${SITE_URL}/api/og?title=${encodeURIComponent(label + " EV Radar")}&subtitle=Latest launches, reviews %26 price updates&tag=news&type=page`, width: 1200, height: 630, alt: `${label} EV Radar` }],
     },
     twitter: {
       card: "summary_large_image",
       title: `${label} EV News – Electric Vehicle Updates India 2026`,
       description: "Get the latest EV news, launches, reviews, and price updates from India.",
-      images: [{ url: `${SITE_URL}/api/og?title=${encodeURIComponent(label + " EV News India")}&subtitle=Latest launches, reviews %26 price updates&tag=news&type=page`, alt: `${label} EV News India` }],
+      images: [{ url: `${SITE_URL}/api/og?title=${encodeURIComponent(label + " EV Radar")}&subtitle=Latest launches, reviews %26 price updates&tag=news&type=page`, alt: `${label} EV Radar` }],
     },
   };
 }
@@ -111,7 +111,7 @@ export default async function NewsPage({ searchParams }) {
   const collectionJsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: `${heading} – EV News India`,
+    name: `${heading} – EV Radar`,
     description: "Latest electric vehicle news from India covering launches, prices, reviews, and EV policy.",
     url: `${SITE_URL}/news`,
     inLanguage: "en-IN",

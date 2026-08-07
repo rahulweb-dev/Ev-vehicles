@@ -1,23 +1,23 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { SITE_URL } from "../layout";
 
 export const metadata = {
-  title: "Terms of Service – EV News India",
-  description: "Terms and conditions governing the use of EV News India (evradar.in).",
+  title: "Terms of Service – EV Radar",
+  description: "Terms and conditions governing the use of EV Radar (evradar.in).",
   alternates: { canonical: `${SITE_URL}/terms` },
   robots: { index: true, follow: true },
   openGraph: {
-    title: "Terms of Service – EV News India",
-    description: "Terms and conditions governing the use of EV News India (evradar.in).",
+    title: "Terms of Service – EV Radar",
+    description: "Terms and conditions governing the use of EV Radar (evradar.in).",
     url: `${SITE_URL}/terms`,
     type: "website",
-    images: [{ url: `${SITE_URL}/api/og?title=Terms of Service&subtitle=EV News India&tag=default&type=page`, width: 1200, height: 630, alt: "Terms of Service – EV News India" }],
+    images: [{ url: `${SITE_URL}/api/og?title=Terms of Service&subtitle=EV Radar&tag=default&type=page`, width: 1200, height: 630, alt: "Terms of Service – EV Radar" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Terms of Service – EV News India",
-    description: "Terms and conditions governing the use of EV News India.",
-    images: [`${SITE_URL}/api/og?title=Terms of Service&subtitle=EV News India&tag=default&type=page`],
+    title: "Terms of Service – EV Radar",
+    description: "Terms and conditions governing the use of EV Radar.",
+    images: [`${SITE_URL}/api/og?title=Terms of Service&subtitle=EV Radar&tag=default&type=page`],
   },
 };
 
@@ -42,7 +42,7 @@ export default function TermsPage() {
         <section className="mb-8">
           <h2 className="text-xl font-black text-gray-900 mb-3">1. Acceptance of Terms</h2>
           <p className="text-gray-600 leading-relaxed">
-            By accessing or using EV News India (<strong>evradar.in</strong>), you agree to be bound by these
+            By accessing or using EV Radar (<strong>evradar.in</strong>), you agree to be bound by these
             Terms of Service. If you do not agree, please discontinue use of the website.
           </p>
         </section>
@@ -50,7 +50,7 @@ export default function TermsPage() {
         <section className="mb-8">
           <h2 className="text-xl font-black text-gray-900 mb-3">2. Use of Content</h2>
           <p className="text-gray-600 leading-relaxed">
-            All content published on EV News India — including articles, vehicle specifications, images, and
+            All content published on EV Radar — including articles, vehicle specifications, images, and
             guides — is for informational purposes only. Reproduction or redistribution of content without
             prior written permission is prohibited. Brief excerpts with attribution and a link back are
             permitted under fair use.
@@ -62,7 +62,7 @@ export default function TermsPage() {
           <p className="text-gray-600 leading-relaxed">
             We strive to keep vehicle prices, specifications, and news accurate. However, EV prices and
             features change frequently. Always verify details with the manufacturer or authorised dealer
-            before making a purchase decision. EV News India is not liable for any decisions made based on
+            before making a purchase decision. EV Radar is not liable for any decisions made based on
             information published on this site.
           </p>
         </section>
@@ -70,7 +70,7 @@ export default function TermsPage() {
         <section className="mb-8">
           <h2 className="text-xl font-black text-gray-900 mb-3">4. Advertising & Sponsored Content</h2>
           <p className="text-gray-600 leading-relaxed">
-            EV News India displays third-party advertisements via Google AdSense and may publish sponsored
+            EV Radar displays third-party advertisements via Google AdSense and may publish sponsored
             content. Sponsored articles are clearly labelled. We do not accept payment to alter editorial
             opinions or vehicle ratings.
           </p>
@@ -96,7 +96,7 @@ export default function TermsPage() {
         <section className="mb-8">
           <h2 className="text-xl font-black text-gray-900 mb-3">7. Intellectual Property</h2>
           <p className="text-gray-600 leading-relaxed">
-            The EV News India name, logo, and original content are the intellectual property of evradar.in.
+            The EV Radar name, logo, and original content are the intellectual property of evradar.in.
             Vehicle manufacturer names and logos are trademarks of their respective owners and are used for
             informational purposes only.
           </p>
@@ -105,7 +105,7 @@ export default function TermsPage() {
         <section className="mb-8">
           <h2 className="text-xl font-black text-gray-900 mb-3">8. Limitation of Liability</h2>
           <p className="text-gray-600 leading-relaxed">
-            EV News India is provided &quot;as is&quot; without any warranties. We are not liable for any direct,
+            EV Radar is provided &quot;as is&quot; without any warranties. We are not liable for any direct,
             indirect, or consequential damages arising from your use of the website or reliance on its content.
           </p>
         </section>

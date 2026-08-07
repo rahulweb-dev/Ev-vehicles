@@ -1,4 +1,4 @@
-import { requireAuth } from "@/lib/auth";
+﻿import { requireAuth } from "@/lib/auth";
 import dbConnect       from "@/lib/mongodb";
 import Vehicle         from "@/lib/models/Vehicle";
 import Article         from "@/lib/models/Article";
@@ -133,7 +133,7 @@ Return ONLY a JSON object with this exact structure:
     image:           vehicle.featuredImage     || "",
     imageAlt:        `${vehicle.name} ${year}`,
     category,
-    author:          "EV News India Team",
+    author:          "EV Radar Team",
     tags:            generated.tags            || [vehicle.brand, vehicle.name, "EV India"],
     readTime:        generated.readTime        || "5 min",
     status:          "draft",

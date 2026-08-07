@@ -1,11 +1,11 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef } from "react";
 import Link from "next/link";
 import { Upload, FileText, CheckCircle, AlertCircle, Download, ArrowLeft, Loader2, X } from "lucide-react";
 
 const CSV_TEMPLATE_HEADER = "title,slug,excerpt,content,image,imageAlt,category,author,tags,readTime,featured,status,metaTitle,metaDescription";
-const CSV_EXAMPLE_ROW     = '"Tata Nexon EV 2025 Review","tata-nexon-ev-2025-review","Best-in-class range and features.","<p>Full review here...</p>","https://example.com/img.jpg","Tata Nexon EV","cars","EV News India Team","tata|nexon|ev","5 min","false","draft","Tata Nexon EV 2025 Review | EVRadar","Full review of Tata Nexon EV 2025 with pros, cons and verdict."';
+const CSV_EXAMPLE_ROW     = '"Tata Nexon EV 2025 Review","tata-nexon-ev-2025-review","Best-in-class range and features.","<p>Full review here...</p>","https://example.com/img.jpg","Tata Nexon EV","cars","EV Radar Team","tata|nexon|ev","5 min","false","draft","Tata Nexon EV 2025 Review | EVRadar","Full review of Tata Nexon EV 2025 with pros, cons and verdict."';
 
 export default function BulkImportPage() {
   const [file,      setFile]      = useState(null);

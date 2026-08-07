@@ -1,22 +1,22 @@
-import { SITE_URL } from "../layout";
+﻿import { SITE_URL } from "../layout";
 
 export const metadata = {
-  title: "Privacy Policy – EV News India",
+  title: "Privacy Policy – EV Radar",
   description:
-    "Read EV News India's privacy policy to understand how we collect, use, and protect your personal information.",
+    "Read EV Radar's privacy policy to understand how we collect, use, and protect your personal information.",
   alternates: { canonical: `${SITE_URL}/privacy-policy` },
   openGraph: {
-    title: "Privacy Policy – EV News India",
-    description: "Read EV News India's privacy policy to understand how we collect, use, and protect your personal information.",
+    title: "Privacy Policy – EV Radar",
+    description: "Read EV Radar's privacy policy to understand how we collect, use, and protect your personal information.",
     url: `${SITE_URL}/privacy-policy`,
     type: "website",
-    images: [{ url: `${SITE_URL}/api/og?title=Privacy Policy&subtitle=EV News India&tag=default&type=page`, width: 1200, height: 630, alt: "Privacy Policy – EV News India" }],
+    images: [{ url: `${SITE_URL}/api/og?title=Privacy Policy&subtitle=EV Radar&tag=default&type=page`, width: 1200, height: 630, alt: "Privacy Policy – EV Radar" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Privacy Policy – EV News India",
-    description: "Read EV News India's privacy policy.",
-    images: [`${SITE_URL}/api/og?title=Privacy Policy&subtitle=EV News India&tag=default&type=page`],
+    title: "Privacy Policy – EV Radar",
+    description: "Read EV Radar's privacy policy.",
+    images: [`${SITE_URL}/api/og?title=Privacy Policy&subtitle=EV Radar&tag=default&type=page`],
   },
 };
 
@@ -38,7 +38,7 @@ export default function PrivacyPolicyPage() {
       <div className="mx-auto max-w-4xl px-4 py-14">
         <div className="prose prose-lg max-w-none prose-headings:font-black prose-headings:text-gray-900 prose-p:text-gray-600 prose-p:leading-relaxed">
           <p>
-            EV News India (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;) is committed to protecting your privacy. This Privacy Policy explains how we
+            EV Radar (&quot;we&quot;, &quot;our&quot;, or &quot;us&quot;) is committed to protecting your privacy. This Privacy Policy explains how we
             collect, use, disclose, and safeguard your information when you visit our website
             evradar.in.
           </p>

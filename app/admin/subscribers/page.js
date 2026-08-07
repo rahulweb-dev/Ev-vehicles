@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import { Mail, Users, UserX, Download, Send, RefreshCw, CheckCircle, AlertCircle } from "lucide-react";
@@ -6,7 +6,7 @@ import { Mail, Users, UserX, Download, Send, RefreshCw, CheckCircle, AlertCircle
 const SIMPLE_TEMPLATE = (subject) => `
 <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#f9fafb;">
   <div style="background:#16a34a;padding:24px;border-radius:12px 12px 0 0;text-align:center;">
-    <h1 style="color:white;margin:0;font-size:20px;">⚡ EV News India</h1>
+    <h1 style="color:white;margin:0;font-size:20px;">⚡ EV Radar</h1>
     <p style="color:#bbf7d0;margin:8px 0 0;font-size:13px;">India's #1 Electric Vehicle News Platform</p>
   </div>
   <div style="background:white;padding:32px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none;">
@@ -21,7 +21,7 @@ const SIMPLE_TEMPLATE = (subject) => `
     </ul>
     <div style="text-align:center;margin:24px 0;">
       <a href="https://www.evradar.in" style="background:#16a34a;color:white;padding:12px 28px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:14px;">
-        Read More on EV News India →
+        Read More on EV Radar →
       </a>
     </div>
     <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0;">
@@ -189,7 +189,7 @@ export default function AdminSubscribersPage() {
                 type="text"
                 value={subject}
                 onChange={e => setSubject(e.target.value)}
-                placeholder="e.g. Top 5 EVs Launched This Week | EV News India"
+                placeholder="e.g. Top 5 EVs Launched This Week | EV Radar"
                 className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm focus:border-green-500 focus:outline-none"
               />
             </div>
