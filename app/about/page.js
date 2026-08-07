@@ -1,5 +1,4 @@
-﻿import Image from "next/image";
-import Link from "next/link";
+﻿import Link from "next/link";
 import { SITE_URL } from "../layout";
 
 export const metadata = {
@@ -27,29 +26,33 @@ const team = [
     name: "Rahul Sharma",
     slug: "rahul-sharma",
     role: "Editor-in-Chief",
-    bio: "10+ years covering automotive industry. EV enthusiast and Tata Nexon EV owner.",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop",
+    bio: "10+ years covering the automotive industry. EV enthusiast and Tata Nexon EV owner.",
+    initial: "R",
+    color: "bg-green-600",
   },
   {
     name: "Priya Menon",
     slug: "priya-menon",
     role: "Senior Auto Journalist",
-    bio: "Former CarWale and AutoX journalist. Specializes in EV reviews and long-distance EV road trips.",
-    image: "https://images.unsplash.com/photo-1494790108755-2616b612b786?q=80&w=400&auto=format&fit=crop",
+    bio: "Specializes in EV reviews and long-distance EV road trips across India.",
+    initial: "P",
+    color: "bg-blue-600",
   },
   {
     name: "Vikram Singh",
     slug: "vikram-singh",
     role: "Two-Wheeler Editor",
     bio: "Lifelong biker turned EV convert. Tests every electric scooter and motorcycle that launches in India.",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400&auto=format&fit=crop",
+    initial: "V",
+    color: "bg-orange-500",
   },
   {
     name: "Deepika Nair",
     slug: "deepika-nair",
     role: "Business & Policy Reporter",
-    bio: "MBA from IIM Bangalore. Covers EV industry news, government policies, and investment trends.",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=400&auto=format&fit=crop",
+    bio: "Covers EV industry news, government policies, and investment trends across India.",
+    initial: "D",
+    color: "bg-purple-600",
   },
 ];
 
@@ -77,10 +80,10 @@ const aboutJsonLd = {
     addressCountry: "IN",
   },
   sameAs: [
-    "https://twitter.com/EVNewsIndia",
-    "https://www.facebook.com/EVNewsIndia",
-    "https://www.instagram.com/evnewsindia",
-    "https://www.youtube.com/@EVNewsIndia",
+    "https://twitter.com/EVRadarIndia",
+    "https://www.facebook.com/EVRadarIndia",
+    "https://www.instagram.com/evradarindia",
+    "https://www.youtube.com/@EVRadarIndia",
   ],
   member: team.map(m => ({
     "@type": "Person",
@@ -170,8 +173,8 @@ export default function AboutPage() {
         <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {team.map((member) => (
             <Link key={member.name} href={`/authors/${member.slug}`} className="group text-center block">
-              <div className="relative mx-auto h-24 w-24 overflow-hidden rounded-full">
-                <Image src={member.image} alt={member.name} fill className="object-cover" sizes="96px" />
+              <div className={`mx-auto flex h-24 w-24 items-center justify-center rounded-full ${member.color} text-3xl font-black text-white`}>
+                {member.initial}
               </div>
               <h3 className="mt-3 font-bold text-gray-900 group-hover:text-green-700 transition">{member.name}</h3>
               <p className="text-sm font-medium text-green-600">{member.role}</p>
