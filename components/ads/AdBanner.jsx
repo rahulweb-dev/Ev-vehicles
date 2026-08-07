@@ -62,7 +62,7 @@ export function AdBannerHorizontal({ slot, className }) {
 export function AdBannerRectangle({ slot, className }) {
   return (
     <AdBanner
-      slot={slot || "1253319567"}
+      slot={slot || "8855789058"}
       format="auto"
       responsive
       className={`my-4 ${className}`}
