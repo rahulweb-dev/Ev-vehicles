@@ -2,8 +2,14 @@
 
 export const runtime = "edge";
 
+async function getFont() {
+  const res = await fetch("https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff2");
+  return res.arrayBuffer();
+}
+
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
+  const interFont = await getFont().catch(() => null);
 
   const title    = searchParams.get("title")    || "EV Radar";
   const subtitle = searchParams.get("subtitle") || "India's #1 Electric Vehicle News Platform";
@@ -30,7 +36,7 @@ export async function GET(request) {
           height: "630px",
           display: "flex",
           background: "linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #064e3b 100%)",
-          fontFamily: "system-ui, -apple-system, sans-serif",
+          fontFamily: "Inter, system-ui, -apple-system, sans-serif",
           position: "relative",
           overflow: "hidden",
         }}
@@ -169,7 +175,13 @@ export async function GET(request) {
         )}
       </div>
     ),
-    { width: 1200, height: 630 }
+    {
+      width: 1200,
+      height: 630,
+      ...(interFont && {
+        fonts: [{ name: "Inter", data: interFont, weight: 900, style: "normal" }],
+      }),
+    }
   );
 
   // OG images are deterministic for a given URL — cache aggressively at the CDN edge.

@@ -1,6 +1,6 @@
 {
-  "name": "EV News India – EVRadar",
-  "short_name": "EVRadar",
+  "name": "EV Radar",
+  "short_name": "EV Radar",
   "description": "India's #1 Electric Vehicle News & Price Guide",
   "start_url": "/",
   "display": "standalone",
@@ -26,7 +26,14 @@
       "type": "image/jpeg",
       "sizes": "390x844",
       "form_factor": "narrow",
-      "label": "EVRadar Home – Latest EV News"
+      "label": "EV Radar Home – Latest EV News"
+    },
+    {
+      "src": "/images/screenshots/home-wide.jpg",
+      "type": "image/jpeg",
+      "sizes": "1280x800",
+      "form_factor": "wide",
+      "label": "EV Radar – India's #1 EV News Platform"
     }
   ],
   "shortcuts": [

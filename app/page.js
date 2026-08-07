@@ -5,7 +5,19 @@ import LatestNewsSection from "@/components/home/LatestNewsSection";
 import HomeCompareWidget from "@/components/home/HomeCompareWidget";
 import VehicleSlider from "@/components/home/VehicleSlider";
 import { AdBannerHorizontal } from "@/components/ads/AdBanner";
+import NewsletterForm from "@/components/NewsletterForm";
 import { SITE_URL } from "./layout";
+
+const GUIDE_LINKS = [
+  { href: "/best-electric-cars-india-2026",  emoji: "🏆", title: "Best Electric Cars 2026",  desc: "Expert-ranked top 10 EVs" },
+  { href: "/best-electric-bikes-india-2026", emoji: "🛵", title: "Best Electric Bikes 2026", desc: "Top scooters & bikes ranked" },
+  { href: "/upcoming-electric-cars-india",   emoji: "📅", title: "Upcoming EVs India",        desc: "Launch dates & expected prices" },
+  { href: "/electric-cars-under-10-lakh",    emoji: "💰", title: "EVs Under ₹10 Lakh",       desc: "Affordable electric cars" },
+  { href: "/ev-charging-guide",              emoji: "⚡", title: "EV Charging Guide",         desc: "Home & public charging explained" },
+  { href: "/subsidies",                      emoji: "🎁", title: "EV Subsidies India",        desc: "FAME, PM E-Drive & state schemes" },
+  { href: "/charging-stations",              emoji: "📍", title: "Charging Stations Map",     desc: "Find chargers near you" },
+  { href: "/government-ev-policy-india",     emoji: "📋", title: "EV Policy India 2026",      desc: "FAME 2, PM E-Drive, PLI explained" },
+];
 
 
 export const revalidate = 120; // re-fetch from DB every 2 minutes
@@ -258,10 +270,10 @@ export default async function Home() {
       </div> */}
 
       {/* Popular Guides — internal links to high-value SEO pages */}
-      {/* <section className="bg-gray-50 py-8">
+      <section className="bg-gray-50 py-8">
         <div className="mx-auto max-w-7xl px-4">
           <h2 className="mb-4 text-xl font-black text-gray-900">EV Buying Guides</h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-3">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {GUIDE_LINKS.map(g => (
               <Link key={g.href} href={g.href}
                 className="flex flex-col rounded-2xl border border-gray-200 bg-white p-4 shadow-sm hover:border-green-400 hover:shadow-md transition">
@@ -272,12 +284,22 @@ export default async function Home() {
             ))}
           </div>
         </div>
-      </section> */}
+      </section>
 
       <LatestNewsSection initialArticles={initialNews} />
 
 
       <HomeCompareWidget />
+
+      {/* Newsletter signup — subscriber growth */}
+      <section className="bg-green-950 py-12">
+        <div className="mx-auto max-w-2xl px-4 text-center">
+          <p className="mb-1 text-sm font-bold uppercase tracking-widest text-green-400">Stay Charged</p>
+          <h2 className="mb-2 text-2xl font-black text-white">Get EV News in Your Inbox</h2>
+          <p className="mb-6 text-gray-400 text-sm">Latest launches, price drops, and EV reviews delivered weekly. No spam.</p>
+          <NewsletterForm />
+        </div>
+      </section>
 
       {fCars.length > 0 && (
         <VehicleSlider

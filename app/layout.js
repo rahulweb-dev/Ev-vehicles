@@ -273,11 +273,20 @@ export default function RootLayout({ children }) {
         <ConditionalShell>{children}</ConditionalShell>
         <CookieConsent />
         {/* <PushNotificationPrompt /> */}
-        {/* <PWAInstallBanner /> */}
+        <PWAInstallBanner />
         <ChatWidgetLoader />
         <BackToTop />
         </ThemeProvider>
         <GoogleAnalytics gaId="G-2QJL966SVB" />
+
+        {/* Service Worker registration */}
+        <Script
+          id="sw-register"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js').catch(()=>{})}`,
+          }}
+        />
 
         {/* Subscribe with Google Basic — enables Google News free-access badge */}
         <Script
