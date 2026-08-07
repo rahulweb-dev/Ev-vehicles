@@ -273,7 +273,7 @@ export default function RootLayout({ children }) {
         <ConditionalShell>{children}</ConditionalShell>
         <CookieConsent />
         {/* <PushNotificationPrompt /> */}
-        <PWAInstallBanner />
+        {/* <PWAInstallBanner /> */}
         <ChatWidgetLoader />
         <BackToTop />
         </ThemeProvider>
