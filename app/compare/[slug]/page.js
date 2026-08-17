@@ -12,27 +12,21 @@ import { parsePrice } from "@/lib/priceUtils";
 export const revalidate = 3600;
 
 /* ─── Pre-generate top vehicle pairs for Google indexing ────────── */
+// Only pre-build the most popular/featured compare pairs.
+// Pairwise combinations from N vehicles = N*(N-1)/2 pages — at N=15 that's 105
+// near-identical template pages which dilute overall site quality for AdSense.
+// Non-listed pairs still render on-demand when visited; they just aren't pre-built.
+const FEATURED_PAIRS = [
+  "tata-nexon-ev-vs-tata-punch-ev",
+  "hyundai-creta-electric-vs-tata-nexon-ev",
+  "mahindra-be-6-vs-tata-nexon-ev",
+  "ola-s1-pro-vs-ather-450x",
+  "tata-punch-ev-vs-mg-windsor-ev",
+  "tvs-iqube-vs-bajaj-chetak",
+];
+
 export async function generateStaticParams() {
-  try {
-    const dbConnect = (await import("@/lib/mongodb")).default;
-    const Vehicle   = (await import("@/lib/models/Vehicle")).default;
-    await dbConnect();
-    const vehicles = await Vehicle.find({ status: "published" })
-      .select("slug")
-      .sort({ featured: -1, createdAt: -1 })
-      .limit(15)
-      .lean();
-    const slugs = vehicles.map(v => v.slug);
-    const pairs = [];
-    for (let i = 0; i < slugs.length; i++) {
-      for (let j = i + 1; j < slugs.length; j++) {
-        pairs.push({ slug: `${slugs[i]}-vs-${slugs[j]}` });
-      }
-    }
-    return pairs;
-  } catch {
-    return [];
-  }
+  return FEATURED_PAIRS.map(slug => ({ slug }));
 }
 
 /* ─── parse "slug1-vs-slug2" ────────────────────────────────────── */
