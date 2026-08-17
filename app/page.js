@@ -269,6 +269,16 @@ export default async function Home() {
         </div>
       </div> */}
 
+      {/* Static editorial intro — server-rendered so Googlebot always sees substantive text */}
+      <section className="bg-white border-b border-gray-100 py-8">
+        <div className="mx-auto max-w-4xl px-4">
+          <h2 className="text-xl font-black text-gray-900 mb-3">India&apos;s Most Trusted Electric Vehicle News Platform</h2>
+          <p className="text-gray-600 leading-relaxed text-sm">
+            EV Radar covers everything that matters in India&apos;s electric vehicle market — new EV launches, price revisions, real-world range tests, government subsidies, charging infrastructure news, and in-depth buying guides. We track every electric car, bike, scooter, and commercial vehicle available in India, with verified ex-showroom prices, ARAI-certified range figures, variant comparisons, and city-wise on-road prices. Whether you are buying your first EV or upgrading, EV Radar gives you the accurate, unbiased information you need to make a confident decision.
+          </p>
+        </div>
+      </section>
+
       {/* Popular Guides — internal links to high-value SEO pages */}
       <section className="bg-gray-50 py-8">
         <div className="mx-auto max-w-7xl px-4">
