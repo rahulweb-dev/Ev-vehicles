@@ -5,7 +5,7 @@ export const metadata = {
   title:       "Data Deletion Instructions | EVRadar",
   description: "How to request deletion of your personal data from EVRadar.",
   alternates:  { canonical: `${SITE_URL}/data-deletion` },
-  robots:      { index: true, follow: true },
+  robots:      { index: false, follow: false },
   openGraph: {
     title: "Data Deletion Instructions | EVRadar",
     description: "How to request deletion of your personal data from EVRadar.",
