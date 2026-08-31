@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useEffect, useRef, useCallback } from 'react'
+
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Autoplay, Pagination } from 'swiper/modules'
 import {
@@ -267,22 +268,6 @@ function DesktopHero({ slides }) {
               <div className="relative h-full w-full overflow-hidden">
                 <Image src={slide.image} alt={slide.title} fill priority={i === 0}
                   className="object-cover" sizes="100vw" />
-                <div className="absolute inset-0 bg-linear-to-r from-black/80 via-black/50 to-black/10" />
-                <div className="absolute inset-0 flex items-center">
-                  <div className="mx-auto w-full max-w-7xl px-6 lg:px-10">
-                    <span className={`inline-block rounded-full ${slide.tagColor} px-4 py-1 text-xs font-black text-white mb-4 shadow`}>
-                      {slide.tag}
-                    </span>
-                    <h1 className="text-3xl lg:text-5xl font-black text-white leading-tight max-w-2xl">
-                      {slide.title}
-                    </h1>
-                    <p className="mt-3 text-base lg:text-lg text-white/70 max-w-xl">{slide.subtitle}</p>
-                    <Link href={slide.cta.href}
-                      className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#00a651] px-6 py-3 text-sm font-black text-white shadow-lg hover:bg-[#009245] hover:scale-105 transition-all">
-                      {slide.cta.label} <ChevronRight size={15} />
-                    </Link>
-                  </div>
-                </div>
               </div>
             </SwiperSlide>
           ))}
@@ -409,20 +394,6 @@ function MobileHero({ mobileSlides }) {
               <div className="relative h-full w-full overflow-hidden">
                 <Image src={slide.image} alt={slide.title} fill priority={i === 0}
                   className="object-cover" sizes="100vw" />
-                <div className="absolute inset-0 bg-linear-to-b from-black/20 via-black/40 to-black/80" />
-                <div className="absolute inset-0 flex flex-col items-center justify-end px-5 pb-12 text-center">
-                  {slide.tag && (
-                    <span className={`mb-3 inline-block rounded-full px-3 py-1 text-[11px] font-black text-white shadow ${slide.tagColor}`}>
-                      {slide.tag}
-                    </span>
-                  )}
-                  <h2 className="text-xl font-black leading-tight text-white sm:text-2xl">{slide.title}</h2>
-                  {slide.subtitle && <p className="mt-1.5 text-xs text-white/70 max-w-xs">{slide.subtitle}</p>}
-                  <Link href={slide.cta.href}
-                    className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-[#00a651] px-5 py-2.5 text-sm font-black text-white shadow-lg hover:bg-[#009245] active:scale-95 transition-all">
-                    {slide.cta.label} <ChevronRight size={14} />
-                  </Link>
-                </div>
               </div>
             </SwiperSlide>
           ))}
