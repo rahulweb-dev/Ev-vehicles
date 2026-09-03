@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element */
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const DEFAULT_FALLBACK = "/images/og-default.jpg";
 
@@ -23,6 +23,7 @@ export default function ArticleImage({
   const preferredSrc       = cleanSrc(src) || normalizedFallback;
 
   const [failedSources, setFailedSources] = useState([]);
+  const imgRef = useRef(null);
 
   const mainFailed     = failedSources.includes(preferredSrc);
   const fallbackFailed = failedSources.includes(normalizedFallback);
@@ -33,8 +34,6 @@ export default function ArticleImage({
     currentSrc = preferredSrc;
   } else if (normalizedFallback !== preferredSrc && !fallbackFailed) {
     currentSrc = normalizedFallback;
-  } else if (DEFAULT_FALLBACK !== normalizedFallback && DEFAULT_FALLBACK !== preferredSrc && !defaultFailed) {
-    currentSrc = DEFAULT_FALLBACK;
   } else if (!defaultFailed) {
     currentSrc = DEFAULT_FALLBACK;
   } else {
@@ -55,8 +54,22 @@ export default function ArticleImage({
     );
   }
 
+  // Detect images that failed BEFORE React hydrated (browser fired onerror
+  // before we could attach a listener — the broken state would stick forever).
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    const img = imgRef.current;
+    if (img && img.complete && img.naturalWidth === 0) {
+      handleError();
+    }
+  // Only run once on mount — intentionally no deps so we capture the
+  // initial currentSrc via closure for the pre-hydration failure case.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <img
+      ref={imgRef}
       src={currentSrc}
       alt={alt}
       className={className}
