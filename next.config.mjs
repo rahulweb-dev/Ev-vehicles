@@ -3,13 +3,8 @@ const nextConfig = {
   compress: true,
   images: {
     remotePatterns: [
-      { protocol: "https", hostname: "ik.imagekit.io" },
-      { protocol: "https", hostname: "*.imagekit.io" },
-      { protocol: "https", hostname: "img.youtube.com" },
-      { protocol: "https", hostname: "i.ytimg.com" },
-      { protocol: "https", hostname: "lh3.googleusercontent.com" },
-      { protocol: "https", hostname: "*.cloudinary.com" },
-      { protocol: "https", hostname: "images.unsplash.com" },
+      { protocol: "https", hostname: "**" },
+      { protocol: "http",  hostname: "**" },
     ],
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 2592000, // 30 days
