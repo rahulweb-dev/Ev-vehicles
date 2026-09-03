@@ -20,18 +20,24 @@ export default function ArticleImage({
   ...props
 }) {
   const normalizedFallback = cleanSrc(fallbackSrc) || DEFAULT_FALLBACK;
-  const preferredSrc = cleanSrc(src) || normalizedFallback;
+  const preferredSrc       = cleanSrc(src) || normalizedFallback;
+
   const [failedSources, setFailedSources] = useState([]);
-  const failedFallback = failedSources.includes(normalizedFallback);
-  const currentSrc = failedSources.includes(preferredSrc) ? normalizedFallback : preferredSrc;
 
-  function handleError() {
-    setFailedSources((prev) => (
-      prev.includes(currentSrc) ? prev : [...prev, currentSrc]
-    ));
-  }
+  const mainFailed     = failedSources.includes(preferredSrc);
+  const fallbackFailed = failedSources.includes(normalizedFallback);
+  const defaultFailed  = failedSources.includes(DEFAULT_FALLBACK);
 
-  if (failedFallback) {
+  let currentSrc;
+  if (!mainFailed) {
+    currentSrc = preferredSrc;
+  } else if (normalizedFallback !== preferredSrc && !fallbackFailed) {
+    currentSrc = normalizedFallback;
+  } else if (DEFAULT_FALLBACK !== normalizedFallback && DEFAULT_FALLBACK !== preferredSrc && !defaultFailed) {
+    currentSrc = DEFAULT_FALLBACK;
+  } else if (!defaultFailed) {
+    currentSrc = DEFAULT_FALLBACK;
+  } else {
     return (
       <div
         aria-label={alt}
@@ -40,6 +46,12 @@ export default function ArticleImage({
       >
         Image unavailable
       </div>
+    );
+  }
+
+  function handleError() {
+    setFailedSources((prev) =>
+      prev.includes(currentSrc) ? prev : [...prev, currentSrc]
     );
   }
 
