@@ -2,446 +2,600 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import {
-  Menu, X, ChevronDown, Search, Car, Bike, Truck,
-  BarChart2, Newspaper, Home, BookOpen, Mail,
-  Info, ArrowRight, Zap, ChevronRight, Calculator,
-  Leaf, MapPin, TrendingUp,
+  X, ChevronDown, Search, Car, Bike, Truck,
+  BarChart2, Newspaper, BookOpen, Mail, Info,
+  ArrowRight, Zap, ChevronRight, TrendingUp, Flame,
+  MapPin, Home, Star, Activity,
 } from 'lucide-react'
 import SearchModal from './SearchModal'
 import DarkModeToggle from './DarkModeToggle'
 import ArticleImage from '@/components/news/ArticleImage'
 
-function articleImageFallback() {
-  return '/images/og-default.jpg'
-}
-
-const DESKTOP_NAV = [
-  { title: 'Home', link: '/' },
+/* ─── Navigation data (Resources/Tools removed) ────────────────── */
+const NAV = [
+  { label: 'Home', href: '/' },
   {
-    title: 'News',
-    link: '/news',
-    dropdown: [
-      { name: 'All EV News',             href: '/news'                      },
-      { name: 'Electric Cars News',      href: '/news?category=cars'        },
-      { name: 'Electric Bikes News',     href: '/news?category=bikes'       },
-      { name: 'Commercial EVs News',     href: '/news?category=commercial'  },
-      { name: 'EV Charging News',        href: '/news?category=charging'    },
+    label: 'News', href: '/news',
+    mega: [
+      {
+        heading: 'By Category',
+        links: [
+          { name: 'All EV News',        href: '/news',                     icon: Newspaper, tag: 'Latest'   },
+          { name: 'Electric Cars',      href: '/news?category=cars',       icon: Car                        },
+          { name: 'Electric Bikes',     href: '/news?category=bikes',      icon: Bike                       },
+          { name: 'Commercial EVs',     href: '/news?category=commercial', icon: Truck                      },
+          { name: 'EV Charging',        href: '/news?category=charging',   icon: Zap                        },
+        ],
+      },
     ],
   },
   {
-    title: 'Vehicles',
-    link: '/cars',
-    dropdown: [
-      { name: 'Popular Electric Cars',  href: '/cars',       icon: Car  },
-      { name: 'Popular Electric Bikes', href: '/bikes',      icon: Bike },
-      { name: 'Commercial EVs',         href: '/commercial', icon: Zap  },
-    ],
-  },
-  { title: 'Compare', link: '/compare' },
-  {
-    title: 'EV Sales',
-    link: '/ev-sales',
-    dropdown: [
-      { name: 'EV Sales Dashboard',   href: '/ev-sales',            icon: TrendingUp },
-      { name: 'Electric Car Sales',   href: '/ev-sales/cars',       icon: Car        },
-      { name: 'Two-Wheeler Sales',    href: '/ev-sales/two-wheelers', icon: Bike     },
-      { name: 'Commercial EV Sales',  href: '/ev-sales/commercial', icon: Truck      },
-      { name: 'EV Market Share',      href: '/ev-market-share',     icon: BarChart2  },
-      { name: 'Top Selling EVs',      href: '/top-selling-evs',     icon: Zap        },
-      { name: 'State Adoption',       href: '/ev-adoption-states',  icon: MapPin     },
+    label: 'Vehicles', href: '/cars',
+    mega: [
+      {
+        heading: 'Browse',
+        links: [
+          { name: 'Electric Cars',    href: '/cars',       icon: Car,      tag: 'Popular' },
+          { name: 'Electric Bikes',   href: '/bikes',      icon: Bike                     },
+          { name: 'Commercial EVs',   href: '/commercial', icon: Truck                    },
+        ],
+      },
+      {
+        heading: 'Explore',
+        links: [
+          { name: 'Compare EVs',      href: '/compare',    icon: BarChart2, tag: 'New'   },
+          { name: 'Top Selling EVs',  href: '/top-selling-evs', icon: Flame             },
+        ],
+      },
     ],
   },
   {
-    title: 'Tools',
-    link: '/emi-calculator',
-    dropdown: [
-      { name: 'EMI Calculator',         href: '/emi-calculator',  icon: Calculator },
-      { name: 'EV vs Petrol Savings',   href: '/ev-vs-petrol',    icon: Leaf       },
-      { name: 'State EV Subsidies',     href: '/ev-subsidy',      icon: MapPin     },
-      { name: 'EV Glossary',            href: '/ev-glossary',     icon: BookOpen   },
+    label: 'EV Sales', href: '/ev-sales',
+    mega: [
+      {
+        heading: 'Sales Data',
+        links: [
+          { name: 'Sales Dashboard',     href: '/ev-sales',                 icon: Activity,  tag: 'Live' },
+          { name: 'Electric Car Sales',  href: '/ev-sales/cars',            icon: Car                   },
+          { name: 'Two-Wheeler Sales',   href: '/ev-sales/two-wheelers',    icon: Bike                  },
+          { name: 'Commercial EV Sales', href: '/ev-sales/commercial',      icon: Truck                 },
+        ],
+      },
+      {
+        heading: 'Insights',
+        links: [
+          { name: 'EV Market Share',    href: '/ev-market-share',      icon: BarChart2              },
+          { name: 'Top Selling EVs',    href: '/top-selling-evs',      icon: Flame,  tag: 'Hot'    },
+          { name: 'State Adoption',     href: '/ev-adoption-states',   icon: MapPin                 },
+        ],
+      },
     ],
   },
-  { title: 'Blogs',   link: '/blogs'   },
-  { title: 'About',   link: '/about'   },
-  { title: 'Contact', link: '/contact' },
+  { label: 'Compare', href: '/compare', cta: true },
+  { label: 'Blogs',   href: '/blogs'   },
+  { label: 'About',   href: '/about'   },
+  { label: 'Contact', href: '/contact' },
 ]
 
-const MOBILE_QUICK = [
-  { label: 'Cars',     href: '/cars',      icon: Car,        color: 'bg-blue-50 text-blue-600'   },
-  { label: 'Bikes',    href: '/bikes',     icon: Bike,       color: 'bg-orange-50 text-orange-600' },
-  { label: 'EV Sales', href: '/ev-sales',  icon: TrendingUp, color: 'bg-green-50 text-green-600' },
-  { label: 'News',     href: '/news',      icon: Newspaper,  color: 'bg-red-50 text-red-600'     },
+const MOBILE_SECTIONS = [
+  { title: 'Explore', items: [
+    { label: 'Home',           href: '/',             icon: Home       },
+    { label: 'Latest News',    href: '/news',         icon: Newspaper  },
+    { label: 'Blogs',          href: '/blogs',        icon: BookOpen   },
+  ]},
+  { title: 'Vehicles', items: [
+    { label: 'Electric Cars',  href: '/cars',         icon: Car        },
+    { label: 'Electric Bikes', href: '/bikes',        icon: Bike       },
+    { label: 'Commercial EVs', href: '/commercial',   icon: Truck      },
+    { label: 'Compare EVs',    href: '/compare',      icon: BarChart2, accent: true },
+  ]},
+  { title: 'EV Data', items: [
+    { label: 'Sales Dashboard',   href: '/ev-sales',             icon: TrendingUp },
+    { label: 'EV Market Share',   href: '/ev-market-share',      icon: BarChart2  },
+    { label: 'Top Selling EVs',   href: '/top-selling-evs',      icon: Flame      },
+    { label: 'State Adoption',    href: '/ev-adoption-states',   icon: MapPin     },
+  ]},
+  { title: 'Company', items: [
+    { label: 'About Us',  href: '/about',   icon: Info },
+    { label: 'Contact',   href: '/contact', icon: Mail },
+  ]},
 ]
 
-const MOBILE_NAV = [
-  { title: 'Home', href: '/', icon: Home },
-  { title: 'Electric Cars', href: '/cars', icon: Car },
-  { title: 'Electric Bikes', href: '/bikes', icon: Bike },
-  { title: 'Compare Vehicles', href: '/compare', icon: BarChart2 },
-  { title: 'EV Sales Data',   href: '/ev-sales', icon: TrendingUp },
-  { title: 'EV Market Share', href: '/ev-market-share', icon: BarChart2 },
-  { title: 'Top Selling EVs', href: '/top-selling-evs', icon: Zap },
-  { title: 'Latest News', href: '/news', icon: Newspaper },
-  { title: 'EMI Calculator', href: '/emi-calculator', icon: Calculator },
-  { title: 'EV vs Petrol', href: '/ev-vs-petrol', icon: Leaf },
-  { title: 'State Subsidies', href: '/ev-subsidy', icon: MapPin },
-  { title: 'EV Glossary', href: '/ev-glossary', icon: BookOpen },
-  { title: 'Blogs', href: '/blogs', icon: BookOpen },
-  { title: 'About Us', href: '/about', icon: Info },
-  { title: 'Contact', href: '/contact', icon: Mail },
+const QUICK_TILES = [
+  { label: 'Cars',     href: '/cars',     icon: Car,        bg: 'bg-blue-600'   },
+  { label: 'Bikes',    href: '/bikes',    icon: Bike,       bg: 'bg-orange-500' },
+  { label: 'Sales',    href: '/ev-sales', icon: TrendingUp, bg: 'bg-green-600'  },
+  { label: 'News',     href: '/news',     icon: Newspaper,  bg: 'bg-rose-600'   },
 ]
 
-/* ─── Mobile Inline Search — queries live API ───────────────────── */
+/* ─── Inline mobile search ──────────────────────────────────────── */
 function MobileSearch({ onClose }) {
-  const [query,   setQuery]   = useState('')
-  const [results, setResults] = useState([])
-  const [busy,    setBusy]    = useState(false)
-  const inputRef = useRef(null)
-  const timerRef = useRef(null)
+  const [q,   setQ]   = useState('')
+  const [res, setRes] = useState([])
+  const [busy, setBusy] = useState(false)
+  const ref   = useRef(null)
+  const timer = useRef(null)
 
-  useEffect(() => { inputRef.current?.focus() }, [])
+  useEffect(() => { ref.current?.focus() }, [])
 
-  function handleChange(e) {
-    const val = e.target.value
-    setQuery(val)
-    clearTimeout(timerRef.current)
-    if (!val.trim()) { setResults([]); return }
-    timerRef.current = setTimeout(async () => {
+  const search = useCallback((val) => {
+    clearTimeout(timer.current)
+    if (!val.trim()) { setRes([]); return }
+    timer.current = setTimeout(async () => {
       setBusy(true)
       try {
         const enc = encodeURIComponent(val)
-        const [vRes, aRes] = await Promise.all([
+        const [vR, aR] = await Promise.all([
           fetch(`/api/vehicles?search=${enc}&status=published&limit=5`).then(r => r.json()),
           fetch(`/api/articles?search=${enc}&status=published&limit=3`).then(r => r.json()),
         ])
-        const vehicles = (vRes.vehicles || []).map(v => ({
+        const vehicles = (vR.vehicles || []).map(v => ({
           kind: 'vehicle', id: v._id, slug: v.slug,
-          vehicleType: v.vehicleType === 'car' ? 'cars' : 'bikes',
+          type: v.vehicleType === 'car' ? 'cars' : 'bikes',
           name: v.name, brand: v.brand, image: v.featuredImage || '',
-          price: v.variants?.[0]?.exShowroomPrice || 'Price TBA',
+          price: v.variants?.[0]?.exShowroomPrice || '',
         }))
-        const articles = (aRes.articles || []).map(a => ({
-          kind: 'article', id: a._id, slug: a.slug,
-          name: a.title, brand: a.category, image: a.image || '',
-          vehicleType: 'news',
+        const articles = (aR.articles || []).map(a => ({
+          kind: 'article', id: a._id, slug: a.slug, type: 'news',
+          name: a.title, brand: a.category || 'EV News', image: a.image || '',
         }))
-        setResults([...vehicles, ...articles].slice(0, 7))
-      } catch { setResults([]) }
+        setRes([...vehicles, ...articles].slice(0, 8))
+      } catch { setRes([]) }
       setBusy(false)
-    }, 320)
-  }
+    }, 300)
+  }, [])
 
   return (
-    <div className="px-4 pb-3 pt-1">
-      <div className="flex items-center gap-2 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 focus-within:border-green-400 focus-within:bg-white transition">
-        <Search size={18} className="text-gray-400 shrink-0" />
-        <input ref={inputRef} type="text" value={query} onChange={handleChange}
-          placeholder="Search EV cars, bikes, news…"
-          className="flex-1 bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-400" />
-        {query && <button aria-label="Clear search" onClick={() => { setQuery(''); setResults([]) }} className="shrink-0 text-gray-400"><X size={15} /></button>}
+    <div className="px-4 pb-4">
+      <div className="flex items-center gap-2.5 rounded-xl border-2 border-green-500/40 bg-gray-50 px-4 py-2.5 focus-within:border-green-500 focus-within:bg-white transition-all">
+        <Search size={15} className="shrink-0 text-green-500" />
+        <input
+          ref={ref}
+          value={q}
+          onChange={e => { setQ(e.target.value); search(e.target.value) }}
+          placeholder="Search EVs, news, brands…"
+          className="flex-1 bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-400"
+        />
+        {q && (
+          <button onClick={() => { setQ(''); setRes([]) }}
+            className="rounded-full p-0.5 text-gray-400 hover:text-gray-600">
+            <X size={13} />
+          </button>
+        )}
       </div>
 
-      {busy && <p className="mt-2 text-center text-xs text-gray-400">Searching…</p>}
+      {busy && (
+        <div className="mt-3 flex justify-center gap-1">
+          {[0, 1, 2].map(i => (
+            <span key={i} className="h-1.5 w-1.5 rounded-full bg-green-500 animate-bounce"
+              style={{ animationDelay: `${i * 120}ms` }} />
+          ))}
+        </div>
+      )}
 
-      {!busy && results.length > 0 && (
-        <div className="mt-2 rounded-2xl border border-gray-100 bg-white shadow-lg overflow-hidden">
-          {results.map((v) => (
-            <Link key={`${v.kind}-${v.id}`}
-              href={v.kind === 'article' ? `/news/${v.slug}` : `/${v.vehicleType}/${v.slug}`}
+      {!busy && res.length > 0 && (
+        <div className="mt-2.5 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-lg">
+          {res.map(item => (
+            <Link
+              key={`${item.kind}-${item.id}`}
+              href={item.kind === 'article' ? `/news/${item.slug}` : `/${item.type}/${item.slug}`}
               onClick={onClose}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 border-b border-gray-50 last:border-0 transition">
-              <div className="relative h-11 w-16 shrink-0 overflow-hidden rounded-xl bg-gray-100">
-                {v.kind === 'article' ? (
-                  <ArticleImage
-                    src={v.image}
-                    fallbackSrc={articleImageFallback(v)}
-                    alt={v.name}
-                    className="h-full w-full object-cover"
-                  />
-                ) : v.image ? (
-                  <Image src={v.image} alt={v.name} fill className="object-cover" sizes="64px" />
-                ) : (
-                  <div className="flex h-full items-center justify-center text-xl text-gray-300">⚡</div>
-                )}
+              className="flex items-center gap-3 border-b border-gray-50 px-4 py-3 last:border-0 hover:bg-green-50 transition"
+            >
+              <div className="relative h-10 w-14 shrink-0 overflow-hidden rounded-lg bg-gray-100">
+                {item.kind === 'article'
+                  ? <ArticleImage src={item.image} fallbackSrc="/images/og-default.jpg" alt={item.name} className="h-full w-full object-cover" />
+                  : item.image
+                    ? <Image src={item.image} alt={item.name} fill className="object-cover" sizes="56px" />
+                    : <div className="flex h-full items-center justify-center text-gray-300"><Zap size={16} /></div>
+                }
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-semibold text-green-600 capitalize">{v.brand}</p>
-                <p className="text-sm font-bold text-gray-800 truncate">{v.name}</p>
-                {v.price && <p className="text-xs text-gray-400">{v.price}</p>}
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] font-black uppercase tracking-wider text-green-600">{item.brand}</p>
+                <p className="truncate text-[13px] font-semibold text-gray-800">{item.name}</p>
+                {item.price && <p className="text-[11px] text-gray-400">{item.price}</p>}
               </div>
-              <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                v.kind === 'article' ? 'bg-yellow-50 text-yellow-700'
-                : v.vehicleType === 'cars' ? 'bg-blue-50 text-blue-600' : 'bg-orange-50 text-orange-600'
+              <span className={`shrink-0 rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wide ${
+                item.kind === 'article' ? 'bg-amber-50 text-amber-600'
+                : item.type === 'cars' ? 'bg-blue-50 text-blue-600'
+                : 'bg-orange-50 text-orange-600'
               }`}>
-                {v.kind === 'article' ? 'News' : v.vehicleType === 'cars' ? 'Car' : 'Bike'}
+                {item.kind === 'article' ? 'News' : item.type === 'cars' ? 'Car' : 'Bike'}
               </span>
             </Link>
           ))}
         </div>
       )}
-
-      {!busy && query && results.length === 0 && (
-        <p className="mt-3 text-center text-sm text-gray-400">No results for &quot;{query}&quot;</p>
+      {!busy && q && res.length === 0 && (
+        <p className="mt-4 text-center text-sm text-gray-400">No results for &quot;{q}&quot;</p>
       )}
     </div>
   )
 }
 
-/* ─── Main Navbar ──────────────────────────────────────────────────── */
+/* ─── Mega-menu dropdown ────────────────────────────────────────── */
+function MegaMenu({ item }) {
+  return (
+    <div className="absolute left-1/2 top-full z-50 mt-0 -translate-x-1/2 pt-3
+      opacity-0 translate-y-2 invisible pointer-events-none
+      group-hover:opacity-100 group-hover:translate-y-0 group-hover:visible group-hover:pointer-events-auto
+      transition-all duration-200 ease-out">
+
+      {/* Triangle tip */}
+      <div className="mx-auto mb-0 h-2.5 w-5 overflow-hidden relative" style={{ marginLeft: 'calc(50% - 10px)' }}>
+        <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 h-3 w-3 rotate-45 border border-gray-100 bg-white shadow-sm" />
+      </div>
+
+      <div className="rounded-2xl border border-gray-100 bg-white shadow-2xl shadow-black/10 overflow-hidden"
+        style={{ minWidth: item.mega.length > 1 ? '480px' : '240px' }}>
+
+        {/* Top accent */}
+        <div className="h-0.5 w-full bg-gradient-to-r from-green-400 via-emerald-500 to-green-600" />
+
+        <div className={`p-3 ${item.mega.length > 1 ? 'grid grid-cols-2 gap-1 divide-x divide-gray-50' : ''}`}>
+          {item.mega.map((col, ci) => (
+            <div key={ci} className={ci > 0 ? 'pl-3' : ''}>
+              <p className="mb-1 px-2.5 pt-1 pb-2 text-[9px] font-black uppercase tracking-[0.12em] text-gray-400">
+                {col.heading}
+              </p>
+              <div className="space-y-0.5">
+                {col.links.map((link, li) => (
+                  <Link
+                    key={li}
+                    href={link.href}
+                    className="group/link flex items-center gap-3 rounded-xl px-2.5 py-2 transition hover:bg-green-50"
+                  >
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500 transition group-hover/link:bg-green-100 group-hover/link:text-green-600">
+                      <link.icon size={13} />
+                    </span>
+                    <span className="flex-1 text-[13px] font-medium text-gray-700 group-hover/link:text-green-700 transition leading-snug whitespace-nowrap">
+                      {link.name}
+                    </span>
+                    {link.tag && (
+                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-[9px] font-black text-green-700">
+                        {link.tag}
+                      </span>
+                    )}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Footer "view all" */}
+        <div className="border-t border-gray-50 bg-gray-50/80 px-5 py-2.5">
+          <Link href={item.href}
+            className="flex items-center gap-1.5 text-[11px] font-bold text-green-600 hover:text-green-700 transition">
+            View all {item.label} <ArrowRight size={11} />
+          </Link>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ─── Desktop nav item ──────────────────────────────────────────── */
+function NavItem({ item, active }) {
+  const isCta = item.cta
+
+  if (isCta) {
+    return (
+      <Link href={item.href}
+        className="flex items-center gap-1.5 rounded-lg border-2 border-green-600 px-3.5 py-1.5 text-[12.5px] font-black text-green-700 transition hover:bg-green-600 hover:text-white active:scale-95">
+        <BarChart2 size={13} />
+        {item.label}
+      </Link>
+    )
+  }
+
+  return (
+    <div className="group relative">
+      <Link
+        href={item.href}
+        className={`relative flex items-center gap-1 rounded-lg px-3 py-2 text-[13px] font-semibold transition-all
+          ${active
+            ? 'text-green-700'
+            : 'text-gray-600 hover:text-green-700 hover:bg-green-50/70'
+          }`}
+      >
+        {item.label}
+        {item.mega && (
+          <ChevronDown size={12} className="mt-px text-gray-400 transition-transform duration-200 group-hover:rotate-180 group-hover:text-green-600" />
+        )}
+        {/* active indicator dot */}
+        {active && (
+          <span className="absolute bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-green-600" />
+        )}
+      </Link>
+
+      {item.mega && <MegaMenu item={item} />}
+    </div>
+  )
+}
+
+/* ─── Main Navbar ───────────────────────────────────────────────── */
 export default function Navbar() {
   const [mobileOpen,   setMobileOpen]   = useState(false)
   const [mobileSearch, setMobileSearch] = useState(false)
+  const [scrolled,     setScrolled]     = useState(false)
   const [trending,     setTrending]     = useState([])
+  const [tickerIdx,    setTickerIdx]    = useState(0)
 
-  const closeMenu = () => { setMobileOpen(false); setMobileSearch(false) }
+  const closeMenu = useCallback(() => { setMobileOpen(false); setMobileSearch(false) }, [])
 
-  // Fetch 3 latest published articles for trending bar
+  /* scroll shadow */
   useEffect(() => {
-    fetch('/api/articles?status=published&limit=3')
-      .then(r => r.json())
-      .then(data => {
-        const arts = data.articles || []
-        if (arts.length > 0) setTrending(arts.map(a => ({ title: a.title, slug: a.slug })))
-      })
-      .catch(() => {})
+    const fn = () => setScrolled(window.scrollY > 4)
+    window.addEventListener('scroll', fn, { passive: true })
+    return () => window.removeEventListener('scroll', fn)
   }, [])
 
-  // Lock scroll when mobile menu is open
+  /* lock body when drawer open */
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
   }, [mobileOpen])
 
+  /* fetch trending articles for ticker */
+  useEffect(() => {
+    fetch('/api/articles?status=published&limit=5')
+      .then(r => r.json())
+      .then(d => { if (d.articles?.length) setTrending(d.articles.map(a => ({ title: a.title, slug: a.slug }))) })
+      .catch(() => {})
+  }, [])
+
+  /* rotate ticker every 4 s */
+  useEffect(() => {
+    if (!trending.length) return
+    const t = setInterval(() => setTickerIdx(i => (i + 1) % trending.length), 4000)
+    return () => clearInterval(t)
+  }, [trending])
+
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/95 backdrop-blur-xl">
-        {/* Top Ticker Bar */}
-        <div className="border-b border-gray-100 bg-gray-950 text-white">
-          <div className="mx-auto flex h-9 max-w-7xl items-center justify-between px-4 text-xs">
-            <p className="flex items-center gap-2 text-gray-300">
-              <span className="text-yellow-400">⚡</span>
-              <span className="hidden sm:inline">Trending: </span>
-              {trending.length > 0 ? (
-                <span className="hidden sm:inline">
-                  {trending.map((a, i) => (
-                    <span key={a.slug}>
-                      {i > 0 && ' • '}
-                      <Link href={`/news/${a.slug}`}
-                        className="hover:text-green-400 transition line-clamp-1 max-w-48 inline-block align-bottom truncate">
-                        {a.title.length > 30 ? a.title.slice(0, 30) + '…' : a.title}
-                      </Link>
-                    </span>
-                  ))}
-                </span>
-              ) : (
-                <span className="hidden sm:inline text-gray-500">Latest EV News &amp; Launches</span>
-              )}
-              <span className="sm:hidden text-gray-400">EV News India</span>
-            </p>
-            <span className="animate-pulse rounded-full bg-red-500 px-2.5 py-0.5 text-[10px] font-bold tracking-wide">
-              LIVE
-            </span>
+      {/* ════════════════════════════════════════════════════════
+          HEADER
+      ════════════════════════════════════════════════════════ */}
+      <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+        scrolled ? 'shadow-lg shadow-black/8' : ''
+      }`}>
+
+        {/* ── Ticker bar ──────────────────────────────────────── */}
+        <div className="bg-gray-950 text-white">
+          <div className="mx-auto flex h-8 max-w-7xl items-center justify-between gap-4 px-4">
+
+            {/* Left: label + rotating headline */}
+            <div className="flex min-w-0 items-center gap-2.5">
+              <span className="flex shrink-0 items-center gap-1 rounded-sm bg-green-600 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-white">
+                <Zap size={8} />LIVE
+              </span>
+              <div className="relative h-4 min-w-0 flex-1 overflow-hidden">
+                {trending.length > 0 ? (
+                  <div
+                    key={tickerIdx}
+                    className="animate-ticker-in whitespace-nowrap text-[11px] text-gray-300"
+                  >
+                    <Link href={`/news/${trending[tickerIdx]?.slug}`}
+                      className="hover:text-green-400 transition">
+                      {trending[tickerIdx]?.title}
+                    </Link>
+                  </div>
+                ) : (
+                  <span className="text-[11px] text-gray-500">India&apos;s #1 Electric Vehicle News Platform</span>
+                )}
+              </div>
+            </div>
+
+            {/* Right: dots */}
+            {trending.length > 1 && (
+              <div className="flex shrink-0 items-center gap-1">
+                {trending.map((_, i) => (
+                  <button key={i} onClick={() => setTickerIdx(i)}
+                    className={`h-1 rounded-full transition-all duration-300 ${i === tickerIdx ? 'w-4 bg-green-500' : 'w-1 bg-white/20 hover:bg-white/40'}`} />
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Main Bar */}
-        <nav className="mx-auto flex h-16.5 max-w-7xl items-center justify-between px-4">
-          {/* Logo */}
-          <Link href="/" className="flex items-center shrink-0">
-            <Image
-              src="/images/logo.png"
-              alt="EV News India"
-              height={34}
-              width={129}
-              className="object-contain"
-              priority
-            />
-          </Link>
+        {/* ── Main nav ────────────────────────────────────────── */}
+        <div className={`border-b transition-all duration-300 ${
+          scrolled
+            ? 'border-gray-200/60 bg-white/95 backdrop-blur-2xl'
+            : 'border-gray-100 bg-white'
+        }`}>
+          <nav className="mx-auto flex h-[60px] max-w-7xl items-center justify-between px-4">
 
-          {/* Desktop Nav Links */}
-          <div className="hidden items-center gap-3 xl:flex">
-            {DESKTOP_NAV.map((item, i) => (
-              <div key={i} className="group relative">
-                <Link
-                  href={item.link}
-                  className={`flex items-center gap-1 text-[12.5px] font-semibold transition
-                    ${item.title === 'Compare'
-                      ? 'rounded-full border border-green-200 bg-green-50 px-3 py-1.5 text-green-700 hover:bg-green-100'
-                      : item.title === 'EV Sales'
-                      ? 'text-green-700 hover:text-green-800'
-                      : 'text-gray-700 hover:text-green-600'
-                    }`}
-                >
-                  {item.title === 'Compare' && <BarChart2 size={13} />}
-                  {item.title === 'EV Sales' && <TrendingUp size={13} />}
-                  {item.title}
-                  {item.dropdown && item.title !== 'Compare' && (
-                    <ChevronDown size={13} className="transition duration-300 group-hover:rotate-180" />
-                  )}
-                </Link>
-
-                {item.title !== 'Compare' && (
-                  <span className="absolute -bottom-1 left-0 h-0.5 w-0 bg-green-600 transition-all duration-300 group-hover:w-full" />
-                )}
-
-                {item.dropdown && (
-                  <div className={`invisible absolute top-9 translate-y-2 rounded-2xl border border-gray-100 bg-white p-2 opacity-0 shadow-2xl transition-all duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 z-50
-                    ${item.title === 'EV Sales' ? 'left-0 w-64' : 'left-0 w-58'}`}>
-                    {item.dropdown.map((drop, di) => (
-                      <Link
-                        key={di}
-                        href={drop.href}
-                        className="flex items-center gap-2.5 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-green-50 hover:text-green-700"
-                      >
-                        {drop.icon && <drop.icon size={15} className="text-green-500" />}
-                        {drop.name}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* Desktop Right */}
-          <div className="hidden items-center gap-2.5 xl:flex">
-            <SearchModal />
-            <DarkModeToggle />
-            <Link
-              href="/news"
-              className="rounded-full bg-green-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg transition hover:bg-green-700"
-            >
-              Latest News
+            {/* Logo */}
+            <Link href="/" className="shrink-0">
+              <Image
+                src="/images/logo.png"
+                alt="EVRadar — India's #1 EV News"
+                width={118}
+                height={32}
+                className="h-8 w-auto object-contain"
+                priority
+              />
             </Link>
-          </div>
 
-          {/* Mobile Right Buttons */}
-          <div className="flex items-center gap-2 xl:hidden">
-            <DarkModeToggle />
-            {/* Mobile Search Icon */}
-            <button
-              onClick={() => { setMobileSearch(!mobileSearch); setMobileOpen(true) }}
-              aria-label="Search"
-              className="flex h-9 w-9 items-center justify-center rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 transition"
-            >
-              <Search size={18} />
-            </button>
-
-            {/* Hamburger */}
-            <button
-              onClick={() => { setMobileOpen(!mobileOpen); setMobileSearch(false) }}
-              aria-label="Toggle menu"
-              className="flex h-9 w-9 items-center justify-center rounded-xl bg-gray-100 text-gray-600 hover:bg-gray-200 transition"
-            >
-              {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
-          </div>
-        </nav>
-      </header>
-
-      {/* ── Mobile Drawer ────────────────────────────────────────────── */}
-      {mobileOpen && (
-        <div className="fixed inset-0 z-150 xl:hidden">
-          {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={closeMenu} />
-
-          {/* Drawer panel */}
-          <div className="absolute inset-y-0 right-0 flex w-full max-w-85 flex-col bg-white shadow-2xl">
-
-            {/* ── Green gradient header ────────────────────────────── */}
-            <div className="bg-linear-to-br from-green-900 via-green-800 to-green-700 px-5 py-5 shrink-0">
-              <div className="flex items-center justify-between mb-3">
-                <Link href="/" onClick={closeMenu} className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-white/20">
-                    <Zap size={16} className="text-white" />
-                  </div>
-                  <span className="text-base font-black text-white">EV News India</span>
-                </Link>
-                <button onClick={closeMenu} aria-label="Close menu"
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/30 active:scale-95 transition">
-                  <X size={17} />
-                </button>
-              </div>
-              <p className="text-[11px] text-green-200 flex items-center gap-1.5">
-                <span className="inline-block h-1.5 w-1.5 rounded-full bg-red-400 animate-pulse" />
-                India&apos;s #1 Electric Vehicle Platform
-              </p>
+            {/* Desktop links */}
+            <div className="hidden items-center gap-0.5 xl:flex">
+              {NAV.map((item, i) => (
+                <NavItem key={i} item={item} />
+              ))}
             </div>
 
-            {/* ── Scrollable body ──────────────────────────────────── */}
-            <div className="flex-1 overflow-y-auto">
+            {/* Desktop right */}
+            <div className="hidden items-center gap-2 xl:flex">
+              <SearchModal />
+              <DarkModeToggle />
+              <Link
+                href="/news"
+                className="group flex items-center gap-1.5 rounded-xl bg-green-600 px-4 py-2 text-[13px] font-black text-white shadow-md shadow-green-600/20 transition hover:bg-green-700 hover:shadow-green-600/30 active:scale-95"
+              >
+                <Flame size={13} className="transition group-hover:scale-110" />
+                Latest News
+              </Link>
+            </div>
 
-              {/* Search */}
-              <div className="border-b border-gray-100 py-2">
-                {mobileSearch
-                  ? <MobileSearch onClose={closeMenu} />
-                  : (
-                    <button
-                      onClick={() => setMobileSearch(true)}
-                      className="mx-4 my-2 flex w-[calc(100%-2rem)] items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-400 hover:border-green-400 hover:bg-white transition"
+            {/* Mobile right */}
+            <div className="flex items-center gap-2 xl:hidden">
+              <DarkModeToggle />
+              <button
+                onClick={() => { setMobileSearch(s => !s); if (!mobileOpen) setMobileOpen(true) }}
+                aria-label="Search"
+                className="flex h-9 w-9 items-center justify-center rounded-xl bg-gray-100 text-gray-600 hover:bg-green-50 hover:text-green-600 transition"
+              >
+                <Search size={17} />
+              </button>
+              <button
+                onClick={() => { setMobileOpen(o => !o); setMobileSearch(false) }}
+                aria-label="Menu"
+                className={`relative flex h-9 w-9 flex-col items-center justify-center gap-1.5 rounded-xl transition ${
+                  mobileOpen ? 'bg-gray-900' : 'bg-gray-100 hover:bg-gray-200'
+                }`}
+              >
+                <span className={`block h-[1.5px] w-5 origin-center rounded-full transition-all duration-300 ${mobileOpen ? 'translate-y-[4.5px] rotate-45 bg-white' : 'bg-gray-700'}`} />
+                <span className={`block h-[1.5px] rounded-full transition-all duration-300 ${mobileOpen ? 'w-0 opacity-0 bg-white' : 'w-5 bg-gray-700'}`} />
+                <span className={`block h-[1.5px] w-5 origin-center rounded-full transition-all duration-300 ${mobileOpen ? '-translate-y-[4.5px] -rotate-45 bg-white' : 'bg-gray-700'}`} />
+              </button>
+            </div>
+          </nav>
+        </div>
+      </header>
+
+      {/* ════════════════════════════════════════════════════════
+          MOBILE DRAWER
+      ════════════════════════════════════════════════════════ */}
+      {/* Backdrop */}
+      <div
+        onClick={closeMenu}
+        className={`fixed inset-0 z-[140] bg-black/60 backdrop-blur-sm transition-opacity duration-300 xl:hidden ${
+          mobileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+      />
+
+      {/* Drawer panel */}
+      <div className={`fixed inset-y-0 right-0 z-[150] flex w-full max-w-[340px] flex-col bg-white shadow-2xl transition-transform duration-300 ease-out xl:hidden ${
+        mobileOpen ? 'translate-x-0' : 'translate-x-full'
+      }`}>
+
+        {/* ── Drawer header ─────────────────────────────────── */}
+        <div className="relative shrink-0 overflow-hidden">
+          {/* BG */}
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-green-950 to-gray-900" />
+          {/* decorative circles */}
+          <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-green-500/10" />
+          <div className="absolute right-4 top-16 h-20 w-20 rounded-full bg-green-500/10" />
+
+          <div className="relative px-5 pt-5 pb-6">
+            <div className="flex items-center justify-between">
+              <Link href="/" onClick={closeMenu} className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-green-600 shadow-lg shadow-green-900/40">
+                  <Zap size={18} className="text-white" />
+                </div>
+                <div>
+                  <p className="text-[15px] font-black text-white">EV News India</p>
+                  <p className="text-[10px] text-green-400">evradar.in</p>
+                </div>
+              </Link>
+              <button onClick={closeMenu} aria-label="Close"
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 active:scale-95 transition">
+                <X size={15} />
+              </button>
+            </div>
+
+            <div className="mt-4 flex items-center gap-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
+              <p className="text-[11px] text-gray-400">India&apos;s #1 Electric Vehicle Platform</p>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Scrollable body ───────────────────────────────── */}
+        <div className="flex-1 overflow-y-auto bg-gray-50">
+
+          {/* Search */}
+          <div className="bg-white border-b border-gray-100 px-4 py-3">
+            {mobileSearch
+              ? <MobileSearch onClose={closeMenu} />
+              : (
+                <button onClick={() => setMobileSearch(true)}
+                  className="flex w-full items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-[13px] text-gray-400 hover:border-green-400 hover:bg-white transition">
+                  <Search size={14} className="text-gray-400" />
+                  Search cars, bikes, news…
+                </button>
+              )
+            }
+          </div>
+
+          {/* Quick tiles */}
+          <div className="bg-white border-b border-gray-100 px-4 py-4">
+            <p className="mb-3 text-[9px] font-black uppercase tracking-[0.15em] text-gray-400">Quick Access</p>
+            <div className="grid grid-cols-4 gap-2">
+              {QUICK_TILES.map(({ label, href, icon: Icon, bg }) => (
+                <Link key={label} href={href} onClick={closeMenu}
+                  className={`flex flex-col items-center gap-1.5 rounded-2xl ${bg} py-4 text-white shadow-sm active:scale-95 transition`}>
+                  <Icon size={18} />
+                  <span className="text-[10px] font-black leading-none">{label}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Sectioned links */}
+          <div className="space-y-3 p-4">
+            {MOBILE_SECTIONS.map(({ title, items }) => (
+              <div key={title}>
+                <p className="mb-1.5 px-1 text-[9px] font-black uppercase tracking-[0.15em] text-gray-400">{title}</p>
+                <div className="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100">
+                  {items.map(({ label, href, icon: Icon, accent }, idx) => (
+                    <Link key={href} href={href} onClick={closeMenu}
+                      className={`group flex items-center gap-3 px-4 py-3.5 transition active:scale-[0.98] ${
+                        idx < items.length - 1 ? 'border-b border-gray-50' : ''
+                      } ${accent
+                        ? 'bg-green-50 hover:bg-green-100 text-green-700'
+                        : 'hover:bg-gray-50 text-gray-700 hover:text-green-700'
+                      }`}
                     >
-                      <Search size={15} className="shrink-0" />
-                      Search EV cars, bikes, brands…
-                    </button>
-                  )
-                }
-              </div>
-
-              {/* Quick access — 4 icon tiles */}
-              <div className="px-4 py-4 border-b border-gray-100">
-                <p className="mb-3 text-[10px] font-black uppercase tracking-widest text-gray-400">Quick Access</p>
-                <div className="grid grid-cols-4 gap-2">
-                  {MOBILE_QUICK.map(({ label, href, icon: Icon, color }) => (
-                    <Link key={label} href={href} onClick={closeMenu}
-                      className={`flex flex-col items-center gap-2 rounded-2xl ${color} py-3.5 transition active:scale-95 hover:opacity-90`}>
-                      <Icon size={20} />
-                      <span className="text-[11px] font-bold leading-none">{label}</span>
+                      <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition ${
+                        accent
+                          ? 'bg-green-100 text-green-600'
+                          : 'bg-gray-100 text-gray-500 group-hover:bg-green-50 group-hover:text-green-600'
+                      }`}>
+                        <Icon size={14} />
+                      </span>
+                      <span className="flex-1 text-[13.5px] font-semibold">{label}</span>
+                      {accent
+                        ? <Star size={11} className="text-green-500 fill-green-500" />
+                        : <ChevronRight size={13} className="text-gray-300 group-hover:text-green-400 transition" />
+                      }
                     </Link>
                   ))}
                 </div>
               </div>
-
-              {/* Navigation links */}
-              <div className="px-4 py-3">
-                <p className="mb-2 px-1 text-[10px] font-black uppercase tracking-widest text-gray-400">Navigation</p>
-                <nav className="space-y-0.5">
-                  {MOBILE_NAV.map(({ title, href, icon: Icon }) => {
-                    const isCompare = href === '/compare'
-                    return (
-                      <Link key={href} href={href} onClick={closeMenu}
-                        className={`group flex items-center gap-3 rounded-xl px-3 py-3 text-[13.5px] font-semibold transition active:scale-[0.98] ${
-                          isCompare ? 'bg-green-50 text-green-700 hover:bg-green-100' : 'text-gray-700 hover:bg-gray-50 hover:text-green-600'
-                        }`}>
-                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-xl transition ${
-                          isCompare ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500 group-hover:bg-green-50 group-hover:text-green-500'
-                        }`}>
-                          <Icon size={15} />
-                        </span>
-                        <span className="flex-1">{title}</span>
-                        <ChevronRight size={13} className="text-gray-300 group-hover:text-green-400 transition" />
-                      </Link>
-                    )
-                  })}
-                </nav>
-              </div>
-            </div>
-
-            {/* ── Footer CTAs ──────────────────────────────────────── */}
-            <div className="shrink-0 border-t border-gray-100 bg-gray-50/80 px-4 py-4 space-y-2">
-              <Link href="/compare" onClick={closeMenu}
-                className="flex items-center justify-center gap-2 w-full rounded-2xl border-2 border-green-600 py-3 text-sm font-bold text-green-700 hover:bg-green-50 active:scale-[0.98] transition">
-                <BarChart2 size={16} /> Compare EVs
-              </Link>
-              <Link href="/news" onClick={closeMenu}
-                className="flex items-center justify-center gap-2 w-full rounded-2xl bg-green-600 py-3.5 text-sm font-black text-white shadow-md hover:bg-green-700 active:scale-[0.98] transition">
-                <Newspaper size={16} /> Latest EV News <ArrowRight size={14} />
-              </Link>
-            </div>
+            ))}
           </div>
         </div>
-      )}
+
+        {/* ── Drawer footer CTAs ────────────────────────────── */}
+        <div className="shrink-0 border-t border-gray-100 bg-white px-4 py-4">
+          <div className="grid grid-cols-2 gap-2.5">
+            <Link href="/compare" onClick={closeMenu}
+              className="flex items-center justify-center gap-1.5 rounded-xl border-2 border-green-600 py-3 text-[12.5px] font-black text-green-700 hover:bg-green-50 active:scale-95 transition">
+              <BarChart2 size={14} /> Compare
+            </Link>
+            <Link href="/news" onClick={closeMenu}
+              className="flex items-center justify-center gap-1.5 rounded-xl bg-green-600 py-3 text-[12.5px] font-black text-white shadow-lg shadow-green-600/25 hover:bg-green-700 active:scale-95 transition">
+              <Flame size={14} /> Latest News
+            </Link>
+          </div>
+        </div>
+      </div>
+
     </>
   )
 }

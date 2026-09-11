@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import Image from "next/image";
 import EVHomepage from "@/components/home/HeroSection";
 import LatestNewsSection from "@/components/home/LatestNewsSection";
@@ -265,110 +265,6 @@ export default async function Home() {
 
       {/* Hero */}
       <EVHomepage />
-
-      {/* Stats strip */}
-      <div className="border-b border-gray-100 bg-white">
-        <div className="mx-auto max-w-7xl px-4">
-          <div className="grid grid-cols-2 divide-x divide-y divide-gray-100 sm:grid-cols-4 sm:divide-y-0">
-            {STATS.map((s) => (
-              <div key={s.label} className="flex flex-col items-center justify-center px-6 py-5 text-center">
-                <span className="text-2xl font-black text-green-600 sm:text-3xl">{s.value}</span>
-                <span className="mt-0.5 text-xs font-semibold text-gray-500 sm:text-sm">{s.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Editorial intro */}
-      <section className="bg-white py-10 sm:py-14">
-        <div className="mx-auto max-w-7xl px-4">
-          <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:gap-16">
-            <div className="flex-1">
-              <span className="inline-block rounded-full bg-green-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-green-700">
-                India&apos;s Most Trusted EV Platform
-              </span>
-              <h2 className="mt-3 text-2xl font-black leading-tight text-gray-900 sm:text-3xl xl:text-4xl">
-                Everything You Need to Know About<br className="hidden sm:block" />
-                <span className="text-green-600"> Electric Vehicles in India</span>
-              </h2>
-              <p className="mt-4 text-sm leading-relaxed text-gray-600 sm:text-base">
-                EV Radar covers every EV launch, price revision, real-world range test, government subsidy, charging infrastructure update, and in-depth buying guide. We track every electric car, bike, scooter, and commercial vehicle in India — verified ex-showroom prices, ARAI range figures, variant comparisons, and city-wise on-road prices.
-              </p>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Link href="/news" className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-green-700 transition">
-                  Latest News →
-                </Link>
-                <Link href="/cars" className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-bold text-gray-700 hover:border-green-400 hover:text-green-700 transition">
-                  Browse EVs
-                </Link>
-              </div>
-            </div>
-
-            {/* Key differentiators */}
-            <div className="grid grid-cols-2 gap-3 lg:w-80 lg:shrink-0 xl:w-96">
-              {[
-                { icon: "✅", title: "Verified Prices",    desc: "Ex-showroom & on-road prices confirmed with dealers" },
-                { icon: "🔋", title: "Real Range Tests",   desc: "ARAI & real-world range data for every EV" },
-                { icon: "📊", title: "Expert Reviews",     desc: "In-depth comparison and buying guidance" },
-                { icon: "🇮🇳", title: "India Focused",     desc: "Subsidies, policies & charging for Indian buyers" },
-              ].map((item) => (
-                <div key={item.title} className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
-                  <div className="mb-2 text-xl">{item.icon}</div>
-                  <p className="text-sm font-bold text-gray-900">{item.title}</p>
-                  <p className="mt-0.5 text-[11px] leading-snug text-gray-500">{item.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Buying Guides */}
-      <section className="border-t border-gray-100 bg-gray-50 py-10 sm:py-14">
-        <div className="mx-auto max-w-7xl px-4">
-          <div className="mb-6 flex items-end justify-between gap-4 sm:mb-8">
-            <div>
-              <span className="inline-block rounded-full bg-green-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-green-700">
-                Resources
-              </span>
-              <h2 className="mt-2 text-2xl font-black text-gray-900 sm:text-3xl">EV Buying Guides</h2>
-              <p className="mt-1 text-sm text-gray-500">Everything you need before buying an electric vehicle in India</p>
-            </div>
-            <Link href="/blogs" className="hidden shrink-0 items-center gap-1 text-sm font-bold text-green-600 hover:text-green-700 transition sm:flex">
-              All Guides →
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 sm:gap-4">
-            {GUIDE_LINKS.map(g => (
-              <Link
-                key={g.href}
-                href={g.href}
-                className={`group flex flex-col rounded-2xl border ${g.border} ${g.bg} p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:p-5`}
-              >
-                <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br ${g.color} text-xl shadow-sm`}>
-                  {g.icon}
-                </div>
-                <p className="text-sm font-bold leading-tight text-gray-900 group-hover:text-green-700 transition sm:text-[15px]">
-                  {g.title}
-                </p>
-                <p className="mt-1 text-[11px] leading-snug text-gray-500">{g.desc}</p>
-                <span className="mt-3 text-xs font-semibold text-green-600 opacity-0 transition group-hover:opacity-100">
-                  Read Guide →
-                </span>
-              </Link>
-            ))}
-          </div>
-
-          <div className="mt-5 sm:hidden">
-            <Link href="/blogs" className="flex items-center justify-center gap-1 text-sm font-bold text-green-600 hover:text-green-700 transition">
-              View All Guides →
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* Latest News */}
       <LatestNewsSection initialArticles={initialNews} />
 
@@ -542,20 +438,7 @@ export default async function Home() {
         </section>
       )}
 
-      {/* Newsletter CTA */}
-      <section className="border-t border-gray-100 bg-white py-12 sm:py-16">
-        <div className="mx-auto max-w-2xl px-4 text-center">
-          <div className="mb-2 text-3xl">⚡</div>
-          <h2 className="text-2xl font-black text-gray-900 sm:text-3xl">Stay Charged with EV Radar</h2>
-          <p className="mt-3 text-sm leading-relaxed text-gray-500 sm:text-base">
-            Get the latest EV launches, price drops, government subsidies, and expert reviews delivered to your inbox every week.
-          </p>
-          <div className="mt-6">
-            <NewsletterForm />
-          </div>
-          <p className="mt-3 text-xs text-gray-400">No spam. Unsubscribe anytime. 1 Lakh+ subscribers.</p>
-        </div>
-      </section>
+    
     </>
   );
 }

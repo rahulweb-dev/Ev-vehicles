@@ -33,27 +33,28 @@ export default function VehicleSlider({
   const headerRef  = useRef(null);
 
   useEffect(() => {
-    if (!sectionRef.current) return;
-    // Lazy-load GSAP so it's excluded from the critical homepage bundle (~80 KB saved)
-    let ctx;
-    Promise.all([import("gsap"), import("gsap/ScrollTrigger")]).then(
-      ([{ gsap }, { ScrollTrigger }]) => {
-        gsap.registerPlugin(ScrollTrigger);
-        ctx = gsap.context(() => {
-          gsap.from(headerRef.current, {
-            opacity: 0, y: 24, duration: 0.6, ease: "power3.out",
-            immediateRender: false,
-            scrollTrigger: { trigger: headerRef.current, start: "top 90%", once: true },
-          });
-          gsap.from(".vs-slide", {
-            opacity: 0, y: 32, stagger: 0.08, duration: 0.5, ease: "power2.out",
-            immediateRender: false,
-            scrollTrigger: { trigger: sectionRef.current, start: "top 85%", once: true },
-          });
-        }, sectionRef.current);
-      }
+    const header = headerRef.current;
+    if (!header) return;
+    // Simple intersection-based fade for the section header only.
+    // We removed the per-slide GSAP animation: with 9 VehicleSlider instances
+    // on the homepage the global ".vs-slide" selector was staggering all ~72
+    // slides at once (9 × 8 × 0.08s = 5.7 s opacity:0 hold) making the whole
+    // page look faded/transparent.
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          header.style.transition = "opacity 0.6s ease, transform 0.6s ease";
+          header.style.opacity    = "1";
+          header.style.transform  = "translateY(0)";
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.1 }
     );
-    return () => ctx?.revert();
+    header.style.opacity   = "0";
+    header.style.transform = "translateY(24px)";
+    obs.observe(header);
+    return () => obs.disconnect();
   }, []);
 
   if (!vehicles.length) return null;
