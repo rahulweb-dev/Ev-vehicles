@@ -9,6 +9,7 @@ import { SITE_URL, SITE_NAME } from "@/app/layout";
 import ArticleAudioPlayer from "@/components/audio/ArticleAudioPlayer";
 import ShareButtons from "@/components/ShareButtons";
 import TableOfContents from "@/components/TableOfContents";
+import ArticleViewCounter from "@/components/ArticleViewCounter";
 
 async function getBlogFromDb(slug) {
   try {
@@ -225,6 +226,7 @@ export default async function BlogPostPage({ params }) {
                 <Clock3 size={15} />
                 {blog.readTime} read
               </div>
+              <ArticleViewCounter slug={blog.slug} initialViews={blog.views || 0} endpoint="/api/blogs" />
               <ShareButtons url={`${SITE_URL}/blogs/${blog.slug}`} title={blog.title} />
             </div>
           </header>

@@ -3,14 +3,14 @@
 import { useEffect, useState } from "react";
 import { Eye } from "lucide-react";
 
-export default function ArticleViewCounter({ slug, initialViews = 0 }) {
+export default function ArticleViewCounter({ slug, initialViews = 0, endpoint = "/api/articles" }) {
   const [views, setViews] = useState(initialViews);
 
   useEffect(() => {
-    const key = `ev-viewed-${slug}`;
+    const key = `ev-viewed-${endpoint.replace(/\//g, "-")}-${slug}`;
     if (sessionStorage.getItem(key)) return;
     sessionStorage.setItem(key, "1");
-    fetch(`/api/articles/${slug}/view`, { method: "POST" })
+    fetch(`${endpoint}/${slug}/view`, { method: "POST" })
       .then(r => r.json())
       .then(() => setViews(v => v + 1))
       .catch(() => {});
