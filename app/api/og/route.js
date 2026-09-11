@@ -2,18 +2,32 @@ import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
 
+// Satori (powering ImageResponse) only supports TTF/OTF — WOFF2 throws
+// "Unsupported OpenType signature wOF2". Google Fonts returns TTF when
+// the User-Agent is an old browser that doesn't support WOFF2.
 async function getFont() {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 3000);
+  const timer = setTimeout(() => controller.abort(), 4000);
   try {
-    const res = await fetch(
-      "https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff2",
-      { signal: controller.signal }
+    const cssRes = await fetch(
+      "https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap",
+      {
+        headers: { "User-Agent": "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1)" },
+        signal: controller.signal,
+      }
     );
-    clearTimeout(timeout);
-    return res.arrayBuffer();
+    const css = await cssRes.text();
+    const ttfUrl = css.match(/src:\s*url\((.+?)\)\s*format\(['"]truetype['"]\)/)?.[1];
+    if (!ttfUrl) return null;
+    const fontRes = await fetch(ttfUrl, { signal: controller.signal });
+    clearTimeout(timer);
+    const buf = await fontRes.arrayBuffer();
+    // Validate it's actually TTF (not WOFF2) before passing to Satori
+    const sig = String.fromCharCode(...new Uint8Array(buf.slice(0, 4)));
+    if (sig === "wOF2" || sig === "wOFF") return null;
+    return buf;
   } catch {
-    clearTimeout(timeout);
+    clearTimeout(timer);
     return null;
   }
 }
@@ -192,16 +206,19 @@ export async function GET(request) {
         width: 1200,
         height: 630,
         ...(interFont && {
-          fonts: [{ name: "Inter", data: interFont, weight: 900, style: "normal" }],
+          fonts: [{ name: "Inter", data: interFont, weight: 700, style: "normal" }],
         }),
       }
     );
 
-    const headers = new Headers(imageResponse.headers);
+    // Buffer the full body so any streaming error is caught inside this try/catch
+    // (streaming errors after headers are sent can't be caught otherwise)
+    const body = await new Response(imageResponse.body).arrayBuffer();
+    const headers = new Headers();
+    headers.set("Content-Type", "image/png");
     headers.set("Cache-Control", "public, max-age=86400, s-maxage=86400, stale-while-revalidate=604800");
-    return new Response(imageResponse.body, { status: 200, headers });
+    return new Response(body, { status: 200, headers });
   } catch {
-    // If OG generation fails for any reason, redirect to the static fallback image.
     return Response.redirect(new URL("/images/og-default.jpg", request.url), 302);
   }
 }
