@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import Image from "next/image";
 import EVHomepage from "@/components/home/HeroSection";
 import LatestNewsSection from "@/components/home/LatestNewsSection";
@@ -9,18 +9,24 @@ import NewsletterForm from "@/components/NewsletterForm";
 import { SITE_URL } from "./layout";
 
 const GUIDE_LINKS = [
-  { href: "/best-electric-cars-india-2026",  emoji: "🏆", title: "Best Electric Cars 2026",  desc: "Expert-ranked top 10 EVs" },
-  { href: "/best-electric-bikes-india-2026", emoji: "🛵", title: "Best Electric Bikes 2026", desc: "Top scooters & bikes ranked" },
-  { href: "/upcoming-electric-cars-india",   emoji: "📅", title: "Upcoming EVs India",        desc: "Launch dates & expected prices" },
-  { href: "/electric-cars-under-10-lakh",    emoji: "💰", title: "EVs Under ₹10 Lakh",       desc: "Affordable electric cars" },
-  { href: "/ev-charging-guide",              emoji: "⚡", title: "EV Charging Guide",         desc: "Home & public charging explained" },
-  { href: "/subsidies",                      emoji: "🎁", title: "EV Subsidies India",        desc: "FAME, PM E-Drive & state schemes" },
-  { href: "/charging-stations",              emoji: "📍", title: "Charging Stations Map",     desc: "Find chargers near you" },
-  { href: "/government-ev-policy-india",     emoji: "📋", title: "EV Policy India 2026",      desc: "FAME 2, PM E-Drive, PLI explained" },
+  { href: "/best-electric-cars-india-2026",  icon: "🏆", color: "from-amber-500 to-orange-500", bg: "bg-amber-50", border: "border-amber-200", title: "Best Electric Cars 2026",  desc: "Expert-ranked top 10 EVs" },
+  { href: "/best-electric-bikes-india-2026", icon: "🛵", color: "from-blue-500 to-cyan-500",   bg: "bg-blue-50",   border: "border-blue-200",   title: "Best Electric Bikes 2026", desc: "Top scooters & bikes ranked" },
+  { href: "/upcoming-electric-cars-india",   icon: "📅", color: "from-purple-500 to-pink-500", bg: "bg-purple-50", border: "border-purple-200", title: "Upcoming EVs India",        desc: "Launch dates & expected prices" },
+  { href: "/electric-cars-under-10-lakh",    icon: "💰", color: "from-green-500 to-emerald-500", bg: "bg-green-50", border: "border-green-200", title: "EVs Under ₹10 Lakh",       desc: "Affordable electric cars" },
+  { href: "/ev-charging-guide",              icon: "⚡", color: "from-yellow-500 to-amber-500", bg: "bg-yellow-50", border: "border-yellow-200", title: "EV Charging Guide",         desc: "Home & public charging explained" },
+  { href: "/subsidies",                      icon: "🎁", color: "from-rose-500 to-pink-500",   bg: "bg-rose-50",   border: "border-rose-200",   title: "EV Subsidies India",        desc: "FAME, PM E-Drive & state schemes" },
+  { href: "/charging-stations",              icon: "📍", color: "from-indigo-500 to-blue-500", bg: "bg-indigo-50", border: "border-indigo-200", title: "Charging Stations Map",     desc: "Find chargers near you" },
+  { href: "/government-ev-policy-india",     icon: "📋", color: "from-teal-500 to-green-500",  bg: "bg-teal-50",   border: "border-teal-200",   title: "EV Policy India 2026",      desc: "FAME 2, PM E-Drive, PLI explained" },
 ];
 
+const STATS = [
+  { value: "80+",    label: "EV Articles" },
+  { value: "200+",   label: "EVs Tracked" },
+  { value: "50+",    label: "Brands Covered" },
+  { value: "1 Lakh+", label: "Monthly Readers" },
+];
 
-export const revalidate = 120; // re-fetch from DB every 2 minutes
+export const revalidate = 120;
 
 export const metadata = {
   title: "EV Radar – India's #1 Electric Vehicle News Platform",
@@ -42,7 +48,6 @@ export const metadata = {
   },
 };
 
-/* ── Map MongoDB Vehicle → VehicleSlider card format ─────────────── */
 function mapVehicle(v, brandLogoMap = {}) {
   const firstVariant = v.variants?.[0];
   const lastVariant  = v.variants?.[v.variants.length - 1];
@@ -70,7 +75,6 @@ function mapVehicle(v, brandLogoMap = {}) {
   };
 }
 
-/* ── Fetch latest blog posts for home section ────────────────────── */
 async function getLatestBlogs() {
   try {
     const dbConnect = (await import("@/lib/mongodb")).default;
@@ -87,7 +91,6 @@ async function getLatestBlogs() {
   }
 }
 
-/* ── Fetch latest articles for ItemList schema ───────────────────── */
 async function getLatestArticles() {
   try {
     const dbConnect = (await import("@/lib/mongodb")).default;
@@ -103,7 +106,6 @@ async function getLatestArticles() {
   }
 }
 
-/* ── Fetch initial news for LatestNewsSection SSR ────────────────── */
 async function getInitialNews() {
   try {
     const dbConnect = (await import("@/lib/mongodb")).default;
@@ -128,7 +130,6 @@ async function getInitialNews() {
   }
 }
 
-/* ── Fetch brand logo map  slug → url ────────────────────────────── */
 async function getBrandLogos() {
   try {
     const dbConnect = (await import("@/lib/mongodb")).default;
@@ -141,7 +142,6 @@ async function getBrandLogos() {
   }
 }
 
-/* ── Fetch a section from MongoDB ────────────────────────────────── */
 async function getVehicles({ category, vehicleType, featured }) {
   try {
     const dbConnect = (await import("@/lib/mongodb")).default;
@@ -261,56 +261,120 @@ export default async function Home() {
       )}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+
+      {/* Hero */}
       <EVHomepage />
 
-      {/* <div className="bg-white py-2">
+      {/* Stats strip */}
+      <div className="border-b border-gray-100 bg-white">
         <div className="mx-auto max-w-7xl px-4">
-          <AdBannerHorizontal slot="9176755624" />
-        </div>
-      </div> */}
-
-      {/* Static editorial intro — server-rendered so Googlebot always sees substantive text */}
-      <section className="bg-white border-b border-gray-100 py-8">
-        <div className="mx-auto max-w-4xl px-4">
-          <h2 className="text-xl font-black text-gray-900 mb-3">India&apos;s Most Trusted Electric Vehicle News Platform</h2>
-          <p className="text-gray-600 leading-relaxed text-sm">
-            EV Radar covers everything that matters in India&apos;s electric vehicle market — new EV launches, price revisions, real-world range tests, government subsidies, charging infrastructure news, and in-depth buying guides. We track every electric car, bike, scooter, and commercial vehicle available in India, with verified ex-showroom prices, ARAI-certified range figures, variant comparisons, and city-wise on-road prices. Whether you are buying your first EV or upgrading, EV Radar gives you the accurate, unbiased information you need to make a confident decision.
-          </p>
-        </div>
-      </section>
-
-      {/* Popular Guides — internal links to high-value SEO pages */}
-      <section className="bg-gray-50 py-8">
-        <div className="mx-auto max-w-7xl px-4">
-          <h2 className="mb-4 text-xl font-black text-gray-900">EV Buying Guides</h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {GUIDE_LINKS.map(g => (
-              <Link key={g.href} href={g.href}
-                className="flex flex-col rounded-2xl border border-gray-200 bg-white p-4 shadow-sm hover:border-green-400 hover:shadow-md transition">
-                <span className="text-2xl mb-2">{g.emoji}</span>
-                <p className="text-sm font-bold text-gray-900 leading-tight">{g.title}</p>
-                <p className="text-[11px] text-gray-500 mt-0.5">{g.desc}</p>
-              </Link>
+          <div className="grid grid-cols-2 divide-x divide-y divide-gray-100 sm:grid-cols-4 sm:divide-y-0">
+            {STATS.map((s) => (
+              <div key={s.label} className="flex flex-col items-center justify-center px-6 py-5 text-center">
+                <span className="text-2xl font-black text-green-600 sm:text-3xl">{s.value}</span>
+                <span className="mt-0.5 text-xs font-semibold text-gray-500 sm:text-sm">{s.label}</span>
+              </div>
             ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Editorial intro */}
+      <section className="bg-white py-10 sm:py-14">
+        <div className="mx-auto max-w-7xl px-4">
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:gap-16">
+            <div className="flex-1">
+              <span className="inline-block rounded-full bg-green-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-green-700">
+                India&apos;s Most Trusted EV Platform
+              </span>
+              <h2 className="mt-3 text-2xl font-black leading-tight text-gray-900 sm:text-3xl xl:text-4xl">
+                Everything You Need to Know About<br className="hidden sm:block" />
+                <span className="text-green-600"> Electric Vehicles in India</span>
+              </h2>
+              <p className="mt-4 text-sm leading-relaxed text-gray-600 sm:text-base">
+                EV Radar covers every EV launch, price revision, real-world range test, government subsidy, charging infrastructure update, and in-depth buying guide. We track every electric car, bike, scooter, and commercial vehicle in India — verified ex-showroom prices, ARAI range figures, variant comparisons, and city-wise on-road prices.
+              </p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link href="/news" className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-green-700 transition">
+                  Latest News →
+                </Link>
+                <Link href="/cars" className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-bold text-gray-700 hover:border-green-400 hover:text-green-700 transition">
+                  Browse EVs
+                </Link>
+              </div>
+            </div>
+
+            {/* Key differentiators */}
+            <div className="grid grid-cols-2 gap-3 lg:w-80 lg:shrink-0 xl:w-96">
+              {[
+                { icon: "✅", title: "Verified Prices",    desc: "Ex-showroom & on-road prices confirmed with dealers" },
+                { icon: "🔋", title: "Real Range Tests",   desc: "ARAI & real-world range data for every EV" },
+                { icon: "📊", title: "Expert Reviews",     desc: "In-depth comparison and buying guidance" },
+                { icon: "🇮🇳", title: "India Focused",     desc: "Subsidies, policies & charging for Indian buyers" },
+              ].map((item) => (
+                <div key={item.title} className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
+                  <div className="mb-2 text-xl">{item.icon}</div>
+                  <p className="text-sm font-bold text-gray-900">{item.title}</p>
+                  <p className="mt-0.5 text-[11px] leading-snug text-gray-500">{item.desc}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      <LatestNewsSection initialArticles={initialNews} />
+      {/* Buying Guides */}
+      <section className="border-t border-gray-100 bg-gray-50 py-10 sm:py-14">
+        <div className="mx-auto max-w-7xl px-4">
+          <div className="mb-6 flex items-end justify-between gap-4 sm:mb-8">
+            <div>
+              <span className="inline-block rounded-full bg-green-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-green-700">
+                Resources
+              </span>
+              <h2 className="mt-2 text-2xl font-black text-gray-900 sm:text-3xl">EV Buying Guides</h2>
+              <p className="mt-1 text-sm text-gray-500">Everything you need before buying an electric vehicle in India</p>
+            </div>
+            <Link href="/blogs" className="hidden shrink-0 items-center gap-1 text-sm font-bold text-green-600 hover:text-green-700 transition sm:flex">
+              All Guides →
+            </Link>
+          </div>
 
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 sm:gap-4">
+            {GUIDE_LINKS.map(g => (
+              <Link
+                key={g.href}
+                href={g.href}
+                className={`group flex flex-col rounded-2xl border ${g.border} ${g.bg} p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:p-5`}
+              >
+                <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br ${g.color} text-xl shadow-sm`}>
+                  {g.icon}
+                </div>
+                <p className="text-sm font-bold leading-tight text-gray-900 group-hover:text-green-700 transition sm:text-[15px]">
+                  {g.title}
+                </p>
+                <p className="mt-1 text-[11px] leading-snug text-gray-500">{g.desc}</p>
+                <span className="mt-3 text-xs font-semibold text-green-600 opacity-0 transition group-hover:opacity-100">
+                  Read Guide →
+                </span>
+              </Link>
+            ))}
+          </div>
 
-      <HomeCompareWidget />
-
-      {/* Newsletter signup — subscriber growth */}
-      <section className="bg-green-950 py-12">
-        <div className="mx-auto max-w-2xl px-4 text-center">
-          <p className="mb-1 text-sm font-bold uppercase tracking-widest text-green-400">Stay Charged</p>
-          <h2 className="mb-2 text-2xl font-black text-white">Get EV News in Your Inbox</h2>
-          <p className="mb-6 text-gray-400 text-sm">Latest launches, price drops, and EV reviews delivered weekly. No spam.</p>
-          <NewsletterForm />
+          <div className="mt-5 sm:hidden">
+            <Link href="/blogs" className="flex items-center justify-center gap-1 text-sm font-bold text-green-600 hover:text-green-700 transition">
+              View All Guides →
+            </Link>
+          </div>
         </div>
       </section>
 
+      {/* Latest News */}
+      <LatestNewsSection initialArticles={initialNews} />
+
+      {/* Compare Widget */}
+      <HomeCompareWidget />
+
+      {/* Featured Cars */}
       {fCars.length > 0 && (
         <VehicleSlider
           title="Featured Electric Cars"
@@ -320,6 +384,7 @@ export default async function Home() {
         />
       )}
 
+      {/* Featured Bikes */}
       {fBikes.length > 0 && (
         <VehicleSlider
           title="Featured Electric Bikes"
@@ -329,6 +394,7 @@ export default async function Home() {
         />
       )}
 
+      {/* Popular Cars */}
       {pCars.length > 0 && (
         <VehicleSlider
           title="Popular Electric Cars"
@@ -344,6 +410,7 @@ export default async function Home() {
         </div>
       </div>
 
+      {/* Popular Bikes */}
       {pBikes.length > 0 && (
         <VehicleSlider
           title="Popular Electric Bikes"
@@ -353,6 +420,7 @@ export default async function Home() {
         />
       )}
 
+      {/* Upcoming Cars */}
       {uCars.length > 0 && (
         <VehicleSlider
           title="Upcoming Electric Cars"
@@ -362,6 +430,7 @@ export default async function Home() {
         />
       )}
 
+      {/* Upcoming Bikes */}
       {uBikes.length > 0 && (
         <VehicleSlider
           title="Upcoming Electric Bikes"
@@ -371,6 +440,7 @@ export default async function Home() {
         />
       )}
 
+      {/* Commercial EVs */}
       {fCommercial.length > 0 && (
         <VehicleSlider
           title="Featured Commercial EVs"
@@ -398,23 +468,31 @@ export default async function Home() {
         />
       )}
 
-         {latestBlogs.length > 0 && (
-        <section className="bg-gray-50 py-12">
+      {/* Blogs section */}
+      {latestBlogs.length > 0 && (
+        <section className="border-t border-gray-100 bg-gray-50 py-12 sm:py-16">
           <div className="mx-auto max-w-7xl px-4">
-            <div className="mb-6 flex items-center justify-between">
+            <div className="mb-7 flex items-end justify-between gap-4 sm:mb-10">
               <div>
-                <h2 className="text-2xl font-black text-gray-900">EV Guides & Blogs</h2>
-                <p className="mt-1 text-sm text-gray-500">In-depth tips and analysis for Indian EV buyers</p>
+                <span className="inline-block rounded-full bg-green-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-green-700">
+                  EV Knowledge
+                </span>
+                <h2 className="mt-2 text-2xl font-black text-gray-900 sm:text-3xl">Guides &amp; Deep Dives</h2>
+                <p className="mt-1 text-sm text-gray-500">In-depth tips, analysis, and advice for Indian EV buyers</p>
               </div>
-              <Link href="/blogs" className="flex items-center gap-1 text-sm font-bold text-green-600 hover:text-green-700 transition">
-                View all →
+              <Link
+                href="/blogs"
+                className="shrink-0 rounded-xl border border-green-200 bg-white px-4 py-2 text-sm font-bold text-green-600 hover:border-green-400 hover:bg-green-50 transition"
+              >
+                View All →
               </Link>
             </div>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {latestBlogs.map(blog => (
+
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 sm:gap-6">
+              {latestBlogs.map((blog, idx) => (
                 <Link key={blog._id?.toString()} href={`/blogs/${blog.slug}`} className="group block">
-                  <article className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
-                    <div className="relative h-44 overflow-hidden bg-gray-100">
+                  <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-green-300 hover:shadow-lg">
+                    <div className="relative h-48 overflow-hidden bg-gray-100 sm:h-52">
                       {blog.image && (
                         <Image
                           src={blog.image}
@@ -422,21 +500,36 @@ export default async function Home() {
                           fill
                           className="object-cover transition duration-500 group-hover:scale-105"
                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          priority={idx === 0}
                         />
                       )}
                       <div className="absolute left-3 top-3">
-                        <span className="rounded-full bg-green-100 px-2.5 py-1 text-[11px] font-bold capitalize text-green-700">
+                        <span className="rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-bold capitalize text-green-700 shadow-sm backdrop-blur-sm">
                           {blog.category}
                         </span>
                       </div>
+                      {blog.featured && (
+                        <div className="absolute right-3 top-3">
+                          <span className="rounded-full bg-amber-400 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-amber-900">
+                            Featured
+                          </span>
+                        </div>
+                      )}
                     </div>
-                    <div className="p-4">
-                      <h3 className="line-clamp-2 text-sm font-bold leading-snug text-gray-900 group-hover:text-green-600">
+
+                    <div className="flex flex-1 flex-col p-4 sm:p-5">
+                      <h3 className="line-clamp-2 flex-1 text-sm font-bold leading-snug text-gray-900 group-hover:text-green-700 transition sm:text-[15px]">
                         {blog.title}
                       </h3>
-                      <p className="mt-1.5 line-clamp-2 text-xs text-gray-500">{blog.excerpt}</p>
-                      <div className="mt-3 flex items-center justify-between text-xs text-gray-400">
-                        <span>{blog.author}</span>
+                      <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-gray-500">{blog.excerpt}</p>
+
+                      <div className="mt-4 flex items-center justify-between border-t border-gray-100 pt-3 text-xs text-gray-400">
+                        <div className="flex items-center gap-2">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-green-600 text-[10px] font-bold text-white">
+                            {blog.author?.charAt(0) || "E"}
+                          </div>
+                          <span className="font-medium text-gray-600">{blog.author}</span>
+                        </div>
                         <span>{blog.readTime}</span>
                       </div>
                     </div>
@@ -447,6 +540,21 @@ export default async function Home() {
           </div>
         </section>
       )}
+
+      {/* Newsletter CTA */}
+      <section className="border-t border-gray-100 bg-white py-12 sm:py-16">
+        <div className="mx-auto max-w-2xl px-4 text-center">
+          <div className="mb-2 text-3xl">⚡</div>
+          <h2 className="text-2xl font-black text-gray-900 sm:text-3xl">Stay Charged with EV Radar</h2>
+          <p className="mt-3 text-sm leading-relaxed text-gray-500 sm:text-base">
+            Get the latest EV launches, price drops, government subsidies, and expert reviews delivered to your inbox every week.
+          </p>
+          <div className="mt-6">
+            <NewsletterForm />
+          </div>
+          <p className="mt-3 text-xs text-gray-400">No spam. Unsubscribe anytime. 1 Lakh+ subscribers.</p>
+        </div>
+      </section>
     </>
   );
 }

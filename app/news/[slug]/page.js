@@ -16,7 +16,6 @@ import BookmarkButton from "@/components/BookmarkButton";
 import ArticleViewCounter from "@/components/ArticleViewCounter";
 import ArticleComments from "@/components/ArticleComments";
 import TrendingWidget from "@/components/TrendingWidget";
-import ArticleStickyBar from "@/components/ArticleStickyBar";
 import ArticleImage from "@/components/news/ArticleImage";
 
 export const revalidate = 300;
@@ -346,7 +345,7 @@ export default async function ArticlePage({ params }) {
               <div className="relative my-6 w-full aspect-video overflow-hidden rounded-xl sm:rounded-2xl bg-gray-100">
                 <ArticleImage
                   src={article.image}
-                  fallbackSrc={imageFallbackPath}
+                  fallbackSrc="/images/og-default.jpg"
                   alt={article.imageAlt || article.title}
                   className="absolute inset-0 h-full w-full object-cover"
                   priority
@@ -575,7 +574,7 @@ export default async function ArticlePage({ params }) {
           </div>
         )}
       </div>
-      <ArticleStickyBar />
+     
     </>
   );
 }
