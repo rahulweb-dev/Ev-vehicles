@@ -13,10 +13,8 @@ const FILTERS = [
   { id: "news",    label: "News",    icon: <Newspaper size={12} /> },
 ];
 
-function articleImageFallback(result) {
-  const title = encodeURIComponent(result?.name || "EV News India");
-  const tag = encodeURIComponent(result?.brand || "news");
-  return `/api/og?title=${title}&tag=${tag}&type=article`;
+function articleImageFallback() {
+  return "/images/og-default.jpg";
 }
 
 export default function SearchModal() {

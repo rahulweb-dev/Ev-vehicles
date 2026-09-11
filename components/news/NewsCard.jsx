@@ -29,10 +29,8 @@ const categoryColors = {
   charging: "bg-green-100 text-green-700",
 };
 
-function articleImageFallback(article) {
-  const title = encodeURIComponent(article?.title || "EV News India");
-  const tag = encodeURIComponent(article?.category || "news");
-  return `/api/og?title=${title}&tag=${tag}&type=article`;
+function articleImageFallback() {
+  return "/images/og-default.jpg";
 }
 
 export default function NewsCard({ article, variant = "default" }) {

@@ -97,10 +97,8 @@ function articleToSide(a) {
   return { image: a.image, title: a.title, category: a.category, slug: a.slug, readTime: a.readTime || "4 min", publishedAt: a.publishedAt };
 }
 
-function articleImageFallback(article, category = "news") {
-  const title = encodeURIComponent(article?.title || "EV News India");
-  const tag = encodeURIComponent(article?.category || category || "news");
-  return `/api/og?title=${title}&tag=${tag}&type=article`;
+function articleImageFallback() {
+  return "/images/og-default.jpg";
 }
 
 export default function LatestNews({ initialArticles = null }) {

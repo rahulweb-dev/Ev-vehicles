@@ -12,10 +12,8 @@ function fmtViews(n) {
   return String(n);
 }
 
-function articleImageFallback(article) {
-  const title = encodeURIComponent(article?.title || "EV News India");
-  const tag = encodeURIComponent(article?.category || "news");
-  return `/api/og?title=${title}&tag=${tag}&type=article`;
+function articleImageFallback() {
+  return "/images/og-default.jpg";
 }
 
 export default function TrendingWidget() {

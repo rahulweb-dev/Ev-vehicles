@@ -5,9 +5,8 @@ import Link from "next/link";
 import { Bookmark, Trash2, ArrowRight } from "lucide-react";
 import ArticleImage from "@/components/news/ArticleImage";
 
-function articleImageFallback(item) {
-  const title = encodeURIComponent(item?.title || "EV News India");
-  return `/api/og?title=${title}&tag=news&type=article`;
+function articleImageFallback() {
+  return "/images/og-default.jpg";
 }
 
 export default function SavedArticles() {
