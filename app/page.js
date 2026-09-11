@@ -114,16 +114,17 @@ async function getInitialNews() {
     const articles = await Article.find({ status: "published", category: "cars" })
       .sort({ publishedAt: -1 })
       .limit(6)
-      .select("slug title image excerpt category readTime")
+      .select("slug title image excerpt category readTime publishedAt")
       .lean();
     if (!articles.length) return null;
     return articles.map(a => ({
-      image:    a.image    || "",
-      title:    a.title    || "",
-      excerpt:  a.excerpt  || "",
-      slug:     a.slug     || "",
-      category: a.category || "cars",
-      readTime: a.readTime || "5 min",
+      image:       a.image       || "",
+      title:       a.title       || "",
+      excerpt:     a.excerpt     || "",
+      slug:        a.slug        || "",
+      category:    a.category    || "cars",
+      readTime:    a.readTime    || "5 min",
+      publishedAt: a.publishedAt || null,
     }));
   } catch {
     return null;
