@@ -260,7 +260,7 @@ export default async function BlogsPage({ searchParams }) {
                           </div>
                           <span>
                             {blog.publishedAt
-                              ? new Date(blog.publishedAt).toLocaleDateString("en-IN", {
+                              ? new Date(blog.publishedAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata",
                                   day: "numeric", month: "short", year: "numeric",
                                 })
                               : ""}

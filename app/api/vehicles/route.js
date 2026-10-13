@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Vehicle from "@/lib/models/Vehicle";
-import { requireAuth } from "@/lib/auth";
+import { requireAuth, getAuthUser } from "@/lib/auth";
 import { logError } from "@/lib/logger";
 
 export const revalidate = 60;
@@ -27,12 +27,15 @@ export async function GET(request) {
     const search         = searchParams.get("search");
     const brand          = searchParams.get("brand");
     const sort           = searchParams.get("sort") || "createdAt";
-    const limit          = parseInt(searchParams.get("limit") || "50");
-    const page           = parseInt(searchParams.get("page") || "1");
+    const limit          = Math.min(Math.max(parseInt(searchParams.get("limit")) || 50, 1), 200);
+    const page           = Math.max(parseInt(searchParams.get("page")) || 1, 1);
+    // Drafts are admin-only; anonymous callers always get published vehicles
+    const isAdmin        = status === "published" ? false : !!(await getAuthUser());
 
     if (vehicleType)          filter.vehicleType  = vehicleType;
     if (category)             filter.category     = category;
-    if (status)               filter.status       = status;
+    if (!isAdmin)             filter.status       = "published";
+    else if (status)          filter.status       = status;
     if (featured === "true")  filter.featured     = true;
     if (availability)         filter.availability = availability;
     if (brand)                filter.brand        = { $regex: escapeRegExp(brand), $options: "i" };

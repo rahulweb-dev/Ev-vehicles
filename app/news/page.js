@@ -39,12 +39,10 @@ const getArticles = cache(async function getArticles(category, page = 1) {
   }
 });
 
+// /news?category=x is the same listing as /news/category/x — point at that one so they don't compete
 function buildNewsCanonical(cat, page) {
-  const p = new URLSearchParams();
-  if (cat)    p.set("category", cat);
-  if (page > 1) p.set("page", String(page));
-  const qs = p.toString();
-  return `${SITE_URL}/news${qs ? `?${qs}` : ""}`;
+  const base = cat && CAT_LABELS[cat] ? `${SITE_URL}/news/category/${cat}` : `${SITE_URL}/news`;
+  return page > 1 ? `${base}?page=${page}` : base;
 }
 
 export async function generateMetadata({ searchParams }) {
@@ -55,8 +53,8 @@ export async function generateMetadata({ searchParams }) {
   const canonical = buildNewsCanonical(cat, page);
   return {
     title: cat
-      ? `${label} News India 2026 – Latest ${label} Updates | EV Radar`
-      : `Latest EV Radar 2026 – Electric Vehicle Updates`,
+      ? `${label} News India 2026 – Latest ${label} Updates`
+      : `Latest EV News 2026 – Electric Vehicle Updates`,
     description:
       cat
         ? `Latest ${label.toLowerCase()} news from India. New ${label.toLowerCase()} launches, prices, range, and reviews updated daily.`

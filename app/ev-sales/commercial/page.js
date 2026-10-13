@@ -5,7 +5,7 @@ import { FALLBACK_ANALYTICS } from "@/lib/ev-sales-fallback";
 export const revalidate = 3600;
 
 export const metadata = {
-  title: `EV Commercial Vehicle Sales India 2025 – Electric Bus, Truck & Fleet Data | ${SITE_NAME}`,
+  title: `EV Commercial Vehicle Sales India 2025 – Electric Bus, Truck & Fleet Data`,
   description: "Monthly electric commercial vehicle sales India 2025. Tata EV, Ashok Leyland, Switch Mobility, EKA — fleet market data, rankings, growth.",
   alternates: { canonical: `${SITE_URL}/ev-sales/commercial` },
   openGraph: {

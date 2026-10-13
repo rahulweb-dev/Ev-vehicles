@@ -5,7 +5,7 @@ import { SITE_URL, SITE_NAME } from '@/app/layout'
 export const revalidate = 86400
 
 export const metadata = {
-  title: 'State-wise EV Subsidy in India 2026 – Electric Vehicle Incentives | EV Radar',
+  title: 'State-wise EV Subsidy in India 2026 – Electric Vehicle Incentives',
   description: 'Complete guide to state-wise EV subsidies in India 2026. Delhi, Maharashtra, Gujarat, Karnataka, Rajasthan, Tamil Nadu EV incentives, road tax waivers and registration fee exemptions explained.',
   keywords: 'ev subsidy india 2026, state ev incentives india, delhi ev subsidy, maharashtra ev policy, gujarat ev subsidy, karnataka ev incentive, rajasthan ev scheme, electric vehicle subsidy india',
   alternates: { canonical: `${SITE_URL}/ev-subsidy` },

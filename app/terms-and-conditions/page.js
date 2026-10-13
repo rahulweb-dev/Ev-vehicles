@@ -2,9 +2,9 @@
 import { SITE_URL } from "../layout";
 
 export const metadata = {
-  title: "Terms of Service – EV Radar",
+  title: "Terms of Service",
   description: "Terms and conditions governing the use of EV Radar (evradar.in).",
-  alternates: { canonical: `${SITE_URL}/terms` },
+  alternates: { canonical: `${SITE_URL}/terms-and-conditions` },
   robots: { index: true, follow: true },
   openGraph: {
     title: "Terms of Service – EV Radar",

@@ -111,8 +111,12 @@ export function useSpeechSynthesis(text, langBcp47 = 'en-IN') {
       }
     }
     u.onerror = (e) => {
-      if (e.error !== 'interrupted' && gen === genRef.current)
-        syncStatus('idle'); clearInterval(pingTimer.current)
+      // Braces matter: clearing the ping on 'interrupted' killed the NEXT playback's keep-alive,
+      // and Chrome then cut long articles off after ~15s
+      if (e.error !== 'interrupted' && gen === genRef.current) {
+        syncStatus('idle')
+        clearInterval(pingTimer.current)
+      }
     }
     window.speechSynthesis.speak(u)
   // eslint-disable-next-line react-hooks/exhaustive-deps

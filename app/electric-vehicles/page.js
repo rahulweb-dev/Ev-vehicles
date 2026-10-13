@@ -152,7 +152,7 @@ async function getLatestEVNews() {
       author:   a.author || "EVRadar Team",
       readTime: a.readTime || "5 min",
       category: a.category || "news",
-      date:     a.publishedAt ? new Date(a.publishedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "",
+      date:     a.publishedAt ? new Date(a.publishedAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "short", year: "numeric" }) : "",
     }));
   } catch {
     return [];

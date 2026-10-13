@@ -6,6 +6,9 @@ import NewsCard from "@/components/news/NewsCard";
 import { SITE_URL } from "@/app/layout";
 import { parsePrice } from "@/lib/priceUtils";
 
+// User text goes into a regex — escape so "C++" or "(" can't throw or mis-match
+const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 export const revalidate = 300;
 
 async function getBrandData(brand) {
@@ -17,7 +20,7 @@ async function getBrandData(brand) {
     await dbConnect();
 
     const decoded = decodeURIComponent(brand).replace(/-/g, " ");
-    const brandRegex = new RegExp(decoded, "i");
+    const brandRegex = new RegExp(escapeRegExp(decoded), "i");
 
     const [vehicles, articles, brandProfile] = await Promise.all([
       Vehicle.find({ brand: brandRegex, status: "published" }).sort({ createdAt: -1 }).lean(),
@@ -25,7 +28,7 @@ async function getBrandData(brand) {
         status: "published",
         $or: [
           { title: brandRegex },
-          { tags:  { $elemMatch: { $regex: decoded, $options: "i" } } },
+          { tags:  { $elemMatch: { $regex: escapeRegExp(decoded), $options: "i" } } },
         ],
       }).sort({ publishedAt: -1 }).limit(9).lean(),
       Brand.findOne({ slug: brand }).lean(),

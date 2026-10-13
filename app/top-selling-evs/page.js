@@ -5,7 +5,7 @@ import { FALLBACK_ANALYTICS } from "@/lib/ev-sales-fallback";
 export const revalidate = 3600;
 
 export const metadata = {
-  title: `Top Selling EVs India 2025 – Best Selling Electric Vehicles | ${SITE_NAME}`,
+  title: `Top Selling EVs India 2025 – Best Selling Electric Vehicles`,
   description: "Best selling electric vehicles in India 2025. Top EV cars, electric scooters, commercial EVs ranked by monthly sales data.",
   keywords: "top selling EV India 2025, best electric cars India, best electric scooter India 2025, EV sales ranking",
   alternates: { canonical: `${SITE_URL}/top-selling-evs` },

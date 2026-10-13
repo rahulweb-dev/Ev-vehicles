@@ -1,7 +1,7 @@
 ﻿import SavedArticles from "@/components/SavedArticles";
 
 export const metadata = {
-  title: "Saved Articles – EV Radar",
+  title: "Saved Articles",
   description: "Your saved EV news articles on EV Radar.",
   robots: { index: false, follow: false },
 };

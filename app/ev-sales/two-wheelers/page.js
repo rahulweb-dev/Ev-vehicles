@@ -5,7 +5,7 @@ import { FALLBACK_ANALYTICS } from "@/lib/ev-sales-fallback";
 export const revalidate = 3600;
 
 export const metadata = {
-  title: `EV Two-Wheeler Sales India 2025 – Electric Scooter & Bike Data | ${SITE_NAME}`,
+  title: `EV Two-Wheeler Sales India 2025 – Electric Scooter & Bike Data`,
   description: "Monthly electric two-wheeler sales data India 2025. Ola Electric, TVS iQube, Ather, Bajaj Chetak, Hero Vida — rankings, market share, growth.",
   alternates: { canonical: `${SITE_URL}/ev-sales/two-wheelers` },
   openGraph: {

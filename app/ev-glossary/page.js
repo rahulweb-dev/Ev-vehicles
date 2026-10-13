@@ -5,7 +5,7 @@ import { SITE_URL, SITE_NAME } from "@/app/layout";
 export const revalidate = 86400;
 
 export const metadata = {
-  title: "EV Glossary – Electric Vehicle Terms Explained | EV Radar",
+  title: "EV Glossary – Electric Vehicle Terms Explained",
   description: "Complete glossary of electric vehicle terms for India. Understand ARAI range, BMS, regenerative braking, CCS2, CHAdeMO, WLTP, SOC, IP67, and every EV acronym explained simply.",
   keywords: "ev glossary india, electric vehicle terms, what is arai range, what is bms ev, ev abbreviations explained, ccs2 charger india, ev terminology",
   alternates: { canonical: `${SITE_URL}/ev-glossary` },

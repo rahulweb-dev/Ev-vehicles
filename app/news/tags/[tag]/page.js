@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import Link from "next/link";
 import { Tag, ChevronRight } from "lucide-react";
 import NewsCard from "@/components/news/NewsCard";
@@ -6,18 +7,27 @@ import { SITE_URL } from "@/app/layout";
 
 export const revalidate = 300;
 
-async function getArticlesByTag(tag) {
+// A bad %-sequence in the URL would otherwise throw and 500 the page
+function safeDecode(tag) {
+  try { return decodeURIComponent(tag).trim(); } catch { return tag; }
+}
+
+const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+// cache(): generateMetadata and the page both need this — one DB query per request
+const getArticlesByTag = cache(async function getArticlesByTag(tag) {
   try {
     const dbConnect = (await import("@/lib/mongodb")).default;
     const Article   = (await import("@/lib/models/Article")).default;
     await dbConnect();
-    const decoded = decodeURIComponent(tag);
+    const decoded = safeDecode(tag);
     // Keep case-insensitive regex — Google may have indexed tag URLs with different casing
     // (e.g. /news/tags/Tesla vs /news/tags/tesla). Exact $in would 404 those indexed pages.
     // The .select() still reduces payload; the regex cost on 67 req/day is negligible.
     const articles = await Article.find({
       status: "published",
-      tags: { $regex: new RegExp(`^${decoded}$`, "i") },
+      // Escaped: tags like "Nexon EV+" or "BE 6 (2025)" would otherwise break the pattern
+      tags: { $regex: new RegExp(`^\\s*${escapeRegExp(decoded)}\\s*$`, "i") },
     })
       .select("slug title image excerpt category publishedAt readTime tags _id")
       .sort({ publishedAt: -1 })
@@ -25,23 +35,28 @@ async function getArticlesByTag(tag) {
       .lean();
     return { articles, tag: decoded };
   } catch {
-    return { articles: [], tag: decodeURIComponent(tag) };
+    return { articles: [], tag: safeDecode(tag) };
   }
-}
+});
 
 export async function generateMetadata({ params }) {
   const { tag } = await params;
-  const decoded = decodeURIComponent(tag);
+  const decoded = safeDecode(tag);
+  // One canonical per tag regardless of the casing in the URL (/tags/Tesla vs /tags/tesla)
+  const canonical = `${SITE_URL}/news/tags/${encodeURIComponent(decoded.toLowerCase())}`;
+  const { articles } = await getArticlesByTag(tag);
   const ogTitle = `${decoded} – Electric Vehicle News India`;
   const ogDesc = `Latest electric vehicle news about ${decoded}. Stay updated on EV launches, reviews, prices, and industry news from India.`;
   return {
     title: `${decoded} EV News – Latest Updates`,
     description: ogDesc,
-    alternates: { canonical: `${SITE_URL}/news/tags/${tag}` },
+    alternates: { canonical },
+    // Thin tag pages (same threshold the sitemap uses) stay out of the index
+    ...(articles.length < 3 && { robots: { index: false, follow: true } }),
     openGraph: {
       title: ogTitle,
       description: ogDesc,
-      url: `${SITE_URL}/news/tags/${tag}`,
+      url: canonical,
       type: "website",
       images: [{ url: `${SITE_URL}/api/og?title=%23${encodeURIComponent(decoded)}&subtitle=Latest EV news %26 updates from EVRadar India&tag=news&type=page`, width: 1200, height: 630, alt: `#${decoded} EV News` }],
     },

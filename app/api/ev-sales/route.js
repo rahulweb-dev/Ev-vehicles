@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { dbConnect } from "@/lib/mongodb";
 import EVSale from "@/lib/models/EVSale";
+import { requireAuth } from "@/lib/auth";
 
 export async function GET(req) {
   try {
@@ -11,8 +12,8 @@ export async function GET(req) {
     const year     = searchParams.get("year");
     const month    = searchParams.get("month");
     const state    = searchParams.get("state");
-    const limit    = parseInt(searchParams.get("limit") || "100");
-    const page     = parseInt(searchParams.get("page") || "1");
+    const limit    = Math.min(Math.max(parseInt(searchParams.get("limit")) || 100, 1), 500);
+    const page     = Math.max(parseInt(searchParams.get("page")) || 1, 1);
 
     const query = {};
     if (segment) query.segment = segment;
@@ -41,6 +42,8 @@ export async function GET(req) {
 
 export async function POST(req) {
   try {
+    const auth = await requireAuth();
+    if (auth.error) return NextResponse.json({ error: auth.error }, { status: auth.status });
     await dbConnect();
     const body = await req.json();
     const { brand, brandSlug, segment, month, year, unitsSold, marketShare, growthPercentage, state, isNational } = body;

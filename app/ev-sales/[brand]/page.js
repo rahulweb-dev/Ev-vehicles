@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { SITE_URL, SITE_NAME } from "@/app/layout";
 import BrandSalesPage from "./BrandSalesPage";
 import { FALLBACK_ANALYTICS, CAR_BRANDS, TWO_WHEELER_BRANDS, COMMERCIAL_BRANDS } from "@/lib/ev-sales-fallback";
@@ -9,13 +10,15 @@ const TW_BRANDS_WITH_SEG  = TWO_WHEELER_BRANDS.map((b) => ({ ...b, name: b.brand
 const COM_BRANDS_WITH_SEG = COMMERCIAL_BRANDS.map((b) => ({ ...b, name: b.brand, slug: b.brandSlug, segment: "commercial", monthlySales: b.sales }));
 const ALL_BRANDS = [...CAR_BRANDS_WITH_SEG, ...TW_BRANDS_WITH_SEG, ...COM_BRANDS_WITH_SEG];
 
+// Next 16: params is a Promise — reading params.brand directly was undefined and 500'd every brand page
 export async function generateMetadata({ params }) {
-  const slug = params.brand;
+  const { brand: slug } = await params;
   const brand = ALL_BRANDS.find((b) => b.slug === slug);
+  if (!brand) return { title: "Brand not found", robots: { index: false, follow: true } };
   const name = brand?.name || slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   const segment = brand?.segment === "two-wheeler" ? "Two-Wheeler" : brand?.segment === "commercial" ? "Commercial" : "Car";
   return {
-    title: `${name} EV Sales India 2025 – Monthly Data & Market Share | ${SITE_NAME}`,
+    title: `${name} EV Sales India 2025 – Monthly Data & Market Share`,
     description: `${name} electric ${segment.toLowerCase()} sales data India 2025 — monthly units sold, market share, year-over-year growth.`,
     alternates: { canonical: `${SITE_URL}/ev-sales/${slug}` },
     openGraph: {
@@ -36,11 +39,12 @@ export async function generateMetadata({ params }) {
 
 async function getBrandData(slug) {
   try {
-    const res = await fetch(`${SITE_URL}/api/ev-sales?brandSlug=${slug}&year=2025`, { next: { revalidate: 3600 } });
+    const res = await fetch(`${SITE_URL}/api/ev-sales?brand=${encodeURIComponent(slug)}&year=2025`, { next: { revalidate: 3600 } });
     if (!res.ok) throw new Error();
     const json = await res.json();
-    if (!json.data?.length) throw new Error("no data");
-    return json.data;
+    // The API returns { records } and filters by ?brand= — this used to read json.data, so real data never showed
+    if (!json.records?.length) throw new Error("no data");
+    return json.records;
   } catch {
     const brand = ALL_BRANDS.find((b) => b.slug === slug);
     if (!brand) return [];
@@ -59,9 +63,10 @@ async function getBrandData(slug) {
 }
 
 export default async function EVBrandPage({ params }) {
-  const slug = params.brand;
+  const { brand: slug } = await params;
   const records = await getBrandData(slug);
   const brand = ALL_BRANDS.find((b) => b.slug === slug);
+  if (!brand && !records.length) notFound();
 
   const jsonLd = {
     "@context": "https://schema.org",

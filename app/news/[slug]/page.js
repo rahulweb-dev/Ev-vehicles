@@ -112,7 +112,10 @@ export async function generateMetadata({ params }) {
   const article = await getArticle(slug);
   if (!article) return { title: "Article Not Found" };
   const fallbackImage = `${SITE_URL}/api/og?title=${encodeURIComponent(article.title)}&tag=${encodeURIComponent(article.category)}&type=article`;
-  const metadataImage = toAbsoluteImageUrl(article.image, fallbackImage);
+  // A text-free cover is fine on the page, but social previews convert better with the headline on them
+  const metadataImage = /\/api\/og\?.*type=cover/.test(article.image || "")
+    ? fallbackImage
+    : toAbsoluteImageUrl(article.image, fallbackImage);
 
   return {
     title: article.metaTitle || article.title,
@@ -122,7 +125,7 @@ export async function generateMetadata({ params }) {
     alternates: { canonical: `${SITE_URL}/news/${article.slug}` },
     other: {
       "news_keywords": article.tags?.join(", ") || "",
-      "article:publisher":      "https://www.facebook.com/EVNewsIndia",
+      "article:publisher":      "https://www.facebook.com/EVRadarIndia",
       "article:published_time": article.publishedAt ? new Date(article.publishedAt).toISOString() : "",
       "article:modified_time":  article.updatedAt  ? new Date(article.updatedAt).toISOString()  : (article.publishedAt ? new Date(article.publishedAt).toISOString() : ""),
       "article:author":         article.author || "",
@@ -295,7 +298,7 @@ export default async function ArticlePage({ params }) {
                 <ChevronRight size={14} />
                 <Link href="/news" className="hover:text-green-600">News</Link>
                 <ChevronRight size={14} />
-                <Link href={`/news?category=${article.category}`} className="capitalize text-green-600 hover:text-green-800">{article.category}</Link>
+                <Link href={`/news/category/${article.category}`} className="capitalize text-green-600 hover:text-green-800">{article.category}</Link>
               </nav>
 
               <header>
@@ -325,7 +328,7 @@ export default async function ArticlePage({ params }) {
                   </Link>
                   <div className="flex items-center gap-1.5">
                     <Calendar size={15} />
-                    {new Date(article.publishedAt || article.createdAt).toLocaleDateString("en-IN", {
+                    {new Date(article.publishedAt || article.createdAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata",
                       day: "numeric", month: "long", year: "numeric",
                     })}
                   </div>
@@ -453,7 +456,7 @@ export default async function ArticlePage({ params }) {
                     <div className="border-b border-green-100 bg-green-600 px-4 py-2.5">
                       <p className="text-xs font-bold uppercase tracking-wider text-white">Featured EV</p>
                     </div>
-                    <Link href={`/${featuredVehicle.vehicleType === "car" ? "cars" : "bikes"}/${featuredVehicle.slug}`} className="group block p-4">
+                    <Link href={`/${featuredVehicle.vehicleType === "car" ? "cars" : featuredVehicle.vehicleType === "commercial" ? "commercial" : "bikes"}/${featuredVehicle.slug}`} className="group block p-4">
                       {featuredVehicle.featuredImage && (
                         <div className="relative mb-3 h-36 overflow-hidden rounded-xl bg-white">
                           <Image

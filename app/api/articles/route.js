@@ -24,8 +24,8 @@ export async function GET(request) {
     const rawStatus = searchParams.get("status") || "published";
     const featured  = searchParams.get("featured");
     const search    = searchParams.get("search");
-    const limit     = parseInt(searchParams.get("limit") || "20");
-    const page      = parseInt(searchParams.get("page")  || "1");
+    const limit     = Math.min(Math.max(parseInt(searchParams.get("limit")) || 20, 1), 200);
+    const page      = Math.max(parseInt(searchParams.get("page")) || 1, 1);
 
     // Only authenticate when the caller explicitly requests non-published articles.
     // Public reads (status=published, the default) skip the cookie read + JWT verify

@@ -2,8 +2,12 @@ import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import dbConnect from "@/lib/mongodb";
 import Blog from "@/lib/models/Blog";
-import { requireAuth } from "@/lib/auth";
+import { requireAuth, getAuthUser } from "@/lib/auth";
 import { sendBlogPublishedEmail } from "@/lib/notifications";
+
+function escapeRegExp(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 
 export async function GET(request) {
   try {
@@ -12,15 +16,18 @@ export async function GET(request) {
     const status   = searchParams.get("status");
     const category = searchParams.get("category");
     const search   = searchParams.get("search");
-    const limit    = parseInt(searchParams.get("limit") || "50");
-    const page     = parseInt(searchParams.get("page")  || "1");
+    const limit    = Math.min(Math.max(parseInt(searchParams.get("limit")) || 50, 1), 200);
+    const page     = Math.max(parseInt(searchParams.get("page")) || 1, 1);
+    // Drafts are admin-only; anonymous callers always get published posts
+    const isAdmin  = status === "published" ? false : !!(await getAuthUser());
 
     const filter = {};
-    if (status)   filter.status   = status;
+    if (!isAdmin)    filter.status   = "published";
+    else if (status) filter.status   = status;
     if (category) filter.category = category;
     if (search)   filter.$or = [
-      { title: { $regex: search, $options: "i" } },
-      { excerpt: { $regex: search, $options: "i" } },
+      { title: { $regex: escapeRegExp(search), $options: "i" } },
+      { excerpt: { $regex: escapeRegExp(search), $options: "i" } },
     ];
 
     const skip = (page - 1) * limit;

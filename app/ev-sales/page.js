@@ -7,7 +7,7 @@ export const revalidate = 3600;
 const DATA_YEAR = new Date().getFullYear();
 
 export const metadata = {
-  title: `EV Sales Intelligence India ${DATA_YEAR} – Monthly EV Market Data | ${SITE_NAME}`,
+  title: `EV Sales Intelligence India ${DATA_YEAR} – Monthly EV Market Data`,
   description: "India EV sales data, market share, brand rankings, state-wise EV adoption and monthly trends for electric cars, two-wheelers and commercial vehicles.",
   keywords: `EV sales India ${DATA_YEAR}, electric vehicle sales data India, EV market share India, top selling EV India, EV monthly sales`,
   alternates: { canonical: `${SITE_URL}/ev-sales` },

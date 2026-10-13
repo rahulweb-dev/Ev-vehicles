@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SITE_URL } from "@/app/layout";
 
 export const metadata = {
-  title:       "Data Deletion Instructions | EVRadar",
+  title:       "Data Deletion Instructions",
   description: "How to request deletion of your personal data from EVRadar.",
   alternates:  { canonical: `${SITE_URL}/data-deletion` },
   robots:      { index: false, follow: false },

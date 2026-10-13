@@ -5,7 +5,8 @@ import PushSubscription from "@/lib/models/PushSubscription";
 export async function POST(request) {
   try {
     const subscription = await request.json();
-    if (!subscription?.endpoint || !subscription?.keys?.p256dh || !subscription?.keys?.auth) {
+    // Strings only — an object like {"$ne": null} would turn the lookup into a query operator
+    if (typeof subscription?.endpoint !== "string" || typeof subscription?.keys?.p256dh !== "string" || typeof subscription?.keys?.auth !== "string") {
       return NextResponse.json({ error: "Invalid subscription" }, { status: 400 });
     }
 
@@ -26,7 +27,7 @@ export async function POST(request) {
 export async function DELETE(request) {
   try {
     const { endpoint } = await request.json();
-    if (!endpoint) return NextResponse.json({ error: "Missing endpoint" }, { status: 400 });
+    if (typeof endpoint !== "string" || !endpoint) return NextResponse.json({ error: "Missing endpoint" }, { status: 400 });
 
     await dbConnect();
     await PushSubscription.deleteOne({ endpoint });

@@ -4,6 +4,9 @@ import { Search, Car, Bike, Newspaper, ArrowRight, ChevronRight } from "lucide-r
 import { SITE_URL } from "@/app/layout";
 import ArticleImage from "@/components/news/ArticleImage";
 
+// User text goes into a regex — escape so "C++" or "(" can't throw or mis-match
+const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 export const revalidate = 0; // always fresh — search results must not be cached
 
 export async function generateMetadata({ searchParams }) {
@@ -30,7 +33,7 @@ async function runSearch(q, type) {
     const Vehicle   = (await import("@/lib/models/Vehicle")).default;
     await dbConnect();
 
-    const rex = { $regex: q, $options: "i" };
+    const rex = { $regex: escapeRegExp(q), $options: "i" };
     const wantVehicles = type !== "news";
     const wantArticles = type !== "cars" && type !== "bikes";
 
@@ -279,7 +282,7 @@ function VehicleCard({ vehicle, type }) {
 
 function ArticleCard({ article }) {
   const date = article.publishedAt
-    ? new Date(article.publishedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })
+    ? new Date(article.publishedAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "short", year: "numeric" })
     : "";
   const fallbackSrc = `/api/og?title=${encodeURIComponent(article.title || "EV Radar")}&tag=${encodeURIComponent(article.category || "news")}&type=article`;
   return (

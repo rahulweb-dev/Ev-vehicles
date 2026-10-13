@@ -2,7 +2,7 @@
 import { SITE_URL } from "../layout";
 
 export const metadata = {
-  title: "Sitemap – EV Radar | All Pages & Categories",
+  title: "Sitemap – All Pages & Categories",
   description: "Complete sitemap of EV Radar — news, electric cars, bikes, guides, tools and more. Browse all sections of India's #1 EV platform.",
   alternates: { canonical: `${SITE_URL}/sitemap-page` },
   openGraph: {
@@ -19,9 +19,9 @@ const sections = [
     heading: "News & Articles",
     links: [
       { href: "/news",           label: "All EV News" },
-      { href: "/news?category=cars",   label: "Electric Car News" },
-      { href: "/news?category=bikes",  label: "Electric Bike News" },
-      { href: "/news?category=policy", label: "EV Policy News" },
+      { href: "/news/category/cars",   label: "Electric Car News" },
+      { href: "/news/category/bikes",  label: "Electric Bike News" },
+      { href: "/news", label: "EV Policy News" },
       { href: "/blogs",          label: "EV Blogs" },
     ],
   },
@@ -79,7 +79,7 @@ const sections = [
     heading: "XML Sitemaps",
     links: [
       { href: "/sitemap.xml",        label: "Main Sitemap (XML)" },
-      { href: "/news-sitemap.xml",   label: "News Sitemap (XML)" },
+      { href: "/sitemap-news.xml",   label: "News Sitemap (XML)" },
       { href: "/image-sitemap.xml",  label: "Image Sitemap (XML)" },
     ],
   },

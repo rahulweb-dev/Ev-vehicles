@@ -52,13 +52,15 @@ export async function generateStaticParams() {
   return Object.keys(VALID_CATEGORIES).map((category) => ({ category }));
 }
 
-export async function generateMetadata({ params }) {
+export async function generateMetadata({ params, searchParams }) {
   const { category } = await params;
   if (!VALID_CATEGORIES[category]) return {};
+  const page  = Math.max(1, parseInt((await searchParams)?.page || "1", 10));
   const label = VALID_CATEGORIES[category];
-  const title = `${label} News India 2026 – Latest ${label} Updates | EV Radar`;
+  // Each page self-canonicals so Google keeps crawling deeper pages to older articles
+  const title = `${label} News India 2026 – Latest ${label} Updates${page > 1 ? ` – Page ${page}` : ""}`;
   const description = `Latest ${label.toLowerCase()} news from India. New ${label.toLowerCase()} launches, prices, range, and reviews updated daily on EV Radar.`;
-  const canonicalUrl = `${SITE_URL}/news/category/${category}`;
+  const canonicalUrl = `${SITE_URL}/news/category/${category}${page > 1 ? `?page=${page}` : ""}`;
   return {
     title,
     description,

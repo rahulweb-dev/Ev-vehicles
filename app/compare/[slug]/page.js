@@ -64,7 +64,7 @@ export async function generateMetadata({ params }) {
   const rangeA = vA.performance?.drivingRange || "";
   const rangeB = vB.performance?.drivingRange || "";
 
-  const title = `${vA.name} vs ${vB.name} ${year} – Price, Range & Specs Compared | EV Radar`;
+  const title = `${vA.name} vs ${vB.name} ${year} – Price, Range & Specs Compared`;
   const desc  = [
     `${vA.name} vs ${vB.name}: Which is better in ${year}?`,
     `${vA.name} starts at ${priceA}${rangeA ? ` with ${rangeA} range` : ""}.`,
@@ -271,7 +271,7 @@ export default async function ComparePairPage({ params }) {
                       </div>
                     ))}
                   </div>
-                  <Link href={`/${v.vehicleType === "car" ? "cars" : "bikes"}/${v.slug}`}
+                  <Link href={`/${v.vehicleType === "car" ? "cars" : v.vehicleType === "commercial" ? "commercial" : "bikes"}/${v.slug}`}
                     className="mt-3 block rounded-xl bg-gray-900 py-2 text-center text-xs font-bold text-white hover:bg-green-700 transition">
                     View Full Details →
                   </Link>
@@ -431,11 +431,11 @@ export default async function ComparePairPage({ params }) {
               current prices and availability, contact your nearest authorised {vA.brand} and {vB.brand} dealership.
             </p>
             <div className="flex flex-wrap gap-3">
-              <Link href={`/${vA.vehicleType === "car" ? "cars" : "bikes"}/${vA.slug}`}
+              <Link href={`/${vA.vehicleType === "car" ? "cars" : vA.vehicleType === "commercial" ? "commercial" : "bikes"}/${vA.slug}`}
                 className="rounded-xl bg-green-600 px-4 py-2 text-xs font-bold text-white hover:bg-green-700 transition">
                 Full {vA.name} Details →
               </Link>
-              <Link href={`/${vB.vehicleType === "car" ? "cars" : "bikes"}/${vB.slug}`}
+              <Link href={`/${vB.vehicleType === "car" ? "cars" : vB.vehicleType === "commercial" ? "commercial" : "bikes"}/${vB.slug}`}
                 className="rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white hover:bg-blue-700 transition">
                 Full {vB.name} Details →
               </Link>

@@ -6,6 +6,9 @@ import { FaXTwitter, FaLinkedin } from "react-icons/fa6";
 import NewsCard from "@/components/news/NewsCard";
 import { SITE_URL, SITE_NAME } from "@/app/layout";
 
+// User text goes into a regex — escape so "C++" or "(" can't throw or mis-match
+const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 export const revalidate = 300;
 
 async function getAuthorData(name) {
@@ -18,7 +21,7 @@ async function getAuthorData(name) {
     const decoded = decodeURIComponent(name).replace(/-/g, " ");
 
     const [articles, profile] = await Promise.all([
-      Article.find({ status: "published", author: { $regex: new RegExp(decoded, "i") } })
+      Article.find({ status: "published", author: { $regex: new RegExp(escapeRegExp(decoded), "i") } })
         .sort({ publishedAt: -1 }).limit(30).lean(),
       Author.findOne({ slug: name }).lean(),
     ]);
@@ -36,7 +39,7 @@ export async function generateMetadata({ params }) {
   const { authorName, profile } = await getAuthorData(name);
   const title = profile?.title || "EV Journalist";
   return {
-    title: `${authorName} – ${title} | ${SITE_NAME}`,
+    title: `${authorName} – ${title}`,
     description: profile?.bio || `Articles by ${authorName} on ${SITE_NAME} – India's leading electric vehicle news and reviews platform.`,
     alternates: { canonical: `${SITE_URL}/authors/${name}` },
     openGraph: {
@@ -67,7 +70,7 @@ export default async function AuthorPage({ params }) {
   const categories  = [...new Set(articles.map(a => a.category))];
   const totalViews  = articles.reduce((s, a) => s + (a.views || 0), 0);
   const latestDate  = articles[0]?.publishedAt
-    ? new Date(articles[0].publishedAt).toLocaleDateString("en-IN", { year: "numeric", month: "short" })
+    ? new Date(articles[0].publishedAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", year: "numeric", month: "short" })
     : null;
 
   const personJsonLd = {

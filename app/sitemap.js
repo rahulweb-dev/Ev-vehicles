@@ -78,7 +78,7 @@ async function getDbEntries() {
         .select("slug publishedAt updatedAt author tags image")
         .lean(),
       Vehicle.find({ status: "published" })
-        .select("slug vehicleType brand updatedAt featured featuredImage name")
+        .select("slug vehicleType brand updatedAt featured featuredImage name variants.exShowroomPrice")
         .lean(),
       Blog.find({ status: "published" })
         .select("slug publishedAt updatedAt featured")
@@ -89,7 +89,8 @@ async function getDbEntries() {
     /* ── Article pages ────────────────────────────────────────────── */
     const articleUrls = articles.map(a => ({
       url:             `${SITE_URL}/news/${a.slug}`,
-      lastModified:    a.publishedAt || a.updatedAt || new Date(),
+      // updatedAt first so edits signal a recrawl
+      lastModified:    a.updatedAt || a.publishedAt || new Date(),
       changeFrequency: "weekly",
       priority:        0.8,
       ...(a.image && { images: [a.image] }),
@@ -105,23 +106,27 @@ async function getDbEntries() {
     }));
 
     /* ── Author archive pages ─────────────────────────────────────── */
+    // A real lastmod (newest article) — Google ignores lastmods that are always "now"
+    const newest = (list) => list.reduce((m, a) => { const d = a.publishedAt || a.updatedAt; return d && d > m ? d : m; }, new Date(0));
     const uniqueAuthors = [...new Set(articles.map(a => a.author).filter(Boolean))];
     const authorUrls = uniqueAuthors.map(author => ({
       url:             `${SITE_URL}/authors/${encodeURIComponent(author.toLowerCase().replace(/\s+/g, "-"))}`,
-      lastModified:    new Date(),
+      lastModified:    newest(articles.filter(a => a.author === author)),
       changeFrequency: "weekly",
       priority:        0.6,
     }));
 
     /* ── Tag pages — only tags with 3+ articles (quality threshold) ─ */
     const tagCounts = {};
-    articles.forEach(a => (a.tags || []).forEach(t => { tagCounts[t] = (tagCounts[t] || 0) + 1; }));
+    // Case-insensitive, lowercase URLs — matches the tag page's canonical
+    articles.forEach(a => new Set((a.tags || []).map(t => t.trim().toLowerCase()).filter(Boolean))
+      .forEach(t => { tagCounts[t] = (tagCounts[t] || 0) + 1; }));
     const qualityTags = Object.entries(tagCounts)
       .filter(([, count]) => count >= 3)
       .map(([tag]) => tag);
     const tagUrls = qualityTags.map(tag => ({
       url:             `${SITE_URL}/news/tags/${encodeURIComponent(tag)}`,
-      lastModified:    new Date(),
+      lastModified:    newest(articles.filter(a => (a.tags || []).some(t => t.trim().toLowerCase() === tag))),
       changeFrequency: "weekly",
       priority:        0.55,
     }));
@@ -148,7 +153,8 @@ async function getDbEntries() {
 
     /* ── City price pages — cars + bikes ─────────────────────────── */
     const cityPriceUrls = vehicles
-      .filter(v => v.vehicleType === "car" || v.vehicleType === "bike")
+      // Price pages without a price are noindex — listing them is a Search Console error
+      .filter(v => (v.vehicleType === "car" || v.vehicleType === "bike") && v.variants?.[0]?.exShowroomPrice)
       .flatMap(v => {
         const base = v.vehicleType === "car" ? "cars" : "bikes";
         return TOP_CITIES.map(city => ({

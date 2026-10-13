@@ -14,80 +14,16 @@ const tabs = [
   { id: "charging",   name: "Charging",   icon: <BatteryCharging size={15} /> },
 ];
 
-const TODAY  = new Date().toISOString();
-const WEEK1  = new Date(Date.now() - 1 * 86400000).toISOString();
-const WEEK2  = new Date(Date.now() - 2 * 86400000).toISOString();
-const WEEK3  = new Date(Date.now() - 3 * 86400000).toISOString();
-const WEEK4  = new Date(Date.now() - 4 * 86400000).toISOString();
-
-const FALLBACK = {
-  cars: {
-    featured: {
-      image: "https://images.unsplash.com/photo-1617788138017-80ad40651399?q=80&w=1600&auto=format&fit=crop",
-      title: "Tata Harrier EV Launched In India – Price, Range & Features Revealed",
-      excerpt: "Tata Motors unveils the Harrier EV with 500 km range and Level 2 ADAS at ₹24.49 Lakh.",
-      slug: "tata-harrier-ev-launched-india-price-range-features-2026",
-      readTime: "6 min", publishedAt: TODAY,
-    },
-    sideNews: [
-      { image: "https://images.unsplash.com/photo-1553440569-bcc63803a83d?q=80&w=400&auto=format&fit=crop", title: "Mahindra BE 6 Crosses 20,000 Bookings In 48 Hours", category: "Trending", slug: "mahindra-be6-electric-suv-review-range-performance-2026", readTime: "5 min", publishedAt: WEEK1 },
-      { image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=400&auto=format&fit=crop", title: "BYD Announces 1000 km Range EV For India 2027", category: "Update", slug: "tata-harrier-ev-launched-india-price-range-features-2026", readTime: "4 min", publishedAt: WEEK2 },
-      { image: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?q=80&w=400&auto=format&fit=crop", title: "Upcoming Compact Electric SUVs Launching In 2026", category: "Upcoming", slug: "tata-harrier-ev-launched-india-price-range-features-2026", readTime: "3 min", publishedAt: WEEK3 },
-      { image: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=400&auto=format&fit=crop", title: "Tata Nexon EV Long Range Variant Now Available", category: "Launch", slug: "tata-harrier-ev-launched-india-price-range-features-2026", readTime: "4 min", publishedAt: WEEK4 },
-    ],
-  },
-  bikes: {
-    featured: {
-      image: "https://images.unsplash.com/photo-1620891549027-942fdc95d3f5?q=80&w=1600&auto=format&fit=crop",
-      title: "Ather 450X Gen 4 Officially Revealed With 146 km Range",
-      excerpt: "Ather launches next-gen electric scooter with improved battery, Google Maps, and faster charging.",
-      slug: "ather-450x-gen-4-launched-india-specs-price-2026",
-      readTime: "5 min", publishedAt: TODAY,
-    },
-    sideNews: [
-      { image: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?q=80&w=400&auto=format&fit=crop", title: "Ola S1 Pro Gets Massive OTA Software Update", category: "Update", slug: "ather-450x-gen-4-launched-india-specs-price-2026", readTime: "3 min", publishedAt: WEEK1 },
-      { image: "https://images.unsplash.com/photo-1517846693594-1567da72af75?q=80&w=400&auto=format&fit=crop", title: "TVS iQube ST Extended — Best Value Electric Scooter?", category: "Review", slug: "ather-450x-gen-4-launched-india-specs-price-2026", readTime: "5 min", publishedAt: WEEK2 },
-      { image: "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?q=80&w=400&auto=format&fit=crop", title: "Ultraviolette F77 Mach 2: India's Fastest EV Bike", category: "Trending", slug: "ather-450x-gen-4-launched-india-specs-price-2026", readTime: "4 min", publishedAt: WEEK3 },
-    ],
-  },
-  commercial: {
-    featured: {
-      image: "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?q=80&w=1600&auto=format&fit=crop",
-      title: "Volvo Introduces Next Generation Electric Trucks In India",
-      excerpt: "Commercial EVs are reshaping Indian logistics with 300 km range and lower total cost of ownership.",
-      slug: "india-50000-ev-charging-stations-2026-government-plan",
-      readTime: "5 min", publishedAt: TODAY,
-    },
-    sideNews: [
-      { image: "https://images.unsplash.com/photo-1494412651409-8963ce7935a7?q=80&w=400&auto=format&fit=crop", title: "Ashok Leyland Expands EV Bus Production Capacity", category: "Industry", slug: "india-50000-ev-charging-stations-2026-government-plan", readTime: "4 min", publishedAt: WEEK1 },
-      { image: "https://images.unsplash.com/photo-1502877338535-766e1452684a?q=80&w=400&auto=format&fit=crop", title: "Electric Cargo Vans See 300% Growth In Indian Cities", category: "Trending", slug: "india-50000-ev-charging-stations-2026-government-plan", readTime: "3 min", publishedAt: WEEK2 },
-    ],
-  },
-  charging: {
-    featured: {
-      image: "https://images.unsplash.com/photo-1678358181658-9e2d9b1aeb9f?q=80&w=1600&auto=format&fit=crop",
-      title: "India Plans 50,000 New EV Charging Stations By 2027",
-      excerpt: "Government accelerates EV charging infrastructure expansion across Tier 2 & 3 cities.",
-      slug: "india-50000-ev-charging-stations-2026-government-plan",
-      readTime: "4 min", publishedAt: TODAY,
-    },
-    sideNews: [
-      { image: "https://images.unsplash.com/photo-1621905251918-48416bd8575a?q=80&w=400&auto=format&fit=crop", title: "DC Fast Charging Speed Improves By 40% With New Tech", category: "Technology", slug: "india-50000-ev-charging-stations-2026-government-plan", readTime: "4 min", publishedAt: WEEK1 },
-      { image: "https://images.unsplash.com/photo-1617788138017-80ad40651399?q=80&w=400&auto=format&fit=crop", title: "Battery Swapping Gains Momentum In Indian Cities", category: "Charging", slug: "india-50000-ev-charging-stations-2026-government-plan", readTime: "3 min", publishedAt: WEEK2 },
-    ],
-  },
-};
-
 const VIEW_ALL_HREF = {
   cars:       "/cars",
   bikes:      "/bikes",
   commercial: "/commercial",
-  charging:   "/news?category=charging",
+  charging:   "/news/category/charging",
 };
 
 function fmtDate(d) {
   if (!d) return null;
-  return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+  return new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Kolkata" });
 }
 
 function articleToFeatured(a) {
@@ -161,25 +97,23 @@ export default function LatestNews({ initialArticles = null }) {
       .then((r) => r.json())
       .then((data) => {
         const articles = data.articles || [];
-        if (articles.length === 0) throw new Error("empty");
-        const feat = articleToFeatured(articles[0]);
+        const feat = articles.length ? articleToFeatured(articles[0]) : null;
         const side = articles.slice(1, 5).map(articleToSide);
         cache.current[active] = { featured: feat, sideNews: side };
         setFeatured(feat);
         setSideNews(side);
       })
       .catch(() => {
-        const fb = FALLBACK[active] || FALLBACK.cars;
-        setFeatured(fb.featured);
-        setSideNews(fb.sideNews);
+        setFeatured(null);
+        setSideNews([]);
       })
       .finally(() => setLoading(false));
   }, [active]);
 
   if (loading) return <LatestNewsSectionSkeleton />;
 
-  const feat     = featured || FALLBACK[active]?.featured;
-  const side     = sideNews.length ? sideNews : FALLBACK[active]?.sideNews || [];
+  const feat     = featured;
+  const side     = sideNews;
   const featHref = `/news/${feat?.slug}`;
 
   return (
@@ -226,8 +160,17 @@ export default function LatestNews({ initialArticles = null }) {
           ))}
         </div>
 
+        {!feat && (
+          <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 px-6 py-14 text-center">
+            <p className="text-base font-semibold text-gray-700">No {tabs.find(t => t.id === active)?.name.toLowerCase()} news yet.</p>
+            <Link href="/news" className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-green-700 hover:text-green-800">
+              Browse all EV news <ArrowRight size={14} />
+            </Link>
+          </div>
+        )}
+
         {/* Main grid: stacked on mobile → two columns on lg */}
-        <div className="grid gap-4 lg:grid-cols-[1fr_320px] lg:gap-5 xl:grid-cols-[1fr_360px]">
+        {feat && <div className="grid gap-4 lg:grid-cols-[1fr_320px] lg:gap-5 xl:grid-cols-[1fr_360px]">
 
           {/* Featured card */}
           <div
@@ -334,7 +277,7 @@ export default function LatestNews({ initialArticles = null }) {
             ))}
           </div>
 
-        </div>
+        </div>}
       </div>
     </section>
   );

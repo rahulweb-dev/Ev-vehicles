@@ -10,12 +10,21 @@ function cleanSrc(src) {
   return typeof src === "string" ? src.trim() : "";
 }
 
-// Build a deduplicated ordered list: [primary, secondary?, DEFAULT_FALLBACK]
-function buildSources(src, fallbackSrc) {
+// ImageKit originals are full-size 1536px uploads (up to ~2.5 MB) — ask for a resized copy.
+// Big originals were timing out (HTTP 408) under load, which dropped cards to the logo fallback.
+function resizedImageKit(url, width) {
+  if (!/^https:\/\/ik\.imagekit\.io\//.test(url) || /[?&]tr=/.test(url)) return url;
+  return `${url}${url.includes("?") ? "&" : "?"}tr=w-${width},q-75`;
+}
+
+// Build a deduplicated ordered list: [resized primary, original primary, secondary?, DEFAULT_FALLBACK]
+// The original acts as a retry when ImageKit hiccups on the resized copy.
+function buildSources(src, fallbackSrc, width) {
   const primary   = cleanSrc(src) || DEFAULT_FALLBACK;
   const secondary = cleanSrc(fallbackSrc) || DEFAULT_FALLBACK;
-  const list = [primary];
-  if (secondary !== primary) list.push(secondary);
+  const list = [resizedImageKit(primary, width)];
+  if (!list.includes(primary)) list.push(primary);
+  if (!list.includes(secondary)) list.push(secondary);
   if (!list.includes(DEFAULT_FALLBACK)) list.push(DEFAULT_FALLBACK);
   return list;
 }
@@ -27,9 +36,11 @@ export default function ArticleImage({
   className = "",
   priority = false,
   loading,
+  width,
   ...props
 }) {
-  const sources = buildSources(src, fallbackSrc);
+  // Hero images get a bigger copy; cards and thumbnails are fine at 800px
+  const sources = buildSources(src, fallbackSrc, width || (priority ? 1280 : 800));
 
   // idx tracks which source in the chain we're currently showing
   const [idx, setIdx]           = useState(0);

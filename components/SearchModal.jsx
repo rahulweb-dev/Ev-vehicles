@@ -205,7 +205,7 @@ export default function SearchModal() {
                   <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                     {popular.map(v => (
                       <Link key={v._id} onClick={close}
-                        href={`/${v.vehicleType === "car" ? "cars" : "bikes"}/${v.slug}`}
+                        href={`/${v.vehicleType === "car" ? "cars" : v.vehicleType === "commercial" ? "commercial" : "bikes"}/${v.slug}`}
                         className="flex items-center gap-2 rounded-xl p-2.5 hover:bg-gray-50 transition">
                         <div className="relative h-10 w-14 shrink-0 overflow-hidden rounded-lg bg-gray-100">
                           {v.featuredImage

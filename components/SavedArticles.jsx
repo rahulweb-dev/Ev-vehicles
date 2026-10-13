@@ -72,7 +72,7 @@ export default function SavedArticles() {
                   </Link>
                   <div className="mt-2 flex items-center justify-between">
                     <p className="text-xs text-gray-400">
-                      {new Date(item.savedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                      {new Date(item.savedAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "short", year: "numeric" })}
                     </p>
                     <button onClick={() => remove(item.slug)}
                       className="flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium text-red-400 transition hover:bg-red-50 hover:text-red-600">

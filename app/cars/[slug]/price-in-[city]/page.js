@@ -84,7 +84,7 @@ export async function generateMetadata({ params }) {
   if (!car) return { title: "Car Not Found" };
 
   const price = car.variants?.[0]?.exShowroomPrice || "";
-  const title = `${car.name} On-Road Price in ${cityData.name} ${new Date().getFullYear()} – Road Tax, Registration & Insurance | EV Radar`;
+  const title = `${car.name} On-Road Price in ${cityData.name} ${new Date().getFullYear()} – Road Tax, Registration & Insurance`;
   const desc  = `${car.name} on-road price in ${cityData.name} (${cityData.state}). Includes ex-showroom price${price ? " starting at " + price : ""}, road tax (${cityData.roadTaxPct}%), registration fee, and insurance. Full cost breakdown for ${cityData.name} buyers.`;
 
   return {

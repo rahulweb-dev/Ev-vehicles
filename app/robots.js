@@ -38,7 +38,6 @@ export default function robots() {
     sitemap: [
       "https://www.evradar.in/sitemap.xml",
       "https://www.evradar.in/sitemap-news.xml",
-      "https://www.evradar.in/news-sitemap.xml",
       "https://www.evradar.in/image-sitemap.xml",
     ],
     host: "https://www.evradar.in",

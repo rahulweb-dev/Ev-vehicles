@@ -32,6 +32,13 @@ async function getFont() {
   }
 }
 
+const COVER_LABELS = {
+  cars:       "Electric Cars",
+  bikes:      "Electric Two-Wheelers",
+  commercial: "Commercial EVs",
+  charging:   "Charging & Infrastructure",
+};
+
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
 
@@ -54,6 +61,39 @@ export async function GET(request) {
 
   try {
     const interFont = await getFont();
+    const fontOpts = interFont ? { fonts: [{ name: "Inter", data: interFont, weight: 700, style: "normal" }] } : {};
+
+    // Text-free article cover: used as the article image when no photo exists, so the
+    // headline the page already prints over the image isn't duplicated inside it.
+    if (type === "cover") {
+      const label = COVER_LABELS[tag?.toLowerCase()] || "Electric Vehicles";
+      const logo  = new URL("/images/logo.png", request.url).href;
+      const cover = new ImageResponse(
+        (
+          <div style={{ width: "1200px", height: "675px", display: "flex", alignItems: "center", justifyContent: "center", background: "#1f5132", position: "relative", overflow: "hidden", fontFamily: "Inter, sans-serif" }}>
+            {/* Radar rings */}
+            {[1100, 860, 620].map((d) => (
+              <div key={d} style={{ position: "absolute", left: `${600 - d / 2}px`, top: `${337 - d / 2}px`, width: `${d}px`, height: `${d}px`, borderRadius: "50%", border: "2px solid rgba(255,255,255,0.10)" }} />
+            ))}
+            <div style={{ position: "absolute", right: "-120px", bottom: "-160px", width: "520px", height: "520px", borderRadius: "50%", background: "radial-gradient(circle, rgba(74,222,128,0.30) 0%, transparent 70%)" }} />
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "28px" }}>
+              <div style={{ width: "300px", height: "300px", borderRadius: "50%", background: "#f6f4ee", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 20px 60px rgba(0,0,0,0.35)" }}>
+                <img src={logo} width={240} height={142} style={{ objectFit: "contain" }} />
+              </div>
+              <div style={{ display: "flex", padding: "10px 26px", borderRadius: "999px", border: "2px solid rgba(255,255,255,0.45)", color: "#ffffff", fontSize: "26px", fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" }}>
+                {label}
+              </div>
+            </div>
+          </div>
+        ),
+        { width: 1200, height: 675, ...fontOpts }
+      );
+      const coverBody = await new Response(cover.body).arrayBuffer();
+      return new Response(coverBody, {
+        status: 200,
+        headers: { "Content-Type": "image/png", "Cache-Control": "public, max-age=604800, s-maxage=604800, immutable" },
+      });
+    }
 
     const imageResponse = new ImageResponse(
       (

@@ -44,7 +44,7 @@ async function getInitialBikes() {
 }
 
 export const metadata = {
-  title: "Electric Bikes & Scooters in India 2026 – Price, Range & Specs | EV Radar",
+  title: "Electric Bikes & Scooters in India 2026 – Price, Range & Specs",
   description:
     "Compare all electric scooters and bikes in India 2026. Filter by budget, brand, range and battery. Ather 450X, Ola S1 Pro, TVS iQube, Bajaj Chetak and more.",
   keywords: "electric bikes india 2026, electric scooters india, best electric scooter india, ola s1 pro price, ather 450x price, tvs iqube price, electric two wheeler india, electric bike price india",

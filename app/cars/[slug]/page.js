@@ -487,7 +487,7 @@ export default async function CarDetailPage({ params }) {
             </div>
             <div className="mt-6 text-center">
               <Link
-                href={`/news?category=cars`}
+                href={`/news/category/cars`}
                 className="inline-flex items-center gap-2 rounded-full border border-green-600 px-6 py-2.5 text-sm font-bold text-green-700 transition hover:bg-green-600 hover:text-white"
               >
                 View All {car.brand} News →

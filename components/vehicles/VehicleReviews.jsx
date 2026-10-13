@@ -72,7 +72,7 @@ function ReviewCard({ review }) {
             <span className="text-sm font-black text-amber-700">{review.rating}.0</span>
           </div>
           <span className="text-[10px] text-gray-400">
-            {new Date(review.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+            {new Date(review.createdAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "short", year: "numeric" })}
           </span>
         </div>
       </div>

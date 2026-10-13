@@ -5,7 +5,7 @@ import { FALLBACK_ANALYTICS } from "@/lib/ev-sales-fallback";
 export const revalidate = 3600;
 
 export const metadata = {
-  title: `EV Car Sales India 2025 – Best Selling Electric Cars & Market Share | ${SITE_NAME}`,
+  title: `EV Car Sales India 2025 – Best Selling Electric Cars & Market Share`,
   description: "Monthly electric car sales data India 2025. Top selling EV cars, brand rankings, market share — Tata, MG, Mahindra, BYD, Hyundai.",
   alternates: { canonical: `${SITE_URL}/ev-sales/cars` },
   openGraph: {

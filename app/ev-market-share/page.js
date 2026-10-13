@@ -5,7 +5,7 @@ import { FALLBACK_ANALYTICS } from "@/lib/ev-sales-fallback";
 export const revalidate = 3600;
 
 export const metadata = {
-  title: `EV Market Share India 2025 – Brand-wise Electric Vehicle Market Share | ${SITE_NAME}`,
+  title: `EV Market Share India 2025 – Brand-wise Electric Vehicle Market Share`,
   description: "Electric vehicle market share in India 2025. Tata, Ola, MG, Mahindra, TVS, Ather — brand-wise EV market share data for cars, two-wheelers, commercial.",
   keywords: "EV market share India 2025, electric car market share, EV brand rankings India, Tata EV market share",
   alternates: { canonical: `${SITE_URL}/ev-market-share` },

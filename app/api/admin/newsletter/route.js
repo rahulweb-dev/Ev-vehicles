@@ -36,8 +36,8 @@ export async function POST(request) {
       return NextResponse.json({ error: "No active subscribers to send to" }, { status: 400 });
     }
     const emails = subscribers.map(s => s.email);
-    const { sent, failed } = await broadcastMail({ emails, subject, html });
-    return NextResponse.json({ success: true, total: emails.length, sent, failed });
+    const { queued } = await broadcastMail({ emails, subject, html });
+    return NextResponse.json({ success: true, total: emails.length, queued });
   } catch (err) {
     console.error("[POST /api/admin/newsletter]", err);
     return NextResponse.json({ error: "Server error" }, { status: 500 });

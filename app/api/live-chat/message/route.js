@@ -2,12 +2,25 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import LiveChatSession from "@/lib/models/LiveChatSession";
 import { getPusherServer } from "@/lib/pusher";
+import { requireAuth } from "@/lib/auth";
 
 // POST — send a message (user or agent)
 export async function POST(req) {
   try {
     await dbConnect();
     const { sessionId, role, content, senderName } = await req.json();
+
+    if (!["user", "agent"].includes(role)) {
+      return NextResponse.json({ error: "Invalid role" }, { status: 400 });
+    }
+    // Only signed-in staff may reply as an agent — otherwise anyone could impersonate support
+    if (role === "agent") {
+      const auth = await requireAuth();
+      if (auth.error) return NextResponse.json({ error: auth.error }, { status: auth.status });
+    }
+    if (typeof sessionId !== "string" || typeof content !== "string") {
+      return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+    }
 
     if (!sessionId || !role || !content?.trim()) {
       return NextResponse.json({ error: "sessionId, role, content required" }, { status: 400 });

@@ -278,7 +278,7 @@ function PickerModal({ type, available, loading, onSelect, onClose }) {
 }
 
 /* ─── Main component ─────────────────────────────────────────────── */
-export default function CompareClient({ initialV0 = null, initialV1 = null }) {
+export default function CompareClient({ initialV0 = null, initialV1 = null, initialV2 = null }) {
   const [type,        setType]        = useState("cars");
   const [selected,    setSelected]    = useState([]);
   const [pickerOpen,  setPickerOpen]  = useState(false);
@@ -302,12 +302,12 @@ export default function CompareClient({ initialV0 = null, initialV1 = null }) {
     fetchType("bike");
   }, []);
 
-  /* Pre-populate selected vehicles from URL params (v0, v1) once both lists load */
+  /* Pre-populate selected vehicles from URL params (v0, v1, v2) once both lists load */
   useEffect(() => {
     if (preApplied.current) return;
     if (loading.cars || loading.bikes) return;
 
-    const slugs = [initialV0, initialV1].filter(Boolean);
+    const slugs = [initialV0, initialV1, initialV2].filter(Boolean);
     if (slugs.length === 0) { preApplied.current = true; return; }
 
     const all = [...allVehicles.cars, ...allVehicles.bikes];
@@ -321,7 +321,7 @@ export default function CompareClient({ initialV0 = null, initialV1 = null }) {
     }
 
     preApplied.current = true;
-  }, [loading.cars, loading.bikes, allVehicles, initialV0, initialV1]);
+  }, [loading.cars, loading.bikes, allVehicles, initialV0, initialV1, initialV2]);
 
   const specs     = type === "cars" ? CAR_SPECS : BIKE_SPECS;
   const isLoading = type === "cars" ? loading.cars : loading.bikes;

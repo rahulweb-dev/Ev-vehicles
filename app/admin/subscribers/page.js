@@ -155,7 +155,7 @@ export default function AdminSubscribersPage() {
         <div className={`rounded-2xl border p-4 text-sm font-semibold ${digestResult.error ? "border-red-200 bg-red-50 text-red-700" : "border-green-200 bg-green-50 text-green-700"}`}>
           {digestResult.error
             ? `Error: ${digestResult.error}`
-            : `Weekly digest sent! ${digestResult.sent}/${digestResult.subscribers} delivered, covering ${digestResult.articles} articles.`}
+            : `Weekly digest queued for ${digestResult.queued ?? digestResult.subscribers} subscribers, covering ${digestResult.articles} articles.`}
         </div>
       )}
 
@@ -247,7 +247,7 @@ export default function AdminSubscribersPage() {
                     <CheckCircle size={15} />
                     {sendResult.mode === "test"
                       ? "Test email sent successfully!"
-                      : `Sent to ${sendResult.sent}/${sendResult.total} subscribers.${sendResult.failed > 0 ? ` (${sendResult.failed} failed)` : ""}`}
+                      : `Queued for ${sendResult.queued ?? sendResult.total} subscribers. Emails go out in batches over the next runs of the mail worker.`}
                   </p>
                 )}
               </div>

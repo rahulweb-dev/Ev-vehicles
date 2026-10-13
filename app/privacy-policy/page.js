@@ -1,7 +1,7 @@
 ﻿import { SITE_URL } from "../layout";
 
 export const metadata = {
-  title: "Privacy Policy – EV Radar",
+  title: "Privacy Policy",
   description:
     "Read EV Radar's privacy policy to understand how we collect, use, and protect your personal information.",
   alternates: { canonical: `${SITE_URL}/privacy-policy` },

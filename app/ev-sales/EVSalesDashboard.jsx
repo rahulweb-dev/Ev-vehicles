@@ -45,7 +45,7 @@ const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Se
 
 function fmtDate(iso) {
   if (!iso) return "July 2025";
-  return new Date(iso).toLocaleDateString("en-IN", { month: "long", year: "numeric" });
+  return new Date(iso).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", month: "long", year: "numeric" });
 }
 
 export default function EVSalesDashboard({ data = {} }) {

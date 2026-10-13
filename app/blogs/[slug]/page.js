@@ -220,7 +220,7 @@ export default async function BlogPostPage({ params }) {
               </div>
               <div className="flex items-center gap-1.5">
                 <Calendar size={15} />
-                {new Date(blog.publishedAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
+                {new Date(blog.publishedAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "long", year: "numeric" })}
               </div>
               <div className="flex items-center gap-1.5">
                 <Clock3 size={15} />

@@ -2,7 +2,7 @@
 import OfflineClient from "./OfflineClient";
 
 export const metadata = {
-  title: "You're Offline – EV Radar",
+  title: "You're Offline",
   robots: { index: false },
 };
 

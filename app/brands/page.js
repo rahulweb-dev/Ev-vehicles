@@ -6,7 +6,7 @@ import { SITE_URL, SITE_NAME } from "../layout";
 export const revalidate = 3600;
 
 export const metadata = {
-  title: `EV Brands in India 2026 – All Electric Vehicle Manufacturers | ${SITE_NAME}`,
+  title: `EV Brands in India 2026 – All Electric Vehicle Manufacturers`,
   description:
     "Explore all electric vehicle brands in India. Browse cars, bikes, and commercial EVs by manufacturer — Tata, Mahindra, Ather, Ola, Hyundai, BYD, Kia, and more.",
   alternates: { canonical: `${SITE_URL}/brands` },

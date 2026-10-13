@@ -2,7 +2,7 @@
 import EMICalculatorApp from "./EMICalculatorApp";
 
 export const metadata = {
-  title: "EV EMI Calculator India 2026 – Electric Vehicle Loan Calculator | EV Radar",
+  title: "EV EMI Calculator India 2026 – Electric Vehicle Loan Calculator",
   description: "Calculate your electric vehicle EMI instantly. Enter EV price, down payment, loan tenure and interest rate to get monthly EMI, total interest and amortization schedule. Free EV loan calculator India.",
   keywords: "ev emi calculator india, electric vehicle loan calculator, ev loan emi 2026, car emi calculator india, ev finance calculator",
   alternates: { canonical: `${SITE_URL}/emi-calculator` },

@@ -92,7 +92,7 @@ export default function PriceHistoryChart({ priceHistory = [], currentPrice, veh
                       style={{ height: `${pct}%` }}
                     />
                     <span className="text-[10px] text-gray-400 text-center leading-tight truncate w-full text-center">
-                      {entry.date.toLocaleDateString("en-IN", { month: "short", year: "2-digit" })}
+                      {entry.date.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", month: "short", year: "2-digit" })}
                     </span>
                   </div>
                 );
@@ -130,7 +130,7 @@ export default function PriceHistoryChart({ priceHistory = [], currentPrice, veh
                   {entry.note && <p className="text-xs text-gray-500">{entry.note}</p>}
                 </div>
                 <p className="text-xs text-gray-400">
-                  {entry.date.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
+                  {entry.date.toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "long", year: "numeric" })}
                 </p>
               </div>
             ))}

@@ -19,7 +19,7 @@ function relativeDate(dateStr) {
   if (mins  < 60)  return `${mins  < 1 ? "Just now" : `${mins}m ago`}`;
   if (hours < 24)  return `${hours}h ago`;
   if (days  < 7)   return `${days}d ago`;
-  return new Date(dateStr).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+  return new Date(dateStr).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "short" });
 }
 
 const categoryColors = {
@@ -86,7 +86,7 @@ function DefaultNewsCard({ article }) {
                 {fmtViews(article.views)}
               </span>
             )}
-            <span title={new Date(article.publishedAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}>
+            <span title={new Date(article.publishedAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "long", year: "numeric" })}>
               {relativeDate(article.publishedAt)}
             </span>
           </div>
@@ -137,7 +137,7 @@ function FeaturedNewsCard({ article }) {
               </div>
               <span>·</span>
               <span>
-                {new Date(article.publishedAt).toLocaleDateString("en-IN", {
+                {new Date(article.publishedAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata",
                   day: "numeric", month: "long",
                 })}
               </span>
@@ -184,7 +184,7 @@ function HorizontalNewsCard({ article }) {
             <Clock3 size={11} />
             <span>{article.readTime}</span>
             <span>·</span>
-            <span title={new Date(article.publishedAt).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}>
+            <span title={new Date(article.publishedAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "long", year: "numeric" })}>
               {relativeDate(article.publishedAt)}
             </span>
           </div>

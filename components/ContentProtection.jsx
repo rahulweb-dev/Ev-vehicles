@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
 
 const SITE_URL = "https://www.evradar.in";
-const CREDIT = `\n\n— Read more at ${SITE_URL}\n© ${new Date().getFullYear()} EV News India. All rights reserved.`;
+const CREDIT = `\n\n— Read more at ${SITE_URL}\n© ${new Date().getFullYear()} EV Radar. All rights reserved.`;
 
 export default function ContentProtection() {
   const pathname = usePathname();
@@ -23,6 +23,8 @@ export default function ContentProtection() {
 
     // 1. Block right-click context menu
     const onContextMenu = (e) => {
+      // Leave forms and links alone: paste, spell-check and "open in new tab" must keep working
+      if (e.target.closest?.("input, textarea, select, [contenteditable], a")) return;
       e.preventDefault();
       showToast();
     };
@@ -81,7 +83,7 @@ export default function ContentProtection() {
       className="fixed bottom-24 left-1/2 -translate-x-1/2 flex items-center gap-2.5 rounded-2xl bg-gray-900/95 px-5 py-3 text-sm text-white shadow-2xl backdrop-blur-sm pointer-events-none select-none"
     >
       <ShieldCheck size={16} className="text-green-400 shrink-0" />
-      <span>© EV News India — Content is copyright protected.</span>
+      <span>© EV Radar — Content is copyright protected.</span>
     </div>
   );
 }

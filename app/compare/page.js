@@ -4,7 +4,7 @@ import CompareClient from "./CompareClient";
 import { SITE_URL } from "../layout";
 
 export const metadata = {
-  title: "Compare Electric Vehicles – Cars & Bikes Side by Side | EV Radar",
+  title: "Compare Electric Vehicles – Cars & Bikes Side by Side",
   description:
     "Compare electric cars and bikes side by side. Check specs, range, motor, price and features of top EVs in India.",
   keywords: "compare electric cars india, ev comparison india, nexon ev vs punch ev, tata vs mahindra ev, electric car comparison 2026, best ev comparison india",
@@ -95,7 +95,7 @@ export default async function ComparePage({ searchParams }) {
         </div>
       )}
 
-      <CompareClient initialV0={sp?.v0 || null} initialV1={sp?.v1 || null} />
+      <CompareClient initialV0={sp?.v0 || null} initialV1={sp?.v1 || null} initialV2={sp?.v2 || null} />
     </>
   );
 }

@@ -7,7 +7,7 @@ import { SITE_URL, SITE_NAME } from "@/app/layout";
 export const revalidate = 3600;
 
 export const metadata = {
-  title: `Our Authors & EV Journalists | ${SITE_NAME}`,
+  title: `Our Authors & EV Journalists`,
   description: `Meet the expert EV journalists and automotive writers behind ${SITE_NAME} — India's #1 electric vehicle news platform.`,
   alternates: { canonical: `${SITE_URL}/authors` },
   openGraph: {
@@ -178,7 +178,7 @@ export default async function AuthorsPage() {
 function AuthorCard({ author }) {
   const initial = author.name?.charAt(0)?.toUpperCase() || "A";
   const latestDate = author.latestArticle
-    ? new Date(author.latestArticle).toLocaleDateString("en-IN", { month: "short", year: "numeric" })
+    ? new Date(author.latestArticle).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", month: "short", year: "numeric" })
     : null;
 
   return (

@@ -49,8 +49,9 @@ const nextConfig = {
       "font-src 'self' data: https://fonts.gstatic.com",
       // Images: allow all HTTPS (vehicle/news images come from many CDNs)
       "img-src 'self' data: blob: https: http:",
-      // Fetch/XHR: GA, our own API, AdSense reporting, Subscribe with Google
-      "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://pagead2.googlesyndication.com https://region1.analytics.google.com https://firestore.googleapis.com https://news.google.com",
+      // Fetch/XHR: GA, our own API, AdSense reporting, Subscribe with Google,
+      // live chat (Pusher), error reporting (Sentry), charging map, read-aloud translation, location lookup
+      "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://stats.g.doubleclick.net https://www.google.com https://pagead2.googlesyndication.com https://*.adtrafficquality.google https://firestore.googleapis.com https://news.google.com https://*.pusher.com wss://*.pusher.com https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://api.openchargemap.io https://translate.googleapis.com https://nominatim.openstreetmap.org",
       // Frames: YouTube embeds + AdSense iframes
       "frame-src https://www.youtube.com https://player.vimeo.com https://www.google.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://news.google.com",
       // Media: audio player uses blob URLs

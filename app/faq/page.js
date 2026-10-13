@@ -3,7 +3,7 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 import { SITE_URL } from "@/app/layout";
 
 export const metadata = {
-  title: "Electric Vehicle FAQ India 2026 – EV Questions Answered | EV Radar",
+  title: "Electric Vehicle FAQ India 2026 – EV Questions Answered",
   description:
     "Answers to the most common electric vehicle questions in India — EV range, charging time, cost, government subsidies, best EVs under ₹15 lakh, and battery life.",
   alternates: { canonical: `${SITE_URL}/faq` },

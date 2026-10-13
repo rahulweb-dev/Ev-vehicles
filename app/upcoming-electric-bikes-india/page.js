@@ -335,7 +335,7 @@ export default function UpcomingElectricBikesPage() {
                       <p className="text-[10px] text-amber-600 font-semibold">Expected Launch</p>
                       <p className="text-sm font-black text-amber-800">{ev.expectedLaunch}</p>
                     </div>
-                    <Link href="/news?category=bikes" className="flex items-center justify-center gap-1.5 rounded-xl border border-gray-200 py-2.5 text-xs font-semibold text-gray-600 hover:border-green-400 hover:text-green-700 transition">
+                    <Link href="/news/category/bikes" className="flex items-center justify-center gap-1.5 rounded-xl border border-gray-200 py-2.5 text-xs font-semibold text-gray-600 hover:border-green-400 hover:text-green-700 transition">
                       <Bell size={12} /> Get Launch Alert
                     </Link>
                   </div>
@@ -362,7 +362,7 @@ export default function UpcomingElectricBikesPage() {
           <div className="mt-10 rounded-2xl bg-green-600 p-8 text-white text-center">
             <h2 className="text-xl font-black">Don&apos;t miss any EV launch</h2>
             <p className="mt-2 text-green-100">Follow our news section for instant alerts when a new bike is confirmed for India.</p>
-            <Link href="/news?category=bikes" className="mt-5 inline-block rounded-full bg-white px-6 py-3 text-sm font-black text-green-700 hover:bg-green-50 transition">
+            <Link href="/news/category/bikes" className="mt-5 inline-block rounded-full bg-white px-6 py-3 text-sm font-black text-green-700 hover:bg-green-50 transition">
               Follow EV Bike Launches →
             </Link>
           </div>

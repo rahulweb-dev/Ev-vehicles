@@ -31,7 +31,7 @@ export async function GET(request) {
   const query = { vehicleSlug: slug, status: "approved" };
 
   const [reviews, total, stats] = await Promise.all([
-    VehicleReview.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+    VehicleReview.find(query).select("-email").sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
     VehicleReview.countDocuments(query),
     VehicleReview.aggregate([
       { $match: query },

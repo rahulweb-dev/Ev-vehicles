@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import sharp from "sharp";
 import { requireAuth } from "@/lib/auth";
 import { uploadToImageKit } from "@/lib/imagekit";
 
@@ -13,6 +12,12 @@ const OPTIMIZABLE = new Set(["image/jpeg","image/jpg","image/png","image/webp","
 
 async function optimizeImage(buffer, mimeType) {
   if (!OPTIMIZABLE.has(mimeType)) return buffer; // pass SVG / unknown through as-is
+
+  // Loaded lazily: sharp's native binary can fail to load on Vercel, and a top-level import
+  // would 500 every upload. Without it we upload the original instead.
+  let sharp;
+  try { sharp = (await import("sharp")).default; }
+  catch (e) { console.warn("[upload] sharp unavailable, uploading original:", e.message); return buffer; }
 
   const img = sharp(buffer);
   const meta = await img.metadata();

@@ -27,10 +27,10 @@ const YoutubeIcon = () => (
 
 const footerLinks = {
   "News Categories": [
-    { name: "Electric Cars News",       href: "/news?category=cars"       },
-    { name: "Electric Bikes News",      href: "/news?category=bikes"      },
-    { name: "Commercial EVs News",      href: "/news?category=commercial" },
-    { name: "EV Charging News",         href: "/news?category=charging"   },
+    { name: "Electric Cars News",       href: "/news/category/cars"       },
+    { name: "Electric Bikes News",      href: "/news/category/bikes"      },
+    { name: "Commercial EVs News",      href: "/news/category/commercial" },
+    { name: "EV Charging News",         href: "/news/category/charging"   },
     { name: "All Latest News",          href: "/news"                     },
   ],
   "Resources": [

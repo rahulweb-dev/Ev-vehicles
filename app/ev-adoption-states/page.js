@@ -5,7 +5,7 @@ import { FALLBACK_ANALYTICS } from "@/lib/ev-sales-fallback";
 export const revalidate = 3600;
 
 export const metadata = {
-  title: `EV Adoption by State India 2025 – State-wise Electric Vehicle Data | ${SITE_NAME}`,
+  title: `EV Adoption by State India 2025 – State-wise Electric Vehicle Data`,
   description: "State-wise EV adoption data India 2025. Top states for electric vehicles — Maharashtra, Delhi, Karnataka, Gujarat, Rajasthan EV sales numbers.",
   keywords: "EV adoption India state-wise, state EV sales India, electric vehicle adoption states India 2025",
   alternates: { canonical: `${SITE_URL}/ev-adoption-states` },

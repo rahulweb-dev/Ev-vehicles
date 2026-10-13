@@ -73,11 +73,13 @@ export async function GET(request) {
 
     /* ── Search ── */
     if (q) {
+      // Escape so searches like "C++" or "(" don't throw or backtrack badly
+      const safeQ = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
       const filter = {
         ...baseFilter,
         $or: [
-          { name:  { $regex: q, $options: "i" } },
-          { brand: { $regex: q, $options: "i" } },
+          { name:  { $regex: safeQ, $options: "i" } },
+          { brand: { $regex: safeQ, $options: "i" } },
         ],
       };
 

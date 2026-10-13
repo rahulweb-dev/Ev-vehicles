@@ -732,7 +732,7 @@ export default function VehicleDetailPage({ vehicle, relatedVehicles = [], vehic
               <div className="rounded-2xl border border-orange-100 bg-orange-50 p-4 text-center">
                 <p className="text-xs text-orange-700 font-semibold">Expected Launch</p>
                 <p className="text-base font-black text-orange-800 mt-1">
-                  {new Date(vehicle.launchDate).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}
+                  {new Date(vehicle.launchDate).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "long", year: "numeric" })}
                 </p>
               </div>
             )}

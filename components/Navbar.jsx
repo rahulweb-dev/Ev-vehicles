@@ -23,10 +23,10 @@ const NAV = [
         heading: 'By Category',
         links: [
           { name: 'All EV News',        href: '/news',                     icon: Newspaper, tag: 'Latest'   },
-          { name: 'Electric Cars',      href: '/news?category=cars',       icon: Car                        },
-          { name: 'Electric Bikes',     href: '/news?category=bikes',      icon: Bike                       },
-          { name: 'Commercial EVs',     href: '/news?category=commercial', icon: Truck                      },
-          { name: 'EV Charging',        href: '/news?category=charging',   icon: Zap                        },
+          { name: 'Electric Cars',      href: '/news/category/cars',       icon: Car                        },
+          { name: 'Electric Bikes',     href: '/news/category/bikes',      icon: Bike                       },
+          { name: 'Commercial EVs',     href: '/news/category/commercial', icon: Truck                      },
+          { name: 'EV Charging',        href: '/news/category/charging',   icon: Zap                        },
         ],
       },
     ],
@@ -133,7 +133,7 @@ function MobileSearch({ onClose }) {
         ])
         const vehicles = (vR.vehicles || []).map(v => ({
           kind: 'vehicle', id: v._id, slug: v.slug,
-          type: v.vehicleType === 'car' ? 'cars' : 'bikes',
+          type: v.vehicleType === 'car' ? 'cars' : v.vehicleType === 'commercial' ? 'commercial' : 'bikes',
           name: v.name, brand: v.brand, image: v.featuredImage || '',
           price: v.variants?.[0]?.exShowroomPrice || '',
         }))
@@ -202,7 +202,7 @@ function MobileSearch({ onClose }) {
                 : item.type === 'cars' ? 'bg-blue-50 text-blue-600'
                 : 'bg-orange-50 text-orange-600'
               }`}>
-                {item.kind === 'article' ? 'News' : item.type === 'cars' ? 'Car' : 'Bike'}
+                {item.kind === 'article' ? 'News' : item.type === 'cars' ? 'Car' : item.type === 'commercial' ? 'Commercial' : 'Bike'}
               </span>
             </Link>
           ))}

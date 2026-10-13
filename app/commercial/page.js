@@ -21,7 +21,7 @@ async function getCommercialArticles() {
       image:    a.image || "",
       author:   a.author || "EVRadar Team",
       readTime: a.readTime || "5 min",
-      date:     a.publishedAt ? new Date(a.publishedAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "",
+      date:     a.publishedAt ? new Date(a.publishedAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "short", year: "numeric" }) : "",
     }));
   } catch {
     return [];
@@ -173,7 +173,7 @@ export default async function CommercialPage() {
             <p className="text-sm text-gray-500">No commercial EV news right now. Check back soon.</p>
           )}
           <div className="mt-5 text-center">
-            <Link href="/news?category=commercial" className="inline-flex items-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-5 py-2.5 text-sm font-semibold text-purple-700 hover:bg-purple-100 transition">
+            <Link href="/news/category/commercial" className="inline-flex items-center gap-2 rounded-xl border border-purple-200 bg-purple-50 px-5 py-2.5 text-sm font-semibold text-purple-700 hover:bg-purple-100 transition">
               View all commercial EV news <ChevronRight size={16} />
             </Link>
           </div>

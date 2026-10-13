@@ -110,7 +110,7 @@ async function getDbContext(query) {
         const range     = v.performance?.drivingRange || v.variants?.[0]?.range || "—";
         const power     = v.performance?.power || "—";
         const fastChg   = v.charging?.fastCharging ? "Fast charging: Yes" : "";
-        const type      = v.vehicleType === "car" ? "cars" : "bikes";
+        const type      = v.vehicleType === "car" ? "cars" : v.vehicleType === "commercial" ? "commercial" : "bikes";
         ctx += `- **${v.brand} ${v.name}** (${v.vehicleType}): ${priceStr} ex-showroom | Range: ${range} | Power: ${power} ${fastChg} → /${type}/${v.slug}\n`;
       }
     }

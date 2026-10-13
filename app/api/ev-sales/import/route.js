@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { dbConnect } from "@/lib/mongodb";
 import EVSale from "@/lib/models/EVSale";
+import { requireAuth } from "@/lib/auth";
 
 // Accepts JSON array of sales records for bulk import
 export async function POST(req) {
   try {
+    const auth = await requireAuth();
+    if (auth.error) return NextResponse.json({ error: auth.error }, { status: auth.status });
     await dbConnect();
     const body = await req.json();
     const { records } = body;

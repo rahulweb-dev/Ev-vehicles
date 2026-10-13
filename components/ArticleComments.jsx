@@ -170,7 +170,7 @@ export default function ArticleComments({ slug }) {
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-sm font-bold text-gray-900">{c.name}</span>
                   <span className="text-xs text-gray-400">
-                    {new Date(c.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                    {new Date(c.createdAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", day: "numeric", month: "short", year: "numeric" })}
                   </span>
                 </div>
                 <p className="text-sm text-gray-700 leading-relaxed">{c.content}</p>

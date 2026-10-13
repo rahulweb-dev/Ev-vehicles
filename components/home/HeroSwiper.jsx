@@ -154,7 +154,7 @@ function SearchBar({ vehicleType, setVehicleType, mobile = false, onQueryChange 
           kind:  'vehicle',
           label: v.name,
           sub:   v.brand,
-          href:  `/${v.vehicleType === 'car' ? 'cars' : 'bikes'}/${v.slug}`,
+          href:  `/${v.vehicleType === 'car' ? 'cars' : v.vehicleType === 'commercial' ? 'commercial' : 'bikes'}/${v.slug}`,
         }))
         const aItems = (aRes.articles || []).map(a => ({
           kind:  'article',
