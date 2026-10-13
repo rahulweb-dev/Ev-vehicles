@@ -1,5 +1,7 @@
-const CACHE_NAME = "evradar-v1";
-const STATIC_CACHE = "evradar-static-v1";
+// v2: stopped intercepting cross-origin images (see fetch handler) — bumping the names
+// makes activate() delete the v1 caches on every visitor's browser.
+const CACHE_NAME = "evradar-v2";
+const STATIC_CACHE = "evradar-static-v2";
 
 // Static assets to cache on install
 const PRECACHE_URLS = [
@@ -39,8 +41,13 @@ self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Skip non-GET, cross-origin API calls, admin routes, Next.js internals
+  // Skip non-GET, cross-origin requests, API calls, admin routes, Next.js internals.
+  // Cross-origin (ImageKit, ads, fonts) is left to the browser: <img> requests to other
+  // origins are opaque, so they could never be cached here anyway, and re-fetching them
+  // from the worker failed intermittently — which we then turned into a fake 408 and
+  // every article card fell back to the logo.
   if (request.method !== "GET") return;
+  if (url.origin !== self.location.origin) return;
   if (url.pathname.startsWith("/api/")) return;
   if (url.pathname.startsWith("/admin")) return;
   if (url.pathname.startsWith("/_next/webpack-hmr")) return;
@@ -59,19 +66,22 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Images → stale-while-revalidate with 7-day TTL
-  if (
-    url.pathname.match(/\.(png|jpe?g|webp|avif|gif|svg|ico)$/i) ||
-    url.hostname === "ik.imagekit.io"
-  ) {
+  // Same-origin images → stale-while-revalidate
+  if (url.pathname.match(/\.(png|jpe?g|webp|avif|gif|svg|ico)$/i)) {
     event.respondWith(
       caches.open(CACHE_NAME).then(async (cache) => {
         const cached = await cache.match(request);
         const fetchPromise = fetch(request).then((response) => {
           if (response.ok) cache.put(request, response.clone());
           return response;
-        }).catch(() => null);
-        return cached || (await fetchPromise) || new Response("", { status: 408 });
+        });
+        if (cached) {
+          fetchPromise.catch(() => {}); // background refresh; failure is fine, we have a copy
+          return cached;
+        }
+        // No copy: return the real network result (or real network error) so <img onError>
+        // and fallbacks behave normally — never a synthetic status
+        return fetchPromise;
       })
     );
     return;
