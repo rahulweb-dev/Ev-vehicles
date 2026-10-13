@@ -223,7 +223,7 @@ export default function AdminArticlesPage() {
     setAiLoading(true);
     try {
       const res  = await fetch("/api/cron/auto-news", { method: "POST" });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({ error: `Server error (HTTP ${res.status}). Check Vercel logs.` }));
       const g    = data.generated || {};
       if (g.created && g.note) {
         alert(`AI article drafted:\n"${g.article.title}"\n\n${g.note}.`);
