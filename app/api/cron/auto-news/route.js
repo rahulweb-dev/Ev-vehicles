@@ -9,6 +9,8 @@ export const dynamic     = "force-dynamic";
 
 // Each run: publish anything that's due, then write + schedule one new AI article.
 async function run() {
+  // maxDuration is 60s — stop new work at 50s so we always answer with JSON, never a 504
+  const deadline = Date.now() + 50_000;
   await dbConnect();
   const published = await publishDueArticles();
 
@@ -18,7 +20,7 @@ async function run() {
 
   let generated;
   try {
-    generated = await generateAutoNewsArticle();
+    generated = await generateAutoNewsArticle({ deadline });
   } catch (e) {
     console.error("[auto-news]", e);
     generated = { error: e.message };
