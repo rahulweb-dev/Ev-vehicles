@@ -6,7 +6,7 @@ import {
   Plus, Pencil, Trash2, Eye, Search, ExternalLink,
   Newspaper, CheckCircle2, FileText, LayoutGrid, List,
   Star, Calendar, TrendingUp, Upload, Square, CheckSquare, X,
-  Globe, EyeOff, Copy,
+  Globe, EyeOff, Copy, Sparkles,
 } from "lucide-react";
 import ArticleImage from "@/components/news/ArticleImage";
 
@@ -196,6 +196,7 @@ export default function AdminArticlesPage() {
   const [duplicating, setDuplicating]   = useState(null);
   const [selected, setSelected]         = useState(new Set());
   const [bulkLoading, setBulkLoading]   = useState(false);
+  const [aiLoading, setAiLoading]       = useState(false);
 
   async function loadArticles() {
     setLoading(true);
@@ -217,6 +218,30 @@ export default function AdminArticlesPage() {
   }
 
   useEffect(() => { loadArticles(); }, []);
+
+  async function handleGenerateAI() {
+    setAiLoading(true);
+    try {
+      const res  = await fetch("/api/cron/auto-news", { method: "POST" });
+      const data = await res.json();
+      const g    = data.generated || {};
+      if (g.created && g.note) {
+        alert(`AI article drafted:\n"${g.article.title}"\n\n${g.note}.`);
+      } else if (g.created) {
+        alert(`AI article drafted:
+"${g.article.title}"
+
+Auto-publishes at ${new Date(g.article.scheduledAt).toLocaleString("en-IN")}. Edit or delete it before then if needed.`);
+      } else {
+        alert(g.error || g.reason || data.error || "Nothing generated");
+      }
+      loadArticles();
+    } catch (e) {
+      alert(`Failed: ${e.message}`);
+    } finally {
+      setAiLoading(false);
+    }
+  }
 
   async function handleDuplicate(id) {
     setDuplicating(id);
@@ -285,6 +310,10 @@ export default function AdminArticlesPage() {
           <p className="mt-0.5 text-sm text-gray-500">{articles.length} articles total</p>
         </div>
         <div className="flex items-center gap-2">
+          <button onClick={handleGenerateAI} disabled={aiLoading}
+            className="flex items-center gap-2 rounded-xl bg-linear-to-r from-violet-600 to-fuchsia-500 px-4 py-2.5 text-sm font-bold text-white hover:opacity-90 disabled:opacity-60 transition shadow-sm">
+            <Sparkles size={16} /> {aiLoading ? "Writing… (~40s)" : "AI News Now"}
+          </button>
           <Link href="/admin/articles/bulk-import"
             className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-bold text-gray-600 hover:bg-gray-50 transition shadow-sm">
             <Upload size={16} /> Bulk Import

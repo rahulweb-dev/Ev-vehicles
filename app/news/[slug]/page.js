@@ -206,7 +206,11 @@ export default async function ArticlePage({ params }) {
       "@type": "SpeakableSpecification",
       cssSelector: ["h1", ".article-lede"],
     },
-    author: {
+    author: article.aiGenerated ? {
+      "@type": "Organization",
+      name: article.author,
+      url: SITE_URL,
+    } : {
       "@type": "Person",
       name: article.author,
       url: `${SITE_URL}/authors/${encodeURIComponent((article.author || "").toLowerCase().replace(/\s+/g, "-"))}`,
@@ -227,6 +231,9 @@ export default async function ArticlePage({ params }) {
     }),
     copyrightHolder: { "@id": `${SITE_URL}/#organization` },
     ...(article.publishedAt && { copyrightYear: new Date(article.publishedAt).getFullYear() }),
+    ...(article.aiGenerated && article.sourceUrl && {
+      isBasedOn: { "@type": "NewsArticle", url: article.sourceUrl, publisher: { "@type": "Organization", name: article.sourceName || "Source" } },
+    }),
     isPartOf: {
       "@type": "WebSite",
       "@id": `${SITE_URL}/#website`,
@@ -358,6 +365,15 @@ export default async function ArticlePage({ params }) {
                 className="prose prose-base max-w-none overflow-x-auto prose-headings:font-black prose-headings:text-gray-900 prose-h2:text-xl prose-h2:mt-7 prose-h2:mb-3 sm:prose-h2:text-2xl sm:prose-h2:mt-8 sm:prose-h2:mb-4 prose-h3:text-lg prose-p:text-gray-700 prose-p:leading-relaxed prose-p:text-[15px] sm:prose-p:text-base prose-strong:text-gray-900 prose-ul:text-gray-700 prose-li:my-1 prose-img:rounded-xl prose-img:w-full prose-a:text-green-700 prose-a:no-underline hover:prose-a:underline"
                 dangerouslySetInnerHTML={{ __html: safeContent }}
               />
+
+              {article.sourceUrl && (
+                <p className="mt-6 text-sm text-gray-500">
+                  Source:{" "}
+                  <a href={article.sourceUrl} target="_blank" rel="nofollow noopener noreferrer" className="font-semibold text-gray-700 hover:text-green-700 hover:underline">
+                    {article.sourceName || "Original report"}
+                  </a>
+                </p>
+              )}
 
               <AdBannerInArticle slot="1253319567" />
 
