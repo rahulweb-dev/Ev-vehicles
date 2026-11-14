@@ -180,10 +180,22 @@ export default async function BlogPostPage({ params }) {
     wordCount: blog.content ? blog.content.replace(/<[^>]+>/g, "").split(/\s+/).filter(Boolean).length : undefined,
   };
 
+  const faqs = (blog.faqs || []).filter(f => f?.question && f?.answer);
+  const faqJsonLd = faqs.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map(({ question, answer }) => ({
+      "@type": "Question",
+      name: question,
+      acceptedAnswer: { "@type": "Answer", text: answer },
+    })),
+  } : null;
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }} />
+      {faqJsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />}
 
       <div className="bg-white">
         <div className="mx-auto max-w-4xl px-4 py-10">
@@ -257,6 +269,23 @@ export default async function BlogPostPage({ params }) {
             className="prose prose-lg max-w-none prose-headings:font-black prose-headings:text-gray-900 prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-p:text-gray-700 prose-p:leading-relaxed prose-strong:text-gray-900 prose-ul:text-gray-700 prose-li:my-1 prose-table:text-sm"
             dangerouslySetInnerHTML={{ __html: tocContent }}
           />
+
+          {faqs.length > 0 && (
+            <section className="mt-10 rounded-2xl border border-gray-100 bg-gray-50 p-6">
+              <h2 className="mb-4 text-xl font-black text-gray-900">Frequently Asked Questions</h2>
+              <div className="space-y-3">
+                {faqs.map(({ question, answer }, i) => (
+                  <details key={i} className="group rounded-xl border border-gray-200 bg-white">
+                    <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4 text-base font-semibold text-gray-900">
+                      {question}
+                      <span className="ml-2 shrink-0 text-gray-400 transition-transform group-open:rotate-180">▾</span>
+                    </summary>
+                    <p className="px-5 pb-4 text-sm leading-relaxed text-gray-600">{answer}</p>
+                  </details>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* Second Ad */}
           <AdBannerInArticle slot="1253319567" />
