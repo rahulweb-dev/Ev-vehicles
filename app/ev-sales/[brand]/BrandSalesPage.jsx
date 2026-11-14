@@ -9,6 +9,7 @@ const SEG_LABEL = { car: "Electric Car", "two-wheeler": "Electric Two-Wheeler", 
 
 export default function BrandSalesPage({ records = [], brandSlug, brandMeta }) {
   const name = brandMeta?.name || brandSlug?.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  const year = records[0]?.year || new Date().getFullYear();
   const segment = records[0]?.segment || "car";
 
   const monthly = records
@@ -38,7 +39,7 @@ export default function BrandSalesPage({ records = [], brandSlug, brandMeta }) {
               <span className={`text-xs font-bold px-3 py-1 rounded-full text-white mb-2 inline-block ${SEG_COLOR[segment] || "bg-green-500"}`}>
                 {SEG_LABEL[segment] || segment}
               </span>
-              <h1 className="text-3xl font-black text-gray-900 dark:text-white">{name} EV Sales India 2025</h1>
+              <h1 className="text-3xl font-black text-gray-900 dark:text-white">{name} EV Sales India {year}</h1>
               <p className="mt-1.5 text-sm text-gray-500 dark:text-gray-400">Monthly electric vehicle sales data — units sold, growth trends for India.</p>
             </div>
           </div>
@@ -49,7 +50,7 @@ export default function BrandSalesPage({ records = [], brandSlug, brandMeta }) {
         {/* Summary Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[
-            { label: "Total Units 2025", value: total.toLocaleString("en-IN") },
+            { label: `Total Units ${year}`, value: total.toLocaleString("en-IN") },
             { label: "Latest Month", value: latest.toLocaleString("en-IN") },
             { label: "Monthly Avg", value: avgMonthly.toLocaleString("en-IN") },
             { label: "MoM Growth", value: `${momGrowth >= 0 ? "+" : ""}${momGrowth.toFixed(1)}%`, positive: momGrowth >= 0 },
@@ -63,7 +64,7 @@ export default function BrandSalesPage({ records = [], brandSlug, brandMeta }) {
 
         {/* Monthly Chart */}
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm">
-          <h2 className="text-sm font-black text-gray-900 dark:text-white mb-4">{name} Monthly Sales Trend 2025</h2>
+          <h2 className="text-sm font-black text-gray-900 dark:text-white mb-4">{name} Monthly Sales Trend {year}</h2>
           <BarChart data={monthly} labelKey="month" valueKey="totalUnits" color={SEG_COLOR[segment] || "bg-green-500"} />
         </div>
 
@@ -84,7 +85,7 @@ export default function BrandSalesPage({ records = [], brandSlug, brandMeta }) {
                 const change = prevUnits !== null && prevUnits > 0 ? ((m.totalUnits - prevUnits) / prevUnits) * 100 : null;
                 return (
                   <tr key={i} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
-                    <td className="py-3 pr-4 font-semibold text-gray-700 dark:text-gray-300">{m.month} 2025</td>
+                    <td className="py-3 pr-4 font-semibold text-gray-700 dark:text-gray-300">{m.month} {year}</td>
                     <td className="py-3 pr-4 text-right font-bold text-gray-900 dark:text-white">{m.totalUnits.toLocaleString("en-IN")}</td>
                     <td className="py-3 text-right">
                       {change !== null ? (
