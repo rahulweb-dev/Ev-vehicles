@@ -386,7 +386,7 @@ const DEFAULT = {
   featuredImage: "", gallery: [], colors: [],
   variants: [],
   performance: {
-    batteryCapacity: "", drivingRange: "", power: "", peakPower: "",
+    batteryCapacity: "", drivingRange: "", realWorldRange: "", power: "", peakPower: "",
     torque: "", topSpeed: "", acceleration: "", driveType: "", batteryType: "",
   },
   charging: {
@@ -842,7 +842,8 @@ export default function VehicleEditor({ initialData, vehicleId }) {
                 <div className="grid gap-4 sm:grid-cols-2">
                   {[
                     { key: "batteryCapacity", label: "Battery Capacity",  placeholder: "e.g. 40.5 kWh" },
-                    { key: "drivingRange",    label: "Driving Range (ARAI)", placeholder: "e.g. 465 km" },
+                    { key: "drivingRange",    label: "Claimed Range",     placeholder: "e.g. 465 km (MIDC P1+P2)" },
+                    { key: "realWorldRange",  label: "Real-World Range (tested)", placeholder: "e.g. ~350 km (Autocar India road test)" },
                     { key: "power",           label: "Motor Power",       placeholder: "e.g. 143 PS" },
                     { key: "peakPower",       label: "Peak Power",        placeholder: "e.g. 129 kW" },
                     { key: "torque",          label: "Torque",            placeholder: "e.g. 250 Nm" },

@@ -110,7 +110,8 @@ export default function VehicleDetailPage({ vehicle, relatedVehicles = [], vehic
 
   /* Quick highlights */
   const highlights = [
-    { icon: <BatteryCharging size={16} className="text-green-600" />,  label: "Range",     value: variant?.range || vehicle.performance?.drivingRange },
+    { icon: <BatteryCharging size={16} className="text-green-600" />,  label: "Claimed Range", value: variant?.range || vehicle.performance?.drivingRange },
+    { icon: <Gauge          size={16} className="text-emerald-600" />, label: "Real-World Range", value: vehicle.performance?.realWorldRange?.split(" (")[0] },
     { icon: <Zap            size={16} className="text-blue-600" />,   label: "Power",     value: vehicle.performance?.power },
     { icon: <Gauge          size={16} className="text-purple-600" />, label: "Top Speed", value: vehicle.performance?.topSpeed },
     { icon: <BatteryCharging size={16} className="text-orange-500" />, label: "0–100 km/h", value: vehicle.performance?.acceleration },
@@ -252,7 +253,7 @@ export default function VehicleDetailPage({ vehicle, relatedVehicles = [], vehic
 
                 {/* Quick highlight specs */}
                 {highlights.length > 0 && (
-                  <div className={`mt-5 grid gap-3 ${highlights.length <= 2 ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-4"}`}>
+                  <div className={`mt-5 grid gap-3 ${highlights.length <= 2 ? "grid-cols-2" : highlights.length >= 5 ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5" : "grid-cols-2 sm:grid-cols-4"}`}>
                     {highlights.map((h) => (
                       <div key={h.label} className="rounded-2xl bg-gray-50 p-3 text-center">
                         <div className="mb-1 flex justify-center">{h.icon}</div>
@@ -339,7 +340,8 @@ export default function VehicleDetailPage({ vehicle, relatedVehicles = [], vehic
                         <div className="space-y-0">
                           {[
                             ["Battery Capacity",  vehicle.performance.batteryCapacity],
-                            ["Driving Range (ARAI)", vehicle.performance.drivingRange],
+                            ["Claimed Range",     vehicle.performance.drivingRange],
+                            ["Real-World Range (tested)", vehicle.performance.realWorldRange],
                             ["Motor Power",       vehicle.performance.power],
                             ["Peak Power",        vehicle.performance.peakPower],
                             ["Torque",            vehicle.performance.torque],
