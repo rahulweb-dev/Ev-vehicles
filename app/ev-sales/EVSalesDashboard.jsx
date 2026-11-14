@@ -85,7 +85,7 @@ export default function EVSalesDashboard({ data = {} }) {
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <span className="bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">Live Intelligence</span>
+                <span className="bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">{data.periodLabel || "Monthly Data"}</span>
                 {isFallback && (
                   <span className="bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 text-xs font-bold px-3 py-1 rounded-full">Sample Data</span>
                 )}
@@ -97,7 +97,7 @@ export default function EVSalesDashboard({ data = {} }) {
                 Monthly EV market insights for India — cars, two-wheelers, commercial vehicles.
               </p>
               <p className="mt-1 text-xs text-gray-400 dark:text-gray-500">
-                Last updated: {fmtDate(new Date().toISOString())} · Source: EV Radar Research
+                Last updated: {fmtDate(data.lastUpdated || new Date().toISOString())} · Source: {data.source || "EV Radar Research"}
               </p>
             </div>
             <div className="flex items-center gap-2 flex-wrap">
@@ -123,7 +123,7 @@ export default function EVSalesDashboard({ data = {} }) {
             <StatCard label="EV Car Sales" value={totals.car?.totalUnits || 0} growth={carGrowth} icon={Car} color="bg-blue-50 dark:bg-blue-900/20" iconColor="text-blue-600" index={1} />
             <StatCard label="Two-Wheeler Sales" value={totals["two-wheeler"]?.totalUnits || 0} growth={twGrowth} icon={Bike} color="bg-emerald-50 dark:bg-emerald-900/20" iconColor="text-emerald-600" index={2} />
             <StatCard label="Commercial Sales" value={totals.commercial?.totalUnits || 0} growth={commGrowth} icon={Truck} color="bg-purple-50 dark:bg-purple-900/20" iconColor="text-purple-600" index={3} />
-            <StatCard label="Market Growth" value={totals.car?.avgGrowth || 0} icon={TrendingUp} color="bg-amber-50 dark:bg-amber-900/20" iconColor="text-amber-600" index={4} suffix="%" />
+            <StatCard label="YoY Growth (all EVs)" value={data.avgGrowth || 0} icon={TrendingUp} color="bg-amber-50 dark:bg-amber-900/20" iconColor="text-amber-600" index={4} suffix="%" />
             <StatCard label="States Covered" value={stateSales.length} icon={MapPin} color="bg-rose-50 dark:bg-rose-900/20" iconColor="text-rose-600" index={5} />
           </div>
         </section>
@@ -211,7 +211,7 @@ export default function EVSalesDashboard({ data = {} }) {
                     </td>
                     <td className="py-3 text-right">
                       <span className={`text-xs font-bold ${(s.avgGrowth || 0) >= 0 ? "text-green-600" : "text-red-600"}`}>
-                        {(s.avgGrowth || 0) >= 0 ? "+" : ""}{(s.avgGrowth || 0).toFixed(1)}%
+                        {Number.isFinite(s.avgGrowth) ? `${s.avgGrowth >= 0 ? "+" : ""}${s.avgGrowth.toFixed(1)}%` : "–"}
                       </span>
                     </td>
                   </tr>

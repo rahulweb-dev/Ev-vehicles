@@ -130,7 +130,7 @@ export default function EVMarketShareDashboard({ data = {} }) {
                   </td>
                   <td className="py-3 text-right">
                     <span className={`text-xs font-bold ${(b.avgGrowth || 0) >= 0 ? "text-green-600" : "text-red-500"}`}>
-                      {(b.avgGrowth || 0) >= 0 ? "+" : ""}{(b.avgGrowth || 0).toFixed(1)}%
+                      {Number.isFinite(b.avgGrowth) ? `${b.avgGrowth >= 0 ? "+" : ""}${b.avgGrowth.toFixed(1)}%` : "–"}
                     </span>
                   </td>
                 </tr>

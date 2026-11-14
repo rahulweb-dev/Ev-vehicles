@@ -74,7 +74,7 @@ export default function TopSellingEVsDashboard({ data = {} }) {
                 <span className={`text-xs font-bold px-2 py-0.5 rounded-full mt-1 inline-block ${SEG_COLOR[b.segment] || ""}`}>{SEG_LABEL[b.segment] || b.segment}</span>
                 <p className="text-xl font-black text-green-600 mt-2">{(b.totalUnits || 0).toLocaleString("en-IN")}</p>
                 <p className="text-xs text-gray-400 mt-0.5">units sold</p>
-                {b.avgGrowth !== undefined && (
+                {Number.isFinite(b.avgGrowth) && (
                   <p className={`flex items-center justify-center gap-0.5 text-xs font-bold mt-1 ${b.avgGrowth >= 0 ? "text-green-600" : "text-red-500"}`}>
                     {b.avgGrowth >= 0 ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
                     {Math.abs(b.avgGrowth).toFixed(1)}%
@@ -106,7 +106,7 @@ export default function TopSellingEVsDashboard({ data = {} }) {
                   <p className="font-semibold text-gray-600 dark:text-gray-400 text-sm">{(b.marketShare || 0).toFixed(1)}%</p>
                   <p className="text-xs text-gray-400">share</p>
                 </div>
-                {b.avgGrowth !== undefined && (
+                {Number.isFinite(b.avgGrowth) && (
                   <span className={`w-14 text-right text-xs font-bold ${b.avgGrowth >= 0 ? "text-green-600" : "text-red-500"}`}>
                     {b.avgGrowth >= 0 ? "+" : ""}{b.avgGrowth.toFixed(1)}%
                   </span>

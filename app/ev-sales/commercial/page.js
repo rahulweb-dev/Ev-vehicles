@@ -1,59 +1,46 @@
 import { SITE_URL, SITE_NAME } from "@/app/layout";
 import SegmentPage from "../SegmentPage";
-import { FALLBACK_ANALYTICS } from "@/lib/ev-sales-fallback";
+import { SEGMENT_ANALYTICS, DATA_YEAR } from "@/lib/ev-sales-fallback";
 
 export const revalidate = 3600;
 
+const TITLE = `Electric Commercial Vehicle Sales India ${DATA_YEAR}`;
+
 export const metadata = {
-  title: `EV Commercial Vehicle Sales India 2025 – Electric Bus, Truck & Fleet Data`,
-  description: "Monthly electric commercial vehicle sales India 2025. Tata EV, Ashok Leyland, Switch Mobility, EKA — fleet market data, rankings, growth.",
+  title: `${TITLE} – Brand-wise Monthly Data & Market Share`,
+  description: "Monthly electric commercial vehicle sales in India: e-trucks, e-SCVs and e-buses, brand rankings and growth from FADA and Vahan data.",
   alternates: { canonical: `${SITE_URL}/ev-sales/commercial` },
   openGraph: {
-    title: "EV Commercial Vehicle Sales India 2025 – Fleet & Truck Market Data",
-    description: "Electric bus, truck and fleet vehicle sales intelligence — brand rankings, monthly trend, market share.",
+    title: `${TITLE} – Brand Rankings & Market Share`,
+    description: "Monthly electric commercial vehicle sales — goods carriers and buses, brand rankings and growth.",
     url: `${SITE_URL}/ev-sales/commercial`,
     type: "website",
-    images: [{ url: `${SITE_URL}/api/og?title=Commercial EV Sales India 2025&subtitle=Bus, Truck %26 Fleet Market Data&tag=commercial&type=page`, width: 1200, height: 630, alt: "EV Commercial Vehicle Sales India 2025" }],
+    images: [{ url: `${SITE_URL}/api/og?title=${encodeURIComponent(TITLE)}&subtitle=Brand Rankings %26 Market Share&tag=commercial&type=page`, width: 1200, height: 630, alt: TITLE }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "EV Commercial Vehicle Sales India 2025 – Fleet & Truck Market Data",
-    images: [`${SITE_URL}/api/og?title=Commercial EV Sales India 2025&subtitle=Bus, Truck %26 Fleet Market Data&tag=commercial&type=page`],
+    title: `${TITLE} – Brand Rankings & Market Share`,
+    images: [`${SITE_URL}/api/og?title=${encodeURIComponent(TITLE)}&subtitle=Brand Rankings %26 Market Share&tag=commercial&type=page`],
   },
 };
 
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Dataset",
-  name: "India Electric Commercial Vehicle Sales Data 2025",
-  description: "Monthly electric commercial vehicle sales for India — buses, trucks, fleet vehicles.",
+  name: `India electric commercial vehicle sales data ${DATA_YEAR}`,
+  description: "Monthly electric commercial vehicle sales — goods carriers and buses, brand rankings and growth.",
   url: `${SITE_URL}/ev-sales/commercial`,
   publisher: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
   spatialCoverage: { "@type": "Country", name: "India" },
-  temporalCoverage: "2025",
+  temporalCoverage: String(DATA_YEAR),
 };
 
-async function getData() {
-  try {
-    const res = await fetch(`${SITE_URL}/api/ev-sales/analytics?year=2025&segment=commercial`, { next: { revalidate: 3600 } });
-    if (!res.ok) throw new Error();
-    return await res.json();
-  } catch {
-    const fb = FALLBACK_ANALYTICS(2025);
-    return {
-      ...fb,
-      brandRankings: fb.brandRankings.filter((b) => b.segment === "commercial"),
-      grandTotal: fb.totals.commercial?.totalUnits || 0,
-    };
-  }
-}
-
-export default async function EVCommercialSalesPage() {
-  const data = await getData();
+export default function EVCommercialSalesPage() {
+  const data = SEGMENT_ANALYTICS("commercial");
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <SegmentPage data={data} segment="commercial" title="EV Commercial Vehicle Sales India 2025" description="Monthly electric bus, truck and fleet sales data — brand rankings, market share, growth trends." breadcrumb={[{ label: "EV Sales", href: "/ev-sales" }, { label: "Commercial" }]} />
+      <SegmentPage data={data} segment="commercial" title={TITLE} description={`Monthly electric commercial vehicle sales — goods carriers and buses, brand rankings and growth (${data.periodLabel}). Source: ${data.source}.`} breadcrumb={[{ label: "EV Sales", href: "/ev-sales" }, { label: "Commercial" }]} />
     </>
   );
 }

@@ -69,7 +69,7 @@ export default function StateAdoptionDashboard({ data = {} }) {
                 <div className="mt-3 flex items-center gap-1.5">
                   {(s.avgGrowth || 0) >= 0 ? <TrendingUp size={14} className="text-green-500" /> : <TrendingDown size={14} className="text-red-500" />}
                   <span className={`text-xs font-bold ${(s.avgGrowth || 0) >= 0 ? "text-green-600" : "text-red-500"}`}>
-                    {(s.avgGrowth || 0) >= 0 ? "+" : ""}{(s.avgGrowth || 0).toFixed(1)}% growth
+                    {Number.isFinite(s.avgGrowth) ? `${s.avgGrowth >= 0 ? "+" : ""}${s.avgGrowth.toFixed(1)}% growth` : "–"}
                   </span>
                 </div>
               </div>
@@ -94,7 +94,7 @@ export default function StateAdoptionDashboard({ data = {} }) {
                     {(s.totalUnits || 0).toLocaleString("en-IN")}
                   </span>
                   <span className={`w-14 shrink-0 text-xs font-bold text-right ${(s.avgGrowth || 0) >= 0 ? "text-green-600" : "text-red-500"}`}>
-                    {(s.avgGrowth || 0) >= 0 ? "+" : ""}{(s.avgGrowth || 0).toFixed(1)}%
+                    {Number.isFinite(s.avgGrowth) ? `${s.avgGrowth >= 0 ? "+" : ""}${s.avgGrowth.toFixed(1)}%` : "–"}
                   </span>
                 </div>
               );
@@ -126,7 +126,7 @@ export default function StateAdoptionDashboard({ data = {} }) {
                     <td className="py-3 pr-4 text-right text-gray-500 dark:text-gray-400 font-semibold">{pct}%</td>
                     <td className="py-3 text-right">
                       <span className={`text-xs font-bold ${(s.avgGrowth || 0) >= 0 ? "text-green-600" : "text-red-500"}`}>
-                        {(s.avgGrowth || 0) >= 0 ? "+" : ""}{(s.avgGrowth || 0).toFixed(1)}%
+                        {Number.isFinite(s.avgGrowth) ? `${s.avgGrowth >= 0 ? "+" : ""}${s.avgGrowth.toFixed(1)}%` : "–"}
                       </span>
                     </td>
                   </tr>

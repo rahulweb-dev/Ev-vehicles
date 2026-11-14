@@ -1,63 +1,69 @@
-﻿import { SITE_URL, SITE_NAME } from "@/app/layout";
+﻿import Link from "next/link";
+import { SITE_URL, SITE_NAME } from "@/app/layout";
 import EVSalesDashboard from "./EVSalesDashboard";
-import { FALLBACK_ANALYTICS } from "@/lib/ev-sales-fallback";
+import { FALLBACK_ANALYTICS, SALES_FACTS, DATA_YEAR } from "@/lib/ev-sales-fallback";
 
 export const revalidate = 3600;
 
-const DATA_YEAR = new Date().getFullYear();
+const fmt = (n) => Math.round(n || 0).toLocaleString("en-IN");
+const lakh = (n) => `${((n || 0) / 100000).toFixed(1)} lakh`;
 
 export const metadata = {
-  title: `EV Sales Intelligence India ${DATA_YEAR} – Monthly EV Market Data`,
-  description: "India EV sales data, market share, brand rankings, state-wise EV adoption and monthly trends for electric cars, two-wheelers and commercial vehicles.",
+  title: `EV Sales India ${DATA_YEAR} – Monthly Brand-wise EV Sales Data`,
+  description: "India EV sales data: monthly brand-wise sales and market share for electric cars, two-wheelers and commercial vehicles, compiled from Vahan registrations and FADA.",
   keywords: `EV sales India ${DATA_YEAR}, electric vehicle sales data India, EV market share India, top selling EV India, EV monthly sales`,
   alternates: { canonical: `${SITE_URL}/ev-sales` },
   openGraph: {
-    title: `EV Sales Intelligence India ${DATA_YEAR} – Market Data & Insights`,
-    description: "Comprehensive EV sales analytics — brand rankings, segment breakdown, state adoption, monthly growth trends.",
+    title: `India EV Sales Data ${DATA_YEAR} | EV Radar`,
+    description: "Monthly brand-wise EV sales, market share and growth for India — cars, two-wheelers and commercial vehicles.",
     url: `${SITE_URL}/ev-sales`,
     type: "website",
-    images: [{ url: `${SITE_URL}/api/og?title=EV Sales Intelligence&subtitle=India Monthly EV Market Data ${DATA_YEAR}&tag=analytics&type=page`, width: 1200, height: 630 }],
   },
   twitter: { card: "summary_large_image", title: `India EV Sales Data ${DATA_YEAR} | EV Radar` },
 };
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Dataset",
-  name: `India EV Sales Intelligence ${DATA_YEAR}`,
-  description: "Monthly electric vehicle sales data for India including cars, two-wheelers, commercial vehicles — brand rankings, market share, state-wise adoption.",
-  url: `${SITE_URL}/ev-sales`,
-  publisher: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
-  temporalCoverage: String(DATA_YEAR),
-  spatialCoverage: { "@type": "Country", name: "India" },
-  keywords: ["EV sales", "Electric vehicles", "India market data", "EV market share"],
-};
+export default function EVSalesPage() {
+  const data = FALLBACK_ANALYTICS();
+  const f = SALES_FACTS();
+  const car1 = f.topCar[0], car2 = f.topCar[1], tw1 = f.topTwoWheeler[0], tw2 = f.topTwoWheeler[1];
+  const state1 = f.topStates[0];
 
-const faqLd = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: [
-    { "@type": "Question", name: "How many EVs were sold in India in 2025?", acceptedAnswer: { "@type": "Answer", text: "India sold over 17 lakh (1.7 million) electric vehicles in 2025 across all segments — cars, two-wheelers, and commercial vehicles — making it one of the fastest-growing EV markets globally." } },
-    { "@type": "Question", name: "Which is the best-selling electric car in India in 2025?", acceptedAnswer: { "@type": "Answer", text: "Tata EV leads the electric car segment in India with a market share exceeding 50%, followed by MG EV, Mahindra EV, BYD, and Hyundai Creta Electric." } },
-    { "@type": "Question", name: "Which electric scooter sells the most in India?", acceptedAnswer: { "@type": "Answer", text: "Ola Electric is the best-selling electric two-wheeler brand in India in 2025, followed by TVS iQube, Ather Energy, Bajaj Chetak, and Hero Vida." } },
-    { "@type": "Question", name: "Which state has the highest EV adoption in India?", acceptedAnswer: { "@type": "Answer", text: "Uttar Pradesh leads in total EV registrations. Maharashtra, Karnataka, Tamil Nadu, and Rajasthan follow closely. Delhi leads in EV adoption rate relative to total vehicle registrations." } },
-    { "@type": "Question", name: "Is India's EV market growing?", acceptedAnswer: { "@type": "Answer", text: "Yes, India's EV market grew over 30% year-over-year in 2025, driven by government incentives under the PM E-Drive scheme, falling battery prices, wider model availability, and growing consumer awareness." } },
-    { "@type": "Question", name: "Which EV brand has the highest market share in India?", acceptedAnswer: { "@type": "Answer", text: "In the electric car segment, Tata EV holds over 50% market share. In electric two-wheelers, Ola Electric leads with approximately 35% share. The Tata Group is the largest EV seller in India overall." } },
-  ],
-};
+  const faqs = [
+    {
+      q: `How many EVs were sold in India in ${f.year}?`,
+      a: `India sold about ${lakh(f.grandTotal)} electric cars, two-wheelers and commercial vehicles in ${f.periodLabel} (excluding three-wheelers), including ${fmt(f.totals.car.totalUnits)} electric cars and ${lakh(f.totals["two-wheeler"].totalUnits)} electric two-wheelers. Source: ${f.source}.`,
+    },
+    {
+      q: `Which company sells the most electric cars in India in ${f.year}?`,
+      a: `${car1?.brand} leads electric car sales in ${f.periodLabel} with ${fmt(car1?.totalUnits)} units (${car1?.marketShare}% share), followed by ${f.topCar.slice(1, 4).map((b) => `${b.brand} (${fmt(b.totalUnits)})`).join(", ")}.`,
+    },
+    {
+      q: `Which is the best-selling electric scooter brand in India in ${f.year}?`,
+      a: `${tw1?.brand} is the top electric two-wheeler brand in ${f.periodLabel} with ${fmt(tw1?.totalUnits)} units (${tw1?.marketShare}% share), followed by ${f.topTwoWheeler.slice(1, 5).map((b) => `${b.brand} (${fmt(b.totalUnits)})`).join(", ")}.`,
+    },
+    {
+      q: "Which state has the most EV registrations in India?",
+      a: state1 ? `${state1.state} recorded the most EV registrations (${fmt(state1.totalUnits)}) in ${f.statesPeriod}, followed by ${f.topStates.slice(1, 4).map((s) => s.state).join(", ")}.` : "State-wise figures are being updated.",
+    },
+  ];
 
-async function getAnalytics() {
-  try {
-    const res = await fetch(`${SITE_URL}/api/ev-sales/analytics?year=2025`, { next: { revalidate: 3600 } });
-    if (!res.ok) throw new Error("API error");
-    return await res.json();
-  } catch {
-    return FALLBACK_ANALYTICS(2025);
-  }
-}
-
-export default async function EVSalesPage() {
-  const data = await getAnalytics();
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    name: `India EV Sales Data ${DATA_YEAR}`,
+    description: `Monthly brand-wise electric vehicle sales in India (${f.periodLabel}) for cars, two-wheelers and commercial vehicles. Source: ${f.source}.`,
+    url: `${SITE_URL}/ev-sales`,
+    publisher: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
+    temporalCoverage: String(DATA_YEAR),
+    dateModified: f.lastUpdated,
+    spatialCoverage: { "@type": "Country", name: "India" },
+    keywords: ["EV sales", "Electric vehicles", "India market data", "EV market share"],
+  };
+  const faqLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map(({ q, a }) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: a } })),
+  };
 
   return (
     <>
@@ -66,16 +72,23 @@ export default async function EVSalesPage() {
 
       {/* Server-rendered intro and FAQ — Googlebot reads this; the dashboard charts below are client-side */}
       <div className="max-w-7xl mx-auto px-4 pt-8 pb-4">
-        <h1 className="text-3xl font-black text-gray-900 mb-3">EV Sales Intelligence — India {DATA_YEAR}</h1>
-        <p className="text-gray-700 leading-relaxed mb-6">
-          India sold over <strong>17 lakh (1.7 million) electric vehicles in 2025</strong> across all segments — cars, two-wheelers, and commercial vehicles — making it one of the fastest-growing EV markets globally. This dashboard tracks monthly EV sales data from official VAHAN registration records, covering all registered electric vehicles by brand, segment, and state. Data is refreshed hourly and presented with year-over-year growth comparisons to help buyers, investors, and policy researchers understand the trajectory of India&apos;s electric mobility transition.
+        <h1 className="text-3xl font-black text-gray-900 mb-3">EV Sales in India — {DATA_YEAR}</h1>
+        <p className="text-gray-700 leading-relaxed mb-2">
+          India sold about <strong>{lakh(f.grandTotal)} electric cars, two-wheelers and commercial vehicles</strong> in {f.periodLabel}.
+          {" "}<strong>{car1?.brand}</strong> leads electric cars with a {car1?.marketShare}% share ahead of {car2?.brand}, while
+          {" "}<strong>{tw1?.brand}</strong> leads electric two-wheelers ahead of {tw2?.brand}. This page tracks brand-wise monthly sales,
+          market share and growth, compiled from Vahan registration data and FADA, and is updated every month.
+        </p>
+        <p className="text-xs text-gray-500 mb-6">
+          Data: {f.periodLabel} · Source: {f.source} · Last updated: {f.lastUpdated} ·{" "}
+          <Link href="/news/ev-sales-october-2026-india-electric-cars-two-wheelers-brand-wise" className="text-green-700 underline">Latest monthly report</Link>
         </p>
         <div className="mb-6 grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
           {[
-            { label: "Total EVs in 2025", value: "17L+" },
-            { label: "YoY Growth", value: "30%+" },
-            { label: "Top Car Brand", value: "Tata EV" },
-            { label: "Top 2W Brand", value: "Ola Electric" },
+            { label: `EVs sold (${f.periodLabel})`, value: lakh(f.grandTotal) },
+            { label: "Electric cars", value: fmt(f.totals.car.totalUnits) },
+            { label: "Top car brand", value: car1?.brand || "–" },
+            { label: "Top 2W brand", value: tw1?.brand || "–" },
           ].map(({ label, value }) => (
             <div key={label} className="rounded-xl bg-green-50 border border-green-100 px-4 py-3">
               <p className="text-xs text-gray-500">{label}</p>
@@ -85,27 +98,15 @@ export default async function EVSalesPage() {
         </div>
 
         {/* Visible FAQ matching FAQPage JSON-LD */}
-        <details className="group rounded-2xl border border-gray-200 bg-white mb-2">
-          <summary className="flex cursor-pointer items-center justify-between px-5 py-3 font-semibold text-gray-900 marker:hidden list-none text-sm">
-            Which is the best-selling EV in India in 2025?
-            <span className="ml-4 shrink-0 text-green-600 group-open:rotate-45 transition-transform duration-200">＋</span>
-          </summary>
-          <p className="px-5 pb-4 text-sm text-gray-600 leading-relaxed">Tata EV leads the electric car segment in India with a market share exceeding 50%, followed by MG EV, Mahindra EV, BYD, and Hyundai Creta Electric. In electric two-wheelers, Ola Electric is the best-selling brand, followed by TVS iQube, Ather Energy, Bajaj Chetak, and Hero Vida.</p>
-        </details>
-        <details className="group rounded-2xl border border-gray-200 bg-white mb-2">
-          <summary className="flex cursor-pointer items-center justify-between px-5 py-3 font-semibold text-gray-900 marker:hidden list-none text-sm">
-            Which state has the highest EV adoption in India?
-            <span className="ml-4 shrink-0 text-green-600 group-open:rotate-45 transition-transform duration-200">＋</span>
-          </summary>
-          <p className="px-5 pb-4 text-sm text-gray-600 leading-relaxed">Uttar Pradesh leads in total EV registrations. Maharashtra, Karnataka, Tamil Nadu, and Rajasthan follow closely. Delhi leads in EV adoption rate relative to total vehicle registrations, driven by aggressive state subsidies and a complete road-tax waiver on EVs.</p>
-        </details>
-        <details className="group rounded-2xl border border-gray-200 bg-white mb-6">
-          <summary className="flex cursor-pointer items-center justify-between px-5 py-3 font-semibold text-gray-900 marker:hidden list-none text-sm">
-            Is India's EV market growing?
-            <span className="ml-4 shrink-0 text-green-600 group-open:rotate-45 transition-transform duration-200">＋</span>
-          </summary>
-          <p className="px-5 pb-4 text-sm text-gray-600 leading-relaxed">Yes — India's EV market grew over 30% year-over-year in 2025, driven by government incentives under the PM E-Drive scheme, falling battery prices, wider model availability across all segments, and rapidly expanding public charging infrastructure.</p>
-        </details>
+        {faqs.map(({ q, a }, i) => (
+          <details key={q} className={`group rounded-2xl border border-gray-200 bg-white ${i === faqs.length - 1 ? "mb-6" : "mb-2"}`}>
+            <summary className="flex cursor-pointer items-center justify-between px-5 py-3 font-semibold text-gray-900 marker:hidden list-none text-sm">
+              {q}
+              <span className="ml-4 shrink-0 text-green-600 group-open:rotate-45 transition-transform duration-200">＋</span>
+            </summary>
+            <p className="px-5 pb-4 text-sm text-gray-600 leading-relaxed">{a}</p>
+          </details>
+        ))}
       </div>
 
       <EVSalesDashboard data={data} />

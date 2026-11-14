@@ -23,7 +23,7 @@ export default function StatCard({ label, value, growth, icon: Icon, color = "bg
         <div className={`h-10 w-10 rounded-xl ${color} flex items-center justify-center shrink-0`}>
           {Icon && <Icon size={20} className={iconColor} />}
         </div>
-        {growth !== undefined && (
+        {Number.isFinite(growth) && (
           <span className={`flex items-center gap-0.5 text-xs font-bold rounded-full px-2 py-0.5 ${isPositive ? "bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400"}`}>
             {isPositive ? <TrendingUp size={11} /> : <TrendingDown size={11} />}
             {Math.abs(growth).toFixed(1)}%

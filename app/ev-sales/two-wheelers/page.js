@@ -1,59 +1,46 @@
 import { SITE_URL, SITE_NAME } from "@/app/layout";
 import SegmentPage from "../SegmentPage";
-import { FALLBACK_ANALYTICS } from "@/lib/ev-sales-fallback";
+import { SEGMENT_ANALYTICS, DATA_YEAR } from "@/lib/ev-sales-fallback";
 
 export const revalidate = 3600;
 
+const TITLE = `EV Two-Wheeler Sales India ${DATA_YEAR}`;
+
 export const metadata = {
-  title: `EV Two-Wheeler Sales India 2025 – Electric Scooter & Bike Data`,
-  description: "Monthly electric two-wheeler sales data India 2025. Ola Electric, TVS iQube, Ather, Bajaj Chetak, Hero Vida — rankings, market share, growth.",
+  title: `${TITLE} – Brand-wise Monthly Data & Market Share`,
+  description: "Monthly electric scooter and bike sales in India: TVS, Bajaj Chetak, Ather, Hero Vida, Ola Electric brand rankings and market share from Vahan data.",
   alternates: { canonical: `${SITE_URL}/ev-sales/two-wheelers` },
   openGraph: {
-    title: "EV Two-Wheeler Sales India 2025 – Electric Scooter Market Data",
-    description: "Electric scooter & bike sales intelligence — brand rankings, monthly trend, market share breakdown.",
+    title: `${TITLE} – Brand Rankings & Market Share`,
+    description: "Monthly electric scooter and bike sales — brand rankings, market share and growth from Vahan registration data.",
     url: `${SITE_URL}/ev-sales/two-wheelers`,
     type: "website",
-    images: [{ url: `${SITE_URL}/api/og?title=EV Two-Wheeler Sales 2025&subtitle=Scooter %26 Bike Market Share India&tag=bikes&type=page`, width: 1200, height: 630, alt: "EV Two-Wheeler Sales India 2025" }],
+    images: [{ url: `${SITE_URL}/api/og?title=${encodeURIComponent(TITLE)}&subtitle=Brand Rankings %26 Market Share&tag=bikes&type=page`, width: 1200, height: 630, alt: TITLE }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "EV Two-Wheeler Sales India 2025 – Electric Scooter Market Data",
-    images: [`${SITE_URL}/api/og?title=EV Two-Wheeler Sales 2025&subtitle=Scooter %26 Bike Market Share India&tag=bikes&type=page`],
+    title: `${TITLE} – Brand Rankings & Market Share`,
+    images: [`${SITE_URL}/api/og?title=${encodeURIComponent(TITLE)}&subtitle=Brand Rankings %26 Market Share&tag=bikes&type=page`],
   },
 };
 
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Dataset",
-  name: "India Electric Two-Wheeler Sales Data 2025",
-  description: "Monthly electric two-wheeler sales rankings, brand market share for India.",
+  name: `India electric two-wheeler sales data ${DATA_YEAR}`,
+  description: "Monthly electric scooter and bike sales — brand rankings, market share and growth from Vahan registration data.",
   url: `${SITE_URL}/ev-sales/two-wheelers`,
   publisher: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
   spatialCoverage: { "@type": "Country", name: "India" },
-  temporalCoverage: "2025",
+  temporalCoverage: String(DATA_YEAR),
 };
 
-async function getData() {
-  try {
-    const res = await fetch(`${SITE_URL}/api/ev-sales/analytics?year=2025&segment=two-wheeler`, { next: { revalidate: 3600 } });
-    if (!res.ok) throw new Error();
-    return await res.json();
-  } catch {
-    const fb = FALLBACK_ANALYTICS(2025);
-    return {
-      ...fb,
-      brandRankings: fb.brandRankings.filter((b) => b.segment === "two-wheeler"),
-      grandTotal: fb.totals["two-wheeler"]?.totalUnits || 0,
-    };
-  }
-}
-
-export default async function EVTwoWheelerSalesPage() {
-  const data = await getData();
+export default function EVTwoWheelerSalesPage() {
+  const data = SEGMENT_ANALYTICS("two-wheeler");
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <SegmentPage data={data} segment="two-wheeler" title="EV Two-Wheeler Sales India 2025" description="Monthly electric scooter & bike sales data — brand rankings, market share, growth trends." breadcrumb={[{ label: "EV Sales", href: "/ev-sales" }, { label: "Two-Wheelers" }]} />
+      <SegmentPage data={data} segment="two-wheeler" title={TITLE} description={`Monthly electric scooter and bike sales — brand rankings, market share and growth from Vahan registration data (${data.periodLabel}). Source: ${data.source}.`} breadcrumb={[{ label: "EV Sales", href: "/ev-sales" }, { label: "Two-Wheelers" }]} />
     </>
   );
 }

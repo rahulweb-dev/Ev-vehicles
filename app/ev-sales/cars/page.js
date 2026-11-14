@@ -1,59 +1,46 @@
 import { SITE_URL, SITE_NAME } from "@/app/layout";
 import SegmentPage from "../SegmentPage";
-import { FALLBACK_ANALYTICS } from "@/lib/ev-sales-fallback";
+import { SEGMENT_ANALYTICS, DATA_YEAR } from "@/lib/ev-sales-fallback";
 
 export const revalidate = 3600;
 
+const TITLE = `EV Car Sales India ${DATA_YEAR}`;
+
 export const metadata = {
-  title: `EV Car Sales India 2025 – Best Selling Electric Cars & Market Share`,
-  description: "Monthly electric car sales data India 2025. Top selling EV cars, brand rankings, market share — Tata, MG, Mahindra, BYD, Hyundai.",
+  title: `${TITLE} – Brand-wise Monthly Data & Market Share`,
+  description: "Monthly electric car sales in India: Tata, Mahindra, MG, VinFast, Kia, Hyundai, BYD brand rankings and market share from Vahan data.",
   alternates: { canonical: `${SITE_URL}/ev-sales/cars` },
   openGraph: {
-    title: "EV Car Sales India 2025 – Top Electric Cars Market Data",
-    description: "Comprehensive electric car sales intelligence — brand rankings, monthly trend, market share breakdown.",
+    title: `${TITLE} – Brand Rankings & Market Share`,
+    description: "Monthly electric car sales — brand rankings, market share and growth from Vahan registration data.",
     url: `${SITE_URL}/ev-sales/cars`,
     type: "website",
-    images: [{ url: `${SITE_URL}/api/og?title=EV Car Sales India 2025&subtitle=Brand Rankings %26 Market Share&tag=cars&type=page`, width: 1200, height: 630, alt: "EV Car Sales India 2025" }],
+    images: [{ url: `${SITE_URL}/api/og?title=${encodeURIComponent(TITLE)}&subtitle=Brand Rankings %26 Market Share&tag=cars&type=page`, width: 1200, height: 630, alt: TITLE }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "EV Car Sales India 2025 – Top Electric Cars Market Data",
-    images: [`${SITE_URL}/api/og?title=EV Car Sales India 2025&subtitle=Brand Rankings %26 Market Share&tag=cars&type=page`],
+    title: `${TITLE} – Brand Rankings & Market Share`,
+    images: [`${SITE_URL}/api/og?title=${encodeURIComponent(TITLE)}&subtitle=Brand Rankings %26 Market Share&tag=cars&type=page`],
   },
 };
 
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Dataset",
-  name: "India Electric Car Sales Data 2025",
-  description: "Monthly electric car sales rankings, brand market share, and growth data for India.",
+  name: `India electric car sales data ${DATA_YEAR}`,
+  description: "Monthly electric car sales — brand rankings, market share and growth from Vahan registration data.",
   url: `${SITE_URL}/ev-sales/cars`,
   publisher: { "@type": "Organization", name: SITE_NAME, url: SITE_URL },
   spatialCoverage: { "@type": "Country", name: "India" },
-  temporalCoverage: "2025",
+  temporalCoverage: String(DATA_YEAR),
 };
 
-async function getData() {
-  try {
-    const res = await fetch(`${SITE_URL}/api/ev-sales/analytics?year=2025&segment=car`, { next: { revalidate: 3600 } });
-    if (!res.ok) throw new Error();
-    return await res.json();
-  } catch {
-    const fb = FALLBACK_ANALYTICS(2025);
-    return {
-      ...fb,
-      brandRankings: fb.brandRankings.filter((b) => b.segment === "car"),
-      grandTotal: fb.totals.car?.totalUnits || 0,
-    };
-  }
-}
-
-export default async function EVCarSalesPage() {
-  const data = await getData();
+export default function EVCarSalesPage() {
+  const data = SEGMENT_ANALYTICS("car");
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <SegmentPage data={data} segment="car" title="EV Car Sales India 2025" description="Monthly electric car sales data — brand rankings, market share, growth trends." breadcrumb={[{ label: "EV Sales", href: "/ev-sales" }, { label: "Cars" }]} />
+      <SegmentPage data={data} segment="car" title={TITLE} description={`Monthly electric car sales — brand rankings, market share and growth from Vahan registration data (${data.periodLabel}). Source: ${data.source}.`} breadcrumb={[{ label: "EV Sales", href: "/ev-sales" }, { label: "Cars" }]} />
     </>
   );
 }
