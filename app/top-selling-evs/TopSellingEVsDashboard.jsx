@@ -1,31 +1,8 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { TrendingUp, TrendingDown, ChevronDown } from "lucide-react";
-
-const TS_FAQS = [
-  { q: "What is the best-selling EV in India in 2025?", a: "Tata Nexon EV is India's best-selling electric car in 2025. In electric two-wheelers, Ola S1 series tops the charts. Overall across all EV segments combined, Ola Electric sells the highest volume of units per month in India." },
-  { q: "Which is the most affordable best-selling EV in India?", a: "The Tata Tiago EV, priced from approximately ₹8.5 lakh (ex-showroom), is among the most affordable and best-selling electric cars in India. In two-wheelers, the Bajaj Chetak and Hero Vida are competitively priced best-sellers under ₹1.5 lakh." },
-  { q: "How many electric vehicles does Ola Electric sell per month?", a: "Ola Electric consistently sells between 25,000 to 50,000+ electric scooters per month in India, making it the single largest EV brand by monthly volume. Sales peak during festive months and dip slightly during monsoon season." },
-  { q: "Are commercial EVs growing faster than passenger EVs in India?", a: "Yes, commercial electric vehicles (electric buses, trucks, and last-mile delivery vehicles) are growing at a faster percentage rate than passenger EVs, albeit from a smaller base. E-three-wheelers and e-buses have seen particularly strong adoption from government procurement and fleet operators." },
-];
-
-function FAQ({ items }) {
-  const [open, setOpen] = useState(null);
-  return (
-    <div className="space-y-2">
-      {items.map((item, i) => (
-        <div key={i} className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden">
-          <button onClick={() => setOpen(open === i ? null : i)} className="w-full flex items-center justify-between px-5 py-4 text-left gap-4">
-            <span className="font-bold text-sm text-gray-800 dark:text-gray-200">{item.q}</span>
-            <ChevronDown size={16} className={`shrink-0 text-gray-400 transition-transform duration-200 ${open === i ? "rotate-180" : ""}`} />
-          </button>
-          {open === i && <div className="px-5 pb-5 text-sm text-gray-600 dark:text-gray-400 leading-relaxed border-t border-gray-50 dark:border-gray-800 pt-4">{item.a}</div>}
-        </div>
-      ))}
-    </div>
-  );
-}
+import { DATA_YEAR } from "@/lib/ev-sales-fallback";
+import { TrendingUp, TrendingDown } from "lucide-react";
 
 const SEG_COLOR = { car: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400", "two-wheeler": "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400", commercial: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400" };
 const SEG_LABEL = { car: "Car", "two-wheeler": "2-Wheeler", commercial: "Commercial" };
@@ -48,8 +25,8 @@ export default function TopSellingEVsDashboard({ data = {} }) {
             <span className="text-gray-700 dark:text-gray-300 font-medium">Top Selling EVs</span>
           </nav>
           {isFallback && <span className="bg-amber-100 text-amber-700 text-xs font-bold px-3 py-1 rounded-full mb-3 inline-block">Sample Data</span>}
-          <h1 className="text-3xl font-black text-gray-900 dark:text-white">Top Selling EVs India 2025</h1>
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Best-selling electric vehicles ranked by total units sold — {(grandTotal).toLocaleString("en-IN")} total EVs in 2025.</p>
+          <h1 className="text-3xl font-black text-gray-900 dark:text-white">Top Selling EVs India {DATA_YEAR}</h1>
+          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Best-selling electric vehicles ranked by total units sold — {(grandTotal).toLocaleString("en-IN")} total EVs in {DATA_YEAR}.</p>
         </div>
       </section>
 
@@ -114,21 +91,6 @@ export default function TopSellingEVsDashboard({ data = {} }) {
               </div>
             ))}
           </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 pb-10 space-y-6">
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 sm:p-8 shadow-sm">
-          <h2 className="text-xl font-black text-gray-900 dark:text-white mb-4">Why These Are India&apos;s Top Selling EVs</h2>
-          <div className="space-y-4 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-            <p>India&apos;s best-selling electric vehicles share a few key traits: competitive pricing relative to their ICE equivalents, a strong dealership or delivery network, and low total cost of ownership. Tata&apos;s dominance in the electric car segment stems from its ability to offer models like the Nexon EV and Tiago EV at price points that undercut many petrol alternatives on a 3-year ownership cost basis, especially with the fuel savings factored in.</p>
-            <p>In electric two-wheelers, the sales rankings shift month to month with aggressive pricing by Ola Electric and seasonal demand patterns. TVS iQube benefits from its trusted parent brand&apos;s widespread service network, while Ather Energy holds strong among consumers who prioritise performance and software features over pure value. Bajaj Chetak and Hero Vida are growing fastest in Tier 2 and Tier 3 cities.</p>
-            <p>Rankings on this page are based on monthly wholesale dispatch data (factory to dealer) and registration data where available. Wholesale and retail figures can differ — we note where data is wholesale-based. All figures are for India only and cover the 2025 calendar year.</p>
-          </div>
-        </div>
-        <div>
-          <h2 className="text-xl font-black text-gray-900 dark:text-white mb-4">FAQs — Top Selling EVs India</h2>
-          <FAQ items={TS_FAQS} />
         </div>
       </div>
     </main>

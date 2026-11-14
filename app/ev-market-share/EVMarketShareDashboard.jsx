@@ -1,33 +1,9 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { ChevronDown } from "lucide-react";
+import { DATA_YEAR } from "@/lib/ev-sales-fallback";
 import DonutChart from "@/components/ev-sales/DonutChart";
 import HBarChart from "@/components/ev-sales/HBarChart";
-
-const MS_FAQS = [
-  { q: "What is the EV market share of Tata in India?", a: "Tata Motors holds over 50% market share in the Indian electric car segment as of 2025. The Tata Nexon EV and Tata Tiago EV are the two best-selling electric cars in India, making Tata the dominant player in the EV four-wheeler market." },
-  { q: "Who leads India's electric two-wheeler market?", a: "Ola Electric leads the Indian electric two-wheeler market with approximately 34-36% market share. TVS iQube holds around 19-20%, followed by Ather Energy at 15-17%, Bajaj Chetak at 12-14%, and Hero Vida at 8-10%." },
-  { q: "What percentage of vehicles sold in India are EVs?", a: "Electric vehicles account for approximately 5-6% of total vehicle registrations in India in 2025. The penetration is highest in the two-wheeler segment at around 5-7%, while electric cars represent about 2-3% of total car sales." },
-  { q: "Is Mahindra gaining EV market share in India?", a: "Yes, Mahindra has significantly increased its EV market share in 2025 following the launch of the XEV 9e and BE 6e. Mahindra now holds approximately 15-20% of the premium electric car segment and is the fastest-growing mainstream EV brand." },
-];
-
-function FAQ({ items }) {
-  const [open, setOpen] = useState(null);
-  return (
-    <div className="space-y-2">
-      {items.map((item, i) => (
-        <div key={i} className="rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden">
-          <button onClick={() => setOpen(open === i ? null : i)} className="w-full flex items-center justify-between px-5 py-4 text-left gap-4">
-            <span className="font-bold text-sm text-gray-800 dark:text-gray-200">{item.q}</span>
-            <ChevronDown size={16} className={`shrink-0 text-gray-400 transition-transform duration-200 ${open === i ? "rotate-180" : ""}`} />
-          </button>
-          {open === i && <div className="px-5 pb-5 text-sm text-gray-600 dark:text-gray-400 leading-relaxed border-t border-gray-50 dark:border-gray-800 pt-4">{item.a}</div>}
-        </div>
-      ))}
-    </div>
-  );
-}
 
 const SEG_LABEL = { car: "Cars", "two-wheeler": "Two-Wheelers", commercial: "Commercial" };
 
@@ -52,7 +28,7 @@ export default function EVMarketShareDashboard({ data = {} }) {
           <div className="flex items-start justify-between flex-wrap gap-3">
             <div>
               {isFallback && <span className="bg-amber-100 text-amber-700 text-xs font-bold px-3 py-1 rounded-full mb-2 inline-block">Sample Data</span>}
-              <h1 className="text-3xl font-black text-gray-900 dark:text-white">EV Market Share India 2025</h1>
+              <h1 className="text-3xl font-black text-gray-900 dark:text-white">EV Market Share India {DATA_YEAR}</h1>
               <p className="mt-1.5 text-sm text-gray-500 dark:text-gray-400">Brand-wise electric vehicle market share — cars, two-wheelers, commercial vehicles.</p>
             </div>
           </div>
@@ -86,7 +62,7 @@ export default function EVMarketShareDashboard({ data = {} }) {
         {/* Brand Market Share */}
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm">
           <div className="flex items-center justify-between flex-wrap gap-3 mb-5">
-            <h2 className="text-base font-black text-gray-900 dark:text-white">Brand Market Share 2025</h2>
+            <h2 className="text-base font-black text-gray-900 dark:text-white">Brand Market Share {DATA_YEAR}</h2>
             <div className="flex gap-2 flex-wrap">
               {[["all", "All Segments"], ["car", "Cars"], ["two-wheeler", "Two-Wheelers"], ["commercial", "Commercial"]].map(([seg, label]) => (
                 <button key={seg} onClick={() => setActiveSegment(seg)}
@@ -137,22 +113,6 @@ export default function EVMarketShareDashboard({ data = {} }) {
               ))}
             </tbody>
           </table>
-        </div>
-      </div>
-
-      {/* Editorial */}
-      <div className="max-w-7xl mx-auto px-4 pb-10 space-y-6">
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 sm:p-8 shadow-sm">
-          <h2 className="text-xl font-black text-gray-900 dark:text-white mb-4">Understanding India&apos;s EV Market Share in 2025</h2>
-          <div className="space-y-4 text-sm text-gray-600 dark:text-gray-400 leading-relaxed">
-            <p>India&apos;s electric vehicle market in 2025 is characterised by a clear concentration at the top — a handful of brands dominate each segment, while challengers are steadily carving out niches. In the electric car space, Tata Motors commands over half the market, a dominance built through early mover advantage, competitive pricing of the Nexon EV and Tiago EV, and an extensive service network. MG Motor and Mahindra are the most credible challengers, with Mahindra&apos;s new BE and XEV series attracting a premium buyer who was previously not considering EVs.</p>
-            <p>The electric two-wheeler market tells a different story — it is far more competitive, with five brands all holding significant share. Ola Electric&apos;s manufacturing scale gives it a cost advantage, but TVS iQube&apos;s dealer network and Ather Energy&apos;s brand loyalty among tech-savvy urban buyers mean the top three are separated by razor-thin margins in some cities. Bajaj Chetak, with its retro design and brand heritage, appeals to a distinct demographic, while Hero Vida is leveraging India&apos;s largest two-wheeler dealership network to expand rapidly.</p>
-            <p>Market share data on this page is computed from monthly wholesale dispatch figures and registration data. It represents share within each segment (electric cars vs total electric cars, not vs all vehicles), and is updated monthly.</p>
-          </div>
-        </div>
-        <div>
-          <h2 className="text-xl font-black text-gray-900 dark:text-white mb-4">FAQs — EV Market Share India</h2>
-          <FAQ items={MS_FAQS} />
         </div>
       </div>
     </main>

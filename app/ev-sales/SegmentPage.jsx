@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { DATA_YEAR } from "@/lib/ev-sales-fallback";
 import { ChevronRight } from "lucide-react";
 import BarChart from "@/components/ev-sales/BarChart";
 import HBarChart from "@/components/ev-sales/HBarChart";
@@ -66,7 +67,7 @@ export default function SegmentPage({ data = {}, segment, title, description, br
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm">
-            <h2 className="text-sm font-black text-gray-900 dark:text-white mb-4">Monthly Sales Trend 2025</h2>
+            <h2 className="text-sm font-black text-gray-900 dark:text-white mb-4">Monthly Sales Trend {DATA_YEAR}</h2>
             <BarChart data={monthlyData} labelKey="month" valueKey="totalUnits" color={SEG_COLOR[segment] || "bg-green-500"} />
           </div>
 
@@ -78,7 +79,7 @@ export default function SegmentPage({ data = {}, segment, title, description, br
 
         {/* Rankings Table */}
         <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm overflow-x-auto">
-          <h2 className="text-sm font-black text-gray-900 dark:text-white mb-5">Brand Rankings — {SEG_LABEL[segment]} 2025</h2>
+          <h2 className="text-sm font-black text-gray-900 dark:text-white mb-5">Brand Rankings — {SEG_LABEL[segment]} {DATA_YEAR}</h2>
           <table className="w-full text-sm">
             <thead>
               <tr className="text-xs font-bold text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-gray-800">
