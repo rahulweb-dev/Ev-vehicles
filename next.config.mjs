@@ -37,7 +37,10 @@ const nextConfig = {
         ["/bikes/ather-el01", "/bikes/ather-konarc"],                      // EL01 was the codename of the Konarc
         ["/bikes/suzuki-burgman-electric", "/bikes/suzuki-e-access"],      // e-Burgman never launched; Suzuki sells the e-Access
         ["/commercial/tata-ultra-t-7-electric", "/commercial/tata-ultra-e-7"], // Ultra T.7 Electric replaced by Ultra E.7
-      ].map(([from, to]) => ({ source: `${from}/:path*`, destination: `${to}/:path*`, permanent: true })),
+      ].flatMap(([from, to]) => [
+        { source: from, destination: to, permanent: true },
+        { source: `${from}/:path+`, destination: `${to}/:path+`, permanent: true },
+      ]),
       // Pages for models that never existed — send to the listing
       ...["/bikes/bounce-infinity-e1-pro", "/bikes/tvs-creon"].map((from) => ({ source: `${from}/:path*`, destination: "/bikes", permanent: true })),
     ];
