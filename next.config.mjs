@@ -28,6 +28,18 @@ const nextConfig = {
         destination: "https://www.evradar.in/:path*",
         permanent: true,
       },
+      // Vehicle pages removed, merged or renamed (Nov 2026 catalogue clean-up).
+      // `:path*` also covers sub-pages such as /price-in-<city>.
+      ...[
+        ["/cars/urban-cruiser", "/cars/toyota-urban-cruiser-ev"],          // duplicate of the Urban Cruiser Ebella
+        ["/cars/hyundai-creta-electric-n-line", "/cars/hyundai-creta-electric"], // model does not exist
+        ["/cars/honda-elevate-ev", "/cars/honda-alpha"],                   // Elevate EV cancelled; Honda's first India EV is the Alpha
+        ["/bikes/ather-el01", "/bikes/ather-konarc"],                      // EL01 was the codename of the Konarc
+        ["/bikes/suzuki-burgman-electric", "/bikes/suzuki-e-access"],      // e-Burgman never launched; Suzuki sells the e-Access
+        ["/commercial/tata-ultra-t-7-electric", "/commercial/tata-ultra-e-7"], // Ultra T.7 Electric replaced by Ultra E.7
+      ].map(([from, to]) => ({ source: `${from}/:path*`, destination: `${to}/:path*`, permanent: true })),
+      // Pages for models that never existed — send to the listing
+      ...["/bikes/bounce-infinity-e1-pro", "/bikes/tvs-creon"].map((from) => ({ source: `${from}/:path*`, destination: "/bikes", permanent: true })),
     ];
   },
 
