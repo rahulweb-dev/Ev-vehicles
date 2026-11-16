@@ -41,6 +41,9 @@ const nextConfig = {
         { source: from, destination: to, permanent: true },
         { source: `${from}/:path+`, destination: `${to}/:path+`, permanent: true },
       ]),
+      // iQube vs Chetak comparison now targets the Chetak 35 Series page
+      { source: "/compare/tvs-iqube-electric-vs-bajaj-chetak-electric", destination: "/compare/tvs-iqube-electric-vs-bajaj-chetak-35-series", permanent: true },
+      { source: "/compare/bajaj-chetak-electric-vs-tvs-iqube-electric", destination: "/compare/tvs-iqube-electric-vs-bajaj-chetak-35-series", permanent: true },
       // Pages for models that never existed — send to the listing
       ...["/bikes/bounce-infinity-e1-pro", "/bikes/tvs-creon"].map((from) => ({ source: `${from}/:path*`, destination: "/bikes", permanent: true })),
     ];

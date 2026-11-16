@@ -592,38 +592,38 @@
  },
  {
   "a": "tvs-iqube-electric",
-  "b": "bajaj-chetak-electric",
+  "b": "bajaj-chetak-35-series",
   "nameA": "TVS iQube Electric",
-  "nameB": "Bajaj Chetak (C Series)",
+  "nameB": "Bajaj Chetak 35 Series",
   "segment": "two-wheeler",
-  "intro": "The TVS iQube and Bajaj Chetak are the two best-selling family electric scooters from established brands. The Chetak starts lower at ₹99,802 and has a metal body and IP67 battery, while the iQube (from ₹1,20,124) offers bigger batteries of up to 5.3 kWh.",
+  "intro": "The TVS iQube and Bajaj Chetak are the two best-selling family electric scooters from established brands. With the same 3.5 kWh battery they are closely matched: the Chetak 35 Series (from ₹1,25,698) has a metal body and slightly more claimed range, while the iQube 3.5 kWh costs ₹1,45,200 and the iQube range goes up to a 5.3 kWh battery.",
   "differences": [
-   "Price: Chetak ₹99,802–1,53,850; iQube ₹1,20,124–1,75,384.",
-   "Battery and IDC range: Chetak 2.5 kWh (113 km) to 3.5 kWh (153 km); iQube 2.3 kWh (114 km) to 5.3 kWh (212 km).",
-   "Charging: neither offers fast charging. Chetak charges 0–80% in about 2 h 25 min to 3 h 25 min from a regular socket; iQube charges 10–80% in 2 h 25 min to 4 h on a 950 W charger.",
-   "Storage: Chetak 35 L (25 L on the C2501); iQube 32 L.",
-   "Top speed: Chetak 60–80 km/h; iQube 82 km/h (68 km/h on 2.3 kWh).",
-   "Warranty: Chetak 3 years / 50,000 km on vehicle and battery; iQube battery 3 years / 50,000 km."
+   "Price: Chetak 35 Series ₹1,25,698–1,53,850; iQube ₹1,20,124–1,75,384 (3.5 kWh from ₹1,45,200).",
+   "Battery and IDC range: Chetak 35 Series 3.5 kWh (151–153 km); iQube 2.3 kWh (114 km) to 5.3 kWh (212 km), with the 3.5 kWh claiming 145 km.",
+   "Charging: neither offers DC fast charging. Chetak 0–80% in 3 h to 3 h 15 min; iQube 3.5 kWh 10–80% in about 3 h 45 min on its portable charger.",
+   "Storage: Chetak 35 L (plus a 5 L glovebox on the C3501); iQube 32 L.",
+   "Top speed: Chetak 70–80 km/h; iQube 82 km/h on the 3.5 kWh.",
+   "Body: the Chetak has a metal body and an IP67-rated battery."
   ],
-  "buyA": "Buy the TVS iQube if you need more than 150 km of claimed range, as only the iQube offers 4.7 and 5.3 kWh batteries.",
-  "buyB": "Buy the Bajaj Chetak if you want the lowest entry price, a metal body and a slightly bigger boot.",
-  "verdict": "With similar 3.5 kWh batteries the two are evenly matched, so let price, dealer proximity and styling decide. The iQube is the better pick for long daily commutes thanks to its larger battery options, and the Chetak is the better buy under ₹1.2 lakh. PM E-Drive subsidy applies to both until March 2028.",
+  "buyA": "Buy the TVS iQube if you want a bigger battery than 3.5 kWh — only the iQube offers 4.7 and 5.3 kWh packs with up to 212 km claimed range — or a cheaper 2.3 kWh entry version.",
+  "buyB": "Buy the Bajaj Chetak 35 Series if you want the most range from a 3.5 kWh scooter, a metal body and a bigger boot, and the C3503 undercuts the iQube 3.5 kWh by about ₹20,000.",
+  "verdict": "At 3.5 kWh the Chetak 35 Series is the better value: it costs less than the iQube 3.5 kWh and claims slightly more range and storage. The iQube is the pick if you need more than 160 km of claimed range, because its 4.7 and 5.3 kWh versions have no Chetak equivalent. PM E-Drive subsidy applies to both until March 2028.",
   "faqs": [
    {
     "question": "Which is cheaper, iQube or Chetak?",
-    "answer": "The Chetak starts at ₹99,802 and the iQube at ₹1,20,124, about ₹20,000 more."
+    "answer": "With the same 3.5 kWh battery, the Chetak C3503 at ₹1,25,698 is about ₹20,000 cheaper than the iQube 3.5 kWh at ₹1,45,200. The cheapest iQube overall is the 2.3 kWh at ₹1,20,124."
    },
    {
     "question": "Which has more range?",
-    "answer": "The iQube ST 5.3 kWh claims 212 km IDC, the most in this pair. The top Chetak 3.5 kWh claims 153 km."
+    "answer": "At 3.5 kWh, the Chetak claims 151–153 km IDC against 145 km for the iQube. The iQube ST 5.3 kWh claims 212 km, the most in this pair."
    },
    {
     "question": "Do either have fast charging?",
-    "answer": "No. Both charge from a home socket, taking roughly 2.5 to 4 hours to reach 80% depending on battery size."
+    "answer": "No. Both charge from a home socket: about 3 to 3 h 15 min to 80% for the Chetak 35 Series and about 3 h 45 min (10–80%) for the iQube 3.5 kWh."
    },
    {
     "question": "Which has more storage?",
-    "answer": "The Chetak, with 35 L on 3.0 and 3.5 kWh versions, against 32 L on the iQube."
+    "answer": "The Chetak 35 Series, with 35 L under the seat (plus a 5 L glovebox on the C3501), against 32 L on the iQube."
    }
   ]
  },
