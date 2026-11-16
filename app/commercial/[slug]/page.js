@@ -1,3 +1,4 @@
+import { comparisonsFor } from "@/lib/comparisons";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -283,7 +284,7 @@ export default async function CommercialDetailPage({ params }) {
         {vehicle.availability === "available" ? " Currently available in India." : " Expected to launch in India soon."}
       </p>
 
-      <VehicleDetailPage vehicle={vehicle} relatedVehicles={related} vehicleType="commercial" />
+      <VehicleDetailPage vehicle={vehicle} relatedVehicles={related} vehicleType="commercial" comparisons={comparisonsFor(vehicle.slug).map((c) => ({ slug: c.slug, label: `${c.nameA} vs ${c.nameB}` }))} />
 
       {relatedNews.length > 0 && (
         <section className="border-t border-gray-100 bg-gray-50 py-12">

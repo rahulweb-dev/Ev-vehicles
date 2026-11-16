@@ -1,0 +1,815 @@
+[
+ {
+  "a": "tata-nexon-ev",
+  "b": "tata-punch-ev",
+  "nameA": "Tata Nexon EV",
+  "nameB": "Tata Punch EV",
+  "segment": "car",
+  "intro": "Both are Tata compact SUVs, both have a 5-star Bharat NCAP rating, so the choice comes down to size and budget. The Punch EV starts at ₹9.79 lakh and the Nexon EV at ₹12.49 lakh (ex-showroom), and the extra money buys more room, a bigger 45 kWh battery and more range.",
+  "differences": [
+   "Price: Punch EV ₹9.79–12.99 lakh; Nexon EV ₹12.49–17.89 lakh.",
+   "Battery and claimed range: Punch EV 30 kWh (365 km) or 40 kWh (468 km); Nexon EV 30 kWh (275 km) or 45 kWh (489 km).",
+   "Real-world range in Autocar India tests: about 304 km for the Punch EV 40 and about 350 km for the Nexon EV 45.",
+   "Size: the Nexon EV is 3,994 mm long with a 2,498 mm wheelbase; the Punch EV is 3,827 mm long with a 2,445 mm wheelbase. Boot space is close (Nexon EV 350 L, Punch EV 366 L).",
+   "DC charging: Punch EV 10–80% in about 30 min (up to 65 kW); Nexon EV 45 10–80% in about 40 min (60 kW).",
+   "Both get 6 airbags, a 360° camera and a lifetime battery warranty for the first owner on the bigger pack (8 years / 1.6 lakh km on the 30 kWh versions)."
+  ],
+  "buyA": "Buy the Tata Nexon EV if you want the roomier cabin, more real-world range (about 350 km on the 45 kWh) and plan regular highway trips with four adults.",
+  "buyB": "Buy the Tata Punch EV if you drive mostly in the city, want to stay near ₹10–13 lakh, and value its smaller footprint and quicker DC charging.",
+  "verdict": "For a city-first buyer on a budget, the Punch EV 40 is the better value: it costs much less than a Nexon EV 45 and gives up only about 45 km of tested range. If the car is your only family car and does highway runs, spend the extra on the Nexon EV 45 for its bigger cabin and longer range.",
+  "faqs": [
+   {
+    "question": "What is the price difference between the Tata Punch EV and Nexon EV?",
+    "answer": "The Punch EV starts at ₹9.79 lakh and the Nexon EV at ₹12.49 lakh, a gap of ₹2.7 lakh at entry level. The top Punch EV (₹12.99 lakh) costs about the same as the base Nexon EV."
+   },
+   {
+    "question": "Which has more real-world range, Punch EV or Nexon EV?",
+    "answer": "In Autocar India road tests, the Nexon EV 45 managed about 350 km and the Punch EV 40 about 304 km, against claimed figures of 489 km and 468 km."
+   },
+   {
+    "question": "Are the Punch EV and Nexon EV equally safe?",
+    "answer": "Both have a 5-star Bharat NCAP rating and 6 airbags as standard, along with ESC and TPMS."
+   },
+   {
+    "question": "Which charges faster on a DC fast charger?",
+    "answer": "Tata quotes 10–80% in about 30 minutes for the Punch EV on a charger of up to 65 kW, and about 40 minutes for the Nexon EV 45 on a 60 kW charger."
+   }
+  ]
+ },
+ {
+  "a": "hyundai-creta-electric",
+  "b": "tata-nexon-ev",
+  "nameA": "Hyundai Creta Electric",
+  "nameB": "Tata Nexon EV",
+  "segment": "car",
+  "intro": "The Hyundai Creta Electric is a mid-size SUV from ₹18.03 lakh, while the Tata Nexon EV is a sub-4-metre SUV from ₹12.49 lakh. The Creta gives you more space, more power and longer range; the Nexon EV costs less and has a 5-star Bharat NCAP rating.",
+  "differences": [
+   "Price: Nexon EV ₹12.49–17.89 lakh; Creta Electric ₹18.03–24.34 lakh. The top Nexon EV costs less than the base Creta Electric.",
+   "Battery and claimed range: Creta Electric 42 kWh (420 km) or 51.4 kWh (510 km); Nexon EV 30 kWh (275 km) or 45 kWh (489 km).",
+   "Real-world range (Autocar India tests): about 430 km for the Creta Electric 51.4 kWh versus about 350 km for the Nexon EV 45.",
+   "Size: the Creta Electric is 4,340 mm long with a 433 L boot; the Nexon EV is 3,994 mm long with a 350 L boot.",
+   "Safety: the Nexon EV has a 5-star Bharat NCAP rating; the Creta Electric has not been crash-tested yet. Both have 6 airbags and Level 2 ADAS on upper trims.",
+   "Power: Creta Electric makes up to 171 PS; Nexon EV 45 makes 144 hp."
+  ],
+  "buyA": "Buy the Hyundai Creta Electric if your budget reaches ₹20 lakh or more and you want a roomier cabin, a bigger boot and about 430 km of real-world range for highway use.",
+  "buyB": "Buy the Tata Nexon EV if you want a proven 5-star Bharat NCAP car for under ₹18 lakh and most of your driving is in and around the city.",
+  "verdict": "The Nexon EV 45 is the sensible pick for most buyers: it costs several lakh less and its tested range of about 350 km covers daily use and occasional trips. Pick the Creta Electric long-range if you regularly carry five adults or drive long highway distances and the higher price is not a stretch.",
+  "faqs": [
+   {
+    "question": "How much more does the Creta Electric cost than the Nexon EV?",
+    "answer": "The Creta Electric starts at ₹18.03 lakh against ₹12.49 lakh for the Nexon EV. The top Nexon EV, at ₹17.89 lakh, is still slightly cheaper than the base Creta Electric."
+   },
+   {
+    "question": "Which is better for a family, Creta Electric or Nexon EV?",
+    "answer": "The Creta Electric is longer (4,340 mm vs 3,994 mm) and has a bigger boot (433 L vs 350 L), so it is the more comfortable five-seater for a family."
+   },
+   {
+    "question": "Is the Hyundai Creta Electric crash-tested?",
+    "answer": "Not yet by Bharat NCAP or Global NCAP. The Nexon EV has a 5-star Bharat NCAP rating from 2024."
+   },
+   {
+    "question": "Which has more real-world range?",
+    "answer": "Autocar India got about 430 km from the Creta Electric 51.4 kWh and about 350 km from the Nexon EV 45 kWh."
+   }
+  ]
+ },
+ {
+  "a": "mahindra-be-6e",
+  "b": "tata-curvv-ev",
+  "nameA": "Mahindra BE 6",
+  "nameB": "Tata Curvv EV",
+  "segment": "car",
+  "intro": "The Mahindra BE 6 and Tata Curvv EV are both coupe-styled SUVs with 5-star Bharat NCAP ratings. The Curvv EV starts lower at ₹17.19 lakh with one 55 kWh battery, while the BE 6 starts at ₹19.45 lakh and offers bigger batteries, more power and much faster DC charging.",
+  "differences": [
+   "Price: Curvv EV ₹17.19–19.69 lakh; BE 6 ₹19.45–26.95 lakh.",
+   "Battery: Curvv EV 55 kWh (502 km claimed); BE 6 59, 70 or 79 kWh (573, 651 or 708 km claimed).",
+   "Real-world range in Autocar India tests: about 365 km for the Curvv EV and about 449 km for the BE 6 79 kWh.",
+   "DC charging: BE 6 20–80% in about 20 min; Curvv EV 10–80% in about 40 min (up to 70 kW).",
+   "Boot: Curvv EV 500 L plus an 11.6 L frunk; BE 6 455 L plus a 45 L frunk.",
+   "Drive: the BE 6 is rear-wheel drive with up to 231 PS; the Curvv EV is front-wheel drive with 167 PS."
+  ],
+  "buyA": "Buy the Mahindra BE 6 if you drive long distances, want the quickest DC charging in this pair, and can stretch past ₹22 lakh for the 79 kWh battery.",
+  "buyB": "Buy the Tata Curvv EV if you want a well-equipped 5-star coupe SUV under ₹20 lakh with a large 500 L boot.",
+  "verdict": "The BE 6 is the better long-distance EV, with about 85 km more tested range and charging in roughly half the time. The Curvv EV makes more sense if your budget stops below ₹20 lakh, since its fully loaded version costs about the same as the base BE 6.",
+  "faqs": [
+   {
+    "question": "What is the price gap between the BE 6 and Curvv EV?",
+    "answer": "The Curvv EV costs ₹17.19–19.69 lakh and the BE 6 ₹19.45–26.95 lakh. The top Curvv EV and the base BE 6 are within ₹25,000 of each other."
+   },
+   {
+    "question": "Which has better real-world range?",
+    "answer": "Autocar India recorded about 449 km from the BE 6 79 kWh and about 365 km from the Curvv EV 55 kWh in Eco mode."
+   },
+   {
+    "question": "Which charges faster?",
+    "answer": "Mahindra claims 20–80% in about 20 minutes for the BE 6. Tata claims 10–80% in about 40 minutes for the Curvv EV on a charger of up to 70 kW."
+   },
+   {
+    "question": "Are both cars safe?",
+    "answer": "Yes. Both have a 5-star Bharat NCAP rating and Level 2 ADAS. The BE 6 has 7 airbags and the Curvv EV has 6."
+   }
+  ]
+ },
+ {
+  "a": "tata-punch-ev",
+  "b": "mg-windsor-ev",
+  "nameA": "Tata Punch EV",
+  "nameB": "MG Windsor EV",
+  "segment": "car",
+  "intro": "The Tata Punch EV is a compact city SUV from ₹9.79 lakh; the MG Windsor EV is a larger, comfort-focused crossover from ₹14.85 lakh. The Windsor offers a far bigger cabin and boot, while the Punch costs about ₹5 lakh less and has a 5-star Bharat NCAP rating.",
+  "differences": [
+   "Price: Punch EV ₹9.79–12.99 lakh; Windsor EV ₹14.85–19.15 lakh.",
+   "Battery and claimed range: Punch EV 30 kWh (365 km) or 40 kWh (468 km); Windsor EV 38 kWh (332 km) or 52.9 kWh (449 km).",
+   "Real-world range (Autocar India): about 304 km for the Punch EV 40 and about 308 km for the Windsor EV 38.",
+   "Size: the Windsor is 4,295 mm long with a 2,700 mm wheelbase and up to 604 L of boot space; the Punch is 3,827 mm long with a 366 L boot.",
+   "Safety: Punch EV has a 5-star Bharat NCAP rating; the Windsor EV has not been crash-tested yet. Both have 6 airbags.",
+   "Battery warranty: lifetime for the first owner on the Punch EV 40 and on the Windsor EV."
+  ],
+  "buyA": "Buy the Tata Punch EV if you want an easy-to-park city car with a proven safety rating at around ₹10–13 lakh.",
+  "buyB": "Buy the MG Windsor EV if rear-seat comfort and luggage space matter most, for example if family members are often driven in the back.",
+  "verdict": "For most city buyers the Punch EV 40 is the better value, giving similar tested range to the Windsor 38 for several lakh less. Choose the Windsor if you need a genuinely spacious back seat and boot, and look at the 52.9 kWh version if you also travel out of town.",
+  "faqs": [
+   {
+    "question": "What is the price difference between the Punch EV and Windsor EV?",
+    "answer": "The Punch EV starts at ₹9.79 lakh and the Windsor EV at ₹14.85 lakh, about ₹5 lakh apart at entry level."
+   },
+   {
+    "question": "Which has more real-world range?",
+    "answer": "They are close: Autocar India got about 304 km from the Punch EV 40 and about 308 km from the Windsor EV 38. The Windsor 52.9 kWh claims 449 km, but no real-world figure is listed for it."
+   },
+   {
+    "question": "Which is better for a family?",
+    "answer": "The Windsor EV, which is about 470 mm longer, has a 2,700 mm wheelbase and up to 604 L of boot space against the Punch EV’s 366 L."
+   },
+   {
+    "question": "Which is safer?",
+    "answer": "The Punch EV has a 5-star Bharat NCAP rating. The Windsor EV has 6 airbags and ESC but has not yet been crash-tested."
+   }
+  ]
+ },
+ {
+  "a": "mg-windsor-ev",
+  "b": "tata-nexon-ev",
+  "nameA": "MG Windsor EV",
+  "nameB": "Tata Nexon EV",
+  "segment": "car",
+  "intro": "The MG Windsor EV (from ₹14.85 lakh) and Tata Nexon EV (from ₹12.49 lakh) overlap in price but suit different people. The Windsor is about space and rear-seat comfort; the Nexon EV offers more tested range and a 5-star Bharat NCAP rating.",
+  "differences": [
+   "Price: Nexon EV ₹12.49–17.89 lakh; Windsor EV ₹14.85–19.15 lakh.",
+   "Battery and claimed range: Windsor EV 38 kWh (332 km) or 52.9 kWh (449 km); Nexon EV 30 kWh (275 km) or 45 kWh (489 km).",
+   "Real-world range (Autocar India): about 350 km for the Nexon EV 45 and about 308 km for the Windsor EV 38.",
+   "Space: the Windsor is 4,295 mm long with a 2,700 mm wheelbase and up to 604 L of boot; the Nexon EV is 3,994 mm long with a 350 L boot.",
+   "Safety: Nexon EV has a 5-star Bharat NCAP rating; the Windsor EV is not yet crash-tested. Both have 6 airbags.",
+   "DC charging: Nexon EV 45 10–80% in about 40 min; Windsor EV 38 0–80% in about 55 min, 52.9 kWh 20–80% in about 50 min."
+  ],
+  "buyA": "Buy the MG Windsor EV if you want the most cabin and boot space for the money and will mostly use it in and around the city.",
+  "buyB": "Buy the Tata Nexon EV if you want more range per rupee, faster DC charging and a car with a 5-star Bharat NCAP result.",
+  "verdict": "Most buyers will be better served by the Nexon EV 45, which costs less than comparable Windsor versions, travels further on a charge and has a crash-test rating. The Windsor is the right choice when rear-seat comfort and boot space are the priority.",
+  "faqs": [
+   {
+    "question": "Which is cheaper, the Windsor EV or Nexon EV?",
+    "answer": "The Nexon EV starts at ₹12.49 lakh, about ₹2.36 lakh below the Windsor EV’s ₹14.85 lakh. The long-range Nexon EV 45 starts at ₹14.34 lakh, while the long-range Windsor (52.9 kWh) starts at ₹18.05 lakh."
+   },
+   {
+    "question": "Which has more real-world range?",
+    "answer": "Autocar India recorded about 350 km from the Nexon EV 45 and about 308 km from the Windsor EV 38 kWh."
+   },
+   {
+    "question": "Which is roomier?",
+    "answer": "The Windsor EV has a 2,700 mm wheelbase and up to 604 L of boot space, compared with 2,498 mm and 350 L in the Nexon EV."
+   },
+   {
+    "question": "Is the MG Windsor EV crash-tested?",
+    "answer": "Not yet. The Nexon EV has a 5-star Bharat NCAP rating from 2024."
+   }
+  ]
+ },
+ {
+  "a": "tata-harrier-ev",
+  "b": "mahindra-xev-9e",
+  "nameA": "Tata Harrier EV",
+  "nameB": "Mahindra XEV 9e",
+  "segment": "car",
+  "intro": "These are the two big electric SUVs from Indian brands, both with 5-star Bharat NCAP ratings and both starting just under ₹22 lakh. The Harrier EV offers dual-motor all-wheel drive and an upright SUV shape; the XEV 9e is a longer coupe-SUV with a larger boot and quicker charging.",
+  "differences": [
+   "Price: Harrier EV ₹21.79–30.54 lakh; XEV 9e ₹21.90–30.50 lakh.",
+   "Battery and claimed range: Harrier EV 65 kWh (538 km) or 75 kWh (627 km); XEV 9e 59 kWh (542 km) or 79 kWh (656 km).",
+   "All-wheel drive: the Harrier EV offers dual-motor QWD versions from ₹26.79 lakh (622 km claimed).",
+   "Size: the XEV 9e is 4,789 mm long; the Harrier EV is 4,598 mm. Mahindra quotes a 663 L boot for the XEV 9e.",
+   "DC charging: XEV 9e 20–80% in about 20 min (Mahindra claim).",
+   "Both scored 5 stars in Bharat NCAP, with 32/32 for adult protection."
+  ],
+  "buyA": "Buy the Tata Harrier EV if you want all-wheel drive for bad roads or hill driving, or prefer a traditional upright SUV body.",
+  "buyB": "Buy the Mahindra XEV 9e if you want the larger boot, faster DC charging and the longest claimed range in this pair.",
+  "verdict": "For most families doing long highway trips the XEV 9e is the stronger all-rounder, thanks to its larger 79 kWh battery option and faster charging at similar prices. The Harrier EV is the pick if you need all-wheel drive, which the XEV 9e does not offer.",
+  "faqs": [
+   {
+    "question": "Which is cheaper, the Harrier EV or XEV 9e?",
+    "answer": "They start within ₹11,000 of each other: ₹21.79 lakh for the Harrier EV and ₹21.90 lakh for the XEV 9e. Top versions are about ₹30.5 lakh for both."
+   },
+   {
+    "question": "Which has more claimed range?",
+    "answer": "The XEV 9e 79 kWh claims 656 km and the Harrier EV 75 kWh claims 627 km (MIDC). Real-world figures will be lower for both."
+   },
+   {
+    "question": "Does either have all-wheel drive?",
+    "answer": "The Harrier EV does, in its QWD dual-motor versions from ₹26.79 lakh. The XEV 9e is rear-wheel drive."
+   },
+   {
+    "question": "Which is safer?",
+    "answer": "Both earned 5 stars in Bharat NCAP with identical scores of 32/32 for adults and 45/49 for children."
+   }
+  ]
+ },
+ {
+  "a": "mahindra-be-6e",
+  "b": "mahindra-xev-9e",
+  "nameA": "Mahindra BE 6",
+  "nameB": "Mahindra XEV 9e",
+  "segment": "car",
+  "intro": "The BE 6 and XEV 9e share Mahindra’s INGLO platform, batteries and 5-star Bharat NCAP rating, so the real question is body style and space. The BE 6 is a compact, sporty two-row SUV from ₹19.45 lakh; the XEV 9e is a larger coupe-SUV from ₹21.90 lakh with a bigger boot.",
+  "differences": [
+   "Price: BE 6 ₹19.45–26.95 lakh; XEV 9e ₹21.90–30.50 lakh.",
+   "Battery and claimed range: BE 6 59 kWh (573 km), 70 kWh (651 km) or 79 kWh (708 km); XEV 9e 59 kWh (542 km) or 79 kWh (656 km).",
+   "Size: the XEV 9e is 4,789 mm long against 4,371 mm for the BE 6, on the same 2,775 mm wheelbase.",
+   "Boot: XEV 9e 663 L (Mahindra figure); BE 6 455 L plus a 45 L frunk.",
+   "Both charge 20–80% in about 20 minutes on a DC fast charger and both are rear-wheel drive.",
+   "Real-world range: about 449 km for the BE 6 79 kWh in Autocar India’s test; no tested figure is listed for the XEV 9e."
+  ],
+  "buyA": "Buy the Mahindra BE 6 if you want the same technology for less money, more claimed range per battery size, and a smaller SUV that is easier to drive in the city.",
+  "buyB": "Buy the Mahindra XEV 9e if you need the extra boot space and a more spacious, premium-feeling cabin for family travel.",
+  "verdict": "The BE 6 is the better value and will suit most couples and small families. Spend the extra ₹2.5–3.5 lakh on the XEV 9e only if you regularly travel with a full boot.",
+  "faqs": [
+   {
+    "question": "What is the price difference between the BE 6 and XEV 9e?",
+    "answer": "The BE 6 starts at ₹19.45 lakh and the XEV 9e at ₹21.90 lakh, a ₹2.45 lakh gap. At the top, the BE 6 ends at ₹26.95 lakh and the XEV 9e at ₹30.50 lakh."
+   },
+   {
+    "question": "Which has more range with the same battery?",
+    "answer": "The lighter BE 6 claims 708 km with the 79 kWh pack against 656 km for the XEV 9e. With the 59 kWh pack the figures are 573 km and 542 km."
+   },
+   {
+    "question": "Which is better for a family?",
+    "answer": "The XEV 9e is about 420 mm longer and Mahindra quotes a 663 L boot, compared with 455 L plus a 45 L frunk in the BE 6."
+   },
+   {
+    "question": "Do the BE 6 and XEV 9e charge at the same speed?",
+    "answer": "Yes, Mahindra claims about 20 minutes for a 20–80% DC fast charge on both."
+   }
+  ]
+ },
+ {
+  "a": "maruti-suzuki-e-vitara",
+  "b": "hyundai-creta-electric",
+  "nameA": "Maruti Suzuki e Vitara",
+  "nameB": "Hyundai Creta Electric",
+  "segment": "car",
+  "intro": "The Maruti Suzuki e Vitara and Hyundai Creta Electric are mid-size electric SUVs from the two biggest carmakers in India. The e Vitara starts lower at ₹16.19 lakh and has a 5-star Bharat NCAP rating; the Creta Electric starts at ₹18.03 lakh and has a tested real-world range of about 430 km.",
+  "differences": [
+   "Price: e Vitara ₹16.19–20.21 lakh; Creta Electric ₹18.03–24.34 lakh.",
+   "Battery and claimed range: e Vitara 49 kWh (440 km) or 61 kWh (543 km); Creta Electric 42 kWh (420 km) or 51.4 kWh (510 km).",
+   "Long-range entry price: e Vitara 61 kWh from ₹17.94 lakh; Creta Electric 51.4 kWh from ₹20 lakh.",
+   "Safety: the e Vitara has a 5-star Bharat NCAP rating; the Creta Electric has not been crash-tested yet.",
+   "Real-world range: Autocar India got about 430 km from the Creta Electric 51.4 kWh; no tested figure is listed for the e Vitara.",
+   "Warranty: both offer 8 years / 1.6 lakh km on the battery."
+  ],
+  "buyA": "Buy the Maruti Suzuki e Vitara if you want the bigger battery for less money, a crash-test rating, and access to Maruti’s large service network.",
+  "buyB": "Buy the Hyundai Creta Electric if you want a proven real-world range figure and a feature-rich cabin, and your budget goes past ₹20 lakh.",
+  "verdict": "On price and safety credentials the e Vitara is the better buy, offering a larger 61 kWh battery for about ₹2 lakh less than the long-range Creta Electric. The Creta Electric makes sense if you prefer its cabin and features, or want a model with an established real-world range figure.",
+  "faqs": [
+   {
+    "question": "Which is cheaper, the e Vitara or the Creta Electric?",
+    "answer": "The e Vitara starts at ₹16.19 lakh and the Creta Electric at ₹18.03 lakh. The cheapest long-range versions are ₹17.94 lakh (e Vitara 61 kWh) and ₹20 lakh (Creta Electric 51.4 kWh)."
+   },
+   {
+    "question": "Which has a bigger battery?",
+    "answer": "The e Vitara, with 49 or 61 kWh, against 42 or 51.4 kWh in the Creta Electric. Claimed ranges top out at 543 km and 510 km respectively."
+   },
+   {
+    "question": "Which is safer?",
+    "answer": "The e Vitara has a 5-star Bharat NCAP rating. The Creta Electric has 6 airbags and Level 2 ADAS but has not yet been crash-tested."
+   },
+   {
+    "question": "What real-world range can I expect from the Creta Electric?",
+    "answer": "Autocar India recorded about 430 km from the 51.4 kWh version, against its 510 km claim."
+   }
+  ]
+ },
+ {
+  "a": "tata-sierra-ev",
+  "b": "hyundai-creta-electric",
+  "nameA": "Tata Sierra EV",
+  "nameB": "Hyundai Creta Electric",
+  "segment": "car",
+  "intro": "The Tata Sierra EV and Hyundai Creta Electric are five-seat mid-size SUVs at similar starting prices: ₹18.79 lakh for the Sierra and ₹18.03 lakh for the Creta. The Sierra gets much bigger batteries (63 or 75 kWh) and an all-wheel-drive option; the Creta has a lighter, smaller battery but an established real-world range figure.",
+  "differences": [
+   "Price: Sierra EV ₹18.79–26.48 lakh; Creta Electric ₹18.03–24.34 lakh.",
+   "Battery and claimed range: Sierra EV 63 kWh (565 km) or 75 kWh (665 km); Creta Electric 42 kWh (420 km) or 51.4 kWh (510 km).",
+   "Drive: Sierra EV is rear-wheel drive, with a dual-motor AWD version at ₹25.99 lakh (624 km claimed); Creta Electric is front-wheel drive only.",
+   "Base versions: ₹18.79 lakh buys a 63 kWh Sierra EV; ₹18.03 lakh buys a 42 kWh Creta Electric.",
+   "Real-world range: about 430 km for the Creta Electric 51.4 kWh (Autocar India); no tested figure is listed yet for the Sierra EV.",
+   "Safety: neither has a Bharat NCAP result listed yet."
+  ],
+  "buyA": "Buy the Tata Sierra EV if you want the most battery for your money, plan long trips, or need all-wheel drive.",
+  "buyB": "Buy the Hyundai Creta Electric if you prefer Hyundai’s service network and a model with a known real-world range, and do not need a 60 kWh-plus battery.",
+  "verdict": "On paper the Sierra EV offers far more for similar money, since even its base version has a 63 kWh battery. The Creta Electric is the safer bet if you value a tested, known quantity over the newer Sierra.",
+  "faqs": [
+   {
+    "question": "What is the price difference between the Sierra EV and Creta Electric?",
+    "answer": "The Creta Electric starts ₹76,000 lower at ₹18.03 lakh against ₹18.79 lakh for the Sierra EV. The top Sierra EV costs ₹26.48 lakh and the top Creta Electric ₹24.34 lakh."
+   },
+   {
+    "question": "Which has more claimed range?",
+    "answer": "The Sierra EV 75 kWh claims 665 km (MIDC), against 510 km for the Creta Electric 51.4 kWh."
+   },
+   {
+    "question": "Does either offer all-wheel drive?",
+    "answer": "The Sierra EV does, in the Empowered A 75 AWD from ₹25.99 lakh. The Creta Electric is front-wheel drive only."
+   },
+   {
+    "question": "What real-world range does the Creta Electric deliver?",
+    "answer": "Autocar India got about 430 km from the 51.4 kWh version."
+   }
+  ]
+ },
+ {
+  "a": "kia-syros-ev",
+  "b": "tata-nexon-ev",
+  "nameA": "Kia Syros EV",
+  "nameB": "Tata Nexon EV",
+  "segment": "car",
+  "intro": "The Kia Syros EV and Tata Nexon EV are both compact electric SUVs priced in the ₹12.5–20 lakh range. The Nexon EV starts lower at ₹12.49 lakh and has a 5-star Bharat NCAP rating; the Syros EV starts at ₹13.49 lakh and offers larger 42 and 51.4 kWh batteries.",
+  "differences": [
+   "Price: Nexon EV ₹12.49–17.89 lakh; Syros EV ₹13.49–19.99 lakh.",
+   "Battery and claimed range: Syros EV 42 kWh (443 km) or 51.4 kWh (526 km); Nexon EV 30 kWh (275 km) or 45 kWh (489 km).",
+   "Long-range entry price: Nexon EV 45 from ₹14.34 lakh; Syros EV 51.4 kWh from ₹16.99 lakh.",
+   "Real-world range: about 350 km for the Nexon EV 45 (Autocar India); no tested figure is listed for the Syros EV.",
+   "Safety: the Nexon EV has a 5-star Bharat NCAP rating; no crash-test result is listed for the Syros EV.",
+   "Battery warranty: lifetime for the first owner on the Nexon EV 45."
+  ],
+  "buyA": "Buy the Kia Syros EV if you want the biggest battery in this pair and like its tall, roomy cabin.",
+  "buyB": "Buy the Tata Nexon EV if you want a lower price, a proven real-world range and a 5-star Bharat NCAP rating.",
+  "verdict": "For most buyers the Nexon EV 45 is the better value, about ₹2.65 lakh cheaper than the long-range Syros EV with a tested range of around 350 km. The Syros EV suits buyers who want more battery capacity and headroom and are happy to pay for it.",
+  "faqs": [
+   {
+    "question": "What is the price gap between the Syros EV and Nexon EV?",
+    "answer": "The Syros EV starts at ₹13.49 lakh, ₹1 lakh above the Nexon EV’s ₹12.49 lakh. The long-range versions start at ₹16.99 lakh (Syros EV) and ₹14.34 lakh (Nexon EV 45)."
+   },
+   {
+    "question": "Which has a bigger battery?",
+    "answer": "The Syros EV offers 42 or 51.4 kWh, claiming 443 km or 526 km. The Nexon EV offers 30 or 45 kWh, claiming 275 km or 489 km."
+   },
+   {
+    "question": "What is the Nexon EV’s real-world range?",
+    "answer": "Autocar India got about 350 km from the Nexon EV 45 in its road test."
+   },
+   {
+    "question": "Which is safer?",
+    "answer": "The Nexon EV has a 5-star Bharat NCAP rating and 6 airbags. A crash-test result for the Syros EV is not listed."
+   }
+  ]
+ },
+ {
+  "a": "tata-curvv-ev",
+  "b": "hyundai-creta-electric",
+  "nameA": "Tata Curvv EV",
+  "nameB": "Hyundai Creta Electric",
+  "segment": "car",
+  "intro": "The Tata Curvv EV (from ₹17.19 lakh) and Hyundai Creta Electric (from ₹18.03 lakh) are five-seat SUVs aimed at the same buyer. The Curvv EV gives you a bigger battery, a larger boot and a 5-star Bharat NCAP rating for less; the Creta Electric goes further in real-world tests.",
+  "differences": [
+   "Price: Curvv EV ₹17.19–19.69 lakh; Creta Electric ₹18.03–24.34 lakh.",
+   "Battery and claimed range: Curvv EV 55 kWh (502 km); Creta Electric 42 kWh (420 km) or 51.4 kWh (510 km).",
+   "Real-world range (Autocar India): about 365 km for the Curvv EV and about 430 km for the Creta Electric 51.4 kWh.",
+   "Boot: Curvv EV 500 L; Creta Electric 433 L.",
+   "Safety: Curvv EV has a 5-star Bharat NCAP rating; the Creta Electric has not been crash-tested yet. Both have 6 airbags and Level 2 ADAS.",
+   "DC charging: both take about 40 minutes for 10–80%."
+  ],
+  "buyA": "Buy the Tata Curvv EV if you want a 55 kWh battery, a 500 L boot and a 5-star safety rating for under ₹20 lakh.",
+  "buyB": "Buy the Hyundai Creta Electric if you want the longer real-world range and better rear-seat headroom than the Curvv’s sloping roof allows.",
+  "verdict": "The Curvv EV is the better value: the top Curvv EV costs less than the cheapest long-range Creta Electric. The Creta Electric 51.4 kWh is worth the premium if you drive long distances regularly, since it went about 65 km further in testing.",
+  "faqs": [
+   {
+    "question": "Which is cheaper, the Curvv EV or Creta Electric?",
+    "answer": "The Curvv EV costs ₹17.19–19.69 lakh. The Creta Electric starts at ₹18.03 lakh, and its long-range 51.4 kWh version starts at ₹20 lakh."
+   },
+   {
+    "question": "Which has better real-world range?",
+    "answer": "Autocar India got about 430 km from the Creta Electric 51.4 kWh and about 365 km from the Curvv EV in Eco mode."
+   },
+   {
+    "question": "Which is safer?",
+    "answer": "The Curvv EV has a 5-star Bharat NCAP rating. The Creta Electric has not yet been crash-tested; both have 6 airbags and ADAS."
+   },
+   {
+    "question": "Which is better for luggage?",
+    "answer": "The Curvv EV, with a 500 L boot plus a small frunk on Empowered versions, against 433 L in the Creta Electric."
+   }
+  ]
+ },
+ {
+  "a": "mahindra-xuv-3xo-ev",
+  "b": "tata-nexon-ev",
+  "nameA": "Mahindra XUV 3XO EV",
+  "nameB": "Tata Nexon EV",
+  "segment": "car",
+  "intro": "The Mahindra XUV 3XO EV and Tata Nexon EV are sub-4-metre electric SUVs in the ₹12.5–18 lakh bracket. The XUV 3XO EV is quicker and well equipped but comes with one 39.4 kWh battery; the Nexon EV offers a choice of batteries, more range and a 5-star Bharat NCAP rating.",
+  "differences": [
+   "Price: XUV 3XO EV ₹13.89–14.96 lakh; Nexon EV ₹12.49–17.89 lakh.",
+   "Battery and claimed range: XUV 3XO EV 39.4 kWh (351 km MIDC, 285 km real-world per Mahindra); Nexon EV 30 kWh (275 km) or 45 kWh (489 km).",
+   "Real-world range: about 350 km for the Nexon EV 45 in Autocar India’s test, against Mahindra’s own 285 km real-world estimate for the XUV 3XO EV.",
+   "Performance: the XUV 3XO EV makes 150 hp and 310 Nm and claims 0–100 km/h in 8.3 s; the Nexon EV 45 makes 144 hp.",
+   "Boot: XUV 3XO EV 364 L; Nexon EV 350 L.",
+   "Safety: the Nexon EV has a 5-star Bharat NCAP rating; the XUV 3XO EV has not been crash-tested (the petrol/diesel XUV 3XO has 5 stars). Both have 6 airbags."
+  ],
+  "buyA": "Buy the Mahindra XUV 3XO EV if you mostly drive in the city, want a strong-performing and well-equipped SUV for about ₹14–15 lakh, and do not need more than about 285 km a charge.",
+  "buyB": "Buy the Tata Nexon EV if you want more range, a choice of battery sizes and a crash-tested EV.",
+  "verdict": "The Nexon EV 45, from ₹14.34 lakh, is the better all-rounder because it goes noticeably further on a charge for similar money. The XUV 3XO EV is worth a look for city users who value its punchy motor and the ADAS and 360° camera on the AX7L.",
+  "faqs": [
+   {
+    "question": "What is the price difference?",
+    "answer": "The XUV 3XO EV costs ₹13.89–14.96 lakh. The Nexon EV ranges from ₹12.49 lakh to ₹17.89 lakh, with the 45 kWh version starting at ₹14.34 lakh."
+   },
+   {
+    "question": "Which has more range?",
+    "answer": "The Nexon EV 45: about 350 km in Autocar India’s test, against Mahindra’s 285 km real-world claim for the XUV 3XO EV."
+   },
+   {
+    "question": "Is the XUV 3XO EV quicker?",
+    "answer": "Mahindra claims 0–100 km/h in 8.3 s from its 150 hp, 310 Nm motor, against Tata’s claim of 8.9 s for the Nexon EV 45."
+   },
+   {
+    "question": "Is a home charger included with the XUV 3XO EV?",
+    "answer": "The 7.2 kW AC charger is optional and costs ₹50,000. On it, a full charge takes about 6.5 hours."
+   }
+  ]
+ },
+ {
+  "a": "tata-tiago-ev",
+  "b": "comet",
+  "nameA": "Tata Tiago EV",
+  "nameB": "MG Comet EV",
+  "segment": "car",
+  "intro": "The Tata Tiago EV and MG Comet EV are the most affordable electric cars in India and both suit city use. The Tiago EV is a conventional five-seat hatchback from ₹6.99 lakh with DC fast charging; the Comet EV is a tiny four-seater from ₹7.90 lakh that is very easy to park.",
+  "differences": [
+   "Price: Tiago EV ₹6.99–9.99 lakh; Comet EV ₹7.90–10.17 lakh.",
+   "Battery and claimed range: Tiago EV 19.2 kWh (226 km) or 24 kWh (285 km); Comet EV 17.3 kWh (230 km).",
+   "Real-world range: about 191 km for the Comet EV (CarWale test); no named road-test figure is listed for the Tiago EV.",
+   "Seats and size: Tiago EV is a five-seater, 3,825 mm long, with a 240 L boot; Comet EV is a four-seater, 2,974 mm long, with almost no boot space when the rear seats are up.",
+   "Charging: Tiago EV takes DC fast charging (10–80% in about 35 min); the Comet EV has no DC charging, but its FC versions charge 10–80% in 2.5 h on a 7.4 kW AC charger.",
+   "Airbags: 6 on the Tiago EV, 2 on the Comet EV."
+  ],
+  "buyA": "Buy the Tata Tiago EV if you want a regular five-seat hatchback with a usable boot, six airbags and the option of DC fast charging on trips out of town.",
+  "buyB": "Buy the MG Comet EV if you drive alone or as a couple in dense city traffic, where its small size and 4.2 m turning radius make parking easy.",
+  "verdict": "The Tiago EV is the better choice for most buyers: it seats five, has a real boot, more airbags and DC fast charging, and starts lower. The Comet EV suits a second car used only in town.",
+  "faqs": [
+   {
+    "question": "Which is cheaper, the Tiago EV or Comet EV?",
+    "answer": "The Tiago EV starts at ₹6.99 lakh and the Comet EV at ₹7.90 lakh. Top versions cost ₹9.99 lakh and ₹10.17 lakh respectively."
+   },
+   {
+    "question": "Which has more real-world range?",
+    "answer": "CarWale’s test got about 191 km from the Comet EV. For the Tiago EV, Tata claims 285 km (MIDC) on the 24 kWh pack; expect less in daily driving."
+   },
+   {
+    "question": "Can I fast-charge the Comet EV?",
+    "answer": "No, the Comet EV has no DC fast charging. The Tiago EV charges 10–80% in about 35 minutes on a 30 kW DC charger."
+   },
+   {
+    "question": "Which is better for a family of four or five?",
+    "answer": "The Tiago EV, which seats five and has a 240 L boot. The Comet EV seats four and has almost no luggage space with the rear seats up."
+   }
+  ]
+ },
+ {
+  "a": "vinfast-vf-6",
+  "b": "hyundai-creta-electric",
+  "nameA": "VinFast VF 6",
+  "nameB": "Hyundai Creta Electric",
+  "segment": "car",
+  "intro": "The VinFast VF 6 (from ₹18.19 lakh) and Hyundai Creta Electric (from ₹18.03 lakh) start at almost the same price. The VF 6 gives you a bigger 59.6 kWh battery as standard and a long wheelbase; the Creta Electric comes from a brand with a large service network and has a proven real-world range.",
+  "differences": [
+   "Price: VF 6 ₹18.19–20.09 lakh; Creta Electric ₹18.03–24.34 lakh.",
+   "Battery and claimed range: VF 6 59.6 kWh (463–468 km); Creta Electric 42 kWh (420 km) or 51.4 kWh (510 km).",
+   "Real-world range: about 430 km for the Creta Electric 51.4 kWh (Autocar India); no tested figure is listed for the VF 6.",
+   "Size: the VF 6 has a 2,730 mm wheelbase and a 423 L boot; the Creta Electric has a 2,610 mm wheelbase and a 433 L boot.",
+   "Safety: the VF 6 has a 5-star Bharat NCAP rating (2026); the Creta Electric has not been crash-tested yet. Both have Level 2 ADAS.",
+   "Brand: VinFast is new to India with a small network; Hyundai has one of the widest service networks in the country."
+  ],
+  "buyA": "Buy the VinFast VF 6 if you want a large battery and a 5-star Bharat NCAP rating at an entry price under ₹20 lakh, and are comfortable with a new brand.",
+  "buyB": "Buy the Hyundai Creta Electric if you want a known real-world range, a wider choice of variants and easy access to service across India.",
+  "verdict": "Most buyers will be better off with the Creta Electric, because Hyundai’s service reach and known real-world performance reduce ownership risk. The VF 6 is worth considering if a 59.6 kWh battery and a 5-star crash rating under ₹20 lakh matter more to you and there is a VinFast workshop near you.",
+  "faqs": [
+   {
+    "question": "What is the price difference between the VF 6 and Creta Electric?",
+    "answer": "The Creta Electric starts ₹16,000 lower at ₹18.03 lakh against ₹18.19 lakh for the VF 6. All VF 6 versions cost less than ₹20.1 lakh, while the Creta Electric goes up to ₹24.34 lakh."
+   },
+   {
+    "question": "Which has the bigger battery?",
+    "answer": "The VF 6, with a 59.6 kWh pack on every version. The Creta Electric offers 42 or 51.4 kWh."
+   },
+   {
+    "question": "Which has more boot space?",
+    "answer": "They are close: 433 L in the Creta Electric against 423 L in the VF 6."
+   },
+   {
+    "question": "Is service a concern with the VF 6?",
+    "answer": "VinFast is new in India and its network is still small, so check the nearest service point before buying."
+   }
+  ]
+ },
+ {
+  "a": "ather-rizta",
+  "b": "tvs-iqube-electric",
+  "nameA": "Ather Rizta",
+  "nameB": "TVS iQube Electric",
+  "segment": "two-wheeler",
+  "intro": "The Ather Rizta and TVS iQube are family electric scooters with similar starting prices: ₹1,21,999 for the Rizta and ₹1,20,124 for the iQube. The Rizta offers fast charging on the Ather Grid and a bigger boot, while the iQube offers larger batteries of up to 5.3 kWh and TVS’s wide dealer network.",
+  "differences": [
+   "Price: Rizta ₹1,21,999–1,56,999; iQube ₹1,20,124–1,75,384.",
+   "Battery and IDC range: Rizta 2.7/2.9 kWh (123 km) or 3.5 kWh (161 km); iQube 2.3 kWh (114 km) up to 5.3 kWh (212 km).",
+   "Real-world range: about 95–105 km for the Rizta Z 2.9 kWh in BikeWale and ZigWheels road tests; no test of the current iQube packs is listed.",
+   "Storage: Rizta 34 L under the seat (plus a 22 L frunk accessory); iQube 32 L.",
+   "Charging: Rizta can use Ather Grid fast chargers (15–30 km in 10 min); the iQube has no fast charging but charges 10–80% in 2 h 25 min to 4 h on its 950 W charger.",
+   "Warranty: Rizta battery 3 years / 30,000 km (5 years / 60,000 km with AtherStack Pro); iQube battery 3 years / 50,000 km."
+  ],
+  "buyA": "Buy the Ather Rizta if you want a roomy seat and boot for family use, plus access to fast charging on the Ather Grid.",
+  "buyB": "Buy the TVS iQube if you want the longest-range battery options (up to 212 km IDC), a longer standard battery warranty and easy service through TVS dealers.",
+  "verdict": "Both are good family scooters; the iQube 3.5 kWh is the safer all-round buy for most people thanks to its warranty and service reach. Pick the Rizta if you live near Ather Grid chargers or want the most storage. PM E-Drive subsidy applies to both until March 2028.",
+  "faqs": [
+   {
+    "question": "Which is cheaper, Rizta or iQube?",
+    "answer": "The iQube starts at ₹1,20,124 and the Rizta at ₹1,21,999, so entry prices are within ₹2,000. The iQube’s range goes higher, up to ₹1,75,384 for the 5.3 kWh ST."
+   },
+   {
+    "question": "What real-world range do they give?",
+    "answer": "Road tests found about 95–105 km from the Rizta Z 2.9 kWh. No road test of the current iQube battery packs is listed yet, so compare the IDC claims."
+   },
+   {
+    "question": "Which has fast charging?",
+    "answer": "The Rizta works with Ather Grid fast chargers, adding 15–30 km in 10 minutes. The iQube has no fast charging."
+   },
+   {
+    "question": "Which is better for a family?",
+    "answer": "Both seat two. The Rizta has a wider seat and a slightly bigger boot (34 L vs 32 L), while the iQube offers bigger batteries for longer commutes."
+   }
+  ]
+ },
+ {
+  "a": "ola-s1-pro",
+  "b": "ather-450x-gen-3",
+  "nameA": "Ola S1 Pro",
+  "nameB": "Ather 450X",
+  "segment": "two-wheeler",
+  "intro": "The Ola S1 Pro and Ather 450X are the performance-focused scooters in this class. The S1 Pro (from ₹1,30,999) offers more battery and claimed range for the money; the Ather 450X (from ₹1,48,998) is known for its build quality, handling and fast-charging network.",
+  "differences": [
+   "Price: S1 Pro ₹1,30,999–1,79,999; 450X ₹1,48,998–1,61,046.",
+   "Battery and IDC range: S1 Pro 3, 4 or 5.2 kWh (176, 242 or 320 km); 450X 2.9 or 3.5 kWh (126 or 161 km).",
+   "Performance: S1 Pro tops out at 117–130 km/h and claims 0–40 km/h in 2.1–2.7 s; the 450X tops out at 90 km/h with 0–40 km/h in 3.3 s.",
+   "Storage: S1 Pro 34 L; 450X 22 L.",
+   "Warranty: S1 Pro 3 years / 40,000 km on the vehicle and 3 years / 50,000 km on the battery; 450X 3 years / 30,000 km on the vehicle and battery (5 years with AtherStack Pro)."
+  ],
+  "buyA": "Buy the Ola S1 Pro if you want the most range and speed for your money and have an Ola service centre nearby.",
+  "buyB": "Buy the Ather 450X if you value build quality, sharp handling and dependable after-sales and fast charging more than headline range.",
+  "verdict": "For most riders the Ather 450X is the lower-risk choice because of its build and service record, even though it offers less range and storage. The S1 Pro makes sense if range per rupee is the priority and you are comfortable with Ola’s service. PM E-Drive subsidy applies to both until March 2028.",
+  "faqs": [
+   {
+    "question": "What is the price difference?",
+    "answer": "The S1 Pro starts at ₹1,30,999, about ₹18,000 less than the 450X at ₹1,48,998. The top S1 Pro+ 5.2 kWh costs ₹1,79,999 and the top 450X ₹1,61,046."
+   },
+   {
+    "question": "Which has more range?",
+    "answer": "On paper the S1 Pro, with IDC claims of 176–320 km against 126–161 km for the 450X. Expect less in daily riding, especially in the faster ride modes."
+   },
+   {
+    "question": "Which is faster?",
+    "answer": "The S1 Pro, with a top speed of 117–130 km/h, against 90 km/h for the 450X."
+   },
+   {
+    "question": "Which has more storage?",
+    "answer": "The S1 Pro, with 34 L under the seat compared with 22 L on the 450X."
+   }
+  ]
+ },
+ {
+  "a": "tvs-iqube-electric",
+  "b": "bajaj-chetak-electric",
+  "nameA": "TVS iQube Electric",
+  "nameB": "Bajaj Chetak (C Series)",
+  "segment": "two-wheeler",
+  "intro": "The TVS iQube and Bajaj Chetak are the two best-selling family electric scooters from established brands. The Chetak starts lower at ₹99,802 and has a metal body and IP67 battery, while the iQube (from ₹1,20,124) offers bigger batteries of up to 5.3 kWh.",
+  "differences": [
+   "Price: Chetak ₹99,802–1,53,850; iQube ₹1,20,124–1,75,384.",
+   "Battery and IDC range: Chetak 2.5 kWh (113 km) to 3.5 kWh (153 km); iQube 2.3 kWh (114 km) to 5.3 kWh (212 km).",
+   "Charging: neither offers fast charging. Chetak charges 0–80% in about 2 h 25 min to 3 h 25 min from a regular socket; iQube charges 10–80% in 2 h 25 min to 4 h on a 950 W charger.",
+   "Storage: Chetak 35 L (25 L on the C2501); iQube 32 L.",
+   "Top speed: Chetak 60–80 km/h; iQube 82 km/h (68 km/h on 2.3 kWh).",
+   "Warranty: Chetak 3 years / 50,000 km on vehicle and battery; iQube battery 3 years / 50,000 km."
+  ],
+  "buyA": "Buy the TVS iQube if you need more than 150 km of claimed range, as only the iQube offers 4.7 and 5.3 kWh batteries.",
+  "buyB": "Buy the Bajaj Chetak if you want the lowest entry price, a metal body and a slightly bigger boot.",
+  "verdict": "With similar 3.5 kWh batteries the two are evenly matched, so let price, dealer proximity and styling decide. The iQube is the better pick for long daily commutes thanks to its larger battery options, and the Chetak is the better buy under ₹1.2 lakh. PM E-Drive subsidy applies to both until March 2028.",
+  "faqs": [
+   {
+    "question": "Which is cheaper, iQube or Chetak?",
+    "answer": "The Chetak starts at ₹99,802 and the iQube at ₹1,20,124, about ₹20,000 more."
+   },
+   {
+    "question": "Which has more range?",
+    "answer": "The iQube ST 5.3 kWh claims 212 km IDC, the most in this pair. The top Chetak 3.5 kWh claims 153 km."
+   },
+   {
+    "question": "Do either have fast charging?",
+    "answer": "No. Both charge from a home socket, taking roughly 2.5 to 4 hours to reach 80% depending on battery size."
+   },
+   {
+    "question": "Which has more storage?",
+    "answer": "The Chetak, with 35 L on 3.0 and 3.5 kWh versions, against 32 L on the iQube."
+   }
+  ]
+ },
+ {
+  "a": "ather-rizta",
+  "b": "bajaj-chetak-35-series",
+  "nameA": "Ather Rizta",
+  "nameB": "Bajaj Chetak 35 Series",
+  "segment": "two-wheeler",
+  "intro": "The Ather Rizta (from ₹1,21,999) and Bajaj Chetak 35 Series (from ₹1,25,698) are comfort-focused family scooters with big boots. The Chetak 35 gives you a 3.5 kWh battery in every version, while the Rizta offers access to Ather’s fast-charging network.",
+  "differences": [
+   "Price: Rizta ₹1,21,999–1,56,999; Chetak 35 Series ₹1,25,698–1,53,850.",
+   "Battery and IDC range: Rizta 2.7/2.9 kWh (123 km) or 3.5 kWh (161 km); Chetak 35 Series 3.5 kWh on all versions (151–153 km).",
+   "Charging: Rizta can use Ather Grid fast chargers (15–30 km in 10 min); the Chetak 35 has no fast charging but charges 0–80% in 3 h to 3 h 25 min from a regular socket.",
+   "Storage: Rizta 34 L; Chetak 35 L (plus a 5 L glovebox on the C3501).",
+   "Top speed: Rizta 80 km/h; Chetak 35 Series 70–80 km/h.",
+   "Warranty: Chetak 3 years / 50,000 km on vehicle and battery; Rizta battery 3 years / 30,000 km (5 years / 60,000 km with AtherStack Pro)."
+  ],
+  "buyA": "Buy the Ather Rizta if Ather Grid chargers are on your routes and you want Ather’s app and software features.",
+  "buyB": "Buy the Bajaj Chetak 35 Series if you want a 3.5 kWh battery at a lower price, a longer standard warranty and a metal body.",
+  "verdict": "Compare like for like and the Chetak C3503 (₹1,25,698, 151 km IDC) undercuts the Rizta S 3.5 kWh (₹1,44,500, 161 km IDC) by about ₹19,000, which makes it the better value for home-charging owners. The Rizta is worth the extra if you depend on fast charging. PM E-Drive subsidy applies to both until March 2028.",
+  "faqs": [
+   {
+    "question": "Which 3.5 kWh scooter is cheaper?",
+    "answer": "The Chetak C3503 costs ₹1,25,698; the Rizta S with the 3.5 kWh battery costs ₹1,44,500."
+   },
+   {
+    "question": "What real-world range can I expect from the Rizta?",
+    "answer": "Road tests show about 95–105 km from the Rizta 123 km version. No tested figure is listed for the Chetak 35 Series."
+   },
+   {
+    "question": "Can these scooters fast-charge?",
+    "answer": "The Rizta can, on Ather Grid chargers. The Chetak 35 Series has no fast charging and takes 3 h to 3 h 25 min to reach 80%."
+   },
+   {
+    "question": "Which has more storage?",
+    "answer": "They are almost equal: 35 L under the seat on the Chetak and 34 L on the Rizta."
+   }
+  ]
+ },
+ {
+  "a": "ola-s1-x",
+  "b": "tvs-iqube-electric",
+  "nameA": "Ola S1 X (Gen 3)",
+  "nameB": "TVS iQube Electric",
+  "segment": "two-wheeler",
+  "intro": "The Ola S1 X is the cheapest way into a fast electric scooter at ₹80,999, while the TVS iQube starts at ₹1,20,124 and is backed by TVS’s dealer network. Ola gives you more battery and speed for the money; TVS offers easier service and a reputation for reliability.",
+  "differences": [
+   "Price: S1 X ₹80,999–1,49,999; iQube ₹1,20,124–1,75,384.",
+   "Battery and IDC range: S1 X 2 kWh (108 km) to 5.2 kWh (320 km); iQube 2.3 kWh (114 km) to 5.3 kWh (212 km).",
+   "Top speed: S1 X 101–125 km/h; iQube 82 km/h (68 km/h on 2.3 kWh).",
+   "Fast charging: S1 X can use Ola Hyperchargers (10–70% in 35 min); the iQube has none.",
+   "Storage: S1 X 34 L; iQube 32 L.",
+   "Warranty: S1 X 3 years / 40,000 km on the vehicle; iQube battery 3 years / 50,000 km."
+  ],
+  "buyA": "Buy the Ola S1 X if you want maximum range and speed on a tight budget and have an Ola service centre nearby.",
+  "buyB": "Buy the TVS iQube if you want a scooter with a strong service network and fewer ownership worries, and can spend over ₹1.2 lakh.",
+  "verdict": "Most family buyers will be happier with the iQube because of TVS’s service reach and build quality. The S1 X is the better deal on paper and suits buyers who prioritise price and range. PM E-Drive subsidy applies to both until March 2028.",
+  "faqs": [
+   {
+    "question": "What is the price difference?",
+    "answer": "The S1 X starts at ₹80,999, about ₹39,000 less than the iQube at ₹1,20,124."
+   },
+   {
+    "question": "Which has more range?",
+    "answer": "The S1 X+ 5.2 kWh claims 320 km IDC against 212 km for the iQube ST 5.3 kWh. Real-world range will be lower than the IDC figure for both."
+   },
+   {
+    "question": "Which is faster?",
+    "answer": "The S1 X, with a top speed of 101–125 km/h depending on version, against 82 km/h for the iQube."
+   },
+   {
+    "question": "Which is better for daily city commuting?",
+    "answer": "Both work well. The iQube has a strong service network and no fast-charging needs; the S1 X costs less and can use Ola Hyperchargers."
+   }
+  ]
+ },
+ {
+  "a": "honda-activa-electric",
+  "b": "tvs-iqube-electric",
+  "nameA": "Honda Activa Electric",
+  "nameB": "TVS iQube Electric",
+  "segment": "two-wheeler",
+  "intro": "The Honda Activa e: (from ₹1,20,133) and TVS iQube (from ₹1,20,124) start at virtually the same price but work in different ways. The Activa e: uses two swappable batteries that you exchange at Honda swap stations, while the iQube is charged at home and offers much more range.",
+  "differences": [
+   "Price: Activa e: ₹1,20,133–1,52,441; iQube ₹1,20,124–1,75,384.",
+   "Battery and IDC range: Activa e: 3 kWh (two 1.5 kWh swappable packs), 102 km; iQube 2.3 kWh (114 km) to 5.3 kWh (212 km).",
+   "Charging: Activa e: relies on battery swapping, so check that your city has swap stations; the iQube charges 10–80% in 2 h 25 min to 4 h on its 950 W charger.",
+   "Top speed: both about 80 km/h (Activa e: 80 km/h; iQube 82 km/h).",
+   "Storage: iQube 32 L under the seat; no boot figure is listed for the Activa e:.",
+   "Warranty: Activa e: battery 3 years / 50,000 km; iQube battery 3 years / 50,000 km."
+  ],
+  "buyA": "Buy the Honda Activa e: if you live in a city with Honda swap stations and cannot charge at home.",
+  "buyB": "Buy the TVS iQube if you can charge at home or work, want more range and storage, and want more battery choices.",
+  "verdict": "For most buyers who can plug in at home, the iQube is the more practical choice, with more range and more variants for the same entry price. The Activa e: suits apartment dwellers without home charging in cities where Honda’s swap network is available. PM E-Drive subsidy applies to both until March 2028.",
+  "faqs": [
+   {
+    "question": "What is the price difference?",
+    "answer": "Almost none at entry level: ₹1,20,133 for the Activa e: and ₹1,20,124 for the iQube."
+   },
+   {
+    "question": "Which has more range?",
+    "answer": "The iQube, with IDC claims from 114 km to 212 km. The Activa e: claims 102 km."
+   },
+   {
+    "question": "Can I charge the Activa e: at home?",
+    "answer": "The Activa e: is designed around swapping its two battery packs at Honda swap stations, so check swap-station coverage in your city before buying."
+   },
+   {
+    "question": "Which has better warranty cover?",
+    "answer": "Both cover the battery for 3 years or 50,000 km."
+   }
+  ]
+ },
+ {
+  "a": "ather-konarc",
+  "b": "ola-s1-x",
+  "nameA": "Ather Konarc",
+  "nameB": "Ola S1 X (Gen 3)",
+  "segment": "two-wheeler",
+  "intro": "The Ather Konarc (from ₹99,999) and Ola S1 X (from ₹80,999) are the entry models from two of India’s biggest electric scooter makers. The S1 X is cheaper and offers more battery and speed; the Konarc has a metal body, a bigger boot and access to the Ather Grid fast chargers.",
+  "differences": [
+   "Price: Konarc ₹99,999–1,44,999; S1 X ₹80,999–1,49,999.",
+   "Battery and IDC range: Konarc 2.1, 2.7 or 3.45 kWh (100, 125 or 161 km); S1 X 2, 3, 4 or 5.2 kWh (108 to 320 km).",
+   "Ather’s own estimate of real-world range for the Konarc: 80, 100 and 130 km by battery.",
+   "Top speed: Konarc 70 km/h; S1 X 101–125 km/h.",
+   "Storage: Konarc 31 L plus a 2 L front compartment; S1 X 34 L.",
+   "Fast charging: Konarc about 15 km in 10 min on Ather Grid; S1 X 10–70% in 35 min on Ola Hyperchargers."
+  ],
+  "buyA": "Buy the Ather Konarc if you want a solid, metal-bodied family scooter with Ather’s software and charging network, and a 70 km/h top speed is enough.",
+  "buyB": "Buy the Ola S1 X if you want the most battery and speed for the money and are close to an Ola service centre.",
+  "verdict": "For family use the Konarc S 125 (₹1,21,999) is the more sensible choice, given its metal body and Ather’s service record. The S1 X wins on price, speed and range, and suits riders who mostly care about those. Note that the ₹99,999 Konarc S 100 will not deliver until early 2027. PM E-Drive subsidy applies to both until March 2028.",
+  "faqs": [
+   {
+    "question": "What is the price difference?",
+    "answer": "The S1 X starts at ₹80,999, about ₹19,000 below the Konarc at ₹99,999. The S1 X 3 kWh (₹1,03,999) and Konarc S 100 are close in price."
+   },
+   {
+    "question": "Which has more range?",
+    "answer": "The S1 X claims more, up to 320 km IDC with the 5.2 kWh battery. The Konarc tops out at 161 km IDC, with Ather estimating 130 km in real-world use."
+   },
+   {
+    "question": "When is the Konarc S 100 available?",
+    "answer": "Deliveries of the ₹99,999 Konarc S 100 are not expected until early 2027. The S 125 and S 161 versions are on sale now."
+   },
+   {
+    "question": "Which charges faster at home?",
+    "answer": "The Konarc uses a 450 W charger and takes 4 h to 5 h 40 min to reach 80%. The S1 X 2 kWh takes about 4.5 h to reach 80%."
+   }
+  ]
+ },
+ {
+  "a": "hero-vida-v2-pro",
+  "b": "ola-s1-x",
+  "nameA": "Hero Vida V2 Pro",
+  "nameB": "Ola S1 X (Gen 3)",
+  "segment": "two-wheeler",
+  "intro": "The Hero Vida V2 Pro (₹1,10,000) and Ola S1 X (from ₹80,999) are both feature-heavy scooters at budget prices. The V2 Pro’s two removable batteries let you charge indoors at home or office; the S1 X offers more range options and a higher top speed.",
+  "differences": [
+   "Price: Vida V2 Pro ₹1,10,000; S1 X ₹80,999–1,49,999.",
+   "Battery and IDC range: V2 Pro 3.94 kWh (two removable 1.97 kWh packs), 165 km; S1 X 2 kWh (108 km) to 5.2 kWh (320 km).",
+   "Top speed: V2 Pro 90 km/h; S1 X 101–125 km/h.",
+   "Acceleration: V2 Pro claims 0–40 km/h in 2.9 s; S1 X claims 3.0 s.",
+   "Storage: V2 Pro 26 L; S1 X 34 L.",
+   "Fast charging: V2 Pro adds about 1.2 km of range per minute on Vida DC chargers; S1 X charges 10–70% in 35 min on Ola Hyperchargers."
+  ],
+  "buyA": "Buy the Hero Vida V2 Pro if you cannot charge at your parking spot and need removable batteries, and want Hero’s large dealer network.",
+  "buyB": "Buy the Ola S1 X if you want the lowest price or the largest battery options, plus more storage and a higher top speed.",
+  "verdict": "For apartment dwellers without a charging point, the V2 Pro’s removable batteries are a real advantage. Otherwise, the S1 X 3 kWh at ₹1,03,999 offers more claimed range for less money. PM E-Drive subsidy applies to both until March 2028.",
+  "faqs": [
+   {
+    "question": "What is the price difference?",
+    "answer": "The V2 Pro costs ₹1,10,000. The S1 X starts at ₹80,999 for the 2 kWh, and the 3 kWh version costs ₹1,03,999."
+   },
+   {
+    "question": "Which has more range?",
+    "answer": "The V2 Pro claims 165 km IDC. The S1 X claims 108 km to 320 km depending on battery. Expect less than the IDC figure in daily riding on both."
+   },
+   {
+    "question": "Can I remove the battery to charge it?",
+    "answer": "Yes on the Vida V2 Pro, which uses two removable 1.97 kWh packs. The S1 X battery is fixed and is charged with a portable charger plugged into the scooter."
+   },
+   {
+    "question": "Which has more storage?",
+    "answer": "The S1 X, with 34 L under the seat compared with 26 L on the V2 Pro."
+   }
+  ]
+ }
+]

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -284,44 +284,41 @@ export default function CompareClient({ initialV0 = null, initialV1 = null, init
   const [pickerOpen,  setPickerOpen]  = useState(false);
   const [allVehicles, setAllVehicles] = useState({ cars: [], bikes: [] });
   const [loading,     setLoading]     = useState({ cars: true, bikes: true });
-  const preApplied                    = useRef(false);
-
-  /* Fetch cars + bikes in parallel on mount */
+  /* Fetch cars + bikes in parallel on mount; once both lists are in, pre-select
+     any vehicles passed in the URL (v0, v1, v2). State is only set inside the
+     async callbacks, never synchronously in the effect body. */
   useEffect(() => {
-    const fetchType = (vehicleType) =>
-      fetch(`/api/vehicles?vehicleType=${vehicleType}&status=published&limit=200`)
+    let cancelled = false;
+    const fetchType = (vehicleType) => {
+      const key = vehicleType === "car" ? "cars" : "bikes";
+      return fetch(`/api/vehicles?vehicleType=${vehicleType}&status=published&limit=200`)
         .then(r => r.json())
-        .then(data => {
-          const mapped = (data.vehicles || []).map(mapVehicle);
-          setAllVehicles(prev => ({ ...prev, [vehicleType === "car" ? "cars" : "bikes"]: mapped }));
-        })
-        .catch(() => {})
-        .finally(() => setLoading(prev => ({ ...prev, [vehicleType === "car" ? "cars" : "bikes"]: false })));
+        .then(data => (data.vehicles || []).map(mapVehicle))
+        .catch(() => [])
+        .then(list => {
+          if (!cancelled) {
+            setAllVehicles(prev => ({ ...prev, [key]: list }));
+            setLoading(prev => ({ ...prev, [key]: false }));
+          }
+          return list;
+        });
+    };
 
-    fetchType("car");
-    fetchType("bike");
-  }, []);
+    Promise.all([fetchType("car"), fetchType("bike")]).then(([cars, bikes]) => {
+      if (cancelled) return;
+      const slugs = [initialV0, initialV1, initialV2].filter(Boolean);
+      if (slugs.length === 0) return;
+      const all = [...cars, ...bikes];
+      const toSelect = slugs.map((slug) => all.find((v) => v.slug === slug)).filter(Boolean);
+      if (toSelect.length > 0) {
+        setSelected(toSelect);
+        /* switch to "bikes" tab if the first vehicle is a bike */
+        setType(cars.some((v) => v.slug === slugs[0]) ? "cars" : "bikes");
+      }
+    });
 
-  /* Pre-populate selected vehicles from URL params (v0, v1, v2) once both lists load */
-  useEffect(() => {
-    if (preApplied.current) return;
-    if (loading.cars || loading.bikes) return;
-
-    const slugs = [initialV0, initialV1, initialV2].filter(Boolean);
-    if (slugs.length === 0) { preApplied.current = true; return; }
-
-    const all = [...allVehicles.cars, ...allVehicles.bikes];
-    const toSelect = slugs.map((slug) => all.find((v) => v.slug === slug)).filter(Boolean);
-
-    if (toSelect.length > 0) {
-      setSelected(toSelect);
-      /* switch to "bikes" tab if the first vehicle is a bike */
-      const firstInCars = allVehicles.cars.some((v) => v.slug === slugs[0]);
-      setType(firstInCars ? "cars" : "bikes");
-    }
-
-    preApplied.current = true;
-  }, [loading.cars, loading.bikes, allVehicles, initialV0, initialV1, initialV2]);
+    return () => { cancelled = true; };
+  }, [initialV0, initialV1, initialV2]);
 
   const specs     = type === "cars" ? CAR_SPECS : BIKE_SPECS;
   const isLoading = type === "cars" ? loading.cars : loading.bikes;

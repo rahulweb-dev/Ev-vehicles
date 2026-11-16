@@ -1,3 +1,4 @@
+import { comparisonsFor } from "@/lib/comparisons";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import Image from "next/image";
@@ -360,7 +361,7 @@ export default async function CarDetailPage({ params }) {
       </p>
 
       <VehicleCTABar vehicleName={car.name} vehicleSlug={car.slug} vehicleType="car" />
-      <VehicleDetailPage vehicle={car} relatedVehicles={related} vehicleType="car" />
+      <VehicleDetailPage vehicle={car} relatedVehicles={related} vehicleType="car" comparisons={comparisonsFor(car.slug).map((c) => ({ slug: c.slug, label: `${c.nameA} vs ${c.nameB}` }))} />
 
       {/* Pros & Cons — server-rendered for content richness and AEO */}
       <PriceHistoryChart

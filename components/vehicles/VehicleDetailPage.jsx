@@ -85,7 +85,7 @@ function SectionCard({ children, className = "" }) {
 }
 
 /* ════════════════════════════════════════════════════════════ */
-export default function VehicleDetailPage({ vehicle, relatedVehicles = [], vehicleType }) {
+export default function VehicleDetailPage({ vehicle, relatedVehicles = [], vehicleType, comparisons = [] }) {
   const [activeImage,   setActiveImage]   = useState(0);
   const [activeColor,   setActiveColor]   = useState(0);
   const [activeVariant, setActiveVariant] = useState(0);
@@ -586,6 +586,22 @@ export default function VehicleDetailPage({ vehicle, relatedVehicles = [], vehic
                   />
                 </div>
               </SectionCard>
+            )}
+
+            {/* Curated head-to-head comparisons */}
+            {comparisons.length > 0 && (
+              <div>
+                <h2 className="mb-3 text-lg font-black text-gray-900">Compare {vehicle.name}</h2>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {comparisons.map((c) => (
+                    <Link key={c.slug} href={`/compare/${c.slug}`}
+                      className="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-800 hover:border-green-400 hover:text-green-700 transition">
+                      {c.label}
+                      <span aria-hidden className="text-gray-300">→</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
             )}
 
             {/* Related vehicles */}
