@@ -1,4 +1,4 @@
-﻿import { NextResponse } from "next/server";
+﻿import { NextResponse, after } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import Lead from "@/lib/models/Lead";
 import { getAuthUser } from "@/lib/auth";
@@ -111,12 +111,9 @@ export async function POST(request) {
       pageUrl: clip(body.pageUrl, 300),
     });
 
-    // Await the alert (serverless functions can be frozen once the response is sent), but never
-    // fail the lead because of email — the lead is already saved. Capped at 8 s.
-    await Promise.race([
-      sendLeadNotification(lead).catch((e) => console.error("[lead email]", e?.message || e)),
-      new Promise((r) => setTimeout(r, 8000)),
-    ]);
+    // Send the alert after the response (after() keeps the function alive on Vercel), so the
+    // visitor isn't kept waiting on SMTP. Email failure never affects the saved lead.
+    after(() => sendLeadNotification(lead).catch((e) => console.error("[lead email]", e?.message || e)));
 
     return NextResponse.json({ success: true, id: lead._id }, { status: 201 });
   } catch (err) {
