@@ -9,6 +9,7 @@ import {
 import { SITE_URL } from "@/app/layout";
 import { parsePrice } from "@/lib/priceUtils";
 import { COMPARISONS, findComparison, comparisonsFor } from "@/lib/comparisons";
+import LeadButton from "@/components/LeadButton";
 
 export const revalidate = 3600;
 
@@ -256,8 +257,10 @@ export default async function ComparePairPage({ params }) {
                       </div>
                     ))}
                   </div>
+                  <LeadButton vehicleName={v.name} vehicleSlug={v.slug} vehicleType={v.vehicleType} source="compare-page"
+                    className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-green-600 py-2 text-xs font-bold text-white hover:bg-green-700 transition" />
                   <Link href={detailHref(v)}
-                    className="mt-3 block rounded-xl bg-gray-900 py-2 text-center text-xs font-bold text-white hover:bg-green-700 transition">
+                    className="mt-2 block rounded-xl bg-gray-900 py-2 text-center text-xs font-bold text-white hover:bg-gray-700 transition">
                     View Full Details →
                   </Link>
                 </div>

@@ -5,6 +5,7 @@ import { ChevronRight, BatteryCharging, IndianRupee, Shield, Gauge, Trophy } fro
 import { SITE_URL } from "@/app/layout";
 import { GUIDES, getGuideData, fmtINR, budgetLabel } from "@/lib/budgetGuides";
 import { comparisonsFor } from "@/lib/comparisons";
+import LeadButton from "@/components/LeadButton";
 
 const YEAR = 2026;
 
@@ -155,7 +156,8 @@ export default async function BudgetGuidePage({ guideKey }) {
                       {isCar && x.safety && <div><dt className="text-gray-400">Safety</dt><dd className="font-bold text-gray-800">{x.safety}</dd></div>}
                     </dl>
                     <div className="mt-4 flex flex-wrap gap-2">
-                      <Link href={x.href} className="rounded-xl bg-gray-900 px-4 py-2 text-xs font-bold text-white hover:bg-green-700 transition">Prices & specs →</Link>
+                      <LeadButton vehicleName={x.name} vehicleSlug={x.slug} vehicleType={g.type} source={`guide:${guideKey}`} />
+                      <Link href={x.href} className="rounded-xl bg-gray-900 px-4 py-2 text-xs font-bold text-white hover:bg-gray-700 transition">Prices & specs →</Link>
                       {cmp && <Link href={`/compare/${cmp.slug}`} className="rounded-xl border border-gray-200 px-4 py-2 text-xs font-bold text-gray-700 hover:border-green-400 transition">{cmp.nameA} vs {cmp.nameB}</Link>}
                     </div>
                   </div>

@@ -13,7 +13,7 @@ async function sendLeadNotification(lead) {
   const toEmail   = process.env.ADMIN_EMAIL || process.env.SENDGRID_FROM_EMAIL;
   if (!apiKey || !toEmail) return;
 
-  const intentLabels = { test_drive: "Test Drive", price: "Best Price", loan: "Loan/Finance", general: "General Enquiry" };
+  const intentLabels = { test_drive: "Test Drive", price_quote: "Best Price", finance: "Loan/Finance", general: "General Enquiry" };
   const intentLabel  = intentLabels[lead.intent] || lead.intent;
 
   const html = `
@@ -29,10 +29,16 @@ async function sendLeadNotification(lead) {
         ["Name",    lead.name],
         ["Phone",   lead.phone],
         ["Email",   lead.email || "—"],
-        ["City",    lead.city  || "—"],
+        ["City",    [lead.city, lead.state].filter(Boolean).join(", ") || "—"],
         ["Vehicle", lead.vehicleName],
         ["Type",    lead.vehicleType],
         ["Intent",  intentLabel],
+        ["Budget",  lead.budget || "—"],
+        ["Callback", lead.callbackTime || "—"],
+        ["WhatsApp", lead.whatsapp ? "Yes" : "No"],
+        ["Exchange", lead.exchange ? "Yes" : "No"],
+        ["Source",  lead.source || "website"],
+        ["Page",    lead.pageUrl || "—"],
       ].map(([k, v]) => `<tr><td style="padding:8px 0;color:#6b7280;width:90px">${escapeHtml(k)}</td><td style="padding:8px 0;font-weight:600;color:#111">${escapeHtml(String(v))}</td></tr>`).join("")}
     </table>
     <a href="${SITE_URL}/admin/leads" style="display:inline-block;margin-top:16px;background:#16a34a;color:#fff;font-weight:700;padding:12px 24px;border-radius:10px;text-decoration:none;font-size:13px">
@@ -65,6 +71,11 @@ export async function POST(request) {
   try {
     const body = await request.json();
     const { name, phone, email, city, state, vehicleName, vehicleSlug, vehicleType, intent } = body;
+    // Older forms sent "price"/"loan" — map them so enum validation never rejects a lead
+    const INTENT_ALIASES = { price: "price_quote", quote: "price_quote", loan: "finance", emi: "finance" };
+    const VALID_INTENTS = ["test_drive", "price_quote", "finance", "general"];
+    const normIntent = INTENT_ALIASES[intent] || intent;
+    const clip = (v, n = 120) => (typeof v === "string" ? v.trim().slice(0, n) : "");
 
     if (!name || !phone || !vehicleName || !vehicleSlug) {
       return NextResponse.json({ error: "Name, phone, and vehicle are required" }, { status: 400 });
@@ -82,8 +93,14 @@ export async function POST(request) {
       state,
       vehicleName,
       vehicleSlug,
-      vehicleType: vehicleType || "car",
-      intent: intent || "general",
+      vehicleType: ["car", "bike", "commercial"].includes(vehicleType) ? vehicleType : "car",
+      intent: VALID_INTENTS.includes(normIntent) ? normIntent : "general",
+      budget: clip(body.budget, 40),
+      callbackTime: clip(body.callbackTime, 40),
+      exchange: !!body.exchange,
+      whatsapp: !!body.whatsapp,
+      source: clip(body.source, 40) || "website",
+      pageUrl: clip(body.pageUrl, 300),
     });
 
     // Fire-and-forget: notify admin via email

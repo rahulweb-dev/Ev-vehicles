@@ -185,6 +185,18 @@ function LeadCard({ lead, onStatusChange, onDelete }) {
         </div>
       </div>
 
+      {/* Extra details captured by the forms */}
+      {(lead.budget || lead.callbackTime || lead.whatsapp || lead.exchange || lead.source || lead.pageUrl) && (
+        <div className="mt-3 flex flex-wrap gap-1.5 text-[11px]">
+          {lead.budget && <span className="rounded-lg bg-gray-100 px-2 py-0.5 text-gray-700">Budget: {lead.budget}</span>}
+          {lead.callbackTime && <span className="rounded-lg bg-gray-100 px-2 py-0.5 text-gray-700">Call: {lead.callbackTime}</span>}
+          {lead.whatsapp && <span className="rounded-lg bg-green-100 px-2 py-0.5 font-semibold text-green-700">WhatsApp OK</span>}
+          {lead.exchange && <span className="rounded-lg bg-amber-100 px-2 py-0.5 font-semibold text-amber-700">Has exchange</span>}
+          {lead.source && <span className="rounded-lg bg-blue-50 px-2 py-0.5 text-blue-700">From: {lead.source}</span>}
+          {lead.pageUrl && <a href={lead.pageUrl} target="_blank" rel="noreferrer" className="rounded-lg bg-gray-50 px-2 py-0.5 text-gray-500 hover:underline">{lead.pageUrl}</a>}
+        </div>
+      )}
+
       {/* CTAs */}
       <div className="mt-4 flex gap-2 border-t border-gray-100 pt-4">
         <a
@@ -192,6 +204,13 @@ function LeadCard({ lead, onStatusChange, onDelete }) {
           className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-green-50 border border-green-200 py-2 text-xs font-bold text-green-700 hover:bg-green-100 transition"
         >
           <Phone size={13} /> Call Now
+        </a>
+        <a
+          href={`https://wa.me/91${lead.phone}?text=${encodeURIComponent(`Hi ${lead.name}, this is EV Radar about your enquiry for the ${lead.vehicleName}${lead.city ? ` in ${lead.city}` : ""}.`)}`}
+          target="_blank" rel="noreferrer"
+          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-emerald-50 border border-emerald-200 py-2 text-xs font-bold text-emerald-700 hover:bg-emerald-100 transition"
+        >
+          WhatsApp
         </a>
         {lead.email && (
           <a

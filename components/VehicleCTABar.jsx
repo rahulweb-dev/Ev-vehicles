@@ -42,6 +42,7 @@ export default function VehicleCTABar({ vehicleName, vehicleSlug, vehicleType = 
           vehicleName={vehicleName}
           vehicleSlug={vehicleSlug}
           vehicleType={vehicleType}
+          source="vehicle-cta-bar"
           onClose={() => setShowLead(false)}
         />
       )}

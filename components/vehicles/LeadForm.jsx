@@ -25,11 +25,14 @@ const CALLBACK_TIMES = [
   "Evening (4pm–7pm)", "Weekend only",
 ];
 
-export default function LeadForm({ vehicleName, vehicleSlug, vehicleType = "car" }) {
+export default function LeadForm({
+  vehicleName, vehicleSlug, vehicleType = "car",
+  defaultCity = "", defaultState = "", source = "vehicle-page", headline = "",
+}) {
   const [form, setForm] = useState({
-    name: "", phone: "", email: "", city: "", state: "",
-    intent: "test_drive", budget: "", callbackTime: "",
-    exchange: false, whatsapp: false,
+    name: "", phone: "", email: "", city: defaultCity, state: defaultState,
+    intent: defaultCity ? "price_quote" : "test_drive", budget: "", callbackTime: "",
+    exchange: false, whatsapp: true,
   });
   const [step,     setStep]     = useState(1);
   const [loading,  setLoading]  = useState(false);
@@ -82,7 +85,7 @@ export default function LeadForm({ vehicleName, vehicleSlug, vehicleType = "car"
       const res = await fetch("/api/leads", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body:    JSON.stringify({ ...form, vehicleName, vehicleSlug, vehicleType }),
+        body:    JSON.stringify({ ...form, vehicleName, vehicleSlug, vehicleType, source, pageUrl: window.location.pathname }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed");
@@ -105,7 +108,7 @@ export default function LeadForm({ vehicleName, vehicleSlug, vehicleType = "car"
         </p>
         {form.whatsapp && (
           <p className="mt-2 text-xs text-green-700 font-semibold">
-            We'll also reach you on WhatsApp at {form.phone}
+            We&apos;ll also reach you on WhatsApp at {form.phone}
           </p>
         )}
         <div className="mt-4 flex gap-2">
@@ -114,7 +117,7 @@ export default function LeadForm({ vehicleName, vehicleSlug, vehicleType = "car"
           </div>
         </div>
         <button
-          onClick={() => { setSuccess(false); setStep(1); setForm({ name: "", phone: "", email: "", city: "", state: "", intent: "test_drive", budget: "", callbackTime: "", exchange: false, whatsapp: false }); }}
+          onClick={() => { setSuccess(false); setStep(1); setForm({ name: "", phone: "", email: "", city: defaultCity, state: defaultState, intent: defaultCity ? "price_quote" : "test_drive", budget: "", callbackTime: "", exchange: false, whatsapp: true }); }}
           className="mt-5 rounded-xl bg-green-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-green-500 transition"
         >
           Submit Another Enquiry
@@ -127,7 +130,7 @@ export default function LeadForm({ vehicleName, vehicleSlug, vehicleType = "car"
     <div className="rounded-2xl border border-green-100 bg-white shadow-lg overflow-hidden">
       {/* Header */}
       <div className="bg-green-600 px-5 py-4 text-center">
-        <p className="text-xs font-semibold uppercase tracking-wider text-green-100">Get Best Price In Your City</p>
+        <p className="text-xs font-semibold uppercase tracking-wider text-green-100">{headline || (defaultCity ? `Get Best Price in ${defaultCity}` : "Get Best Price In Your City")}</p>
         <h3 className="text-base font-black text-white mt-0.5">{vehicleName}</h3>
         {/* Step indicator */}
         <div className="mt-3 flex items-center justify-center gap-2">
