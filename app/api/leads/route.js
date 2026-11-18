@@ -4,14 +4,16 @@ import Lead from "@/lib/models/Lead";
 import { getAuthUser } from "@/lib/auth";
 import { formLimiter, getIp } from "@/lib/rateLimit";
 import { escapeHtml } from "@/lib/sanitize";
+import { sendMail } from "@/lib/mailer";
 
 const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.evradar.in").replace(/\/$/, "");
 
+// Lead alert to the site owner. Uses SendGrid when configured, otherwise the site's SMTP
+// mailer (same path as the contact form) — previously it silently did nothing without SendGrid.
 async function sendLeadNotification(lead) {
   const apiKey   = process.env.SENDGRID_API_KEY;
   const fromEmail = process.env.SENDGRID_FROM_EMAIL || "noreply@evradar.in";
-  const toEmail   = process.env.ADMIN_EMAIL || process.env.SENDGRID_FROM_EMAIL;
-  if (!apiKey || !toEmail) return;
+  const toEmail   = process.env.ADMIN_EMAIL || process.env.SENDGRID_FROM_EMAIL || process.env.SMTP_USER || "contact@evradar.in";
 
   const intentLabels = { test_drive: "Test Drive", price_quote: "Best Price", finance: "Loan/Finance", general: "General Enquiry" };
   const intentLabel  = intentLabels[lead.intent] || lead.intent;
@@ -48,16 +50,22 @@ async function sendLeadNotification(lead) {
 </div>
 </body></html>`;
 
-  await fetch("https://api.sendgrid.com/v3/mail/send", {
-    method:  "POST",
-    headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      personalizations: [{ to: [{ email: toEmail }] }],
-      from:    { email: fromEmail, name: "EV Radar Leads" },
-      subject: `🔔 New ${intentLabel} Lead — ${lead.vehicleName} (${lead.phone})`,
-      content: [{ type: "text/html", value: html }],
-    }),
-  });
+  const subject = `🔔 New ${intentLabel} Lead — ${lead.vehicleName}${lead.city ? `, ${lead.city}` : ""} (${lead.phone})`;
+  if (apiKey) {
+    const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
+      method:  "POST",
+      headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        personalizations: [{ to: [{ email: toEmail }] }],
+        from:    { email: fromEmail, name: "EV Radar Leads" },
+        subject,
+        content: [{ type: "text/html", value: html }],
+      }),
+    });
+    if (res.ok) return;
+    console.error("[lead email] SendGrid failed", res.status, "— falling back to SMTP");
+  }
+  await sendMail({ to: toEmail, subject, html });
 }
 
 function escapeRegExp(str) {
@@ -103,8 +111,12 @@ export async function POST(request) {
       pageUrl: clip(body.pageUrl, 300),
     });
 
-    // Fire-and-forget: notify admin via email
-    sendLeadNotification(lead).catch(console.error);
+    // Await the alert (serverless functions can be frozen once the response is sent), but never
+    // fail the lead because of email — the lead is already saved. Capped at 8 s.
+    await Promise.race([
+      sendLeadNotification(lead).catch((e) => console.error("[lead email]", e?.message || e)),
+      new Promise((r) => setTimeout(r, 8000)),
+    ]);
 
     return NextResponse.json({ success: true, id: lead._id }, { status: 201 });
   } catch (err) {
