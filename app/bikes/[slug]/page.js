@@ -1,3 +1,4 @@
+import { CITIES, TOP_CITY_SLUGS, getCity } from "@/lib/cityPricing";
 import { comparisonsFor } from "@/lib/comparisons";
 import { notFound } from "next/navigation";
 import { cache } from "react";
@@ -398,20 +399,7 @@ export default async function BikeDetailPage({ params }) {
           <h2 className="mb-4 text-xl font-black text-gray-900">{bike.name} On-Road Price by City</h2>
           <p className="mb-5 text-sm text-gray-500">Check the exact on-road price of {bike.name} in your city, including RTO, insurance, and state taxes.</p>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-            {[
-              { slug: "mumbai",     name: "Mumbai" },
-              { slug: "delhi",      name: "Delhi" },
-              { slug: "bangalore",  name: "Bangalore" },
-              { slug: "chennai",    name: "Chennai" },
-              { slug: "hyderabad",  name: "Hyderabad" },
-              { slug: "pune",       name: "Pune" },
-              { slug: "ahmedabad",  name: "Ahmedabad" },
-              { slug: "kolkata",    name: "Kolkata" },
-              { slug: "jaipur",     name: "Jaipur" },
-              { slug: "lucknow",    name: "Lucknow" },
-              { slug: "chandigarh", name: "Chandigarh" },
-              { slug: "bhopal",     name: "Bhopal" },
-            ].map((city) => (
+            {TOP_CITY_SLUGS.map((s) => getCity(s)).map((city) => (
               <Link key={city.slug}
                 href={`/bikes/${bike.slug}/price-in-${city.slug}`}
                 className="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-800 hover:border-green-400 hover:text-green-700 transition">
@@ -420,6 +408,12 @@ export default async function BikeDetailPage({ params }) {
               </Link>
             ))}
           </div>
+          <p className="mt-5 text-xs leading-relaxed text-gray-500">
+            <span className="font-bold text-gray-700">More cities: </span>
+            {CITIES.filter((c) => !TOP_CITY_SLUGS.includes(c.slug)).map((c, i, arr) => (
+              <span key={c.slug}><Link href={`/bikes/${bike.slug}/price-in-${c.slug}`} className="hover:text-green-700 hover:underline">{c.name}</Link>{i < arr.length - 1 ? " · " : ""}</span>
+            ))}
+          </p>
         </div>
       </section>
 

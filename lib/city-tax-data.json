@@ -1,0 +1,1070 @@
+{
+ "asOf": "2026-11-18",
+ "registrationNote": "Registration (RC) fee is waived for battery-electric vehicles under central rules (G.S.R. 525(E), 2021). Number plate (HSRP), smart card and hypothecation charges may still apply.",
+ "states": {
+  "Andhra Pradesh": {
+   "car": {
+    "pct": 0,
+    "slabs": null,
+    "note": "Reported as exempt from road (life) tax under AP Sustainable Electric Mobility Policy 4.0 (2024-29). Deccan Chronicle (Sep 2026) describes a 5-year road tax waiver for EVs registered in AP. We did not see the GO text.",
+    "subsidy": "none for private cars (the 5% subsidy excludes cars)"
+   },
+   "twoWheeler": {
+    "pct": 0,
+    "slabs": null,
+    "note": "Same road tax waiver as cars (reported; GO text not seen).",
+    "subsidy": "Up to 5% of ex-showroom price for e-2W (no rupee cap reported), available until Mar 2027 per the transport minister (Deccan Chronicle, 9 Sep 2026)"
+   },
+   "confidence": "medium",
+   "usable": true,
+   "validity": "Policy 2024-2029; 5% purchase incentive until Mar 2027",
+   "policy": "Andhra Pradesh Sustainable Electric Mobility Policy 4.0 (2024-29)"
+  },
+  "Arunachal Pradesh": {
+   "car": {
+    "pct": null,
+    "slabs": null,
+    "note": "Only a 2021 draft EV policy (BEE) was found. Aggregators claim a 100% waiver but cite no notification.",
+    "subsidy": "unknown"
+   },
+   "twoWheeler": {
+    "pct": null,
+    "slabs": null,
+    "note": "Same as car: no notification found.",
+    "subsidy": "unknown"
+   },
+   "confidence": "low",
+   "usable": false,
+   "validity": "unknown",
+   "policy": "Arunachal Pradesh State EV Policy 2021 (draft; final notification not found)"
+  },
+  "Assam": {
+   "car": {
+    "pct": null,
+    "slabs": null,
+    "note": "EV Policy of Assam 2021 (notified 4 Sep 2021, 5-year term) waived road tax and registration for EVs. That term ended around 3 Sep 2026 and we found no extension or successor policy. A transport official was also quoted as describing only a 2% MV tax cut, which conflicts with the full waiver.",
+    "subsidy": "Policy-era subsidy of about ₹10,000/kWh (cap ₹1.5 lakh) per aggregators. It probably ended with the policy, and delivery was reported as poor."
+   },
+   "twoWheeler": {
+    "pct": null,
+    "slabs": null,
+    "note": "Same as car.",
+    "subsidy": "Policy-era per-kWh subsidy; probably closed"
+   },
+   "confidence": "low",
+   "usable": false,
+   "validity": "4 Sep 2021 to about Sep 2026 (5 years); no extension found",
+   "policy": "Electric Vehicle Policy of Assam, 2021"
+  },
+  "Bihar": {
+   "car": {
+    "pct": 5,
+    "slabs": [
+     {
+      "upTo": 800000,
+      "pct": 4.5
+     },
+     {
+      "upTo": 1500000,
+      "pct": 5
+     },
+     {
+      "upTo": null,
+      "pct": 6
+     }
+    ],
+    "note": "Bihar EV Policy 2026 (approved May 2026, reportedly effective 1 Jun 2026) gives a 50% motor vehicle tax concession to all EVs registered in Bihar. Standard car slabs are reported as 8% up to ₹1L, 9% ₹1-8L, 10% ₹8-15L and 12% above ₹15L, so the EV rates are derived as 50% of those. roadTaxPct is the ₹8-15L band.",
+    "subsidy": "₹1 lakh for e-cars bought by women (caps and quota not stated)"
+   },
+   "twoWheeler": {
+    "pct": null,
+    "slabs": null,
+    "note": "50% of the standard 2W one-time tax. The standard 2W slabs are reported only as 8-12%, and a 17 Jul 2026 notification revised 2W tax, so the exact EV rate is not confirmed (likely 4-6%).",
+    "subsidy": "₹10,000 (general) / ₹12,000 (SC/ST) for e-2W"
+   },
+   "confidence": "low",
+   "usable": false,
+   "validity": "from about 1 Jun 2026; end date not stated (target year 2030)",
+   "policy": "Bihar Electric Vehicle Policy 2026"
+  },
+  "Chhattisgarh": {
+   "car": {
+    "pct": null,
+    "slabs": null,
+    "note": "The CG EV Policy 2022 (approved Jul 2022, 5 years) set a taper: 100% road tax exemption in years 1-2, 50% in years 3-4 and 25% in year 5. A 2025-26 Raipur report says EVs get 50% off lifetime tax. Nov 2026 falls in year 5 (25% rebate) or at the end of year 4, depending on the start date.",
+    "subsidy": "unknown / likely none for private buyers"
+   },
+   "twoWheeler": {
+    "pct": null,
+    "slabs": null,
+    "note": "Same taper as cars.",
+    "subsidy": "unknown"
+   },
+   "confidence": "low",
+   "usable": false,
+   "validity": "about Jul 2022 to Jul 2027",
+   "policy": "Chhattisgarh State Electric Vehicle Policy 2022"
+  },
+  "Goa": {
+   "car": {
+    "pct": 0,
+    "slabs": null,
+    "note": "EVs were exempted from road tax by a 2018 notification under Sec 11 of the Goa, Daman & Diu MV Tax Act 1974; no end date was found. The Goa Electric Mobility Promotion Policy 2021 also waived road tax and registration.",
+    "subsidy": "none known for private cars (the 2021 policy subsidies have ended). A Jul 2026 draft scheme covers bike-taxi and auto operators only."
+   },
+   "twoWheeler": {
+    "pct": 0,
+    "slabs": null,
+    "note": "Same exemption as cars.",
+    "subsidy": "none known for private buyers"
+   },
+   "confidence": "medium",
+   "usable": true,
+   "validity": "no end date found",
+   "policy": "Goa EV road tax exemption notification (2018) + Goa Electric Mobility Promotion Policy 2021"
+  },
+  "Gujarat": {
+   "car": {
+    "pct": 1,
+    "slabs": null,
+    "note": "The standard lump-sum tax is 6%. EVs got a 5-point concession (effective 1%) from 18 Apr 2025 to 31 Mar 2026. A circular of 30 Mar 2026 reportedly extended it to 31 Mar 2027 (Gujarat Samachar, DeshGujarat, Apr 2026). Some later aggregator pages say it reverted to 6%. A Green Mobility Policy 2026 proposing a 100% exemption was reported in Aug 2026, but we could not confirm it was notified.",
+    "subsidy": "none (the earlier 2021 policy subsidy has ended). The proposed Green Mobility Policy adds ₹10,000 for women buyers and a ₹50,000 scrappage incentive (not confirmed as notified)."
+   },
+   "twoWheeler": {
+    "pct": 1,
+    "slabs": null,
+    "note": "Same 1% effective rate (6% minus 5% concession) until 31 Mar 2027, per the Apr 2026 reports.",
+    "subsidy": "none confirmed (proposed: ₹5,000 for women buyers, ₹10,000 for scrapping a 2W)"
+   },
+   "confidence": "medium",
+   "usable": true,
+   "validity": "till 31 Mar 2027 (reported)",
+   "policy": "Gujarat MV tax concession for EVs (1%), extended by circular dated 30 Mar 2026"
+  },
+  "Haryana": {
+   "car": {
+    "pct": 0,
+    "slabs": [
+     {
+      "upTo": 3000000,
+      "pct": 0
+     },
+     {
+      "upTo": null,
+      "pct": null
+     }
+    ],
+    "note": "100% MV tax exemption for BEVs up to ₹30 lakh ex-showroom and 50% above ₹30 lakh (Cabinet 28-29 Jul 2026; reportedly in effect around 21 Aug 2026). It replaced the earlier 20% one-time exemption. Above ₹30L the EV pays half the standard rate (standard is about 10% above ₹20L, so about 5%).",
+    "subsidy": "none (an extra 1% tax rebate for non-transport vehicles up to ₹20L registered in a woman's name is not EV-specific and is moot when tax is 0)"
+   },
+   "twoWheeler": {
+    "pct": 0,
+    "slabs": null,
+    "note": "Reported to cover e-2W/3W/4W BEVs. All e-2Ws fall under the ₹30L cap.",
+    "subsidy": "none"
+   },
+   "confidence": "high",
+   "usable": true,
+   "validity": "end date not reported",
+   "policy": "Haryana MV tax exemption for BEVs (Cabinet decision Jul 2026, per Budget 2026-27)"
+  },
+  "Himachal Pradesh": {
+   "car": {
+    "pct": 0,
+    "slabs": null,
+    "note": "Several insurer guides (Cars24, Bajaj) list 0% for private e-cars and e-2W. Policybazaar says only commercial EVs get 100%. The HP EV Policy 2021 proposed exempting all EVs under the HP MV Taxation Act.",
+    "subsidy": "none known for private buyers"
+   },
+   "twoWheeler": {
+    "pct": 0,
+    "slabs": null,
+    "note": "Same as car (conflicting sources).",
+    "subsidy": "none known"
+   },
+   "confidence": "low",
+   "usable": false,
+   "validity": "unknown",
+   "policy": "Himachal Pradesh Electric Vehicle Policy 2022"
+  },
+  "Jharkhand": {
+   "car": {
+    "pct": null,
+    "slabs": null,
+    "note": "Jharkhand EV Policy 2022 (gazette 19 Oct 2022, about 5 years): EVs made in Jharkhand get 100% exemption for the first 10,000 buyers, 75% for the next 5,000 and 25% after that. EVs made outside the state (almost all cars) get a 25% exemption on the standard rate. The standard rate was not confirmed.",
+    "subsidy": "Policy announced up to ₹1.5 lakh for e-cars (reported 2022). Current availability is unconfirmed."
+   },
+   "twoWheeler": {
+    "pct": null,
+    "slabs": null,
+    "note": "Same tiered or 25% structure.",
+    "subsidy": "₹10,000 for e-2W announced in 2022; current availability unconfirmed"
+   },
+   "confidence": "low",
+   "usable": false,
+   "validity": "Oct 2022 to about 2027",
+   "policy": "Jharkhand Electric Vehicle Policy 2022"
+  },
+  "Karnataka": {
+   "car": {
+    "pct": 8,
+    "slabs": [
+     {
+      "upTo": 1000000,
+      "pct": 5
+     },
+     {
+      "upTo": 2500000,
+      "pct": 8
+     },
+     {
+      "upTo": null,
+      "pct": 10
+     }
+    ],
+    "note": "Karnataka MV Taxation (Amendment) Act 2026 ended the EV car exemption from about 1-10 Apr 2026. Lifetime tax is 5% up to ₹10L, 8% for ₹10-25L and 10% above ₹25L (the 10% band above ₹25L has applied since 2024). roadTaxPct is the ₹10-25L band.",
+    "subsidy": "none"
+   },
+   "twoWheeler": {
+    "pct": 0,
+    "slabs": null,
+    "note": "e-2Ws remain fully exempt.",
+    "subsidy": "none"
+   },
+   "confidence": "high",
+   "usable": true,
+   "validity": "in force from Apr 2026; no end date",
+   "policy": "Karnataka Motor Vehicles Taxation (Amendment) Act, 2026"
+  },
+  "Kerala": {
+   "car": {
+    "pct": 3,
+    "slabs": [
+     {
+      "upTo": 1000000,
+      "pct": 3
+     },
+     {
+      "upTo": 2000000,
+      "pct": 5
+     },
+     {
+      "upTo": 4000000,
+      "pct": 10
+     },
+     {
+      "upTo": null,
+      "pct": 15
+     }
+    ],
+    "note": "Lifetime tax on EVs was a flat 5% until Mar 2025. From 1 Apr 2025 it was 5% up to ₹15L, 8% for ₹15-20L and 10% above ₹20L. The revised Budget (19 Jun 2026) and Kerala Finance Act 2026 (passed 1 Jul 2026, effective at once) set 3% up to ₹10L, 5% for ₹10-15L (unchanged), 5% for ₹15-20L (cut from 8%), 10% for ₹20-40L (unchanged) and 15% above ₹40L (raised from 10%). roadTaxPct is the band up to ₹10L.",
+    "subsidy": "none"
+   },
+   "twoWheeler": {
+    "pct": 3,
+    "slabs": null,
+    "note": "The e-2W rate was 5% through 2025. The 2026 cut for EVs up to ₹10L (5% to 3%) appears to cover e-2W, but no source says so explicitly. It may still be 5%.",
+    "subsidy": "none"
+   },
+   "confidence": "medium",
+   "usable": true,
+   "validity": "from 1 Jul 2026; no end date",
+   "policy": "Kerala Finance Act 2026 (revised Budget 2026-27)"
+  },
+  "Madhya Pradesh": {
+   "car": {
+    "pct": null,
+    "slabs": null,
+    "note": "The 100% MV tax exemption (notification 9 Apr 2025, MP EV Policy 2025) covered e-cars up to ₹20L registered by 26 Mar 2026. It lapsed and we found no renewal for private vehicles (e-buses continue to Mar 2027). The standard MP lifetime tax applies, which insurer guides put at about 8% up to ₹10L and higher above that. The exact current EV rate is not confirmed, and one guide mentions a 4% EV rate.",
+    "subsidy": "none (the ₹50,000 car / ₹10,000 2W subsidies in the draft were not notified, per evfy)"
+   },
+   "twoWheeler": {
+    "pct": null,
+    "slabs": null,
+    "note": "The exemption lapsed on 26 Mar 2026. The standard 2W lifetime tax applies; the rate is not confirmed.",
+    "subsidy": "none confirmed"
+   },
+   "confidence": "low",
+   "usable": false,
+   "validity": "the exemption applied to registrations up to 26 Mar 2026",
+   "policy": "Madhya Pradesh Electric Vehicle Policy 2025 (tax exemption window expired)"
+  },
+  "Maharashtra": {
+   "car": {
+    "pct": 0,
+    "slabs": null,
+    "note": "100% MV tax exemption for EVs under the Maharashtra EV Policy 2025 (1 Apr 2025 to 31 Mar 2030), with no price cap. The 6% tax on EVs above ₹30L proposed in Budget 2025-26 was withdrawn.",
+    "subsidy": "10% of ex-factory price up to ₹1.5 lakh for e-4W per the policy table. Several sources say only transport/fleet cars qualify, so treat private-car eligibility as uncertain. Toll waiver on Mumbai-Pune Expressway, Samruddhi and Atal Setu."
+   },
+   "twoWheeler": {
+    "pct": 0,
+    "slabs": null,
+    "note": "Fully exempt.",
+    "subsidy": "10% of ex-factory price up to ₹10,000, for the first 1 lakh e-2W (quota may be exhausted)"
+   },
+   "confidence": "high",
+   "usable": true,
+   "validity": "1 Apr 2025 to 31 Mar 2030",
+   "policy": "Maharashtra Electric Vehicle Policy 2025"
+  },
+  "Manipur": {
+   "car": {
+    "pct": null,
+    "slabs": null,
+    "note": "No EV road tax notification found.",
+    "subsidy": "unknown"
+   },
+   "twoWheeler": {
+    "pct": null,
+    "slabs": null,
+    "note": "No EV road tax notification found.",
+    "subsidy": "unknown"
+   },
+   "confidence": "low",
+   "usable": false,
+   "validity": "unknown",
+   "policy": "unknown"
+  },
+  "Meghalaya": {
+   "car": {
+    "pct": 0,
+    "slabs": null,
+    "note": "The Meghalaya EV Policy 2021 exemption (notified 4 Mar 2022) ran to 31 Mar 2026. The EV Policy 2026 (notified around Oct 2026, 3 years) exempts MV tax and registration fees for EVs registered in the policy period, subject to Transport Department conditions.",
+    "subsidy": "₹25,000 for private e-cars up to ₹35L ex-factory (first 3,000), plus ₹50,000 for scrapping a BS-IV or older car; first come, first served"
+   },
+   "twoWheeler": {
+    "pct": 0,
+    "slabs": null,
+    "note": "Same exemption as cars.",
+    "subsidy": "Incentive for e-2W priced up to ₹1.75L; amount not reported"
+   },
+   "confidence": "medium",
+   "usable": true,
+   "validity": "3-year policy from about Oct 2026",
+   "policy": "Meghalaya Electric Vehicle Policy 2026"
+  },
+  "Mizoram": {
+   "car": {
+    "pct": null,
+    "slabs": null,
+    "note": "Only aggregator claims of a waiver; no notification found.",
+    "subsidy": "unknown"
+   },
+   "twoWheeler": {
+    "pct": null,
+    "slabs": null,
+    "note": "Same as car.",
+    "subsidy": "unknown"
+   },
+   "confidence": "low",
+   "usable": false,
+   "validity": "unknown",
+   "policy": "unknown"
+  },
+  "Nagaland": {
+   "car": {
+    "pct": null,
+    "slabs": null,
+    "note": "Only aggregator claims of a road tax exemption; no notification found.",
+    "subsidy": "unknown"
+   },
+   "twoWheeler": {
+    "pct": null,
+    "slabs": null,
+    "note": "Same as car.",
+    "subsidy": "unknown"
+   },
+   "confidence": "low",
+   "usable": false,
+   "validity": "unknown",
+   "policy": "unknown"
+  },
+  "Odisha": {
+   "car": {
+    "pct": 0,
+    "slabs": null,
+    "note": "100% road tax and registration fee exemption for BEVs under Odisha EV Policy 2021. It was extended a quarter at a time; the latest extension (Commerce & Transport notification, 4 Oct 2026) runs to 31 Dec 2026.",
+    "subsidy": "Policy-era purchase incentives (2W 15% up to ₹5,000; 4W 15% up to ₹50,000). It is unclear whether they are still being disbursed."
+   },
+   "twoWheeler": {
+    "pct": 0,
+    "slabs": null,
+    "note": "Same exemption, till 31 Dec 2026.",
+    "subsidy": "see car note (2W up to ₹5,000 under the 2021 policy; current status unclear)"
+   },
+   "confidence": "medium",
+   "usable": true,
+   "validity": "till 31 Dec 2026",
+   "policy": "Odisha Electric Vehicle Policy 2021 (extended)"
+  },
+  "Punjab": {
+   "car": {
+    "pct": 0,
+    "slabs": null,
+    "note": "MV tax exemption on all registered EVs/BOVs (earlier notification 13 Apr 2023, valid to 20 Feb 2026) was extended by one year; the Punjab EV Policy 2022 was extended to 20 Feb 2027.",
+    "subsidy": "none known for private cars"
+   },
+   "twoWheeler": {
+    "pct": 0,
+    "slabs": null,
+    "note": "Same exemption.",
+    "subsidy": "none confirmed"
+   },
+   "confidence": "medium",
+   "usable": true,
+   "validity": "till 20 Feb 2027",
+   "policy": "Punjab Electric Vehicle Policy 2022 (extended)"
+  },
+  "Rajasthan": {
+   "car": {
+    "pct": 0,
+    "slabs": null,
+    "note": "Every source we found says pure EVs are fully exempt from MV tax under the Rajasthan EV Policy (REVP) 2022 (effective 1 Sep 2022 for 5 years). We did not find a 2026 notification. The 25% hybrid exemption was withdrawn (not relevant to BEVs).",
+    "subsidy": "Per-kWh purchase incentive under REVP / the 2025 ₹200 crore subsidy announcement. Current amounts and status are unconfirmed."
+   },
+   "twoWheeler": {
+    "pct": 0,
+    "slabs": null,
+    "note": "Same exemption.",
+    "subsidy": "unconfirmed"
+   },
+   "confidence": "low",
+   "usable": false,
+   "validity": "1 Sep 2022 to about 31 Aug 2027 (one blog says the 2025 update ended 31 Mar 2026)",
+   "policy": "Rajasthan Electric Vehicle Policy 2022"
+  },
+  "Sikkim": {
+   "car": {
+    "pct": null,
+    "slabs": null,
+    "note": "Only aggregator claims; no policy or notification found.",
+    "subsidy": "unknown"
+   },
+   "twoWheeler": {
+    "pct": null,
+    "slabs": null,
+    "note": "Same as car.",
+    "subsidy": "unknown"
+   },
+   "confidence": "low",
+   "usable": false,
+   "validity": "unknown",
+   "policy": "unknown"
+  },
+  "Tamil Nadu": {
+   "car": {
+    "pct": 0,
+    "slabs": null,
+    "note": "100% road tax exemption for all battery-operated vehicles (transport and non-transport), extended by GO dated 29 Dec 2025 for 1 Jan 2026 to 31 Dec 2027.",
+    "subsidy": "none for private cars"
+   },
+   "twoWheeler": {
+    "pct": 0,
+    "slabs": null,
+    "note": "Same exemption, till 31 Dec 2027.",
+    "subsidy": "none confirmed for private e-2W"
+   },
+   "confidence": "high",
+   "usable": true,
+   "validity": "1 Jan 2026 to 31 Dec 2027",
+   "policy": "Tamil Nadu Electric Vehicle Policy 2023 (road tax GO dated 29 Dec 2025)"
+  },
+  "Telangana": {
+   "car": {
+    "pct": 0,
+    "slabs": null,
+    "note": "100% road tax and registration fee exemption for EVs bought and registered in Telangana (GO Ms 41, Nov 2024), with no cap on vehicle count or price, until 31 Dec 2026. No extension had been notified as of 29 Oct 2026.",
+    "subsidy": "none"
+   },
+   "twoWheeler": {
+    "pct": 0,
+    "slabs": null,
+    "note": "Same exemption, till 31 Dec 2026.",
+    "subsidy": "none"
+   },
+   "confidence": "high",
+   "usable": true,
+   "validity": "18 Nov 2024 to 31 Dec 2026",
+   "policy": "Telangana EV & Hybrid Policy / GO Ms No. 41 (Nov 2024)"
+  },
+  "Tripura": {
+   "car": {
+    "pct": null,
+    "slabs": null,
+    "note": "Official Tripura EV Policy 2022 (gazette about 1 Jun 2022, 5 years): 25% exemption of the applicable road tax for 2W/3W/4W/buses. The standard Tripura rate was not determined, so the EV pays 75% of the standard rate.",
+    "subsidy": "Purchase incentives under the 2022 policy; amounts not verified"
+   },
+   "twoWheeler": {
+    "pct": null,
+    "slabs": null,
+    "note": "25% exemption on the standard rate (pays 75%).",
+    "subsidy": "not verified"
+   },
+   "confidence": "medium",
+   "usable": true,
+   "validity": "about Jun 2022 to Jun 2027",
+   "policy": "Tripura Electric Vehicle Policy 2022"
+  },
+  "Uttar Pradesh": {
+   "car": {
+    "pct": 8,
+    "slabs": [
+     {
+      "upTo": 1000000,
+      "pct": 8
+     },
+     {
+      "upTo": null,
+      "pct": 10
+     }
+    ],
+    "note": "The blanket EV road tax and registration exemption (14 Oct 2022 to 13 Oct 2025) lapsed. From 14 Oct 2025 to 13 Oct 2027 the exemption applies only to EVs manufactured, sold and registered in UP, which excludes almost all cars on sale. Other EVs pay the standard one-time tax: 8% up to ₹10L and 10% above (some guides say 9%/11%). roadTaxPct is the band up to ₹10L.",
+    "subsidy": "none for most buyers (purchase subsidy is restricted to UP-made EVs; the early-bird cash subsidy has closed)"
+   },
+   "twoWheeler": {
+    "pct": 10,
+    "slabs": [
+     {
+      "upTo": 40000,
+      "pct": 7
+     },
+     {
+      "upTo": null,
+      "pct": 10
+     }
+    ],
+    "note": "Standard 2W one-time tax: 7% up to ₹40,000 and 10% above, so almost all e-2W pay 10%. Older guides list different slabs. The exemption applies only to UP-made e-2W.",
+    "subsidy": "₹5,000 reported for UP-made e-2W only"
+   },
+   "confidence": "medium",
+   "usable": true,
+   "validity": "the restricted exemption runs 14 Oct 2025 to 13 Oct 2027",
+   "policy": "UP Electric Vehicle Manufacturing and Mobility Policy 2022 (benefits restricted to 'Made in UP' from 14 Oct 2025)"
+  },
+  "Uttarakhand": {
+   "car": {
+    "pct": 0,
+    "slabs": null,
+    "note": "100% road tax exemption for EVs under a 2019 MV Taxation notification, reportedly extended by Cabinet in 2025. A new EV Policy 2026 was still pending approval mid-2026.",
+    "subsidy": "none currently (the earlier policy has lapsed; the 2026 policy is not yet confirmed)"
+   },
+   "twoWheeler": {
+    "pct": 0,
+    "slabs": null,
+    "note": "Same exemption.",
+    "subsidy": "none currently"
+   },
+   "confidence": "low",
+   "usable": false,
+   "validity": "unknown end date",
+   "policy": "Uttarakhand MV Taxation EV exemption (2019 notification, extended)"
+  },
+  "West Bengal": {
+   "car": {
+    "pct": 0,
+    "slabs": null,
+    "note": "MV tax, additional tax and registration fee waiver for EVs: officially 1 Apr 2022 to 31 Mar 2024, reportedly extended. CSE (Feb 2026) still describes a temporary exemption, and aggregators say the policy window runs to about Mar 2026. We found no 2026 extension notification.",
+    "subsidy": "none"
+   },
+   "twoWheeler": {
+    "pct": 0,
+    "slabs": null,
+    "note": "Same as car (status after Mar 2026 unconfirmed).",
+    "subsidy": "none"
+   },
+   "confidence": "low",
+   "usable": false,
+   "validity": "last confirmed window ran to 31 Mar 2024; reported to about Mar 2026",
+   "policy": "West Bengal EV Policy 2021 / transport department tax waiver"
+  },
+  "Andaman and Nicobar Islands": {
+   "car": {
+    "pct": null,
+    "slabs": null,
+    "note": "A 2022 draft EV policy mentioned road tax and registration exemptions. We found no final notification.",
+    "subsidy": "unknown"
+   },
+   "twoWheeler": {
+    "pct": null,
+    "slabs": null,
+    "note": "Same as car.",
+    "subsidy": "unknown"
+   },
+   "confidence": "low",
+   "usable": false,
+   "validity": "unknown",
+   "policy": "A&N EV Policy (draft 2022)"
+  },
+  "Chandigarh": {
+   "car": {
+    "pct": 0,
+    "slabs": null,
+    "note": "Road tax exemption for EVs (including e-2W) under the Chandigarh EV Policy, 18 Mar 2023 to 17 Mar 2028. The standard UT rate is 6%. Strong hybrids get 50% only up to ₹20L.",
+    "subsidy": "none: the cash subsidy ended for purchases after 25 Sep 2026; tax and registration waivers retained"
+   },
+   "twoWheeler": {
+    "pct": 0,
+    "slabs": null,
+    "note": "Same exemption, till 17 Mar 2028.",
+    "subsidy": "none (ended Sep 2026)"
+   },
+   "confidence": "high",
+   "usable": true,
+   "validity": "18 Mar 2023 to 17 Mar 2028",
+   "policy": "Chandigarh Electric Vehicle Policy 2022"
+  },
+  "Dadra and Nagar Haveli and Daman and Diu": {
+   "car": {
+    "pct": null,
+    "slabs": null,
+    "note": "No information found.",
+    "subsidy": "unknown"
+   },
+   "twoWheeler": {
+    "pct": null,
+    "slabs": null,
+    "note": "No information found.",
+    "subsidy": "unknown"
+   },
+   "confidence": "low",
+   "usable": false,
+   "validity": "unknown",
+   "policy": "unknown"
+  },
+  "Delhi": {
+   "car": {
+    "pct": 0,
+    "slabs": [
+     {
+      "upTo": 3000000,
+      "pct": 0
+     },
+     {
+      "upTo": null,
+      "pct": null
+     }
+    ],
+    "note": "100% road tax and registration fee waiver for electric cars up to ₹30 lakh ex-showroom under Delhi EV Policy 2026 (in force 1 Jul 2026 to 31 Mar 2030). Cars above ₹30L pay the standard Delhi rate (petrol-equivalent, about 10%; not confirmed). Hybrids are excluded.",
+    "subsidy": "Scrappage bonus up to ₹1 lakh for scrapping a BS-IV or older 4W and buying an e-car (draft conditions: car up to ₹30L, first 1 lakh applicants). No direct e-car purchase subsidy."
+   },
+   "twoWheeler": {
+    "pct": 0,
+    "slabs": null,
+    "note": "BEV road tax and registration waiver (Outlook: covers eligible battery EVs); e-2W are far below any cap.",
+    "subsidy": "Purchase incentive of up to ₹30,000 in year 1 (FY from Jul 2026), ₹20,000 in year 2, ₹10,000 in year 3. Per-kWh basis and price ceiling not confirmed."
+   },
+   "confidence": "high",
+   "usable": true,
+   "validity": "1 Jul 2026 to 31 Mar 2030",
+   "policy": "Delhi Electric Vehicle Policy 2026 (EV Policy 2.0)"
+  },
+  "Jammu and Kashmir": {
+   "car": {
+    "pct": null,
+    "slabs": null,
+    "note": "J&K EV Policy 2026 (notified 1 Oct 2026, runs 2026-2032). Coverage did not state the road/token tax terms. Aggregators claim a waiver.",
+    "subsidy": "₹1 lakh early-adopter top-up for the first 1,500 personal e-cars; 3-5% loan interest subvention for up to 36 months"
+   },
+   "twoWheeler": {
+    "pct": null,
+    "slabs": null,
+    "note": "Road tax terms not found.",
+    "subsidy": "₹5,000 early-adopter top-up for the first 10,000 e-2W"
+   },
+   "confidence": "low",
+   "usable": false,
+   "validity": "2026 to 2032",
+   "policy": "Jammu and Kashmir Electric Vehicle Policy 2026"
+  },
+  "Ladakh": {
+   "car": {
+    "pct": 0,
+    "slabs": null,
+    "note": "EVs exempt from road tax under the Ladakh EV & Allied Infrastructure Policy (17 Aug 2022 to 16 Aug 2027), continuing S.O. 08 dated 26 Mar 2021.",
+    "subsidy": "Policy-era purchase subsidies (2022); current availability unknown"
+   },
+   "twoWheeler": {
+    "pct": 0,
+    "slabs": null,
+    "note": "Same exemption.",
+    "subsidy": "Policy-era subsidy; current status unknown"
+   },
+   "confidence": "medium",
+   "usable": true,
+   "validity": "17 Aug 2022 to 16 Aug 2027",
+   "policy": "Ladakh Electric Vehicle and Allied Infrastructure Policy 2022"
+  },
+  "Lakshadweep": {
+   "car": {
+    "pct": null,
+    "slabs": null,
+    "note": "Only an aggregator claim; nothing verified.",
+    "subsidy": "unknown"
+   },
+   "twoWheeler": {
+    "pct": null,
+    "slabs": null,
+    "note": "Only an aggregator claim; nothing verified.",
+    "subsidy": "unknown"
+   },
+   "confidence": "low",
+   "usable": false,
+   "validity": "unknown",
+   "policy": "unknown"
+  },
+  "Puducherry": {
+   "car": {
+    "pct": null,
+    "slabs": null,
+    "note": "Aggregators claim a full waiver, while another source describes a 50% road tax concession under the Green Mobility Policy (announced in Budget 2025). We found no notification.",
+    "subsidy": "unconfirmed"
+   },
+   "twoWheeler": {
+    "pct": null,
+    "slabs": null,
+    "note": "Same as car.",
+    "subsidy": "unconfirmed"
+   },
+   "confidence": "low",
+   "usable": false,
+   "validity": "unknown",
+   "policy": "Puducherry Green Mobility Policy (announced 2025)"
+  }
+ },
+ "cities": [
+  {
+   "slug": "mumbai",
+   "name": "Mumbai",
+   "state": "Maharashtra"
+  },
+  {
+   "slug": "pune",
+   "name": "Pune",
+   "state": "Maharashtra"
+  },
+  {
+   "slug": "nagpur",
+   "name": "Nagpur",
+   "state": "Maharashtra"
+  },
+  {
+   "slug": "nashik",
+   "name": "Nashik",
+   "state": "Maharashtra"
+  },
+  {
+   "slug": "thane",
+   "name": "Thane",
+   "state": "Maharashtra"
+  },
+  {
+   "slug": "navi-mumbai",
+   "name": "Navi Mumbai",
+   "state": "Maharashtra"
+  },
+  {
+   "slug": "aurangabad",
+   "name": "Chhatrapati Sambhajinagar (Aurangabad)",
+   "state": "Maharashtra"
+  },
+  {
+   "slug": "delhi",
+   "name": "Delhi",
+   "state": "Delhi"
+  },
+  {
+   "slug": "gurugram",
+   "name": "Gurugram",
+   "state": "Haryana"
+  },
+  {
+   "slug": "faridabad",
+   "name": "Faridabad",
+   "state": "Haryana"
+  },
+  {
+   "slug": "noida",
+   "name": "Noida",
+   "state": "Uttar Pradesh"
+  },
+  {
+   "slug": "ghaziabad",
+   "name": "Ghaziabad",
+   "state": "Uttar Pradesh"
+  },
+  {
+   "slug": "lucknow",
+   "name": "Lucknow",
+   "state": "Uttar Pradesh"
+  },
+  {
+   "slug": "kanpur",
+   "name": "Kanpur",
+   "state": "Uttar Pradesh"
+  },
+  {
+   "slug": "agra",
+   "name": "Agra",
+   "state": "Uttar Pradesh"
+  },
+  {
+   "slug": "varanasi",
+   "name": "Varanasi",
+   "state": "Uttar Pradesh"
+  },
+  {
+   "slug": "bangalore",
+   "name": "Bengaluru",
+   "state": "Karnataka"
+  },
+  {
+   "slug": "mysuru",
+   "name": "Mysuru",
+   "state": "Karnataka"
+  },
+  {
+   "slug": "mangaluru",
+   "name": "Mangaluru",
+   "state": "Karnataka"
+  },
+  {
+   "slug": "hubballi",
+   "name": "Hubballi",
+   "state": "Karnataka"
+  },
+  {
+   "slug": "chennai",
+   "name": "Chennai",
+   "state": "Tamil Nadu"
+  },
+  {
+   "slug": "coimbatore",
+   "name": "Coimbatore",
+   "state": "Tamil Nadu"
+  },
+  {
+   "slug": "madurai",
+   "name": "Madurai",
+   "state": "Tamil Nadu"
+  },
+  {
+   "slug": "tiruchirappalli",
+   "name": "Tiruchirappalli",
+   "state": "Tamil Nadu"
+  },
+  {
+   "slug": "hyderabad",
+   "name": "Hyderabad",
+   "state": "Telangana"
+  },
+  {
+   "slug": "warangal",
+   "name": "Warangal",
+   "state": "Telangana"
+  },
+  {
+   "slug": "visakhapatnam",
+   "name": "Visakhapatnam",
+   "state": "Andhra Pradesh"
+  },
+  {
+   "slug": "vijayawada",
+   "name": "Vijayawada",
+   "state": "Andhra Pradesh"
+  },
+  {
+   "slug": "tirupati",
+   "name": "Tirupati",
+   "state": "Andhra Pradesh"
+  },
+  {
+   "slug": "kolkata",
+   "name": "Kolkata",
+   "state": "West Bengal"
+  },
+  {
+   "slug": "siliguri",
+   "name": "Siliguri",
+   "state": "West Bengal"
+  },
+  {
+   "slug": "ahmedabad",
+   "name": "Ahmedabad",
+   "state": "Gujarat"
+  },
+  {
+   "slug": "surat",
+   "name": "Surat",
+   "state": "Gujarat"
+  },
+  {
+   "slug": "vadodara",
+   "name": "Vadodara",
+   "state": "Gujarat"
+  },
+  {
+   "slug": "rajkot",
+   "name": "Rajkot",
+   "state": "Gujarat"
+  },
+  {
+   "slug": "gandhinagar",
+   "name": "Gandhinagar",
+   "state": "Gujarat"
+  },
+  {
+   "slug": "jaipur",
+   "name": "Jaipur",
+   "state": "Rajasthan"
+  },
+  {
+   "slug": "jodhpur",
+   "name": "Jodhpur",
+   "state": "Rajasthan"
+  },
+  {
+   "slug": "udaipur",
+   "name": "Udaipur",
+   "state": "Rajasthan"
+  },
+  {
+   "slug": "kota",
+   "name": "Kota",
+   "state": "Rajasthan"
+  },
+  {
+   "slug": "indore",
+   "name": "Indore",
+   "state": "Madhya Pradesh"
+  },
+  {
+   "slug": "bhopal",
+   "name": "Bhopal",
+   "state": "Madhya Pradesh"
+  },
+  {
+   "slug": "jabalpur",
+   "name": "Jabalpur",
+   "state": "Madhya Pradesh"
+  },
+  {
+   "slug": "gwalior",
+   "name": "Gwalior",
+   "state": "Madhya Pradesh"
+  },
+  {
+   "slug": "kochi",
+   "name": "Kochi",
+   "state": "Kerala"
+  },
+  {
+   "slug": "thiruvananthapuram",
+   "name": "Thiruvananthapuram",
+   "state": "Kerala"
+  },
+  {
+   "slug": "kozhikode",
+   "name": "Kozhikode",
+   "state": "Kerala"
+  },
+  {
+   "slug": "chandigarh",
+   "name": "Chandigarh",
+   "state": "Chandigarh"
+  },
+  {
+   "slug": "ludhiana",
+   "name": "Ludhiana",
+   "state": "Punjab"
+  },
+  {
+   "slug": "amritsar",
+   "name": "Amritsar",
+   "state": "Punjab"
+  },
+  {
+   "slug": "jalandhar",
+   "name": "Jalandhar",
+   "state": "Punjab"
+  },
+  {
+   "slug": "mohali",
+   "name": "Mohali",
+   "state": "Punjab"
+  },
+  {
+   "slug": "patna",
+   "name": "Patna",
+   "state": "Bihar"
+  },
+  {
+   "slug": "ranchi",
+   "name": "Ranchi",
+   "state": "Jharkhand"
+  },
+  {
+   "slug": "jamshedpur",
+   "name": "Jamshedpur",
+   "state": "Jharkhand"
+  },
+  {
+   "slug": "bhubaneswar",
+   "name": "Bhubaneswar",
+   "state": "Odisha"
+  },
+  {
+   "slug": "cuttack",
+   "name": "Cuttack",
+   "state": "Odisha"
+  },
+  {
+   "slug": "raipur",
+   "name": "Raipur",
+   "state": "Chhattisgarh"
+  },
+  {
+   "slug": "guwahati",
+   "name": "Guwahati",
+   "state": "Assam"
+  },
+  {
+   "slug": "dehradun",
+   "name": "Dehradun",
+   "state": "Uttarakhand"
+  },
+  {
+   "slug": "shimla",
+   "name": "Shimla",
+   "state": "Himachal Pradesh"
+  },
+  {
+   "slug": "jammu",
+   "name": "Jammu",
+   "state": "Jammu and Kashmir"
+  },
+  {
+   "slug": "srinagar",
+   "name": "Srinagar",
+   "state": "Jammu and Kashmir"
+  },
+  {
+   "slug": "panaji",
+   "name": "Panaji",
+   "state": "Goa"
+  },
+  {
+   "slug": "puducherry",
+   "name": "Puducherry",
+   "state": "Puducherry"
+  },
+  {
+   "slug": "shillong",
+   "name": "Shillong",
+   "state": "Meghalaya"
+  },
+  {
+   "slug": "agartala",
+   "name": "Agartala",
+   "state": "Tripura"
+  }
+ ]
+}

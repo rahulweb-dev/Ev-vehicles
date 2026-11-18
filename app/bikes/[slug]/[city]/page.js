@@ -1,7 +1,7 @@
 import { notFound }         from "next/navigation";
 import { permanentRedirect } from "next/navigation";
 
-const VALID_CITIES = ["mumbai", "delhi", "bangalore", "hyderabad", "chennai", "pune", "ahmedabad", "kolkata", "jaipur", "lucknow", "chandigarh", "bhopal"];
+import { getCity } from "@/lib/cityPricing";
 
 function parseCitySlug(raw) {
   return (raw || "").replace(/^price-in-/, "");
@@ -16,6 +16,6 @@ export async function generateStaticParams() {
 export default async function BikeCityPriceRedirect({ params }) {
   const { slug, city: rawCity } = await params;
   const city = parseCitySlug(rawCity);
-  if (!VALID_CITIES.includes(city)) notFound();
+  if (!getCity(city)) notFound();
   permanentRedirect(`/bikes/${slug}/price-in-${city}`);
 }

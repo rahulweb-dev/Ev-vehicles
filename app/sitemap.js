@@ -1,3 +1,4 @@
+import { CITIES } from "@/lib/cityPricing";
 import { COMPARISONS } from "@/lib/comparisons";
 const SITE_URL = "https://www.evradar.in";
 
@@ -57,11 +58,7 @@ const STATIC_PAGES = [
  * Balanced crawl budget vs. coverage: 12 cities × N cars = N×12 URLs.
  */
 // MUST match the CITIES array in app/cars/[slug]/price-in-[city]/page.js exactly
-const TOP_CITIES = [
-  "mumbai", "delhi", "bangalore", "hyderabad", "chennai",
-  "pune", "ahmedabad", "kolkata", "jaipur", "lucknow",
-  "chandigarh", "bhopal",
-];
+const TOP_CITIES = CITIES.map((c) => c.slug); // all cities (lib/city-tax-data.json)
 
 async function getDbEntries() {
   try {
@@ -155,7 +152,7 @@ async function getDbEntries() {
     /* ── City price pages — cars + bikes ─────────────────────────── */
     const cityPriceUrls = vehicles
       // Price pages without a price are noindex — listing them is a Search Console error
-      .filter(v => (v.vehicleType === "car" || v.vehicleType === "bike") && v.variants?.[0]?.exShowroomPrice)
+      .filter(v => (v.vehicleType === "car" || v.vehicleType === "bike") && v.variants?.some(x => /d/.test(x.exShowroomPrice || "")))
       .flatMap(v => {
         const base = v.vehicleType === "car" ? "cars" : "bikes";
         return TOP_CITIES.map(city => ({
