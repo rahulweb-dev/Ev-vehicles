@@ -79,6 +79,9 @@ export default function EVSalesDashboard({ data = {} }) {
               <Link href="/ev-sales/commercial" className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-purple-50 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 text-sm font-bold hover:bg-purple-100 transition">
                 <Truck size={15} /> Commercial
               </Link>
+              <Link href="/ev-sales/history" className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-sm font-bold hover:bg-amber-100 transition">
+                <TrendingUp size={15} /> History 2020–2026
+              </Link>
             </div>
           </div>
         </div>

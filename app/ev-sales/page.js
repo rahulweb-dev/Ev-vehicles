@@ -1,7 +1,8 @@
 ﻿import Link from "next/link";
 import { SITE_URL, SITE_NAME } from "@/app/layout";
 import EVSalesDashboard from "./EVSalesDashboard";
-import { FALLBACK_ANALYTICS, SALES_FACTS, DATA_YEAR } from "@/lib/ev-sales-fallback";
+import { FALLBACK_ANALYTICS, SALES_FACTS, DATA_YEAR, MONTHS_COVERED } from "@/lib/ev-sales-fallback";
+import { THREE_WHEELER_2026, CALENDAR_YEARS } from "@/lib/ev-sales-history";
 
 export const revalidate = 3600;
 
@@ -27,6 +28,8 @@ export default function EVSalesPage() {
   const f = SALES_FACTS();
   const car1 = f.topCar[0], car2 = f.topCar[1], tw1 = f.topTwoWheeler[0], tw2 = f.topTwoWheeler[1];
   const state1 = f.topStates[0];
+  const threeW = THREE_WHEELER_2026.slice(0, MONTHS_COVERED).reduce((s, r) => s + r.total, 0);
+  const cy2025 = CALENDAR_YEARS.find((y) => y.year === 2025);
 
   const faqs = [
     {
@@ -79,9 +82,15 @@ export default function EVSalesPage() {
           {" "}<strong>{tw1?.brand}</strong> leads electric two-wheelers ahead of {tw2?.brand}. This page tracks brand-wise monthly sales,
           market share and growth, compiled from Vahan registration data and FADA, and is updated every month.
         </p>
+        <p className="text-gray-700 leading-relaxed mb-2">
+          Adding <strong>{lakh(threeW)} electric three-wheelers</strong> (e-rickshaws and L5 autos, EVreporter/Vahan), India&apos;s total for {f.periodLabel} is
+          {" "}<strong>{lakh(f.grandTotal + threeW)} EVs</strong>. For comparison, {lakh(cy2025.total)} EVs were registered in all of 2025.{" "}
+          <Link href="/ev-sales/history" className="font-semibold text-green-700 underline">See every year from 2020 →</Link>
+        </p>
         <p className="text-xs text-gray-500 mb-6">
           Data: {f.periodLabel} · Source: {f.source} · Last updated: {f.lastUpdated} ·{" "}
-          <Link href="/news/ev-sales-october-2026-india-electric-cars-two-wheelers-brand-wise" className="text-green-700 underline">Latest monthly report</Link>
+          <Link href="/news/ev-sales-october-2026-india-electric-cars-two-wheelers-brand-wise" className="text-green-700 underline">Latest monthly report</Link> ·{" "}
+          <Link href="/ev-sales/history" className="text-green-700 underline">EV sales history 2020–2026</Link>
         </p>
         <div className="mb-6 grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
           {[
