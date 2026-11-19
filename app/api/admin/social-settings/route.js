@@ -4,11 +4,12 @@ import SocialSettings    from "@/lib/models/SocialSettings";
 import { requireAuth }   from "@/lib/auth";
 import { encrypt, decrypt, isEncrypted } from "@/lib/encrypt";
 
-const PLATFORMS = ["facebook", "linkedin", "pinterest", "telegram"];
+const PLATFORMS = ["facebook", "instagram", "linkedin", "pinterest", "telegram"];
 
 // Credential fields per platform (used for masking returned to UI)
 const CRED_FIELDS = {
   facebook:  ["appId", "appSecret", "accessToken", "pageId"],
+  instagram: ["igUserId"], // posts with the Facebook Page access token
   linkedin:  ["clientId", "clientSecret", "accessToken", "companyUrn"],
   pinterest: ["accessToken", "boardId"],
   telegram:  ["botToken", "channelId"],
@@ -38,6 +39,7 @@ export async function GET() {
       return {
         platform,
         enabled:     doc?.enabled ?? false,
+        autoPost:    doc?.autoPost ?? false,
         credentials: maskCreds(platform, doc?.credentials ?? {}),
         updatedAt:   doc?.updatedAt ?? null,
       };
@@ -58,7 +60,7 @@ export async function POST(request) {
   if (auth.error) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
   try {
-    const { platform, enabled, credentials = {} } = await request.json();
+    const { platform, enabled, autoPost, credentials = {} } = await request.json();
 
     if (!PLATFORMS.includes(platform)) {
       return NextResponse.json({ error: "Invalid platform" }, { status: 400 });
@@ -84,7 +86,7 @@ export async function POST(request) {
 
     const doc = await SocialSettings.findOneAndUpdate(
       { platform },
-      { $set: { enabled: !!enabled, credentials: updatedCreds } },
+      { $set: { enabled: !!enabled, ...(autoPost !== undefined && { autoPost: !!autoPost }), credentials: updatedCreds } },
       { upsert: true, new: true, runValidators: true }
     );
 

@@ -4,6 +4,9 @@ import { publishDueArticles, isCronAuthorized }  from "@/lib/publishScheduled";
 
 // GET /api/admin/scheduler?secret=YOUR_SCHEDULER_SECRET  (or Authorization: Bearer <secret>)
 // Publishes drafts whose scheduledAt has passed. /api/cron/auto-news also does this hourly.
+// Instagram publishing waits for media processing, so allow more than the default time.
+export const maxDuration = 60;
+
 export async function GET(request) {
   if (!isCronAuthorized(request)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

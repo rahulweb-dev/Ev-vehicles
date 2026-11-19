@@ -10,6 +10,7 @@ import {
   Users, Building2, MapPin, ShieldCheck, Car, LayoutTemplate, MessageSquare, Radio, MessagesSquare, BookOpen, Bell, SearchCheck, UserCircle, Tag, Star, Mail,
   Share2, BarChart3, HardDrive, Database, Image as ImageIcon, Megaphone, Link2,
   Zap,
+  CalendarClock, Inbox,
 } from "lucide-react";
 import { getPusherClient } from "@/lib/pusherClient";
 
@@ -119,6 +120,8 @@ const ADMIN_NAV = [
   { href: "/admin/push-notifications", label: "Push Notifications", icon: Bell },
   { href: "/admin/notifications",      label: "Notifications",      icon: Bell },
   { href: "/admin/seo-audit",          label: "SEO Audit",          icon: SearchCheck },
+  { href: "/admin/social-scheduler",  label: "Social Scheduler",   icon: CalendarClock },
+  { href: "/admin/social-inbox",      label: "Social Inbox",       icon: Inbox },
   { href: "/admin/social-settings",   label: "Social Settings",    icon: Share2 },
   { href: "/admin/social-report",     label: "Social Report",      icon: BarChart3 },
   { href: "/admin/authors",            label: "Authors",            icon: UserCircle },

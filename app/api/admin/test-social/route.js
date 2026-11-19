@@ -78,7 +78,7 @@ export async function POST() {
     ].join("\n");
 
     // ── 4. Post to Facebook ──────────────────────────────────────
-    const fbRes = await fetch(`https://graph.facebook.com/v19.0/${pageId}/feed`, {
+    const fbRes = await fetch(`https://graph.facebook.com/v23.0/${pageId}/feed`, {
       method:  "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

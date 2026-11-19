@@ -21,6 +21,16 @@ const PLATFORMS = [
     ],
   },
   {
+    id:    "instagram",
+    label: "Instagram (Business / Creator)",
+    emoji: "📸",
+    color: "pink",
+    docs:  "https://developers.facebook.com/docs/instagram-platform/content-publishing",
+    fields: [
+      { key: "igUserId", label: "Instagram Account ID", hint: "Numeric ID of the Instagram professional account linked to your Facebook Page. Posting uses the Facebook Page Access Token above." },
+    ],
+  },
+  {
     id:    "linkedin",
     label: "LinkedIn Company Page",
     emoji: "💼",
@@ -61,6 +71,8 @@ const INPUT = "w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-
 
 function PlatformCard({ platform, serverData, onSave }) {
   const [enabled,   setEnabled]   = useState(serverData?.enabled ?? false);
+  const [autoPost,  setAutoPost]  = useState(serverData?.autoPost ?? false);
+  const supportsAutoPost = ["facebook", "instagram"].includes(platform.id);
   const [creds,     setCreds]     = useState(() => {
     const out = {};
     platform.fields.forEach(f => { out[f.key] = ""; });
@@ -85,7 +97,7 @@ function PlatformCard({ platform, serverData, onSave }) {
       const res = await fetch("/api/admin/social-settings", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ platform: platform.id, enabled, credentials: creds }),
+        body: JSON.stringify({ platform: platform.id, enabled, ...(supportsAutoPost && { autoPost }), credentials: creds }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Save failed");
@@ -107,6 +119,7 @@ function PlatformCard({ platform, serverData, onSave }) {
     sky:  { ring: "ring-sky-200",    badge: "bg-sky-100 text-sky-700",     toggle: "text-sky-600"  },
     red:  { ring: "ring-red-200",    badge: "bg-red-100 text-red-700",     toggle: "text-red-500"  },
     cyan: { ring: "ring-cyan-200",   badge: "bg-cyan-100 text-cyan-700",   toggle: "text-cyan-600" },
+    pink: { ring: "ring-pink-200",   badge: "bg-pink-100 text-pink-700",   toggle: "text-pink-600" },
   };
   const c = colorMap[platform.color] || colorMap.blue;
   const isSet = serverData?.updatedAt;
@@ -182,6 +195,13 @@ function PlatformCard({ platform, serverData, onSave }) {
         ))}
       </div>
 
+      {supportsAutoPost && (
+        <label className="mx-5 mb-4 flex cursor-pointer items-center gap-2 rounded-lg bg-gray-50 px-3 py-2 text-xs font-semibold text-gray-700">
+          <input type="checkbox" checked={autoPost} onChange={(e) => setAutoPost(e.target.checked)} className="h-4 w-4 accent-green-600" />
+          Auto-post every new article and buyer&apos;s guide when it goes live
+        </label>
+      )}
+
       {/* Footer */}
       <div className="flex items-center justify-between border-t border-gray-100 px-5 py-3">
         <a
@@ -218,7 +238,12 @@ export default function SocialSettingsPage() {
     setLoading(false);
   }
 
-  useEffect(() => { fetchSettings(); }, []);
+  // Initial load: state is only set in the async callback (not synchronously in the effect)
+  useEffect(() => {
+    let alive = true;
+    fetch("/api/admin/social-settings").then((r) => r.json()).then((d) => { if (alive && d.settings) setSettings(d.settings); }).catch(() => {}).finally(() => alive && setLoading(false));
+    return () => { alive = false; };
+  }, []);
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
