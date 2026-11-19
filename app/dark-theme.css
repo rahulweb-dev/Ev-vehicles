@@ -4,6 +4,11 @@
 html.dark{color-scheme:dark}
 .dark body{background-color:#0b1120;color:#e2e8f0}
 .dark .prose{--tw-prose-body:#cbd5e1;--tw-prose-headings:#f1f5f9;--tw-prose-lead:#a7b2c2;--tw-prose-links:#4ade80;--tw-prose-bold:#f1f5f9;--tw-prose-counters:#94a3b8;--tw-prose-bullets:#7c889b;--tw-prose-hr:#2a374d;--tw-prose-quotes:#e2e8f0;--tw-prose-quote-borders:#36445c;--tw-prose-captions:#94a3b8;--tw-prose-code:#f1f5f9;--tw-prose-pre-code:#cbd5e1;--tw-prose-pre-bg:#0a0f1a;--tw-prose-th-borders:#36445c;--tw-prose-td-borders:#2a374d}
+.dark .prose :is(h1,h2,h3,h4,h5,h6,strong,b,th,dt){color:#f1f5f9 !important}
+.dark .prose :is(p,li,ul,ol,td,dd,figcaption,blockquote){color:#cbd5e1 !important}
+.dark .prose a{color:#4ade80 !important}
+.dark .prose [style*="color"]{color:inherit !important}
+.dark .prose [style*="background"]{background-color:transparent !important}
 .dark .prose table th,.dark .prose table td{border-color:#2a374d}
 .dark .prose table th,.dark .prose table tr:nth-child(even) td{background:#1a2335}
 .dark input:not([type=checkbox]):not([type=radio]):not([type=range]),.dark select,.dark textarea{color:#f1f5f9}
@@ -790,7 +795,7 @@ html.dark{color-scheme:dark}
 .dark .from-lime-100{--tw-gradient-from:rgb(132 204 22 / 0.16)}
 .dark .to-lime-100{--tw-gradient-to:rgb(132 204 22 / 0.16)}
 /* Logos: the EV Radar logo is dark green on a light background; brand logos are often dark on transparent */
-.dark img[src*="/images/logo"]{filter:invert(1) hue-rotate(180deg) brightness(1.1)}
+.dark img[src*="logo.png"]{filter:invert(1) hue-rotate(180deg) brightness(1.1)}
 .dark img[src*="brand-logos"]{background-color:#fff;border-radius:6px}
 /* Opt-out: keep a light surface (e.g. brand logos that are dark on transparent) */
 .dark .keep-light,.dark .keep-light *{color-scheme:light}
