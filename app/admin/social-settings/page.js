@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import MetaConnectPanel from "@/components/admin/MetaConnectPanel";
 import {
   CheckCircle2, AlertCircle, Loader2, Save,
   Eye, EyeOff, ToggleLeft, ToggleRight, ExternalLink,
@@ -260,6 +261,8 @@ export default function SocialSettingsPage() {
           Generate with: <code className="rounded bg-amber-100 px-1 font-mono">openssl rand -hex 32</code>
         </div>
       </div>
+
+      <MetaConnectPanel onConnected={fetchSettings} />
 
       {loading ? (
         <div className="flex items-center justify-center py-20 text-gray-400">

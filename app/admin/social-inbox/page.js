@@ -68,6 +68,12 @@ export default function SocialInboxPage() {
         <button onClick={refresh} className="flex items-center gap-1.5 rounded-xl border border-gray-200 px-3 py-2 text-xs font-bold text-gray-700"><RefreshCw size={13} className={loading ? "animate-spin" : ""} />Refresh</button>
       </div>
 
+      {data?.newEvents?.length > 0 && (
+        <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+          <b>{data.newEvents.length} new since your last visit:</b>
+          <ul className="mt-1 space-y-0.5 text-xs">{data.newEvents.slice(0, 5).map((e, i) => <li key={i}>{ICON[e.platform]} {e.kind}{e.sender ? ` from ${e.sender}` : ""}: {e.text?.slice(0, 100)}</li>)}</ul>
+        </div>
+      )}
       {data?.error && <p className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">{data.error} — <Link href="/admin/social-settings" className="font-bold underline">Social Settings</Link></p>}
 
       <div className="flex flex-wrap gap-2">

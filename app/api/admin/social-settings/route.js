@@ -72,7 +72,7 @@ export async function POST(request) {
     const existing = await SocialSettings.findOne({ platform }).lean();
     const existingCreds = existing?.credentials ?? {};
 
-    const updatedCreds = {};
+    const updatedCreds = { ...existingCreds };
     for (const field of CRED_FIELDS[platform] || []) {
       const incoming = credentials[field] ?? "";
       if (incoming === "" || incoming === "••••••••") {
