@@ -145,7 +145,7 @@ export default async function BlogPostPage({ params }) {
     "@type": "BlogPosting",
     headline: blog.title,
     description: blog.excerpt,
-    image: [blog.image],
+    image: [{ "@type": "ImageObject", url: blog.image, ...((blog.imageAiGenerated || blog.imageCredit) && { creditText: blog.imageAiGenerated ? "AI-generated illustration" : blog.imageCredit.replace(/^Image:\s*/i, "") }) }],
     datePublished: blog.publishedAt,
     dateModified: blog.updatedAt || blog.publishedAt,
     inLanguage: "en-IN",
@@ -247,16 +247,23 @@ export default async function BlogPostPage({ params }) {
           <ArticleAudioPlayer title={blog.title} content={blog.content} />
 
           {/* Hero Image */}
-          <div className="relative my-8 h-[250px] overflow-hidden rounded-2xl sm:h-[400px]">
-            <Image
-              src={blog.image}
-              alt={blog.title}
-              fill
-              className="object-cover"
-              priority
-              sizes="(max-width: 768px) 100vw, 800px"
-            />
-          </div>
+          <figure className="my-8">
+            <div className="relative h-[250px] overflow-hidden rounded-2xl sm:h-[400px]">
+              <Image
+                src={blog.image}
+                alt={blog.imageAlt || blog.title}
+                fill
+                className="object-cover"
+                priority
+                sizes="(max-width: 768px) 100vw, 800px"
+              />
+            </div>
+            {(blog.imageAiGenerated || blog.imageCredit) && (
+              <figcaption className="mt-1.5 text-right text-[11px] text-gray-500">
+                {blog.imageAiGenerated ? "Illustration (AI-generated)" : blog.imageCredit}
+              </figcaption>
+            )}
+          </figure>
 
           {/* In-article Ad */}
           <AdBannerInArticle slot="1253319567" />

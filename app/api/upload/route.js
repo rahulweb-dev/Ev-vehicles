@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
 import { uploadToImageKit } from "@/lib/imagekit";
+import { detectAiImage } from "@/lib/aiImage";
 
 export const dynamic = "force-dynamic";
 
@@ -53,6 +54,8 @@ export async function POST(request) {
 
     const rawBuffer = Buffer.from(bytes);
     const mimeType  = file.type || "image/jpeg";
+    // Check the ORIGINAL file for AI-generation provenance before it is re-encoded
+    const ai = detectAiImage(rawBuffer);
 
     // Optimize: resize + re-encode as WebP
     const optimized = await optimizeImage(rawBuffer, mimeType);
@@ -68,6 +71,8 @@ export async function POST(request) {
       originalSize:  rawBuffer.byteLength,
       optimizedSize: optimized.byteLength,
       savings: `${Math.round((1 - optimized.byteLength / rawBuffer.byteLength) * 100)}%`,
+      aiGenerated: ai.aiGenerated,
+      aiVendor: ai.vendor,
     });
   } catch (error) {
     console.error("[Upload]", error);

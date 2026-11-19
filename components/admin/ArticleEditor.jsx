@@ -71,6 +71,8 @@ export default function ArticleEditor({ initialData = null }) {
     content: initialData?.content || "",
     image: initialData?.image || "",
     imageAlt: initialData?.imageAlt || "",
+    imageCredit: initialData?.imageCredit || "",
+    imageAiGenerated: initialData?.imageAiGenerated || false,
     category: initialData?.category || "cars",
     author: initialData?.author || "EV News India Team",
     tags: initialData?.tags || [],
@@ -172,8 +174,10 @@ export default function ArticleEditor({ initialData = null }) {
       const res = await fetch("/api/upload", { method: "POST", body: fd });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Upload failed");
-      setForm((f) => ({ ...f, image: data.url, imageAlt: f.imageAlt || f.title }));
-      showToast("Featured image uploaded ✓");
+      setForm((f) => ({ ...f, image: data.url, imageAlt: f.imageAlt || f.title, imageAiGenerated: !!data.aiGenerated, ...(data.aiGenerated && { imageCredit: "" }) }));
+      showToast(data.aiGenerated
+        ? `Uploaded — this image is AI-generated${data.aiVendor ? ` (${data.aiVendor})` : ""}, so it will be labelled "Illustration (AI-generated)". Use an official photo for news about a real vehicle.`
+        : "Featured image uploaded ✓", data.aiGenerated ? "error" : "success");
     } catch (err) {
       showToast(err.message, "error");
     } finally {
@@ -457,6 +461,22 @@ export default function ArticleEditor({ initialData = null }) {
                 placeholder="Alt text for accessibility"
                 className={`mt-2 ${INPUT}`}
               />
+            )}
+            {form.image && (
+              <input
+                type="text"
+                value={form.imageCredit}
+                onChange={(e) => set("imageCredit", e.target.value)}
+                placeholder="Image credit, e.g. Image: Tata Motors"
+                disabled={form.imageAiGenerated}
+                className={`mt-2 ${INPUT} disabled:opacity-50`}
+              />
+            )}
+            {form.image && (
+              <label className={`mt-2 flex items-start gap-2 rounded-lg border px-3 py-2 text-xs ${form.imageAiGenerated ? "border-amber-300 bg-amber-50 text-amber-800" : "border-gray-200 text-gray-600"}`}>
+                <input type="checkbox" checked={form.imageAiGenerated} onChange={(e) => set("imageAiGenerated", e.target.checked)} className="mt-0.5 accent-amber-600" />
+                <span><b>AI-generated illustration</b> — shows “Illustration (AI-generated)” under the image. Detected automatically on upload.</span>
+              </label>
             )}
 
             {/* Image size guidelines */}

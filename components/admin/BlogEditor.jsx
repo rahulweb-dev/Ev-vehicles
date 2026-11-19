@@ -29,7 +29,7 @@ function slugify(text) {
 
 const EMPTY = {
   title: "", slug: "", excerpt: "", content: "",
-  image: "", imageAlt: "", category: "guides",
+  image: "", imageAlt: "", imageCredit: "", imageAiGenerated: false, category: "guides",
   author: "EVRadar Team", tags: "", readTime: "5 min",
   featured: false, status: "draft",
   metaTitle: "", metaDescription: "",
@@ -79,8 +79,11 @@ export default function BlogEditor({ mode = "new", blogId }) {
       fd.append("file", file);
       const res  = await fetch("/api/upload", { method: "POST", body: fd });
       const data = await res.json();
-      if (data.url) set("image", data.url);
-      else setError("Image upload failed");
+      if (data.url) {
+        set("image", data.url);
+        set("imageAiGenerated", !!data.aiGenerated);
+        if (data.aiGenerated) setError(`This image is AI-generated${data.aiVendor ? ` (${data.aiVendor})` : ""}. It will be labelled "Illustration (AI-generated)" — use an official photo where you can.`);
+      } else setError("Image upload failed");
     } catch { setError("Image upload failed"); }
     setUploading(false);
   }
@@ -355,6 +358,17 @@ export default function BlogEditor({ mode = "new", blogId }) {
               <input type="text" value={form.imageAlt} onChange={e => set("imageAlt", e.target.value)}
                 placeholder="Alt text for image"
                 className="mt-2 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs focus:border-green-400 focus:outline-none" />
+            )}
+            {form.image && (
+              <input type="text" value={form.imageCredit} onChange={e => set("imageCredit", e.target.value)}
+                placeholder="Image credit, e.g. Image: Tata Motors" disabled={form.imageAiGenerated}
+                className="mt-2 w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs focus:border-green-400 focus:outline-none disabled:opacity-50" />
+            )}
+            {form.image && (
+              <label className={`mt-2 flex items-start gap-2 rounded-xl border px-3 py-2 text-xs ${form.imageAiGenerated ? "border-amber-300 bg-amber-50 text-amber-800" : "border-gray-200 text-gray-600"}`}>
+                <input type="checkbox" checked={!!form.imageAiGenerated} onChange={e => set("imageAiGenerated", e.target.checked)} className="mt-0.5 accent-amber-600" />
+                <span><b>AI-generated illustration</b> — shows “Illustration (AI-generated)” under the image.</span>
+              </label>
             )}
             <div className="mt-2">
               <input type="text" value={form.image} onChange={e => set("image", e.target.value)}

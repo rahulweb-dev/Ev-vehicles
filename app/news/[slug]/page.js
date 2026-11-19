@@ -198,7 +198,7 @@ export default async function ArticlePage({ params }) {
     "@type": "NewsArticle",
     headline: article.title,
     description: article.excerpt,
-    image: [articleImage],
+    image: [{ "@type": "ImageObject", url: articleImage, ...((article.imageAiGenerated || article.imageCredit) && { creditText: article.imageAiGenerated ? "AI-generated illustration" : article.imageCredit.replace(/^Image:\s*/i, "") }) }],
     url: `${SITE_URL}/news/${slug}`,
     datePublished: article.publishedAt,
     dateModified: article.updatedAt || article.publishedAt,
@@ -352,15 +352,22 @@ export default async function ArticlePage({ params }) {
               {/* Audio Player */}
               <ArticleAudioPlayer title={article.title} content={article.content} />
 
-              <div className="relative my-6 w-full aspect-video overflow-hidden rounded-xl sm:rounded-2xl bg-gray-100">
-                <ArticleImage
-                  src={article.image}
-                  fallbackSrc="/images/og-default.jpg"
-                  alt={article.imageAlt || article.title}
-                  className="absolute inset-0 h-full w-full object-cover"
-                  priority
-                />
-              </div>
+              <figure className="my-6">
+                <div className="relative w-full aspect-video overflow-hidden rounded-xl sm:rounded-2xl bg-gray-100">
+                  <ArticleImage
+                    src={article.image}
+                    fallbackSrc="/images/og-default.jpg"
+                    alt={article.imageAlt || article.title}
+                    className="absolute inset-0 h-full w-full object-cover"
+                    priority
+                  />
+                </div>
+                {(article.imageAiGenerated || article.imageCredit) && (
+                  <figcaption className="mt-1.5 text-right text-[11px] text-gray-500">
+                    {article.imageAiGenerated ? "Illustration (AI-generated)" : article.imageCredit}
+                  </figcaption>
+                )}
+              </figure>
 
               <AdBannerInArticle slot="1253319567" />
 
