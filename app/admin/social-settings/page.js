@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import MetaConnectPanel from "@/components/admin/MetaConnectPanel";
 import InstagramConnectPanel from "@/components/admin/InstagramConnectPanel";
+import PinterestConnectPanel from "@/components/admin/PinterestConnectPanel";
 import {
   CheckCircle2, AlertCircle, Loader2, Save,
   Eye, EyeOff, ToggleLeft, ToggleRight, ExternalLink,
@@ -51,10 +52,10 @@ const PLATFORMS = [
     label: "Pinterest Board",
     emoji: "📌",
     color: "red",
-    docs:  "https://developers.pinterest.com/tools/oauth-token",
+    docs:  "https://developers.pinterest.com/apps/",
     fields: [
-      { key: "accessToken", label: "Access Token", hint: "OAuth token — must have scopes: pins:read, pins:write, boards:read", secret: true },
-      { key: "boardId",     label: "Board ID",     hint: "Numeric board ID (get from developers.pinterest.com/tools/oauth-token → GET /boards)" },
+      { key: "clientId",     label: "App ID",     hint: "developers.pinterest.com → My apps → your app → App ID" },
+      { key: "clientSecret", label: "App secret", hint: "Same page → App secret key → Show", secret: true },
     ],
   },
   {
@@ -75,7 +76,7 @@ const INPUT = "w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-
 function PlatformCard({ platform, serverData, onSave }) {
   const [enabled,   setEnabled]   = useState(serverData?.enabled ?? false);
   const [autoPost,  setAutoPost]  = useState(serverData?.autoPost ?? false);
-  const supportsAutoPost = ["facebook", "instagram"].includes(platform.id);
+  const supportsAutoPost = ["facebook", "instagram", "pinterest"].includes(platform.id);
   const [creds,     setCreds]     = useState(() => {
     const out = {};
     platform.fields.forEach(f => { out[f.key] = ""; });
@@ -270,6 +271,7 @@ export default function SocialSettingsPage() {
 
       <MetaConnectPanel onConnected={fetchSettings} />
       <InstagramConnectPanel onChange={fetchSettings} />
+      <PinterestConnectPanel onChange={fetchSettings} />
 
       {loading ? (
         <div className="flex items-center justify-center py-20 text-gray-400">

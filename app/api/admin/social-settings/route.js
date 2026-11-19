@@ -12,7 +12,7 @@ const CRED_FIELDS = {
   facebook:  ["appId", "appSecret", "accessToken", "pageId"],
   instagram: ["igAppId", "igAppSecret"], // Instagram Login app credentials; the account itself connects via OAuth
   linkedin:  ["clientId", "clientSecret", "accessToken", "companyUrn"],
-  pinterest: ["accessToken", "boardId"],
+  pinterest: ["clientId", "clientSecret"], // App credentials; the account connects via "Connect Pinterest"
   telegram:  ["botToken", "channelId"],
 };
 

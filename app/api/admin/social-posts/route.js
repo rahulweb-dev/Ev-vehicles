@@ -17,13 +17,14 @@ export async function GET(request) {
   // Show queued posts for scheduled articles straight away (the cron also does this every 15 min)
   await syncScheduledContent().catch((e) => console.error("[social sync]", e.message));
   const q = status === "all" ? { owner: null } : status === "failed" ? { owner: null, status: { $in: ["failed", "partial"] } } : { owner: null, status };
+  const pin = await (await import("@/lib/social/pinterestApi")).getPinterestConfig();
   const [posts, cfg] = await Promise.all([
     SocialPost.find(q).sort({ scheduledAt: -1, createdAt: -1 }).limit(200).lean(),
     getMetaConfig(),
   ]);
   return NextResponse.json({
     posts,
-    connected: { facebook: !!(cfg.pageToken && cfg.pageId && cfg.facebook.enabled), instagram: !!(cfg.ig.token && cfg.igUserId && cfg.instagram.enabled) },
+    connected: { facebook: !!(cfg.pageToken && cfg.pageId && cfg.facebook.enabled), instagram: !!(cfg.ig.token && cfg.igUserId && cfg.instagram.enabled), pinterest: pin.connected && pin.enabled },
   });
 }
 
@@ -32,8 +33,9 @@ export async function POST(request) {
   await dbConnect();
   if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const b = await request.json();
-  const platforms = (b.platforms || []).filter((p) => ["facebook", "instagram"].includes(p));
-  if (!platforms.length) return NextResponse.json({ error: "Choose Facebook and/or Instagram" }, { status: 400 });
+  const platforms = (b.platforms || []).filter((p) => ["facebook", "instagram", "pinterest"].includes(p));
+  if (!platforms.length) return NextResponse.json({ error: "Choose at least one platform" }, { status: 400 });
+  if (platforms.includes("pinterest") && !b.imageUrl) return NextResponse.json({ error: "Pinterest pins need an image" }, { status: 400 });
   if (!String(b.message || "").trim() && !b.imageUrl) return NextResponse.json({ error: "Write a message or add an image" }, { status: 400 });
   if (platforms.includes("instagram") && !b.imageUrl) return NextResponse.json({ error: "Instagram posts need an image" }, { status: 400 });
   const when = b.publishNow ? new Date() : b.scheduledAt ? new Date(b.scheduledAt) : null;

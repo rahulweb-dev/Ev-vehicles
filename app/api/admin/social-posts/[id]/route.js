@@ -24,7 +24,7 @@ export async function PATCH(request, { params }) {
   if (["published", "publishing"].includes(post.status)) return NextResponse.json({ error: "Already published" }, { status: 409 });
   const b = await request.json();
   for (const k of ["message", "igCaption", "link", "imageUrl"]) if (typeof b[k] === "string") post[k] = b[k];
-  if (Array.isArray(b.platforms)) post.platforms = b.platforms.filter((p) => ["facebook", "instagram"].includes(p));
+  if (Array.isArray(b.platforms)) post.platforms = b.platforms.filter((p) => ["facebook", "instagram", "pinterest"].includes(p));
   if (b.scheduledAt) { post.scheduledAt = new Date(b.scheduledAt); post.status = "scheduled"; }
   await post.save();
   return NextResponse.json({ success: true, post });

@@ -12,7 +12,7 @@ const STATUS = {
   failed: { label: "Failed", cls: "bg-red-100 text-red-700" },
   draft: { label: "Draft", cls: "bg-gray-100 text-gray-600" },
 };
-const PLAT = { facebook: { label: "Facebook", emoji: "📘" }, instagram: { label: "Instagram", emoji: "📸" } };
+const PLAT = { facebook: { label: "Facebook", emoji: "📘" }, instagram: { label: "Instagram", emoji: "📸" }, pinterest: { label: "Pinterest", emoji: "📌" } };
 
 // <input type="datetime-local"> wants local time "YYYY-MM-DDTHH:mm"
 const localInput = (d) => { const x = new Date(d.getTime() - d.getTimezoneOffset() * 60000); return x.toISOString().slice(0, 16); };
@@ -79,7 +79,7 @@ export default function SocialSchedulerPage() {
   }
 
   const igLen = (sameCaption ? form.message : form.igCaption).length;
-  const notConnected = ["facebook", "instagram"].filter((p) => data.connected && data.connected[p] === false);
+  const notConnected = ["facebook", "instagram", "pinterest"].filter((p) => data.connected && data.connected[p] === false);
 
   return (
     <div className="space-y-6 px-4 pb-10 pt-20 sm:px-6 lg:px-8 lg:pt-8">
@@ -157,6 +157,8 @@ export default function SocialSchedulerPage() {
                   {p.platforms.includes("facebook") && p.fbImageUrl && <a href={p.fbImageUrl} target="_blank" rel="noreferrer" title="Facebook image 1200×630"><img src={p.fbImageUrl} alt="Facebook image" className="h-20 w-[152px] rounded-lg object-cover" /></a>}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   {p.platforms.includes("instagram") && p.igImageUrl && <a href={p.igImageUrl} target="_blank" rel="noreferrer" title="Instagram card 1080×1350"><img src={p.igImageUrl} alt="Instagram card" className="h-20 w-16 rounded-lg object-cover" /></a>}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  {p.platforms.includes("pinterest") && p.pinImageUrl && <a href={p.pinImageUrl} target="_blank" rel="noreferrer" title="Pinterest pin 1000×1500"><img src={p.pinImageUrl} alt="Pinterest pin" className="h-20 w-[54px] rounded-lg object-cover" /></a>}
                 </div>
               ) : p.imageUrl ? <img src={`${p.imageUrl.split("?")[0]}?tr=w-160`} alt="" className="h-20 w-20 shrink-0 rounded-lg object-cover" /> : <div className="h-20 w-20 shrink-0 rounded-lg bg-gray-100" />}
               <div className="min-w-0 flex-1">

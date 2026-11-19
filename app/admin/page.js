@@ -8,7 +8,7 @@ import {
   Database, RefreshCw, Monitor, Smartphone, Tablet, Activity, CalendarClock, Sparkles, BookOpen, Image as ImageIcon,
   Radio, Send, Globe, PenSquare, Gauge, TrendingUp, CircleCheck, Rocket, ChevronRight,
 } from "lucide-react";
-import { FaFacebook, FaInstagram } from "react-icons/fa6";
+import { FaFacebook, FaInstagram, FaPinterest } from "react-icons/fa6";
 import { getPusherClient } from "@/lib/pusherClient";
 import ArticleImage from "@/components/news/ArticleImage";
 import { Card, CardHeader, CountUp, Delta, Sparkline, AreaChart, Donut, Ring, Bar, Skeleton } from "@/components/admin/dashboard/ui";
@@ -133,7 +133,7 @@ function TrafficCard({ pv, loading, onRefresh, refreshing }) {
 /* ─── Social automation ────────────────────────────────────────────── */
 function SocialCard({ social, i }) {
   const queue = (social?.posts || []).filter((p) => p.status === "scheduled").sort((a, b) => new Date(a.scheduledAt) - new Date(b.scheduledAt));
-  const fb = social?.connected?.facebook, ig = social?.connected?.instagram;
+  const fb = social?.connected?.facebook, ig = social?.connected?.instagram, pn = social?.connected?.pinterest;
   return (
     <Card i={i} className="overflow-hidden">
       <div className="relative bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950 px-5 pb-5 pt-5 text-white">
@@ -145,8 +145,8 @@ function SocialCard({ social, i }) {
           </div>
           <Link href="/admin/social-scheduler" className="flex items-center gap-1 rounded-lg bg-white/10 px-2.5 py-1.5 text-xs font-semibold ring-1 ring-white/15 transition hover:bg-white/20">Open <ArrowUpRight size={13} /></Link>
         </div>
-        <div className="relative mt-4 grid grid-cols-3 gap-2">
-          {[[FaFacebook, "Facebook", fb, "text-[#1877F2]"], [FaInstagram, "Instagram", ig, "text-[#E4405F]"]].map(([I, l, on, c]) => (
+        <div className="relative mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {[[FaFacebook, "Facebook", fb, "text-[#1877F2]"], [FaInstagram, "Instagram", ig, "text-[#E4405F]"], [FaPinterest, "Pinterest", pn, "text-[#E60023]"]].map(([I, l, on, c]) => (
             <div key={l} className="flex items-center gap-2 rounded-xl bg-white/[0.06] px-3 py-2.5 ring-1 ring-white/10">
               <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white"><I className={c} size={15} /></span>
               <div className="min-w-0"><p className="truncate text-xs font-semibold">{l}</p>
@@ -168,7 +168,7 @@ function SocialCard({ social, i }) {
                   <p className="truncate text-[13px] font-medium text-slate-800">{(p.message || "").replace(/^⚡\s*/, "").split("\n")[0]}</p>
                   <p className="flex items-center gap-1.5 text-[11px] text-slate-400"><Clock size={11} />{fmtWhen(p.scheduledAt)}</p>
                 </div>
-                <span className="flex shrink-0 gap-1 text-sm">{p.platforms?.includes("facebook") && <FaFacebook className="text-[#1877F2]" />}{p.platforms?.includes("instagram") && <FaInstagram className="text-[#E4405F]" />}</span>
+                <span className="flex shrink-0 gap-1 text-sm">{p.platforms?.includes("facebook") && <FaFacebook className="text-[#1877F2]" />}{p.platforms?.includes("instagram") && <FaInstagram className="text-[#E4405F]" />}{p.platforms?.includes("pinterest") && <FaPinterest className="text-[#E60023]" />}</span>
               </li>
             ))}
           </ul>
