@@ -21,7 +21,7 @@ export async function GET(request) {
   ]);
   return NextResponse.json({
     posts,
-    connected: { facebook: !!(cfg.pageToken && cfg.pageId && cfg.facebook.enabled), instagram: !!(cfg.pageToken && cfg.igUserId && cfg.instagram.enabled) },
+    connected: { facebook: !!(cfg.pageToken && cfg.pageId && cfg.facebook.enabled), instagram: !!(cfg.ig.token && cfg.igUserId && cfg.instagram.enabled) },
   });
 }
 

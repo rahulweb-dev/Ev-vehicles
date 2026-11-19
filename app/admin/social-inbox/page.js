@@ -55,7 +55,7 @@ export default function SocialInboxPage() {
   }
 
   const list = (data?.[tab] || []).filter((x) => platform === "all" || x.platform === platform);
-  const errs = Object.entries(data?.errors || {}).filter(([k, v]) => v && v !== "Instagram not connected" && (tab === "messages" ? k.endsWith("Messages") : k.endsWith("Comments")));
+  const errs = Object.entries(data?.errors || {}).filter(([k, v]) => v && v !== "Instagram not connected" && v !== "Facebook not connected" && (tab === "messages" ? k.endsWith("Messages") : k.endsWith("Comments")));
   const conv = tab === "messages" && open ? list.find((c) => c.id === open) : null;
 
   return (

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import MetaConnectPanel from "@/components/admin/MetaConnectPanel";
+import InstagramConnectPanel from "@/components/admin/InstagramConnectPanel";
 import {
   CheckCircle2, AlertCircle, Loader2, Save,
   Eye, EyeOff, ToggleLeft, ToggleRight, ExternalLink,
@@ -28,7 +29,8 @@ const PLATFORMS = [
     color: "pink",
     docs:  "https://developers.facebook.com/docs/instagram-platform/content-publishing",
     fields: [
-      { key: "igUserId", label: "Instagram Account ID", hint: "Numeric ID of the Instagram professional account linked to your Facebook Page. Posting uses the Facebook Page Access Token above." },
+      { key: "igAppId", label: "Instagram App ID", hint: "Meta app → Instagram → API setup with Instagram login → Instagram app ID (different from the Facebook App ID)" },
+      { key: "igAppSecret", label: "Instagram App Secret", hint: "Same screen → Instagram app secret → Show", secret: true },
     ],
   },
   {
@@ -267,6 +269,7 @@ export default function SocialSettingsPage() {
       </div>
 
       <MetaConnectPanel onConnected={fetchSettings} />
+      <InstagramConnectPanel onChange={fetchSettings} />
 
       {loading ? (
         <div className="flex items-center justify-center py-20 text-gray-400">

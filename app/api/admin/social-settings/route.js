@@ -10,7 +10,7 @@ const PLATFORMS = ["facebook", "instagram", "linkedin", "pinterest", "telegram"]
 // Credential fields per platform (used for masking returned to UI)
 const CRED_FIELDS = {
   facebook:  ["appId", "appSecret", "accessToken", "pageId"],
-  instagram: ["igUserId"], // posts with the Facebook Page access token
+  instagram: ["igAppId", "igAppSecret"], // Instagram Login app credentials; the account itself connects via OAuth
   linkedin:  ["clientId", "clientSecret", "accessToken", "companyUrn"],
   pinterest: ["accessToken", "boardId"],
   telegram:  ["botToken", "channelId"],

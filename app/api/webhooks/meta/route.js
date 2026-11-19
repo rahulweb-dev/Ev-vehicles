@@ -2,6 +2,7 @@ import { NextResponse, after } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import SocialEvent from "@/lib/models/SocialEvent";
 import { getAppCreds, getFacebookDoc, validSignature, webhookVerifyToken, SITE_URL } from "@/lib/social/metaAuth";
+import { getIgAppCreds, igWebhookVerifyToken } from "@/lib/social/instagramAuth";
 import { decrypt } from "@/lib/encrypt";
 import { sendMail } from "@/lib/mailer";
 import { escapeHtml } from "@/lib/sanitize";
@@ -11,9 +12,10 @@ import { escapeHtml } from "@/lib/sanitize";
 
 export async function GET(request) {
   const sp = new URL(request.url).searchParams;
-  const { appSecret } = await getAppCreds();
-  const expected = webhookVerifyToken(appSecret);
-  if (sp.get("hub.mode") === "subscribe" && expected && sp.get("hub.verify_token") === expected) {
+  const [{ appSecret }, { igAppSecret }] = await Promise.all([getAppCreds(), getIgAppCreds()]);
+  // Facebook product webhooks use the token from the App Secret; Instagram Login webhooks the one from the Instagram App Secret
+  const accepted = [webhookVerifyToken(appSecret), igWebhookVerifyToken(igAppSecret)].filter(Boolean);
+  if (sp.get("hub.mode") === "subscribe" && accepted.includes(sp.get("hub.verify_token"))) {
     return new NextResponse(sp.get("hub.challenge") || "", { status: 200, headers: { "Content-Type": "text/plain" } });
   }
   return new NextResponse("Forbidden", { status: 403 });
@@ -42,8 +44,9 @@ function parseEvents(body, ownIds) {
 
 export async function POST(request) {
   const raw = await request.text();
-  const { appSecret } = await getAppCreds();
-  if (!validSignature(raw, request.headers.get("x-hub-signature-256"), appSecret)) {
+  const [{ appSecret }, { igAppSecret }] = await Promise.all([getAppCreds(), getIgAppCreds()]);
+  const sig = request.headers.get("x-hub-signature-256");
+  if (!validSignature(raw, sig, appSecret) && !validSignature(raw, sig, igAppSecret)) {
     return new NextResponse("Invalid signature", { status: 401 });
   }
   let body; try { body = JSON.parse(raw); } catch { return new NextResponse("Bad JSON", { status: 400 }); }

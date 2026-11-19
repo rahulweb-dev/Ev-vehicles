@@ -18,29 +18,36 @@ export async function GET() {
   await dbConnect();
   if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const cfg = await getMetaConfig();
-  if (!cfg.pageToken || !cfg.pageId) return NextResponse.json({ error: "Connect Facebook in Admin → Social Settings first", sections: {} });
+  const hasFb = !!(cfg.pageToken && cfg.pageId);
+  const hasIg = !!(cfg.igUserId && cfg.ig.token);
+  if (!hasFb && !hasIg) return NextResponse.json({ error: "Connect Facebook or Instagram in Admin → Social Settings first", sections: {} });
   const t = cfg.pageToken;
+  const igOpts = { token: cfg.ig.token, base: cfg.ig.base };
+  // Instagram DMs: via the linked Page, or directly on the Instagram account with Instagram Login
+  const igLogin = cfg.ig.mode === "instagram-login";
+  const igConvPath = igLogin ? "me/conversations" : `${cfg.pageId}/conversations`;
+  const noFb = { items: [], error: "Facebook not connected" };
   const convFields = "id,updated_time,unread_count,participants,messages.limit(15){id,message,from,created_time}";
   const mapConv = (platform) => (c) => {
     const msgs = (c.messages?.data || []).slice().reverse();
-    const customer = (c.participants?.data || []).find((p) => p.id !== cfg.pageId && p.id !== cfg.igUserId) || {};
+    const customer = (c.participants?.data || c.participants || []).find((p) => p.id !== cfg.pageId && p.id !== cfg.igUserId) || {};
     return { id: c.id, platform, updatedAt: c.updated_time, unread: c.unread_count || 0, customer: { id: customer.id, name: customer.name || customer.username || "Customer" },
       messages: msgs.map((m) => ({ id: m.id, text: m.message || "", fromMe: m.from?.id === cfg.pageId || m.from?.id === cfg.igUserId, at: m.created_time })) };
   };
 
   const [fbMessages, igMessages, fbComments, igComments] = await Promise.all([
-    section(async () => (await graph(`${cfg.pageId}/conversations`, { token: t, params: { fields: convFields, limit: 25 } })).data.map(mapConv("facebook"))),
-    cfg.igUserId
-      ? section(async () => (await graph(`${cfg.pageId}/conversations`, { token: t, params: { platform: "instagram", fields: convFields, limit: 25 } })).data.map(mapConv("instagram")))
+    hasFb ? section(async () => (await graph(`${cfg.pageId}/conversations`, { token: t, params: { fields: convFields, limit: 25 } })).data.map(mapConv("facebook"))) : noFb,
+    hasIg
+      ? section(async () => (await graph(igConvPath, { ...igOpts, params: { platform: "instagram", fields: igLogin ? convFields.replace("unread_count,", "") : convFields, limit: 25 } })).data.map(mapConv("instagram")))
       : { items: [], error: "Instagram not connected" },
-    section(async () => {
+    !hasFb ? noFb : section(async () => {
       const posts = (await graph(`${cfg.pageId}/posts`, { token: t, params: { fields: "id,message,permalink_url,created_time,comments.limit(25).order(reverse_chronological){id,message,from,created_time,comment_count}", limit: 10 } })).data;
       return posts.flatMap((p) => (p.comments?.data || []).map((c) => ({ id: c.id, platform: "facebook", text: c.message, author: c.from?.name || "Someone", fromMe: c.from?.id === cfg.pageId, at: c.created_time, replies: c.comment_count || 0,
         post: { id: p.id, text: (p.message || "").slice(0, 120), url: p.permalink_url } })));
     }),
-    cfg.igUserId
+    hasIg
       ? section(async () => {
-        const media = (await graph(`${cfg.igUserId}/media`, { token: t, params: { fields: "id,caption,permalink,timestamp,comments.limit(25){id,text,username,timestamp,replies{id}}", limit: 10 } })).data;
+        const media = (await graph(`${cfg.igUserId}/media`, { ...igOpts, params: { fields: "id,caption,permalink,timestamp,comments.limit(25){id,text,username,timestamp,replies{id}}", limit: 10 } })).data;
         return media.flatMap((m) => (m.comments?.data || []).map((c) => ({ id: c.id, platform: "instagram", text: c.text, author: c.username ? `@${c.username}` : "Someone", fromMe: false, at: c.timestamp, replies: c.replies?.data?.length || 0,
           post: { id: m.id, text: (m.caption || "").slice(0, 120), url: m.permalink } })));
       })
@@ -68,14 +75,15 @@ export async function POST(request) {
   const text = String(b.text || "").trim().slice(0, 2000);
   if (!text) return NextResponse.json({ error: "Write a reply" }, { status: 400 });
   try {
+    const igLogin = b.platform === "instagram" && cfg.ig.mode === "instagram-login";
     if (b.type === "message") {
-      // Facebook and Instagram DMs both go through the Page's /messages endpoint (24-hour reply window)
-      const r = await graph(`${cfg.pageId}/messages`, { method: "POST", token: cfg.pageToken, params: { recipient: { id: b.recipientId }, message: { text }, messaging_type: "RESPONSE" } });
+      // DMs go through the Page's /messages endpoint, or the Instagram account's own endpoint with Instagram Login (24-hour window)
+      const r = await graph(igLogin ? `${cfg.igUserId}/messages` : `${cfg.pageId}/messages`, { method: "POST", ...(igLogin ? { token: cfg.ig.token, base: cfg.ig.base } : { token: cfg.pageToken }), params: { recipient: { id: b.recipientId }, message: { text }, messaging_type: "RESPONSE" } });
       return NextResponse.json({ success: true, id: r.message_id });
     }
     if (b.type === "comment") {
       const path = b.platform === "instagram" ? `${b.commentId}/replies` : `${b.commentId}/comments`;
-      const r = await graph(path, { method: "POST", token: cfg.pageToken, params: { message: text } });
+      const r = await graph(path, { method: "POST", ...(b.platform === "instagram" ? { token: cfg.ig.token, base: cfg.ig.base } : { token: cfg.pageToken }), params: { message: text } });
       return NextResponse.json({ success: true, id: r.id });
     }
     return NextResponse.json({ error: "Unknown reply type" }, { status: 400 });
