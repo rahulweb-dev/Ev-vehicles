@@ -1,34 +1,45 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { getAuthUser, verifyToken } from "@/lib/auth";
+import { requireAuth, verifyToken } from "@/lib/auth";
 import { encrypt } from "@/lib/encrypt";
 import { getAppCreds, exchangeCode, listPages, SITE_URL } from "@/lib/social/metaAuth";
 
-// GET /api/admin/social/meta/callback?code=..&state=.. — Facebook redirects here after login
-export async function GET(request) {
-  const back = (q) => NextResponse.redirect(`${SITE_URL}/admin/social-settings?meta=${q}`);
-  const user = await getAuthUser();
-  if (!user || user.role !== "admin") return NextResponse.redirect(`${SITE_URL}/admin/login`);
+export const maxDuration = 60;
 
+// GET /api/admin/social/meta/callback?code=..&state=.. — Facebook redirects here after login.
+// state.target "site" = the site's own Page (admin), "account" = the user's own Pages (My Social).
+export async function GET(request) {
   const sp = new URL(request.url).searchParams;
-  if (sp.get("error")) return back("denied");
   const state = sp.get("state") || "";
-  const jar = await cookies();
-  const cookieState = jar.get("meta_oauth_state")?.value;
   const payload = verifyToken(state);
-  if (!state || state !== cookieState || payload?.purpose !== "meta-oauth") return back("bad-state");
+  const forAccount = payload?.target === "account";
+  const base = forAccount ? "/admin/my-social" : "/admin/social-settings";
+  const back = (q) => NextResponse.redirect(`${SITE_URL}${base}?meta=${q}`);
+
+  const user = (await requireAuth()).user;
+  if (!user || (!forAccount && user.role !== "admin")) return NextResponse.redirect(`${SITE_URL}/admin/login`);
+  if (sp.get("error")) return back("denied");
+  const cookieState = (await cookies()).get("meta_oauth_state")?.value;
+  if (!state || state !== cookieState || payload?.purpose !== "meta-oauth" || payload.uid !== String(user.id || "")) return back("bad-state");
 
   try {
     const creds = await getAppCreds();
     const userToken = await exchangeCode(sp.get("code"), creds);
-    const pages = await listPages(userToken);
     const dbConnect = (await import("@/lib/mongodb")).default;
-    const SocialSettings = (await import("@/lib/models/SocialSettings")).default;
     await dbConnect();
-    const fb = await SocialSettings.findOne({ platform: "facebook" });
-    await SocialSettings.findOneAndUpdate({ platform: "facebook" },
-      { $set: { credentials: { ...(fb?.credentials?.toObject?.() || {}), userToken: encrypt(userToken) } } }, { upsert: true });
-    const res = back(pages.length ? "choose-page" : "no-pages");
+    let res;
+    if (forAccount) {
+      const { saveFacebookAccounts } = await import("@/lib/social/accounts");
+      const saved = await saveFacebookAccounts(user.id, userToken);
+      res = back(saved.length ? `connected&n=${saved.length}` : "no-pages");
+    } else {
+      const pages = await listPages(userToken);
+      const SocialSettings = (await import("@/lib/models/SocialSettings")).default;
+      const fb = await SocialSettings.findOne({ platform: "facebook" });
+      await SocialSettings.findOneAndUpdate({ platform: "facebook" },
+        { $set: { credentials: { ...(fb?.credentials?.toObject?.() || {}), userToken: encrypt(userToken) } } }, { upsert: true });
+      res = back(pages.length ? "choose-page" : "no-pages");
+    }
     res.cookies.delete("meta_oauth_state");
     return res;
   } catch (e) {

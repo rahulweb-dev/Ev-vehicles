@@ -56,7 +56,7 @@ export async function GET() {
 
   const byTime = (a, b) => new Date(b.updatedAt || b.at) - new Date(a.updatedAt || a.at);
   // Webhook events received since the inbox was last opened (then marked as seen)
-  const newEvents = await SocialEvent.find({ read: false }).sort({ createdAt: -1 }).limit(50).lean();
+  const newEvents = await SocialEvent.find({ read: false, owner: null }).sort({ createdAt: -1 }).limit(50).lean();
   if (newEvents.length) await SocialEvent.updateMany({ _id: { $in: newEvents.map((e) => e._id) } }, { $set: { read: true } });
   return NextResponse.json({
     newEvents: newEvents.map((e) => ({ platform: e.platform, kind: e.kind, text: e.text, sender: e.senderName || "", at: e.at })),

@@ -14,7 +14,7 @@ export async function GET(request) {
   await dbConnect();
   if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const status = new URL(request.url).searchParams.get("status") || "all";
-  const q = status === "all" ? {} : status === "failed" ? { status: { $in: ["failed", "partial"] } } : { status };
+  const q = status === "all" ? { owner: null } : status === "failed" ? { owner: null, status: { $in: ["failed", "partial"] } } : { owner: null, status };
   const [posts, cfg] = await Promise.all([
     SocialPost.find(q).sort({ scheduledAt: -1, createdAt: -1 }).limit(200).lean(),
     getMetaConfig(),

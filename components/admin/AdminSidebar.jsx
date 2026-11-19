@@ -123,6 +123,7 @@ const ADMIN_NAV = [
   { href: "/admin/social-scheduler",  label: "Social Scheduler",   icon: CalendarClock },
   { href: "/admin/social-inbox",      label: "Social Inbox",       icon: Inbox },
   { href: "/admin/social-settings",   label: "Social Settings",    icon: Share2 },
+  { href: "/admin/my-social",         label: "My Social",          icon: Share2 },
   { href: "/admin/social-report",     label: "Social Report",      icon: BarChart3 },
   { href: "/admin/authors",            label: "Authors",            icon: UserCircle },
   { href: "/admin/dealers",            label: "Dealers",            icon: Building2 },
@@ -132,6 +133,7 @@ const ADMIN_NAV = [
 
 const DEALER_NAV = [
   { href: "/admin/leads", label: "My Leads", icon: Users },
+  { href: "/admin/my-social", label: "My Social", icon: Share2 },
 ];
 
 export default function AdminSidebar() {

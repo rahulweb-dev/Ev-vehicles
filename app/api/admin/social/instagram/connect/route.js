@@ -1,16 +1,19 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
-import { getAuthUser, signToken } from "@/lib/auth";
+import { requireAuth, signToken } from "@/lib/auth";
 import { SITE_URL } from "@/lib/social/metaAuth";
 import { getIgAppCreds, IG_OAUTH_REDIRECT, IG_SCOPES } from "@/lib/social/instagramAuth";
 
-// GET /api/admin/social/instagram/connect — start "Connect Instagram" (Instagram Login)
-export async function GET() {
-  const user = await getAuthUser();
-  if (!user || user.role !== "admin") return NextResponse.redirect(`${SITE_URL}/admin/login`);
+// GET /api/admin/social/instagram/connect          — admin: the site's own Instagram
+// GET /api/admin/social/instagram/connect?for=me   — any logged-in user: their own Instagram (My Social)
+export async function GET(request) {
+  const forMe = new URL(request.url).searchParams.get("for") === "me";
+  const user = (await requireAuth()).user;
+  if (!user || (!forMe && user.role !== "admin")) return NextResponse.redirect(`${SITE_URL}/admin/login`);
+  const back = forMe ? "/admin/my-social" : "/admin/social-settings";
   const { igAppId, igAppSecret } = await getIgAppCreds();
-  if (!igAppId || !igAppSecret) return NextResponse.redirect(`${SITE_URL}/admin/social-settings?ig=missing-app`);
-  const state = signToken({ purpose: "ig-oauth", uid: String(user.id || user._id || user.email || ""), n: crypto.randomBytes(8).toString("hex") });
+  if (!igAppId || !igAppSecret) return NextResponse.redirect(`${SITE_URL}${back}?ig=missing-app`);
+  const state = signToken({ purpose: "ig-oauth", target: forMe ? "account" : "site", uid: String(user.id || ""), n: crypto.randomBytes(8).toString("hex") });
   const url = new URL("https://www.instagram.com/oauth/authorize");
   url.searchParams.set("enable_fb_login", "0");
   url.searchParams.set("force_authentication", "1");
