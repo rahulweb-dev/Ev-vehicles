@@ -3,6 +3,7 @@ import dbConnect         from "@/lib/mongodb";
 import SocialSettings    from "@/lib/models/SocialSettings";
 import { requireAuth }   from "@/lib/auth";
 import { encrypt, decrypt, isEncrypted } from "@/lib/encrypt";
+import { checkAppCreds } from "@/lib/social/metaAuth";
 
 const PLATFORMS = ["facebook", "instagram", "linkedin", "pinterest", "telegram"];
 
@@ -82,6 +83,13 @@ export async function POST(request) {
         // Encrypt and store the new value
         updatedCreds[field] = encrypt(incoming);
       }
+    }
+
+    // Facebook: refuse an App ID / App Secret pair that Meta doesn't accept (login and webhooks would silently fail)
+    const changed = (f) => credentials[f] && credentials[f] !== "••••••••";
+    if (platform === "facebook" && (changed("appId") || changed("appSecret"))) {
+      const problem = await checkAppCreds(decrypt(updatedCreds.appId || ""), decrypt(updatedCreds.appSecret || ""));
+      if (problem) return NextResponse.json({ error: problem }, { status: 400 });
     }
 
     const doc = await SocialSettings.findOneAndUpdate(

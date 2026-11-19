@@ -71,7 +71,8 @@ export default function MetaConnectPanel({ onConnected }) {
         </div>
         {data.appConfigured ? (
           <a href="/api/admin/social/meta/connect" className="flex items-center gap-2 rounded-xl bg-[#1877F2] px-4 py-2.5 text-sm font-bold text-white hover:opacity-90"><Link2 size={15} />{c ? "Reconnect / change Page" : "Connect with Facebook"}</a>
-        ) : <p className="max-w-xs rounded-xl bg-amber-50 p-3 text-xs text-amber-800">First enter your Meta <b>App ID</b> and <b>App Secret</b> in the Facebook Page card below and click Save.</p>}
+        ) : data.appError ? <p className="max-w-sm rounded-xl bg-red-50 p-3 text-xs text-red-700"><b>App Secret problem:</b> {data.appError} Paste the correct App Secret in the Facebook Page card below and click Save.</p>
+        : <p className="max-w-xs rounded-xl bg-amber-50 p-3 text-xs text-amber-800">First enter your Meta <b>App ID</b> and <b>App Secret</b> in the Facebook Page card below and click Save.</p>}
       </div>
 
       {note && <p className={`flex items-start gap-2 rounded-xl px-3 py-2 text-sm ${note.type === "err" ? "bg-red-50 text-red-700" : "bg-green-50 text-green-700"}`}>{note.type === "err" ? <AlertCircle size={15} className="mt-0.5 shrink-0" /> : <CheckCircle2 size={15} className="mt-0.5 shrink-0" />}{note.text}</p>}

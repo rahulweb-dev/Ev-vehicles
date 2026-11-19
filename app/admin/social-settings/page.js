@@ -172,6 +172,10 @@ function PlatformCard({ platform, serverData, onSave }) {
             <div className="relative">
               <input
                 type={secret && !show[key] ? "password" : "text"}
+                autoComplete={secret ? "new-password" : "off"}
+                name={`social-${key}`}
+                data-1p-ignore
+                data-lpignore="true"
                 value={creds[key]}
                 onChange={(e) => setField(key, e.target.value)}
                 placeholder={

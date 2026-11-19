@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/auth";
-import { getAppCreds, listPages, connectPage, getFacebookDoc, webhookVerifyToken, OAUTH_REDIRECT, WEBHOOK_URL } from "@/lib/social/metaAuth";
+import { getAppCreds, checkAppCreds, listPages, connectPage, getFacebookDoc, webhookVerifyToken, OAUTH_REDIRECT, WEBHOOK_URL } from "@/lib/social/metaAuth";
 
 const isAdmin = async () => { const u = await getAuthUser(); return u && u.role === "admin"; };
 
@@ -11,10 +11,11 @@ export async function GET() {
   const fb = await getFacebookDoc();
   const SocialSettings = (await import("@/lib/models/SocialSettings")).default;
   const ig = await SocialSettings.findOne({ platform: "instagram" }).lean();
+  const appError = appId && appSecret ? await checkAppCreds(appId, appSecret) : "";
   let pages = [], pagesError = "";
   if (userToken) { try { pages = await listPages(userToken); } catch (e) { pagesError = e.message; } }
   return NextResponse.json({
-    appConfigured: !!(appId && appSecret), loggedIn: !!userToken, pages, pagesError,
+    appConfigured: !!(appId && appSecret) && !appError, appError, loggedIn: !!userToken, pages, pagesError,
     connected: fb?.account ? { page: fb.account, instagram: ig?.account || null } : null,
     setup: { oauthRedirectUri: OAUTH_REDIRECT, webhookUrl: WEBHOOK_URL, webhookVerifyToken: webhookVerifyToken(appSecret) },
   });
