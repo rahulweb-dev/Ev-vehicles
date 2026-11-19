@@ -16,43 +16,45 @@ import { getPusherClient } from "@/lib/pusherClient";
 const ADMIN_GROUPS = [
   { label: "Overview", items: [
     { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
+    { href: "/admin/notifications", label: "Activity", icon: Bell },
   ] },
   { label: "Content", items: [
-    { href: "/admin/articles", label: "Articles", icon: Newspaper },
+    { href: "/admin/articles", label: "News articles", icon: Newspaper },
     { href: "/admin/blogs", label: "Buyer's guides", icon: BookOpen },
     { href: "/admin/vehicles", label: "Vehicles", icon: Car },
-    { href: "/admin/ev-sales", label: "EV sales data", icon: LineChart },
     { href: "/admin/brands", label: "Brand logos", icon: Tag },
     { href: "/admin/banners", label: "Banners", icon: LayoutTemplate },
     { href: "/admin/authors", label: "Authors", icon: UserCircle },
   ] },
-  { label: "Customers", items: [
+  { label: "Leads & sales", items: [
     { href: "/admin/leads", label: "Leads", icon: Sparkles },
     { href: "/admin/chatbot-leads", label: "Chatbot leads", icon: MessageSquare },
     { href: "/admin/live-chat", label: "Live chat", icon: Radio, badge: "liveChat" },
     { href: "/admin/dealers", label: "Dealers", icon: Building2 },
+  ] },
+  { label: "Marketing", items: [
+    { href: "/admin/marketing/campaigns", label: "Email campaigns", icon: Megaphone },
+    { href: "/admin/subscribers", label: "Subscribers", icon: Mail },
+    { href: "/admin/push-notifications", label: "Push notifications", icon: BellRing },
+  ] },
+  { label: "Social media", items: [
+    { href: "/admin/social-scheduler", label: "Scheduler", icon: CalendarClock },
+    { href: "/admin/social-inbox", label: "Social inbox", icon: Inbox },
+    { href: "/admin/my-social", label: "My Social", icon: Share2 },
+    { href: "/admin/social-settings", label: "Connections", icon: FaFacebook },
+  ] },
+  { label: "Analytics & reports", items: [
+    { href: "/admin/ev-sales", label: "EV sales data", icon: LineChart },
+    { href: "/admin/social-report", label: "Social report", icon: BarChart3 },
+    { href: "/admin/seo-audit", label: "SEO audit", icon: SearchCheck },
+    { href: "/admin/tools/links", label: "Broken links", icon: Link2 },
   ] },
   { label: "Community", items: [
     { href: "/admin/comments", label: "Comments", icon: MessagesSquare, badge: "comments" },
     { href: "/admin/reviews", label: "Reviews", icon: Star },
     { href: "/admin/charging-reports", label: "Charging reports", icon: Zap },
   ] },
-  { label: "Social", items: [
-    { href: "/admin/social-scheduler", label: "Scheduler", icon: CalendarClock },
-    { href: "/admin/social-inbox", label: "Social inbox", icon: Inbox },
-    { href: "/admin/my-social", label: "My Social", icon: Share2 },
-    { href: "/admin/social-report", label: "Social report", icon: BarChart3 },
-    { href: "/admin/social-settings", label: "Connections", icon: FaFacebook },
-  ] },
-  { label: "Marketing", items: [
-    { href: "/admin/subscribers", label: "Subscribers", icon: Mail },
-    { href: "/admin/marketing/campaigns", label: "Campaigns", icon: Megaphone },
-    { href: "/admin/push-notifications", label: "Push notifications", icon: BellRing },
-    { href: "/admin/notifications", label: "Notifications", icon: Bell },
-  ] },
-  { label: "Tools", items: [
-    { href: "/admin/seo-audit", label: "SEO audit", icon: SearchCheck },
-    { href: "/admin/tools/links", label: "Link checker", icon: Link2 },
+  { label: "System", items: [
     { href: "/admin/settings", label: "Settings", icon: Settings },
   ] },
 ];
