@@ -59,7 +59,7 @@ export default function SocialInboxPage() {
   const conv = tab === "messages" && open ? list.find((c) => c.id === open) : null;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 px-4 pb-10 pt-20 sm:px-6 lg:px-8 lg:pt-8">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h1 className="flex items-center gap-2 text-2xl font-black text-gray-900"><Inbox size={22} />Social Inbox</h1>

@@ -84,7 +84,7 @@ export default function AdminReviewsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-4 pb-10 pt-20 sm:px-6 lg:px-8 lg:pt-8">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-black text-gray-900">Vehicle Reviews</h1>

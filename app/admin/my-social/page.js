@@ -112,7 +112,7 @@ export default function MySocialPage() {
   const hasIg = accounts.some((a) => form.accountIds.includes(a.id) && a.platform === "instagram");
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-4 pb-10 pt-20 sm:px-6 lg:px-8 lg:pt-8">
       <div>
         <h1 className="text-2xl font-black text-gray-900">My Social</h1>
         <p className="text-sm text-gray-500">Connect your own Facebook Pages and Instagram accounts, then post or schedule to them from here. Only you can see and post to your accounts.</p>

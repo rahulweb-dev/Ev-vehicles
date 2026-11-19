@@ -37,7 +37,7 @@ export default function ChargingReportsPage() {
   const gmaps = (c) => c?.length === 2 ? `https://www.google.com/maps?q=${c[1]},${c[0]}` : null;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 px-4 pb-10 pt-20 sm:px-6 lg:px-8 lg:pt-8">
       <div>
         <h1 className="text-2xl font-black text-gray-900">Charging Station Reports</h1>
         <p className="text-sm text-gray-500">Missing stations and problems reported by visitors. Approving a missing station adds it to the map; approving “closed” or “wrong location” updates the station.</p>

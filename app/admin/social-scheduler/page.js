@@ -82,7 +82,7 @@ export default function SocialSchedulerPage() {
   const notConnected = ["facebook", "instagram"].filter((p) => data.connected && data.connected[p] === false);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-4 pb-10 pt-20 sm:px-6 lg:px-8 lg:pt-8">
       <div>
         <h1 className="flex items-center gap-2 text-2xl font-black text-gray-900"><CalendarClock size={22} />Social Scheduler</h1>
         <p className="text-sm text-gray-500">Write a post once and publish it to Facebook and Instagram now or at a set time. New articles and guides are auto-posted when “Auto-post” is on in <Link href="/admin/social-settings" className="font-semibold text-blue-600">Social Settings</Link>.</p>

@@ -1,403 +1,279 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  LayoutDashboard, Newspaper, LogOut,
-  Menu, X, ExternalLink, Settings,
-  Users, Building2, MapPin, ShieldCheck, Car, LayoutTemplate, MessageSquare, Radio, MessagesSquare, BookOpen, Bell, SearchCheck, UserCircle, Tag, Star, Mail,
-  Share2, BarChart3, HardDrive, Database, Image as ImageIcon, Megaphone, Link2,
-  Zap,
-  CalendarClock, Inbox,
+  LayoutDashboard, Newspaper, LogOut, Menu, X, ExternalLink, Settings, Users, Building2, MapPin, ShieldCheck, Car,
+  LayoutTemplate, MessageSquare, Radio, MessagesSquare, BookOpen, Bell, SearchCheck, UserCircle, Tag, Star, Mail,
+  Share2, BarChart3, Megaphone, Link2, Zap, CalendarClock, Inbox, Search, ChevronsLeft, ChevronsRight, BellRing,
+  LineChart, Database, Image as ImageIcon, Sparkles,
 } from "lucide-react";
+import { FaFacebook } from "react-icons/fa6";
 import { getPusherClient } from "@/lib/pusherClient";
+
+const ADMIN_GROUPS = [
+  { label: "Overview", items: [
+    { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  ] },
+  { label: "Content", items: [
+    { href: "/admin/articles", label: "Articles", icon: Newspaper },
+    { href: "/admin/blogs", label: "Buyer's guides", icon: BookOpen },
+    { href: "/admin/vehicles", label: "Vehicles", icon: Car },
+    { href: "/admin/ev-sales", label: "EV sales data", icon: LineChart },
+    { href: "/admin/brands", label: "Brand logos", icon: Tag },
+    { href: "/admin/banners", label: "Banners", icon: LayoutTemplate },
+    { href: "/admin/authors", label: "Authors", icon: UserCircle },
+  ] },
+  { label: "Customers", items: [
+    { href: "/admin/leads", label: "Leads", icon: Sparkles },
+    { href: "/admin/chatbot-leads", label: "Chatbot leads", icon: MessageSquare },
+    { href: "/admin/live-chat", label: "Live chat", icon: Radio, badge: "liveChat" },
+    { href: "/admin/dealers", label: "Dealers", icon: Building2 },
+  ] },
+  { label: "Community", items: [
+    { href: "/admin/comments", label: "Comments", icon: MessagesSquare, badge: "comments" },
+    { href: "/admin/reviews", label: "Reviews", icon: Star },
+    { href: "/admin/charging-reports", label: "Charging reports", icon: Zap },
+  ] },
+  { label: "Social", items: [
+    { href: "/admin/social-scheduler", label: "Scheduler", icon: CalendarClock },
+    { href: "/admin/social-inbox", label: "Social inbox", icon: Inbox },
+    { href: "/admin/my-social", label: "My Social", icon: Share2 },
+    { href: "/admin/social-report", label: "Social report", icon: BarChart3 },
+    { href: "/admin/social-settings", label: "Connections", icon: FaFacebook },
+  ] },
+  { label: "Marketing", items: [
+    { href: "/admin/subscribers", label: "Subscribers", icon: Mail },
+    { href: "/admin/marketing/campaigns", label: "Campaigns", icon: Megaphone },
+    { href: "/admin/push-notifications", label: "Push notifications", icon: BellRing },
+    { href: "/admin/notifications", label: "Notifications", icon: Bell },
+  ] },
+  { label: "Tools", items: [
+    { href: "/admin/seo-audit", label: "SEO audit", icon: SearchCheck },
+    { href: "/admin/tools/links", label: "Link checker", icon: Link2 },
+    { href: "/admin/settings", label: "Settings", icon: Settings },
+  ] },
+];
+
+const DEALER_GROUPS = [
+  { label: "Workspace", items: [
+    { href: "/admin/leads", label: "My leads", icon: Sparkles },
+    { href: "/admin/my-social", label: "My Social", icon: Share2 },
+  ] },
+];
+
+const readCollapsed = () => { try { return localStorage.getItem("admin-sidebar-collapsed") === "1"; } catch { return false; } };
 
 function fmtBytes(b) {
   if (!b) return "0 B";
-  const u = ["B", "KB", "MB", "GB"];
-  const i = Math.floor(Math.log(b) / Math.log(1024));
+  const u = ["B", "KB", "MB", "GB"], i = Math.floor(Math.log(b) / Math.log(1024));
   return `${(b / Math.pow(1024, i)).toFixed(1)} ${u[i]}`;
 }
 
-function MiniStorageBar({ used, total, color }) {
-  const pct = total > 0 ? Math.min((used / total) * 100, 100) : 0;
+function Brand({ collapsed }) {
   return (
-    <div className="mt-1 h-1.5 w-full rounded-full bg-gray-200 overflow-hidden">
-      <div
-        className={`h-full rounded-full ${pct >= 85 ? "bg-red-500" : color}`}
-        style={{ width: `${pct}%` }}
-      />
+    <Link href="/admin" className="flex min-w-0 items-center gap-2.5">
+      <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 shadow-lg shadow-emerald-500/30">
+        <Zap size={18} className="text-white" fill="currentColor" />
+        <span className="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/25" />
+      </span>
+      {!collapsed && (
+        <span className="min-w-0 leading-tight">
+          <span className="block text-[15px] font-bold tracking-tight text-white">EV Radar</span>
+          <span className="block text-[10px] font-medium uppercase tracking-[0.18em] text-emerald-300/80">Admin studio</span>
+        </span>
+      )}
+    </Link>
+  );
+}
+
+function StorageMini() {
+  const [d, setD] = useState(null);
+  useEffect(() => { fetch("/api/admin/storage").then((r) => (r.ok ? r.json() : null)).then((x) => x && setD(x)).catch(() => {}); }, []);
+  if (!d) return null;
+  const rows = [
+    ["MongoDB", d.mongo?.fsUsedSize || d.mongo?.storageSize || 0, d.mongo?.fsTotalSize || 512 * 1024 * 1024, "from-emerald-400 to-teal-500", Database],
+    ["ImageKit", d.imagekit?.totalSize || 0, 20 * 1024 * 1024 * 1024, "from-violet-400 to-fuchsia-500", ImageIcon],
+  ];
+  return (
+    <div className="mx-3 mb-2 space-y-2.5 rounded-xl bg-white/[0.04] p-3 ring-1 ring-white/[0.06]">
+      {rows.map(([l, used, total, g, I]) => {
+        const pct = total ? Math.min((used / total) * 100, 100) : 0;
+        return (
+          <div key={l}>
+            <div className="mb-1 flex items-center justify-between text-[10px]">
+              <span className="flex items-center gap-1 font-medium text-white/60"><I size={10} />{l}</span>
+              <span className="text-white/40">{fmtBytes(used)}</span>
+            </div>
+            <div className="h-1 overflow-hidden rounded-full bg-white/10">
+              <motion.div className={`h-full rounded-full bg-gradient-to-r ${pct >= 85 ? "from-rose-400 to-rose-600" : g}`} initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 1, ease: "easeOut" }} />
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
 
-function SidebarStorageWidget() {
-  const [data, setData] = useState(null);
-
-  useEffect(() => {
-    fetch("/api/admin/storage")
-      .then(r => r.ok ? r.json() : null)
-      .then(d => { if (d) setData(d); })
-      .catch(() => {});
-  }, []);
-
-  if (!data) return null;
-
-  const mongo  = data.mongo;
-  const imgkit = data.imagekit;
-
-  const mongoTotal = mongo?.fsTotalSize  || 512 * 1024 * 1024;
-  const mongoUsed  = mongo?.fsUsedSize   || mongo?.storageSize || 0;
-  const mongoPct   = mongoTotal > 0 ? Math.min((mongoUsed / mongoTotal) * 100, 100) : 0;
-
-  const ikTotal = 20 * 1024 * 1024 * 1024;
-  const ikUsed  = imgkit?.totalSize || 0;
-  const ikPct   = ikTotal > 0 ? Math.min((ikUsed / ikTotal) * 100, 100) : 0;
+function NavBody({ groups, pathname, collapsed, counts, user, isAdmin, onNavigate, onLogout, loggingOut, layoutKey }) {
+  const [q, setQ] = useState("");
+  const filtered = useMemo(() => {
+    const s = q.trim().toLowerCase();
+    if (!s) return groups;
+    return groups.map((g) => ({ ...g, items: g.items.filter((i) => i.label.toLowerCase().includes(s)) })).filter((g) => g.items.length);
+  }, [q, groups]);
+  const isActive = (item) => (item.exact ? pathname === item.href : pathname.startsWith(item.href));
 
   return (
-    <div className="mx-3 mb-2 rounded-xl border border-gray-100 bg-gray-50 p-3">
-      <div className="flex items-center gap-1.5 mb-2">
-        <HardDrive size={12} className="text-gray-400" />
-        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wide">Storage</span>
+    <>
+      {!collapsed && (
+        <div className="px-3 pt-4">
+          <label className="flex items-center gap-2 rounded-xl bg-white/[0.05] px-3 py-2 text-white/40 ring-1 ring-white/[0.06] focus-within:ring-emerald-400/40">
+            <Search size={14} />
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search menu…" className="w-full bg-transparent text-[13px] text-white placeholder-white/35 outline-none" />
+          </label>
+        </div>
+      )}
+
+      <nav className="flex-1 space-y-5 overflow-y-auto px-3 py-4 [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.12)_transparent]">
+        {filtered.map((g) => (
+          <div key={g.label}>
+            {!collapsed ? <p className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/30">{g.label}</p> : <div className="mx-auto mb-2 h-px w-6 bg-white/10" />}
+            <ul className="space-y-0.5">
+              {g.items.map((item) => {
+                const Icon = item.icon, active = isActive(item);
+                const n = item.badge ? counts[item.badge] || 0 : 0;
+                return (
+                  <li key={item.href} className="relative">
+                    <Link href={item.href} onClick={onNavigate} title={collapsed ? item.label : undefined}
+                      className={`group relative flex items-center gap-3 rounded-xl px-3 py-2 text-[13.5px] font-medium transition-colors ${collapsed ? "justify-center" : ""} ${active ? "text-white" : "text-white/55 hover:bg-white/[0.04] hover:text-white"}`}>
+                      {active && (
+                        <motion.span layoutId={`nav-active-${layoutKey}`} className="absolute inset-0 rounded-xl bg-gradient-to-r from-emerald-500/20 via-emerald-500/10 to-transparent ring-1 ring-inset ring-emerald-400/25"
+                          transition={{ type: "spring", stiffness: 420, damping: 34 }}>
+                          <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-emerald-400 shadow-[0_0_12px_2px_rgba(52,211,153,0.6)]" />
+                        </motion.span>
+                      )}
+                      <Icon size={17} className={`relative shrink-0 transition-transform duration-200 group-hover:scale-110 ${active ? "text-emerald-300" : ""}`} />
+                      {!collapsed && <span className="relative truncate">{item.label}</span>}
+                      {n > 0 && (collapsed
+                        ? <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-[#0B1120]" />
+                        : <span className={`relative ml-auto flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-bold text-white ${item.badge === "liveChat" ? "animate-pulse bg-rose-500" : "bg-amber-500"}`}>{n}</span>)}
+                      {!collapsed && item.label === "My leads" && !isAdmin && user?.city && <span className="relative ml-auto rounded-md bg-sky-500/15 px-1.5 py-0.5 text-[10px] font-semibold text-sky-300">{user.city}</span>}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ))}
+        {!filtered.length && <p className="px-3 text-xs text-white/35">Nothing matches “{q}”.</p>}
+      </nav>
+
+      <div className="border-t border-white/[0.06] pt-3">
+        {!collapsed && isAdmin && <StorageMini />}
+        {user && (
+          <div className={`mx-3 mb-3 flex items-center gap-2.5 rounded-xl p-2 ${collapsed ? "justify-center" : "bg-white/[0.04] ring-1 ring-white/[0.06]"}`}>
+            <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-sky-500 text-sm font-bold text-white">
+              {user.name?.[0]?.toUpperCase()}
+              <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-emerald-400 ring-2 ring-[#0B1120]" />
+            </span>
+            {!collapsed && (
+              <>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[13px] font-semibold text-white">{user.name}</p>
+                  <p className="flex items-center gap-1 truncate text-[10px] text-white/45">
+                    {isAdmin ? <><ShieldCheck size={10} className="text-emerald-400" />Super admin</> : <><MapPin size={10} className="text-sky-400" />{user.city ? `${user.city}, ${user.state}` : "Dealer"}</>}
+                  </p>
+                </div>
+                {isAdmin && <a href="/" target="_blank" rel="noreferrer" title="View site" className="rounded-lg p-1.5 text-white/40 transition hover:bg-white/10 hover:text-white"><ExternalLink size={15} /></a>}
+                <button onClick={onLogout} disabled={loggingOut} title="Log out" className="rounded-lg p-1.5 text-white/40 transition hover:bg-rose-500/15 hover:text-rose-300 disabled:opacity-50"><LogOut size={15} /></button>
+              </>
+            )}
+          </div>
+        )}
+        {collapsed && <button onClick={onLogout} title="Log out" className="mx-auto mb-3 flex rounded-lg p-2 text-white/40 hover:bg-rose-500/15 hover:text-rose-300"><LogOut size={16} /></button>}
       </div>
-
-      {/* MongoDB */}
-      {mongo && (
-        <div className="mb-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1">
-              <Database size={10} className="text-emerald-600" />
-              <span className="text-[10px] font-semibold text-gray-600">MongoDB</span>
-            </div>
-            <span className="text-[10px] text-gray-400">{mongoPct.toFixed(0)}%</span>
-          </div>
-          <MiniStorageBar used={mongoUsed} total={mongoTotal} color="bg-emerald-500" />
-          <div className="mt-0.5 flex justify-between text-[9px] text-gray-400">
-            <span>{fmtBytes(mongoUsed)} used</span>
-            <span>{fmtBytes(mongoTotal - mongoUsed)} free</span>
-          </div>
-        </div>
-      )}
-
-      {/* ImageKit */}
-      {imgkit && (
-        <div>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1">
-              <ImageIcon size={10} className="text-violet-600" />
-              <span className="text-[10px] font-semibold text-gray-600">ImageKit</span>
-            </div>
-            <span className="text-[10px] text-gray-400">{ikPct.toFixed(0)}%</span>
-          </div>
-          <MiniStorageBar used={ikUsed} total={ikTotal} color="bg-violet-500" />
-          <div className="mt-0.5 flex justify-between text-[9px] text-gray-400">
-            <span>{fmtBytes(ikUsed)} used</span>
-            <span>{fmtBytes(ikTotal - ikUsed)} free</span>
-          </div>
-        </div>
-      )}
-    </div>
+    </>
   );
 }
-
-const ADMIN_NAV = [
-  { href: "/admin",                 label: "Dashboard",    icon: LayoutDashboard, exact: true },
-  { href: "/admin/articles",        label: "Articles",     icon: Newspaper },
-  { href: "/admin/blogs",           label: "Blogs",        icon: BookOpen },
-  { href: "/admin/vehicles",        label: "Vehicles",     icon: Car },
-  { href: "/admin/brands",          label: "Brand Logos",  icon: Tag },
-  { href: "/admin/banners",         label: "Banners",      icon: LayoutTemplate },
-  { href: "/admin/leads",           label: "Leads",        icon: Users },
-  { href: "/admin/chatbot-leads",   label: "Chatbot Leads", icon: MessageSquare },
-  { href: "/admin/charging-reports", label: "Charging Reports", icon: Zap },
-  { href: "/admin/live-chat",       label: "Live Chat",    icon: Radio, badge: "liveChat" },
-  { href: "/admin/reviews",             label: "Reviews",           icon: Star,           badge: "reviews" },
-  { href: "/admin/comments",           label: "Comments",          icon: MessagesSquare, badge: "comments" },
-  { href: "/admin/subscribers",         label: "Subscribers",        icon: Mail },
-  { href: "/admin/marketing/campaigns", label: "Campaigns",          icon: Megaphone },
-  { href: "/admin/push-notifications", label: "Push Notifications", icon: Bell },
-  { href: "/admin/notifications",      label: "Notifications",      icon: Bell },
-  { href: "/admin/seo-audit",          label: "SEO Audit",          icon: SearchCheck },
-  { href: "/admin/social-scheduler",  label: "Social Scheduler",   icon: CalendarClock },
-  { href: "/admin/social-inbox",      label: "Social Inbox",       icon: Inbox },
-  { href: "/admin/social-settings",   label: "Social Settings",    icon: Share2 },
-  { href: "/admin/my-social",         label: "My Social",          icon: Share2 },
-  { href: "/admin/social-report",     label: "Social Report",      icon: BarChart3 },
-  { href: "/admin/authors",            label: "Authors",            icon: UserCircle },
-  { href: "/admin/dealers",            label: "Dealers",            icon: Building2 },
-  { href: "/admin/tools/links",         label: "Link Checker",       icon: Link2 },
-  { href: "/admin/settings",           label: "Settings",           icon: Settings },
-];
-
-const DEALER_NAV = [
-  { href: "/admin/leads", label: "My Leads", icon: Users },
-  { href: "/admin/my-social", label: "My Social", icon: Share2 },
-];
 
 export default function AdminSidebar() {
-  const pathname    = usePathname();
-  const [collapsed, setCollapsed]   = useState(false);
+  const pathname = usePathname();
+  const [collapsed, setCollapsed] = useState(readCollapsed);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
-  const [waitingChats,   setWaitingChats]   = useState(0);
-  const [pendingComments,setPendingComments] = useState(0);
-  const [currentUser,    setCurrentUser]    = useState(null);
+  const [waitingChats, setWaitingChats] = useState(0);
+  const [pendingComments, setPendingComments] = useState(0);
+  const [user, setUser] = useState(null);
 
+  useEffect(() => { fetch("/api/auth/me").then((r) => r.json()).then((d) => d.user && setUser(d.user)).catch(() => {}); }, []);
   useEffect(() => {
-    fetch("/api/auth/me").then((r) => r.json()).then((d) => {
-      if (d.user) setCurrentUser(d.user);
-    }).catch(() => {});
-  }, []);
-
-  /* real-time waiting chat count via Pusher */
-  useEffect(() => {
-    /* initial count */
-    fetch("/api/live-chat/sessions?status=waiting")
-      .then(r => r.json())
-      .then(d => setWaitingChats(d.total || 0))
-      .catch(() => {});
-
+    fetch("/api/live-chat/sessions?status=waiting").then((r) => r.json()).then((d) => setWaitingChats(d.total || 0)).catch(() => {});
     const pusher = getPusherClient();
     if (!pusher) return;
-
     const ch = pusher.subscribe("admin-notifications");
-    ch.bind("new-session",  () => setWaitingChats(n => n + 1));
-    /* when session status changes to active/closed, decrement waiting */
-    return () => {
-      ch.unbind_all();
-      pusher.unsubscribe("admin-notifications");
-    };
+    ch.bind("new-session", () => setWaitingChats((n) => n + 1));
+    return () => { ch.unbind_all(); pusher.unsubscribe("admin-notifications"); };
   }, []);
+  useEffect(() => { fetch("/api/admin/comments?status=pending&limit=1").then((r) => r.json()).then((d) => setPendingComments(d.pendingCount || 0)).catch(() => {}); }, []);
 
-  /* pending comments count */
-  useEffect(() => {
-    fetch("/api/admin/comments?status=pending&limit=1")
-      .then(r => r.json())
-      .then(d => setPendingComments(d.pendingCount || 0))
-      .catch(() => {});
-  }, []);
-
-  async function handleLogout() {
+  function toggle() {
+    setCollapsed((c) => { try { localStorage.setItem("admin-sidebar-collapsed", c ? "0" : "1"); } catch {} return !c; });
+  }
+  async function logout() {
     setLoggingOut(true);
     await fetch("/api/auth/logout", { method: "POST" });
     window.location.href = "/admin/login";
   }
 
-  const isAdmin  = currentUser?.role === "admin";
-  const navItems = isAdmin ? ADMIN_NAV : DEALER_NAV;
-
-  function isActive(item) {
-    if (item.exact) return pathname === item.href;
-    return pathname.startsWith(item.href);
-  }
+  const isAdmin = user?.role === "admin";
+  const groups = isAdmin ? ADMIN_GROUPS : DEALER_GROUPS;
+  const counts = { liveChat: waitingChats, comments: pendingComments };
+  const shared = { groups, pathname, counts, user, isAdmin, onLogout: logout, loggingOut };
+  const shell = "bg-[#0B1120] bg-[radial-gradient(120%_60%_at_0%_0%,rgba(16,185,129,0.12),transparent_60%),radial-gradient(80%_50%_at_100%_100%,rgba(56,189,248,0.08),transparent_60%)]";
 
   return (
     <>
-      {/* ── Desktop Sidebar ──────────────────────────────────── */}
-      <aside className={`hidden lg:flex flex-col ${collapsed ? "w-16" : "w-64"} shrink-0 sticky top-0 h-screen bg-white border-r border-gray-200 transition-all duration-200`}>
-
-        {/* Logo area */}
-        <div className="flex h-16 items-center justify-between border-b border-gray-200 px-3">
-          {!collapsed && (
-            <Link href="/admin" className="flex items-center gap-2 min-w-0">
-              <Image
-                src="/images/logo.png"
-                alt="EVRadar"
-                width={120}
-                height={36}
-                className="object-contain h-9 w-auto"
-                priority
-              />
-            </Link>
-          )}
-          {collapsed && (
-            <Link href="/admin" className="mx-auto">
-              <Image
-                src="/images/logo.png"
-                alt="EVRadar"
-                width={32}
-                height={32}
-                className="object-contain h-8 w-8"
-                priority
-              />
-            </Link>
-          )}
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className={`${collapsed ? "mx-auto" : ""} shrink-0 rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition`}
-          >
-            <Menu size={18} />
-          </button>
+      {/* Desktop */}
+      <motion.aside animate={{ width: collapsed ? 76 : 264 }} transition={{ type: "spring", stiffness: 300, damping: 32 }}
+        className={`sticky top-0 hidden h-screen shrink-0 flex-col border-r border-white/[0.06] lg:flex ${shell}`}>
+        <div className={`flex h-16 items-center border-b border-white/[0.06] px-4 ${collapsed ? "justify-center" : "justify-between"}`}>
+          <Brand collapsed={collapsed} />
+          {!collapsed && <button onClick={toggle} className="rounded-lg p-1.5 text-white/40 transition hover:bg-white/10 hover:text-white" aria-label="Collapse sidebar"><ChevronsLeft size={17} /></button>}
         </div>
+        {collapsed && <button onClick={toggle} className="mx-auto mt-3 rounded-lg p-1.5 text-white/40 transition hover:bg-white/10 hover:text-white" aria-label="Expand sidebar"><ChevronsRight size={17} /></button>}
+        <NavBody {...shared} collapsed={collapsed} layoutKey="desktop" />
+      </motion.aside>
 
-        {/* User info strip */}
-        {!collapsed && currentUser && (
-          <div className={`mx-3 mt-3 rounded-xl border p-3 ${
-            isAdmin
-              ? "border-green-200 bg-green-50"
-              : "border-blue-200 bg-blue-50"
-          }`}>
-            <div className="flex items-center gap-2.5">
-              <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-black ${
-                isAdmin ? "bg-green-700 text-white" : "bg-blue-600 text-white"
-              }`}>
-                {currentUser.name?.[0]?.toUpperCase()}
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs font-black truncate bg-linear-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">{currentUser.name}</p>
-                <div className="flex items-center gap-1 mt-0.5">
-                  {isAdmin
-                    ? <><ShieldCheck size={10} className="text-green-700" /><span className="text-[10px] text-green-700 font-semibold">Super Admin</span></>
-                    : <><MapPin size={10} className="text-blue-600" /><span className="text-[10px] text-blue-600 font-semibold">{currentUser.city || "Dealer"}</span></>
-                  }
-                </div>
-              </div>
-            </div>
-            {!isAdmin && currentUser.city && (
-              <p className="mt-2 text-[10px] text-blue-500 leading-tight">
-                Leads from <strong className="text-blue-700">{currentUser.city}, {currentUser.state}</strong> only
-              </p>
-            )}
-          </div>
-        )}
-
-        {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto p-3 space-y-0.5 mt-2">
-          {navItems.map((item) => {
-            const Icon   = item.icon;
-            const active = isActive(item);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                title={item.label}
-                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
-                  active
-                    ? "bg-green-700 text-white shadow-sm"
-                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                }`}
-              >
-                <Icon size={18} className="shrink-0" />
-                {!collapsed && <span>{item.label}</span>}
-                {!collapsed && item.badge === "liveChat" && waitingChats > 0 && (
-                  <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-black text-white">
-                    {waitingChats}
-                  </span>
-                )}
-                {!collapsed && item.badge === "comments" && pendingComments > 0 && (
-                  <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-500 px-1 text-[9px] font-black text-white">
-                    {pendingComments}
-                  </span>
-                )}
-                {!collapsed && item.label === "Leads" && !isAdmin && currentUser?.city && (
-                  <span className="ml-auto rounded-lg bg-blue-100 px-1.5 py-0.5 text-[10px] font-bold text-blue-700">
-                    {currentUser.city}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Bottom — always visible */}
-        <div className="border-t border-gray-200">
-          {!collapsed && isAdmin && <SidebarStorageWidget />}
-          <div className="p-3 space-y-1">
-          {isAdmin && (
-            <a
-              href="/"
-              target="_blank"
-              title="View Site"
-              className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition"
-            >
-              <ExternalLink size={18} className="shrink-0" />
-              {!collapsed && <span>View Site</span>}
-            </a>
-          )}
-          <button
-            onClick={handleLogout}
-            disabled={loggingOut}
-            title="Logout"
-            className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-600 hover:bg-red-50 hover:text-red-600 transition disabled:opacity-50"
-          >
-            <LogOut size={18} className="shrink-0" />
-            {!collapsed && <span>{loggingOut ? "Logging out…" : "Logout"}</span>}
-          </button>
-          </div>
-        </div>
-      </aside>
-
-      {/* ── Mobile Top Bar ───────────────────────────────────── */}
-      <MobileTopBar
-        navItems={navItems}
-        pathname={pathname}
-        onLogout={handleLogout}
-        currentUser={currentUser}
-        isAdmin={isAdmin}
-        waitingChats={waitingChats}
-        pendingComments={pendingComments}
-      />
-    </>
-  );
-}
-
-function MobileTopBar({ navItems, pathname, onLogout, currentUser, isAdmin, waitingChats = 0, pendingComments = 0 }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
-      <div className="flex h-14 items-center justify-between px-4">
-        <Link href="/admin">
-          <Image
-            src="/images/logo.png"
-            alt="EVRadar"
-            width={100}
-            height={30}
-            className="object-contain h-8 w-auto"
-            priority
-          />
+      {/* Mobile top bar */}
+      <div className="fixed inset-x-0 top-0 z-50 flex h-14 items-center justify-between border-b border-slate-200/70 bg-white/80 px-4 backdrop-blur-xl lg:hidden">
+        <Link href="/admin" className="flex items-center gap-2">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-400 to-teal-600"><Zap size={16} className="text-white" fill="currentColor" /></span>
+          <span className="text-[15px] font-bold tracking-tight text-slate-900">EV Radar <span className="font-medium text-slate-400">Admin</span></span>
         </Link>
-        <button onClick={() => setOpen(!open)} className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 transition">
-          {open ? <X size={22} /> : <Menu size={22} />}
+        <button onClick={() => setMobileOpen(true)} className="relative rounded-lg p-2 text-slate-600 hover:bg-slate-100" aria-label="Open menu">
+          <Menu size={21} />
+          {waitingChats + pendingComments > 0 && <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-rose-500" />}
         </button>
       </div>
 
-      {open && (
-        <nav className="p-3 space-y-1 bg-white border-t border-gray-100">
-          {currentUser && (
-            <div className={`mb-2 rounded-xl border p-3 ${isAdmin ? "border-green-200 bg-green-50" : "border-blue-200 bg-blue-50"}`}>
-              <p className="text-xs font-black bg-linear-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">{currentUser.name}</p>
-              <p className={`text-[10px] font-semibold ${isAdmin ? "text-green-700" : "text-blue-600"}`}>
-                {isAdmin ? "Super Admin · All locations" : `Dealer · ${currentUser.city}, ${currentUser.state}`}
-              </p>
-            </div>
-          )}
-          {navItems.map((item) => {
-            const Icon   = item.icon;
-            const active = item.exact ? pathname === item.href : pathname.startsWith(item.href);
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium ${
-                  active ? "bg-green-700 text-white" : "text-gray-600 hover:bg-gray-100"
-                }`}
-              >
-                <Icon size={18} /> {item.label}
-                {item.badge === "liveChat"  && waitingChats    > 0 && <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-black text-white">{waitingChats}</span>}
-                {item.badge === "comments"  && pendingComments > 0 && <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-amber-500 px-1 text-[9px] font-black text-white">{pendingComments}</span>}
-              </Link>
-            );
-          })}
-          <button
-            onClick={onLogout}
-            className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-red-600 hover:bg-red-50 transition"
-          >
-            <LogOut size={18} /> Logout
-          </button>
-        </nav>
-      )}
-    </div>
+      <AnimatePresence>
+        {mobileOpen && (
+          <>
+            <motion.div className="fixed inset-0 z-[60] bg-slate-950/50 backdrop-blur-sm lg:hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setMobileOpen(false)} />
+            <motion.aside className={`fixed inset-y-0 left-0 z-[70] flex w-[86%] max-w-[300px] flex-col shadow-2xl lg:hidden ${shell}`}
+              initial={{ x: "-100%" }} animate={{ x: 0 }} exit={{ x: "-100%" }} transition={{ type: "spring", stiffness: 380, damping: 38 }}>
+              <div className="flex h-16 items-center justify-between border-b border-white/[0.06] px-4">
+                <Brand collapsed={false} />
+                <button onClick={() => setMobileOpen(false)} className="rounded-lg p-1.5 text-white/50 hover:bg-white/10 hover:text-white" aria-label="Close menu"><X size={19} /></button>
+              </div>
+              <NavBody {...shared} collapsed={false} layoutKey="mobile" onNavigate={() => setMobileOpen(false)} />
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

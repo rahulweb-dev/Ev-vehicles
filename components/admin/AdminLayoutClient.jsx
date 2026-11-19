@@ -45,16 +45,20 @@ export default function AdminLayoutClient({ children }) {
 
   if (!checked) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-green-600 border-t-transparent" />
+      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#0B1120]">
+        <div className="relative h-12 w-12">
+          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-600 shadow-lg shadow-emerald-500/40 animate-pulse" />
+          <svg viewBox="0 0 24 24" className="absolute inset-0 m-auto h-6 w-6 text-white" fill="currentColor"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" /></svg>
+        </div>
+        <p className="text-xs font-medium uppercase tracking-[0.2em] text-white/40">Loading admin</p>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-[#F5F7FA]">
       <AdminSidebar />
-      <main className="flex-1 overflow-auto">{children}</main>
+      <main className="min-w-0 flex-1 overflow-auto">{children}</main>
     </div>
   );
 }

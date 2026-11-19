@@ -2,987 +2,561 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  Newspaper, Eye, Plus, CheckCircle2, FileText,
-  BarChart2, Zap, Users, Car, Bike, Truck, ArrowRight,
-  Clock, Star, Mail, BellRing, HardDrive, Image as ImageIcon,
-  Database, RefreshCw, AlertCircle, TrendingUp, Monitor, Smartphone, Tablet,
+  Newspaper, Eye, Plus, FileText, Zap, Users, Car, Bike, Truck, ArrowUpRight, Clock, Star, Mail, BellRing, BellOff,
+  Database, RefreshCw, Monitor, Smartphone, Tablet, Activity, CalendarClock, Sparkles, BookOpen, Image as ImageIcon,
+  Radio, Send, Globe, PenSquare, Gauge, TrendingUp, CircleCheck, Rocket, ChevronRight,
 } from "lucide-react";
+import { FaFacebook, FaInstagram } from "react-icons/fa6";
 import { getPusherClient } from "@/lib/pusherClient";
 import ArticleImage from "@/components/news/ArticleImage";
+import { Card, CardHeader, CountUp, Delta, Sparkline, AreaChart, Donut, Ring, Bar, Skeleton } from "@/components/admin/dashboard/ui";
 
-function articleImageFallback(article) {
-  const title = encodeURIComponent(article?.title || "EV Radar");
-  const tag = encodeURIComponent(article?.category || "news");
-  return `/api/og?title=${title}&tag=${tag}&type=article`;
+const CAT = {
+  cars: { label: "Cars", dot: "bg-sky-500", bar: "bg-gradient-to-r from-sky-400 to-sky-600", chip: "bg-sky-50 text-sky-700" },
+  bikes: { label: "Two-wheelers", dot: "bg-orange-500", bar: "bg-gradient-to-r from-amber-400 to-orange-500", chip: "bg-orange-50 text-orange-700" },
+  commercial: { label: "Commercial", dot: "bg-violet-500", bar: "bg-gradient-to-r from-violet-400 to-violet-600", chip: "bg-violet-50 text-violet-700" },
+  charging: { label: "Charging", dot: "bg-teal-500", bar: "bg-gradient-to-r from-teal-400 to-emerald-500", chip: "bg-teal-50 text-teal-700" },
+};
+const catOf = (c) => CAT[c] || { label: c || "Other", dot: "bg-slate-400", bar: "bg-slate-400", chip: "bg-slate-100 text-slate-600" };
+const fmtDate = (d) => new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+const fmtWhen = (d) => new Date(d).toLocaleString("en-IN", { weekday: "short", day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
+const ogFallback = (a) => `/api/og?title=${encodeURIComponent(a?.title || "EV Radar")}&tag=${encodeURIComponent(a?.category || "news")}&type=article`;
+
+function fmtBytes(bytes) {
+  if (!bytes) return "0 B";
+  const u = ["B", "KB", "MB", "GB"], i = Math.floor(Math.log(bytes) / Math.log(1024));
+  return `${(bytes / Math.pow(1024, i)).toFixed(i > 0 ? 1 : 0)} ${u[i]}`;
 }
 
 function playSound(type = "chat") {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc  = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.type = "sine";
-    if (type === "new") {
-      osc.frequency.setValueAtTime(880, ctx.currentTime);
-      osc.frequency.setValueAtTime(1100, ctx.currentTime + 0.12);
-      gain.gain.setValueAtTime(0.4, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
-      osc.onended = () => ctx.close();
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 0.4);
-    } else {
-      osc.frequency.setValueAtTime(660, ctx.currentTime);
-      gain.gain.setValueAtTime(0.2, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
-      osc.onended = () => ctx.close();
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 0.25);
-    }
+    const osc = ctx.createOscillator(), gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination); osc.type = "sine";
+    const t = ctx.currentTime, len = type === "new" ? 0.4 : 0.25;
+    osc.frequency.setValueAtTime(type === "new" ? 880 : 660, t);
+    if (type === "new") osc.frequency.setValueAtTime(1100, t + 0.12);
+    gain.gain.setValueAtTime(type === "new" ? 0.4 : 0.2, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + len);
+    osc.onended = () => ctx.close(); osc.start(t); osc.stop(t + len);
   } catch {}
 }
 
-function StatCard({ icon: Icon, label, value, sub, gradient }) {
-  return (
-    <div className={`relative overflow-hidden rounded-2xl p-5 text-white ${gradient}`}>
+function greetingFor(d) {
+  const h = d.getHours();
+  return h < 5 ? "Working late" : h < 12 ? "Good morning" : h < 17 ? "Good afternoon" : "Good evening";
+}
+
+/* ─── KPI card ─────────────────────────────────────────────────────── */
+function Kpi({ i, icon: Icon, label, value, delta, deltaSuffix, foot, spark, color, gradient, loading, href }) {
+  const body = (
+    <Card i={i} className="group relative h-full overflow-hidden p-5 transition-shadow hover:shadow-[0_12px_32px_-12px_rgba(15,23,42,0.18)]">
+      <div className={`pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gradient-to-br ${gradient} opacity-[0.12] blur-2xl transition-opacity group-hover:opacity-25`} />
       <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm font-medium text-white/75">{label}</p>
-          <p className="mt-1.5 text-3xl font-black">{value ?? "—"}</p>
-          {sub && <p className="mt-1 text-xs text-white/60">{sub}</p>}
+        <div className="min-w-0">
+          <p className="text-[13px] font-medium text-slate-500">{label}</p>
+          <div className="mt-1.5 text-[30px] font-bold leading-none tracking-tight text-slate-900">{loading ? <Skeleton className="h-8 w-20" /> : <CountUp value={value} />}</div>
         </div>
-        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/20">
-          <Icon size={22} />
-        </div>
+        <span className={`flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${gradient} text-white shadow-lg shadow-black/5 transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110`}><Icon size={19} /></span>
       </div>
-      <div className="pointer-events-none absolute -right-6 -bottom-6 h-28 w-28 rounded-full bg-white/10" />
-    </div>
+      <div className="mt-3 flex min-h-[22px] flex-wrap items-center gap-2">
+        {delta != null && !loading && <Delta value={delta} suffix={deltaSuffix} />}
+        {foot && <span className="text-xs text-slate-400">{foot}</span>}
+      </div>
+      {spark && <div className="-mx-1 mt-3"><Sparkline data={spark} color={color} /></div>}
+    </Card>
   );
+  return href ? <Link href={href} className="block h-full">{body}</Link> : body;
 }
 
-function ArticleCard({ article }) {
-  const catColor = {
-    cars: "bg-blue-500", bikes: "bg-orange-500",
-    commercial: "bg-purple-500", charging: "bg-teal-500",
-  }[article.category] || "bg-gray-400";
-
+/* ─── Traffic ──────────────────────────────────────────────────────── */
+function TrafficCard({ pv, loading, onRefresh, refreshing }) {
+  const last = pv?.last7days || [];
+  const total7 = last.reduce((s, d) => s + d.views, 0);
+  const dev = pv?.devices || {};
+  const mob = dev.mobile || 0, desk = dev.desktop || 0, tab = dev.tablet || 0, devTotal = mob + desk + tab;
+  const top = (pv?.topPages || []).slice(0, 5);
+  const topMax = Math.max(...top.map((p) => p.views), 1);
   return (
-    <div className="group flex gap-3 rounded-xl border border-gray-200 bg-white p-3 hover:border-green-200 hover:shadow-sm transition">
-      <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg bg-gray-100">
-        <ArticleImage
-          src={article.image}
-          fallbackSrc={articleImageFallback(article)}
-          alt={article.imageAlt || article.title}
-          className="h-full w-full object-cover transition group-hover:scale-105"
-        />
-        <span className={`absolute left-1 top-1 rounded px-1 py-0.5 text-[8px] font-black text-white uppercase ${catColor}`}>
-          {article.category.slice(0, 3)}
-        </span>
-      </div>
-      <div className="flex flex-1 flex-col justify-between min-w-0">
-        <p className="line-clamp-2 text-sm font-semibold text-gray-800 leading-snug">{article.title}</p>
-        <div className="flex items-center gap-2 mt-1">
-          <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-            article.status === "published" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
-          }`}>
-            {article.status}
-          </span>
-          <span className="flex items-center gap-1 text-xs text-gray-400">
-            <Eye size={10} /> {(article.views || 0).toLocaleString("en-IN")}
-          </span>
-          <span className="text-xs text-gray-400">
-            {new Date(article.publishedAt || article.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
-          </span>
-        </div>
-      </div>
-      <Link href={`/admin/articles/${article._id}/edit`}
-        className="self-start rounded-lg p-1.5 text-gray-300 hover:bg-gray-100 hover:text-gray-700 transition opacity-0 group-hover:opacity-100">
-        <BarChart2 size={14} />
-      </Link>
-    </div>
-  );
-}
-
-function fmtBytes(bytes) {
-  if (!bytes || bytes === 0) return "0 B";
-  const units = ["B", "KB", "MB", "GB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(1024));
-  return `${(bytes / Math.pow(1024, i)).toFixed(i > 0 ? 1 : 0)} ${units[i]}`;
-}
-
-function StorageBar({ used, total, color = "bg-green-500" }) {
-  const pct = total > 0 ? Math.min((used / total) * 100, 100) : 0;
-  const danger = pct >= 85;
-  return (
-    <div className="mt-1.5">
-      <div className="h-2 w-full rounded-full bg-gray-100 overflow-hidden">
-        <div
-          className={`h-full rounded-full transition-all ${danger ? "bg-red-500" : color}`}
-          style={{ width: `${pct}%` }}
-        />
-      </div>
-      <p className="mt-1 text-[10px] text-gray-400">{pct.toFixed(1)}% used</p>
-    </div>
-  );
-}
-
-function StorageWidget({ storage, loading, onRefresh, refreshing }) {
-  if (loading) {
-    return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-        <div className="flex items-center gap-2 mb-4">
-          <HardDrive size={16} className="text-blue-600" />
-          <span className="font-bold text-gray-800 text-sm">Storage Usage</span>
-        </div>
-        <div className="space-y-3">
-          {[1,2].map(i => (
-            <div key={i} className="animate-pulse space-y-1.5">
-              <div className="h-3 w-1/2 rounded bg-gray-100" />
-              <div className="h-2 w-full rounded-full bg-gray-100" />
-              <div className="h-2 w-1/3 rounded bg-gray-100" />
-            </div>
+    <div className="grid gap-5 xl:grid-cols-3">
+      <Card i={4} className="xl:col-span-2">
+        <CardHeader icon={Activity} title="Website traffic" sub="Page views over the last 7 days" right={
+          <div className="flex items-center gap-2">
+            {pv?.fetchedAt && <span className="hidden text-[11px] text-slate-400 sm:inline">Updated {new Date(pv.fetchedAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</span>}
+            <button onClick={onRefresh} disabled={refreshing} className="rounded-lg border border-slate-200 p-1.5 text-slate-500 transition hover:bg-slate-50 hover:text-slate-900 disabled:opacity-40" aria-label="Refresh traffic"><RefreshCw size={14} className={refreshing ? "animate-spin" : ""} /></button>
+          </div>} />
+        <div className="flex flex-wrap gap-x-8 gap-y-2 px-5 pt-4">
+          {[["7-day views", total7], ["This month", pv?.month?.views || 0], ["Yesterday", pv?.yesterday?.views || 0]].map(([l, v]) => (
+            <div key={l}><p className="text-xs text-slate-500">{l}</p><p className="text-lg font-bold tracking-tight text-slate-900">{loading ? <Skeleton className="h-6 w-14" /> : <CountUp value={v} />}</p></div>
           ))}
         </div>
-      </div>
-    );
-  }
+        <div className="px-3 pb-4 pt-2">{loading ? <Skeleton className="mx-2 h-[200px]" /> : <AreaChart data={last} />}</div>
+      </Card>
 
-  const mongo   = storage?.mongo;
-  const imgkit  = storage?.imagekit;
-  const fetchedAt = storage?.fetchedAt
-    ? new Date(storage.fetchedAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })
-    : null;
-
-  // MongoDB Atlas free tier = 512 MB; paid tiers expose fsTotalSize
-  const mongoTotal = mongo?.fsTotalSize || 512 * 1024 * 1024;
-  const mongoUsed  = mongo?.fsUsedSize  || mongo?.storageSize || 0;
-
-  // ImageKit free = 20 GB
-  const ikTotal = 20 * 1024 * 1024 * 1024;
-  const ikUsed  = imgkit?.totalSize || 0;
-
-  return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <HardDrive size={16} className="text-blue-600" />
-          <span className="font-bold text-gray-800 text-sm">Storage Usage</span>
-        </div>
-        <button
-          onClick={onRefresh}
-          disabled={refreshing}
-          title="Refresh storage stats"
-          className="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition disabled:opacity-40"
-        >
-          <RefreshCw size={13} className={refreshing ? "animate-spin" : ""} />
-        </button>
-      </div>
-
-      <div className="space-y-4">
-        {/* MongoDB */}
-        <div className="rounded-xl bg-gray-50 p-3">
-          <div className="flex items-center gap-2 mb-1">
-            <Database size={13} className="text-emerald-600" />
-            <span className="text-xs font-bold text-gray-700">MongoDB Atlas</span>
+      <Card i={5} className="flex flex-col">
+        <CardHeader icon={Gauge} title="Today's audience" tone="blue" sub="Devices and most-read pages" />
+        <div className="flex items-center gap-5 px-5 pt-4">
+          <Donut segments={[{ label: "Mobile", value: mob, color: "#0ea5e9" }, { label: "Desktop", value: desk, color: "#10b981" }, { label: "Tablet", value: tab, color: "#a855f7" }]}
+            center={<><span className="text-xl font-bold text-slate-900">{devTotal ? Math.round((mob / devTotal) * 100) : 0}%</span><span className="text-[10px] font-medium text-slate-400">mobile</span></>} />
+          <div className="flex-1 space-y-2.5">
+            {[["Mobile", mob, Smartphone, "text-sky-500"], ["Desktop", desk, Monitor, "text-emerald-500"], ["Tablet", tab, Tablet, "text-purple-500"]].map(([l, v, I, c]) => (
+              <div key={l} className="flex items-center gap-2 text-sm">
+                <I size={14} className={c} /><span className="flex-1 text-slate-600">{l}</span>
+                <span className="font-semibold text-slate-900">{devTotal ? Math.round((v / devTotal) * 100) : 0}%</span>
+              </div>
+            ))}
           </div>
-          {mongo ? (
-            <>
-              <div className="flex justify-between text-[11px] text-gray-500 mt-1">
-                <span>Used: <b className="text-gray-800">{fmtBytes(mongoUsed)}</b></span>
-                <span>Total: <b className="text-gray-800">{fmtBytes(mongoTotal)}</b></span>
-              </div>
-              <StorageBar used={mongoUsed} total={mongoTotal} color="bg-emerald-500" />
-              <div className="mt-2 flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-gray-400">
-                <span>Data: {fmtBytes(mongo.dataSize)}</span>
-                <span>Indexes: {fmtBytes(mongo.indexSize)}</span>
-                <span>Collections: {mongo.collections}</span>
-                <span>Documents: {(mongo.objects || 0).toLocaleString("en-IN")}</span>
-              </div>
-            </>
-          ) : (
-            <p className="mt-1 flex items-center gap-1 text-[11px] text-red-500">
-              <AlertCircle size={11} /> Could not fetch MongoDB stats
-            </p>
+        </div>
+        <div className="mt-4 flex-1 border-t border-slate-100 px-5 py-4">
+          <p className="mb-2.5 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Top pages today</p>
+          {loading ? <Skeleton className="h-24" /> : top.length === 0 ? <p className="text-sm text-slate-400">No visits tracked yet today.</p> : (
+            <ul className="space-y-2.5">
+              {top.map((p, i) => (
+                <li key={p.path}>
+                  <div className="mb-1 flex items-center justify-between gap-3 text-xs">
+                    <a href={p.path} target="_blank" rel="noreferrer" className="truncate text-slate-600 hover:text-emerald-700" title={p.path}>{p.path === "/" ? "Home page" : p.path}</a>
+                    <span className="shrink-0 font-semibold text-slate-900">{p.views}</span>
+                  </div>
+                  <Bar pct={(p.views / topMax) * 100} className="bg-gradient-to-r from-sky-400 to-indigo-500" delay={0.1 * i} />
+                </li>
+              ))}
+            </ul>
           )}
         </div>
-
-        {/* ImageKit */}
-        <div className="rounded-xl bg-gray-50 p-3">
-          <div className="flex items-center gap-2 mb-1">
-            <ImageIcon size={13} className="text-violet-600" />
-            <span className="text-xs font-bold text-gray-700">ImageKit CDN</span>
-          </div>
-          {imgkit ? (
-            <>
-              <div className="flex justify-between text-[11px] text-gray-500 mt-1">
-                <span>Used: <b className="text-gray-800">{fmtBytes(ikUsed)}</b></span>
-                <span>Plan: <b className="text-gray-800">{fmtBytes(ikTotal)}</b></span>
-              </div>
-              <StorageBar used={ikUsed} total={ikTotal} color="bg-violet-500" />
-              <div className="mt-2 flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-gray-400">
-                <span>Files: {(imgkit.totalFiles || 0).toLocaleString("en-IN")}</span>
-                <span>Free: {fmtBytes(ikTotal - ikUsed)}</span>
-                {imgkit.truncated && <span className="text-amber-500">* counted first 5000 files</span>}
-              </div>
-            </>
-          ) : (
-            <p className="mt-1 flex items-center gap-1 text-[11px] text-red-500">
-              <AlertCircle size={11} /> Could not fetch ImageKit stats
-            </p>
-          )}
-        </div>
-      </div>
-
-      {fetchedAt && (
-        <p className="mt-3 text-[10px] text-gray-400 text-right">
-          {storage?.cached ? "Cached · " : ""}Last updated {fetchedAt}
-        </p>
-      )}
+      </Card>
     </div>
   );
 }
 
-// ─── 7-day bar chart (inline SVG) ─────────────────────────────────────────
-function TrafficBars({ data }) {
-  if (!data || data.length === 0) return (
-    <div className="flex h-16 items-center justify-center text-xs text-gray-300">No data yet</div>
-  );
-  const max = Math.max(...data.map(d => d.views), 1);
-  const W = 280, H = 52;
-  const barW = Math.floor(W / data.length) - 3;
-  const days = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+/* ─── Social automation ────────────────────────────────────────────── */
+function SocialCard({ social, i }) {
+  const queue = (social?.posts || []).filter((p) => p.status === "scheduled").sort((a, b) => new Date(a.scheduledAt) - new Date(b.scheduledAt));
+  const fb = social?.connected?.facebook, ig = social?.connected?.instagram;
   return (
-    <div className="space-y-1">
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" preserveAspectRatio="none">
-        {data.map((d, i) => {
-          const h = Math.max(3, (d.views / max) * H);
-          const x = i * (barW + 3);
-          const y = H - h;
-          return (
-            <g key={d.date}>
-              <rect x={x} y={0} width={barW} height={H} rx={2} fill="#f0fdf4" />
-              <rect x={x} y={y} width={barW} height={h} rx={2} fill="#16a34a" />
-            </g>
-          );
-        })}
-      </svg>
-      <div className="flex justify-between px-0.5">
-        {data.map(d => {
-          const day = new Date(d.date + "T00:00:00").getDay();
-          return (
-            <span key={d.date} className="text-[9px] text-gray-400">{days[day]}</span>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function SiteTrafficWidget({ pv, pvLoading, onRefresh, refreshing }) {
-  if (pvLoading) {
-    return (
-      <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-        <div className="mb-4 flex items-center gap-2">
-          <TrendingUp size={18} className="text-green-700" />
-          <h2 className="font-bold text-gray-800">Website Traffic</h2>
-        </div>
-        <div className="grid gap-3 grid-cols-2 sm:grid-cols-4 mb-4">
-          {[1,2,3,4].map(i => (
-            <div key={i} className="animate-pulse rounded-xl bg-gray-100 h-20" />
-          ))}
-        </div>
-        <div className="animate-pulse rounded-xl bg-gray-100 h-16" />
-      </div>
-    );
-  }
-
-  const today     = pv?.today     || { views: 0, unique: 0 };
-  const yesterday = pv?.yesterday || { views: 0, unique: 0 };
-  const month     = pv?.month     || { views: 0 };
-  const topPages  = pv?.topPages  || [];
-  const devices   = pv?.devices   || {};
-  const totalToday = today.views;
-  const viewDelta  = today.views - yesterday.views;
-  const mob = devices.mobile  || 0;
-  const desk= devices.desktop || 0;
-  const tab = devices.tablet  || 0;
-  const devTotal = mob + desk + tab || 1;
-
-  const fetchedAt = pv?.fetchedAt
-    ? new Date(pv.fetchedAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })
-    : null;
-
-  return (
-    <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <TrendingUp size={18} className="text-green-700" />
-          <h2 className="font-bold text-gray-800">Website Traffic</h2>
-          {pv?.cached && <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] text-gray-400">cached</span>}
-        </div>
-        <div className="flex items-center gap-2">
-          {fetchedAt && <span className="text-[10px] text-gray-400">{fetchedAt}</span>}
-          <button
-            onClick={onRefresh}
-            disabled={refreshing}
-            title="Refresh traffic stats"
-            className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition disabled:opacity-40"
-          >
-            <RefreshCw size={13} className={refreshing ? "animate-spin" : ""} />
-          </button>
-        </div>
-      </div>
-
-      {/* Stat tiles */}
-      <div className="grid gap-3 grid-cols-2 sm:grid-cols-4 mb-5">
-        {[
-          { label: "Today's Views",    value: today.views,     sub: viewDelta >= 0 ? `+${viewDelta} vs yesterday` : `${viewDelta} vs yesterday`, positive: viewDelta >= 0, bg: "bg-green-50 border-green-100", num: "text-green-700" },
-          { label: "Today's Visitors", value: today.unique,    sub: "unique sessions",   positive: true, bg: "bg-blue-50 border-blue-100",   num: "text-blue-700" },
-          { label: "Yesterday Views",  value: yesterday.views, sub: `${yesterday.unique} visitors`, positive: null, bg: "bg-gray-50 border-gray-200",  num: "text-gray-700" },
-          { label: "This Month",       value: month.views,     sub: "last 30 days",      positive: null, bg: "bg-purple-50 border-purple-100", num: "text-purple-700" },
-        ].map(({ label, value, sub, positive, bg, num }) => (
-          <div key={label} className={`rounded-xl border ${bg} p-3`}>
-            <p className="text-[11px] font-medium text-gray-500">{label}</p>
-            <p className={`text-2xl font-black mt-0.5 ${num}`}>{(value ?? 0).toLocaleString("en-IN")}</p>
-            {sub && (
-              <p className={`text-[10px] mt-0.5 ${positive === true ? "text-green-600" : positive === false ? "text-red-500" : "text-gray-400"}`}>
-                {sub}
-              </p>
-            )}
+    <Card i={i} className="overflow-hidden">
+      <div className="relative bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950 px-5 pb-5 pt-5 text-white">
+        <div className="pointer-events-none absolute -right-8 -top-12 h-40 w-40 rounded-full bg-emerald-500/20 blur-3xl" />
+        <div className="relative flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/15"><Rocket size={17} /></span>
+            <div><p className="text-[15px] font-bold tracking-tight">Social autopilot</p><p className="text-xs text-white/55">Articles post themselves when they go live</p></div>
           </div>
-        ))}
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        {/* 7-day bar chart */}
-        <div className="rounded-xl bg-gray-50 p-3">
-          <p className="text-[11px] font-bold text-gray-600 mb-2">Last 7 Days</p>
-          <TrafficBars data={pv?.last7days} />
-          {pv?.last7days?.length > 0 && (
-            <p className="text-[10px] text-gray-400 mt-1 text-right">
-              {pv.last7days.reduce((s, d) => s + d.views, 0).toLocaleString("en-IN")} total views
-            </p>
-          )}
+          <Link href="/admin/social-scheduler" className="flex items-center gap-1 rounded-lg bg-white/10 px-2.5 py-1.5 text-xs font-semibold ring-1 ring-white/15 transition hover:bg-white/20">Open <ArrowUpRight size={13} /></Link>
         </div>
-
-        {/* Right column: top pages + device split */}
-        <div className="space-y-3">
-          {/* Top pages */}
-          <div className="rounded-xl bg-gray-50 p-3">
-            <p className="text-[11px] font-bold text-gray-600 mb-2">Top Pages Today</p>
-            {topPages.length === 0 ? (
-              <p className="text-[11px] text-gray-400">No visits tracked yet</p>
-            ) : (
-              <div className="space-y-1.5">
-                {topPages.slice(0, 5).map(p => (
-                  <div key={p.path} className="flex items-center gap-2">
-                    <span className="min-w-0 flex-1 truncate text-[11px] text-gray-600" title={p.path}>
-                      {p.path === "/" ? "Home" : p.path}
-                    </span>
-                    <span className="shrink-0 rounded bg-green-100 px-1.5 py-0.5 text-[10px] font-bold text-green-700">
-                      {p.views}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Device split */}
-          {totalToday > 0 && (
-            <div className="rounded-xl bg-gray-50 p-3">
-              <p className="text-[11px] font-bold text-gray-600 mb-2">Devices Today</p>
-              <div className="flex items-center gap-3">
-                {[
-                  { icon: Smartphone, label: "Mobile",  count: mob,  color: "text-blue-600" },
-                  { icon: Monitor,    label: "Desktop", count: desk, color: "text-green-700" },
-                  { icon: Tablet,     label: "Tablet",  count: tab,  color: "text-purple-600" },
-                ].map(({ icon: Icon, label, count, color }) => (
-                  <div key={label} className="flex flex-col items-center gap-0.5 flex-1">
-                    <Icon size={14} className={color} />
-                    <p className={`text-sm font-bold ${color}`}>{Math.round((count / devTotal) * 100)}%</p>
-                    <p className="text-[9px] text-gray-400">{label}</p>
-                  </div>
-                ))}
-              </div>
+        <div className="relative mt-4 grid grid-cols-3 gap-2">
+          {[[FaFacebook, "Facebook", fb, "text-[#1877F2]"], [FaInstagram, "Instagram", ig, "text-[#E4405F]"]].map(([I, l, on, c]) => (
+            <div key={l} className="flex items-center gap-2 rounded-xl bg-white/[0.06] px-3 py-2.5 ring-1 ring-white/10">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white"><I className={c} size={15} /></span>
+              <div className="min-w-0"><p className="truncate text-xs font-semibold">{l}</p>
+                <p className={`flex items-center gap-1 text-[10px] ${on ? "text-emerald-300" : "text-amber-300"}`}><span className={`h-1.5 w-1.5 rounded-full ${on ? "animate-pulse bg-emerald-400" : "bg-amber-400"}`} />{on ? "Connected" : "Not connected"}</p></div>
             </div>
-          )}
+          ))}
+          <div className="rounded-xl bg-white/[0.06] px-3 py-2.5 ring-1 ring-white/10"><p className="text-xl font-bold leading-none"><CountUp value={queue.length} /></p><p className="mt-1 text-[10px] text-white/55">posts queued</p></div>
         </div>
       </div>
-    </div>
+      <div className="px-5 py-4">
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">Up next</p>
+        {!social ? <Skeleton className="h-28" /> : queue.length === 0 ? <p className="py-4 text-sm text-slate-400">Nothing queued. Scheduled articles appear here automatically.</p> : (
+          <ul className="divide-y divide-slate-100">
+            {queue.slice(0, 4).map((p) => (
+              <li key={p._id} className="flex items-center gap-3 py-2.5">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={p.igImageUrl || (p.imageUrl ? `${p.imageUrl.split("?")[0]}?tr=w-120` : "/images/logo.png")} alt="" className="h-11 w-9 shrink-0 rounded-md bg-slate-100 object-cover" loading="lazy" />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[13px] font-medium text-slate-800">{(p.message || "").replace(/^⚡\s*/, "").split("\n")[0]}</p>
+                  <p className="flex items-center gap-1.5 text-[11px] text-slate-400"><Clock size={11} />{fmtWhen(p.scheduledAt)}</p>
+                </div>
+                <span className="flex shrink-0 gap-1 text-sm">{p.platforms?.includes("facebook") && <FaFacebook className="text-[#1877F2]" />}{p.platforms?.includes("instagram") && <FaInstagram className="text-[#E4405F]" />}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </Card>
   );
 }
 
+/* ─── Page ─────────────────────────────────────────────────────────── */
 export default function AdminDashboard() {
-  const [stats, setStats]           = useState(null);
-  const [recent, setRecent]         = useState([]);
-  const [featured, setFeatured]     = useState([]);
-  const [leads, setLeads]           = useState(null);
-  const [vehicles, setVehicles]     = useState(null);
+  const [now] = useState(() => new Date());
+  const [me, setMe] = useState(null);
+  const [stats, setStats] = useState(null);
+  const [recent, setRecent] = useState([]);
+  const [featured, setFeatured] = useState([]);
+  const [leads, setLeads] = useState(null);
+  const [vehicles, setVehicles] = useState(null);
   const [subscribers, setSubscribers] = useState(null);
-  const [analytics, setAnalytics]   = useState(null);
-  const [loading, setLoading]       = useState(true);
-  const [soundOn, setSoundOn]       = useState(true);
-  const [newChats, setNewChats]     = useState(0);
+  const [analytics, setAnalytics] = useState(null);
+  const [social, setSocial] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [soundOn, setSoundOn] = useState(true);
+  const [newChats, setNewChats] = useState(0);
   const [reindexing, setReindexing] = useState(false);
-  const [reindexResult, setReindexResult] = useState(null);
-  const [storage, setStorage]       = useState(null);
-  const [storageLoading, setStorageLoading] = useState(true);
+  const [toast, setToast] = useState(null);
+  const [storage, setStorage] = useState(null);
   const [storageRefreshing, setStorageRefreshing] = useState(false);
-  const [pv, setPv]                 = useState(null);
-  const [pvLoading, setPvLoading]   = useState(true);
+  const [pv, setPv] = useState(null);
+  const [pvLoading, setPvLoading] = useState(true);
   const [pvRefreshing, setPvRefreshing] = useState(false);
-  const soundOnRef                  = useRef(true);
+  const soundOnRef = useRef(true);
   useEffect(() => { soundOnRef.current = soundOn; }, [soundOn]);
 
-  /* Pusher: listen for new live-chat sessions from any page */
+  /* Pusher: new live-chat sessions */
   useEffect(() => {
     const pusher = getPusherClient();
     if (!pusher) return;
     const ch = pusher.subscribe("admin-notifications");
     ch.bind("new-session", (data) => {
       if (soundOnRef.current) playSound("new");
-      setNewChats(p => p + 1);
-      if (document.hidden && Notification.permission === "granted") {
-        new Notification("EVRadar Live Chat", {
-          body: `New visitor: ${data.userName || "Visitor"} is waiting`,
-          icon: "/images/logo.png",
-        });
+      setNewChats((p) => p + 1);
+      if (document.hidden && typeof Notification !== "undefined" && Notification.permission === "granted") {
+        new Notification("EVRadar Live Chat", { body: `New visitor: ${data.userName || "Visitor"} is waiting`, icon: "/images/logo.png" });
       }
     });
-    ch.bind("user-message", () => {
-      if (soundOnRef.current) playSound("chat");
-    });
+    ch.bind("user-message", () => { if (soundOnRef.current) playSound("chat"); });
     return () => { ch.unbind_all(); pusher.unsubscribe("admin-notifications"); };
   }, []);
 
   async function fetchStorage(force = false) {
-    const url = force ? "/api/admin/storage?bust=" + Date.now() : "/api/admin/storage";
-    try {
-      const res = await fetch(url);
-      if (res.ok) setStorage(await res.json());
-    } catch {}
-    setStorageLoading(false);
+    try { const r = await fetch(force ? `/api/admin/storage?bust=${Date.now()}` : "/api/admin/storage"); if (r.ok) setStorage(await r.json()); } catch {}
     setStorageRefreshing(false);
   }
-
   async function fetchPageviews(force = false) {
-    const url = force ? "/api/admin/pageviews?bust=" + Date.now() : "/api/admin/pageviews";
-    try {
-      const res = await fetch(url);
-      if (res.ok) setPv(await res.json());
-    } catch {}
-    setPvLoading(false);
-    setPvRefreshing(false);
+    try { const r = await fetch(force ? `/api/admin/pageviews?bust=${Date.now()}` : "/api/admin/pageviews"); if (r.ok) setPv(await r.json()); } catch {}
+    setPvLoading(false); setPvRefreshing(false);
   }
-
-  useEffect(() => { fetchStorage(); fetchPageviews(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    fetch("/api/admin/storage").then((r) => (r.ok ? r.json() : null)).then((d) => d && setStorage(d)).catch(() => {});
+    fetch("/api/admin/pageviews").then((r) => (r.ok ? r.json() : null)).then((d) => d && setPv(d)).catch(() => {}).finally(() => setPvLoading(false));
+  }, []);
 
   useEffect(() => {
+    fetch("/api/auth/me").then((r) => r.json()).then((d) => setMe(d.user || null)).catch(() => {});
+    fetch("/api/admin/social-posts?status=scheduled").then((r) => (r.ok ? r.json() : null)).then((d) => setSocial(d || { posts: [], connected: {} })).catch(() => setSocial({ posts: [], connected: {} }));
     async function load() {
       try {
-        const [pubRes, draftRes, latestRes, leadsRes, featRes, vehRes, subRes, analyticsRes] = await Promise.all([
-          fetch("/api/articles?status=published&limit=100"),
-          fetch("/api/articles?status=draft&limit=100"),
-          fetch("/api/articles?status=published&limit=6"),
-          fetch("/api/leads?limit=200"),
-          fetch("/api/articles?status=published&featured=true&limit=3"),
-          fetch("/api/vehicles?limit=200"),
-          fetch("/api/subscribe?limit=50"),
-          fetch("/api/admin/analytics"),
+        const res = await Promise.all([
+          fetch("/api/articles?status=published&limit=100"), fetch("/api/articles?status=draft&limit=100"), fetch("/api/articles?status=published&limit=6"),
+          fetch("/api/leads?limit=200"), fetch("/api/articles?status=published&featured=true&limit=3"), fetch("/api/vehicles?limit=200"),
+          fetch("/api/subscribe?limit=50"), fetch("/api/admin/analytics"),
         ]);
-        const [pub, draft, latest, leadsData, feat, vehData, subData, analyticsData] = await Promise.all([
-          pubRes.json(), draftRes.json(), latestRes.json(), leadsRes.json(), featRes.json(), vehRes.json(), subRes.json(), analyticsRes.json(),
-        ]);
+        const [pub, draft, latest, leadsData, feat, vehData, subData, analyticsData] = await Promise.all(res.map((r) => r.json()));
         setAnalytics(analyticsData);
-        const totalViews = (pub.articles || []).reduce((s, a) => s + (a.views || 0), 0);
-        setStats({ published: pub.total || 0, drafts: draft.total || 0, total: (pub.total || 0) + (draft.total || 0), views: totalViews });
+        setStats({ published: pub.total || 0, drafts: draft.total || 0, total: (pub.total || 0) + (draft.total || 0), views: (pub.articles || []).reduce((s, a) => s + (a.views || 0), 0) });
         setRecent(latest.articles || []);
         setFeatured((feat.articles || []).slice(0, 3));
-        const allLeads = leadsData.leads || [];
+        const L = leadsData.leads || [];
+        const weekAgo = Date.now() - 7 * 86400e3;
         setLeads({
-          total: allLeads.length,
-          newLeads: allLeads.filter((l) => l.status === "new").length,
-          cars: allLeads.filter((l) => l.vehicleType === "car").length,
-          bikes: allLeads.filter((l) => l.vehicleType === "bike").length,
-          commercial: allLeads.filter((l) => l.vehicleType === "commercial").length,
-          recent: allLeads.slice(0, 4),
+          total: L.length, newLeads: L.filter((l) => l.status === "new").length, week: L.filter((l) => new Date(l.createdAt) > weekAgo).length,
+          cars: L.filter((l) => l.vehicleType === "car").length, bikes: L.filter((l) => l.vehicleType === "bike").length,
+          commercial: L.filter((l) => l.vehicleType === "commercial").length, recent: L.slice(0, 5),
         });
-        const allV = vehData.vehicles || [];
+        const V = vehData.vehicles || [];
         setVehicles({
-          total:        allV.length,
-          upcomingCars: allV.filter((v) => v.category === "upcoming" && v.vehicleType === "car").length,
-          upcomingBikes:allV.filter((v) => v.category === "upcoming" && v.vehicleType === "bike").length,
-          popularCars:  allV.filter((v) => v.category === "popular"  && v.vehicleType === "car").length,
-          popularBikes: allV.filter((v) => v.category === "popular"  && v.vehicleType === "bike").length,
-          published:    allV.filter((v) => v.status === "published").length,
+          total: V.length, published: V.filter((v) => v.status === "published").length,
+          upcomingCars: V.filter((v) => v.category === "upcoming" && v.vehicleType === "car").length,
+          upcomingBikes: V.filter((v) => v.category === "upcoming" && v.vehicleType === "bike").length,
+          popularCars: V.filter((v) => v.category === "popular" && v.vehicleType === "car").length,
+          popularBikes: V.filter((v) => v.category === "popular" && v.vehicleType === "bike").length,
         });
-        setSubscribers({
-          total:   subData.total || 0,
-          recent:  (subData.subscribers || []).slice(0, 6),
-        });
+        setSubscribers({ total: subData.total || 0, recent: (subData.subscribers || []).slice(0, 6) });
       } catch {
         setStats({ published: 0, drafts: 0, total: 0, views: 0 });
-        setLeads({ total: 0, newLeads: 0, cars: 0, bikes: 0, commercial: 0, recent: [] });
-        setVehicles({ total: 0, upcomingCars: 0, upcomingBikes: 0, popularCars: 0, popularBikes: 0, published: 0 });
+        setLeads({ total: 0, newLeads: 0, week: 0, cars: 0, bikes: 0, commercial: 0, recent: [] });
+        setVehicles({ total: 0, published: 0, upcomingCars: 0, upcomingBikes: 0, popularCars: 0, popularBikes: 0 });
         setSubscribers({ total: 0, recent: [] });
-      } finally {
-        setLoading(false);
-      }
+      } finally { setLoading(false); }
     }
     load();
   }, []);
 
+  function say(text, ok = true) { setToast({ text, ok }); setTimeout(() => setToast(null), 6000); }
+  async function reindex() {
+    setReindexing(true);
+    try {
+      const r = await fetch("/api/admin/reindex", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "all" }) });
+      const d = await r.json();
+      say(d.success ? `Submitted ${d.totalUrls} URLs to Google & Bing via IndexNow` : "Re-index failed", !!d.success);
+    } catch { say("Network error while re-indexing", false); }
+    setReindexing(false);
+  }
+
+  const today = pv?.today || { views: 0, unique: 0 }, yesterday = pv?.yesterday || { views: 0, unique: 0 };
+  const spark = (pv?.last7days || []).map((d) => d.views);
+  const mongo = storage?.mongo, ik = storage?.imagekit;
+  const mongoTotal = mongo?.fsTotalSize || 512 * 1024 * 1024, mongoUsed = mongo?.fsUsedSize || mongo?.storageSize || 0;
+  const ikTotal = 20 * 1024 * 1024 * 1024, ikUsed = ik?.totalSize || 0;
+  const cats = analytics?.articlesByCategory || [];
+  const catMax = Math.max(...cats.map((c) => c.count), 1);
+  const topArticles = analytics?.topArticles || [];
+  const firstName = (me?.name || "").split(" ")[0];
+
   return (
-    <div className="min-h-screen bg-gray-50 p-4 pt-20 lg:p-6 lg:pt-6">
+    <div className="min-h-screen bg-[#F5F7FA] px-4 pb-10 pt-20 sm:px-6 lg:px-8 lg:pt-8">
+      <div className="mx-auto max-w-[1440px] space-y-6">
 
-      {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-black text-gray-900">Dashboard</h1>
-          <p className="mt-0.5 text-sm text-gray-500">Welcome back — EVBharat India CMS</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setSoundOn(p => !p)}
-            title={soundOn ? "Mute notifications" : "Unmute notifications"}
-            className={`relative rounded-xl p-2.5 border transition ${
-              soundOn ? "border-green-200 bg-green-50 text-green-600 hover:bg-green-100" : "border-gray-200 bg-white text-gray-300 hover:bg-gray-50"
-            }`}
-          >
-            <BellRing size={16} />
-            {newChats > 0 && soundOn && (
-              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-black text-white">
-                {newChats}
-              </span>
-            )}
-          </button>
-          {newChats > 0 && (
-            <Link href="/admin/live-chat"
-              onClick={() => setNewChats(0)}
-              className="flex items-center gap-2 rounded-xl bg-orange-500 px-3 py-2.5 text-sm font-bold text-white hover:bg-orange-600 transition animate-pulse shadow-sm">
-              <BellRing size={14} /> {newChats} New Chat{newChats > 1 ? "s" : ""}
-            </Link>
-          )}
-          <button
-            onClick={async () => {
-              setReindexing(true);
-              setReindexResult(null);
-              try {
-                const res = await fetch("/api/admin/reindex", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ type: "all" }) });
-                const data = await res.json();
-                setReindexResult(data.success ? `✓ Submitted ${data.totalUrls} URLs to Google/Bing` : "✗ Reindex failed");
-              } catch {
-                setReindexResult("✗ Network error");
-              } finally {
-                setReindexing(false);
-                setTimeout(() => setReindexResult(null), 8000);
-              }
-            }}
-            disabled={reindexing}
-            title="Submit all content to Google & Bing via IndexNow"
-            className="flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2.5 text-sm font-bold text-blue-700 hover:bg-blue-100 transition disabled:opacity-50"
-          >
-            <Zap size={14} className={reindexing ? "animate-spin" : ""} />
-            {reindexing ? "Submitting…" : reindexResult || "Re-index All"}
-          </button>
-          <Link href="/admin/articles/new"
-            className="flex items-center gap-2 rounded-xl bg-green-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-green-800 transition shadow-sm">
-            <Plus size={16} /> New Article
-          </Link>
-        </div>
-      </div>
-
-      {/* Site Traffic */}
-      <SiteTrafficWidget
-        pv={pv}
-        pvLoading={pvLoading}
-        refreshing={pvRefreshing}
-        onRefresh={() => { setPvRefreshing(true); fetchPageviews(true); }}
-      />
-
-      {/* Stat cards */}
-      <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard icon={Newspaper}    label="Total Articles" value={stats?.total}
-          sub={`${stats?.published ?? 0} published · ${stats?.drafts ?? 0} drafts`}
-          gradient="bg-gradient-to-br from-blue-500 to-blue-700" />
-        <StatCard icon={CheckCircle2} label="Published"      value={stats?.published}
-          sub="Live on site" gradient="bg-gradient-to-br from-green-600 to-green-800" />
-        <StatCard icon={FileText}     label="Drafts"         value={stats?.drafts}
-          sub="Awaiting publish" gradient="bg-gradient-to-br from-amber-500 to-orange-600" />
-        <StatCard icon={Eye}          label="Total Views"    value={stats?.views?.toLocaleString("en-IN")}
-          sub="Across all articles" gradient="bg-gradient-to-br from-purple-500 to-purple-700" />
-      </div>
-
-      {/* Vehicle stats */}
-      <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Car size={18} className="text-green-700" />
-            <h2 className="font-bold text-gray-800">Vehicle CMS</h2>
-            {loading
-              ? <div className="h-4 w-20 animate-pulse rounded bg-gray-100" />
-              : <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-bold text-green-700">{vehicles?.total ?? 0} total</span>
-            }
+        {/* Header */}
+        <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-emerald-600">
+              <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" /><span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" /></span>
+              Live · {now.toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" })}
+            </p>
+            <h1 className="mt-1.5 text-[28px] font-bold tracking-tight text-slate-900 sm:text-[32px]">{greetingFor(now)}{firstName ? `, ${firstName}` : ""} <span className="inline-block origin-[70%_70%] animate-[wave_2.2s_ease-in-out_1]">👋</span></h1>
+            <p className="mt-1 text-sm text-slate-500">Here&apos;s what&apos;s happening on EV Radar today.</p>
           </div>
-          <div className="flex items-center gap-2">
-            <Link href="/admin/vehicles/new"
-              className="flex items-center gap-1.5 rounded-xl bg-green-700 px-3 py-1.5 text-xs font-bold text-white hover:bg-green-800 transition">
-              <Plus size={12} /> Add Vehicle
-            </Link>
-            <Link href="/admin/vehicles"
-              className="flex items-center gap-1 text-xs font-semibold text-green-700 hover:text-green-900 transition">
-              Manage all <ArrowRight size={12} />
+          <div className="flex flex-wrap items-center gap-2">
+            <button onClick={() => setSoundOn((p) => !p)} title={soundOn ? "Mute live-chat sounds" : "Unmute live-chat sounds"}
+              className={`relative flex h-10 w-10 items-center justify-center rounded-xl border bg-white transition ${soundOn ? "border-slate-200 text-slate-700 hover:bg-slate-50" : "border-slate-200 text-slate-300"}`}>
+              {soundOn ? <BellRing size={17} /> : <BellOff size={17} />}
+              {newChats > 0 && <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[9px] font-bold text-white">{newChats}</span>}
+            </button>
+            <AnimatePresence>
+              {newChats > 0 && (
+                <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}>
+                  <Link href="/admin/live-chat" onClick={() => setNewChats(0)} className="flex h-10 items-center gap-2 rounded-xl bg-gradient-to-r from-orange-500 to-rose-500 px-4 text-sm font-semibold text-white shadow-lg shadow-orange-500/25">
+                    <Radio size={15} className="animate-pulse" />{newChats} new chat{newChats > 1 ? "s" : ""}
+                  </Link>
+                </motion.div>
+              )}
+            </AnimatePresence>
+            <button onClick={reindex} disabled={reindexing} title="Submit all content to Google & Bing via IndexNow"
+              className="flex h-10 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:opacity-60">
+              <Zap size={15} className={reindexing ? "animate-pulse text-amber-500" : "text-amber-500"} />{reindexing ? "Submitting…" : "Re-index all"}
+            </button>
+            <Link href="/admin/articles/new" className="group flex h-10 items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 text-sm font-semibold text-white shadow-lg shadow-emerald-600/25 transition hover:shadow-emerald-600/40">
+              <Plus size={16} className="transition-transform group-hover:rotate-90" />New article
             </Link>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {[
-            { label: "Upcoming Cars",   value: vehicles?.upcomingCars,  icon: Car,  color: "text-blue-600",   bg: "bg-blue-50",   border: "border-blue-100",   href: "/admin/vehicles?category=upcoming&type=car" },
-            { label: "Upcoming Bikes",  value: vehicles?.upcomingBikes, icon: Bike, color: "text-orange-500", bg: "bg-orange-50", border: "border-orange-100", href: "/admin/vehicles?category=upcoming&type=bike" },
-            { label: "Popular Cars",    value: vehicles?.popularCars,   icon: Car,  color: "text-green-700",  bg: "bg-green-50",  border: "border-green-100",  href: "/admin/vehicles?category=popular&type=car" },
-            { label: "Popular Bikes",   value: vehicles?.popularBikes,  icon: Bike, color: "text-purple-600", bg: "bg-purple-50", border: "border-purple-100", href: "/admin/vehicles?category=popular&type=bike" },
-          ].map(({ label, value, icon: Icon, color, bg, border, href }) => (
-            <Link key={label} href={href}
-              className={`flex items-center gap-3 rounded-xl border ${border} ${bg} px-4 py-3 transition hover:shadow-sm`}>
-              <Icon size={18} className={color} />
-              <div>
-                {loading
-                  ? <div className="h-5 w-8 animate-pulse rounded bg-gray-200 mb-1" />
-                  : <p className="text-xl font-black text-gray-900">{value ?? 0}</p>
-                }
-                <p className="text-[11px] text-gray-500">{label}</p>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        {!loading && vehicles?.published !== undefined && (
-          <p className="mt-3 text-[11px] text-gray-400">
-            {vehicles.published} published · {(vehicles.total - vehicles.published)} drafts
-          </p>
-        )}
-      </div>
-
-      {/* Main grid */}
-      <div className="grid gap-6 lg:grid-cols-3">
-
-        {/* Left — articles (2 cols) */}
-        <div className="space-y-6 lg:col-span-2">
-
-          {/* Featured */}
-          {(loading || featured.length > 0) && (
-            <section>
-              <div className="mb-3 flex items-center justify-between">
-                <h2 className="flex items-center gap-2 font-bold text-gray-800">
-                  <Star size={16} className="text-yellow-500" /> Featured Articles
-                </h2>
-                <Link href="/admin/articles" className="text-xs font-semibold text-green-700 hover:text-green-900 transition">
-                  View all →
-                </Link>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-3">
-                {loading
-                  ? Array(3).fill(0).map((_, i) => <div key={i} className="animate-pulse rounded-2xl bg-gray-200 h-48" />)
-                  : featured.map((a) => (
-                    <Link key={a._id} href={`/admin/articles/${a._id}/edit`}
-                      className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white hover:border-green-200 hover:shadow-md transition">
-                      <div className="relative h-32 w-full bg-gray-100">
-                        <ArticleImage
-                          src={a.image}
-                          fallbackSrc={articleImageFallback(a)}
-                          alt={a.imageAlt || a.title}
-                          className="h-full w-full object-cover transition group-hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
-                        <span className="absolute right-2 top-2 flex items-center gap-0.5 rounded-full bg-yellow-400/90 px-2 py-0.5 text-[9px] font-black text-yellow-900">
-                          <Star size={8} fill="currentColor" /> Featured
-                        </span>
-                      </div>
-                      <div className="p-3">
-                        <p className="line-clamp-2 text-xs font-semibold text-gray-800 leading-snug">{a.title}</p>
-                        <div className="mt-1.5 flex items-center gap-1 text-[10px] text-gray-400">
-                          <Eye size={9} /> {(a.views || 0).toLocaleString("en-IN")} views
-                        </div>
-                      </div>
-                    </Link>
-                  ))
-                }
-              </div>
-            </section>
+        <AnimatePresence>
+          {toast && (
+            <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
+              className={`flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium ${toast.ok ? "bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200" : "bg-rose-50 text-rose-700 ring-1 ring-rose-200"}`}>
+              <CircleCheck size={16} />{toast.text}
+            </motion.div>
           )}
+        </AnimatePresence>
 
-          {/* Recent articles */}
-          <section>
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="flex items-center gap-2 font-bold text-gray-800">
-                <Clock size={16} className="text-gray-400" /> Recent Articles
-              </h2>
-              <Link href="/admin/articles" className="text-xs font-semibold text-green-700 hover:text-green-900 transition">
-                Manage all →
-              </Link>
-            </div>
-            <div className="space-y-2">
-              {loading
-                ? Array(5).fill(0).map((_, i) => <div key={i} className="animate-pulse rounded-xl bg-gray-200 h-18" />)
-                : recent.length === 0
-                ? (
-                  <div className="rounded-2xl border border-dashed border-gray-300 py-12 text-center">
-                    <Newspaper size={28} className="mx-auto mb-2 text-gray-300" />
-                    <p className="text-sm text-gray-400">No articles yet</p>
-                    <Link href="/admin/articles/new"
-                      className="mt-3 inline-flex items-center gap-1 rounded-xl bg-green-700 px-3 py-1.5 text-xs font-bold text-white hover:bg-green-800 transition">
-                      <Plus size={12} /> Write first article
-                    </Link>
+        {/* KPIs */}
+        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+          <Kpi i={0} icon={Eye} label="Views today" value={today.views} delta={pvLoading ? null : today.views - yesterday.views} spark={spark} color="#10b981" gradient="from-emerald-500 to-teal-500" loading={pvLoading} />
+          <Kpi i={1} icon={Users} label="Visitors today" value={today.unique} foot={`${(yesterday.unique || 0).toLocaleString("en-IN")} yesterday`} gradient="from-sky-500 to-indigo-500" loading={pvLoading} spark={(pv?.last7days || []).map((d) => d.unique ?? d.views)} color="#0ea5e9" />
+          <Kpi i={2} icon={Sparkles} label="Customer leads" value={leads?.total} foot={leads ? `${leads.newLeads} new · ${leads.week} this week` : ""} gradient="from-amber-400 to-orange-500" loading={loading} href="/admin/leads" />
+          <Kpi i={3} icon={Mail} label="Email subscribers" value={subscribers?.total} foot={`${(stats?.views || 0).toLocaleString("en-IN")} article views all-time`} gradient="from-violet-500 to-fuchsia-500" loading={loading} href="/admin/subscribers" />
+        </div>
+
+        {/* Traffic */}
+        <TrafficCard pv={pv} loading={pvLoading} refreshing={pvRefreshing} onRefresh={() => { setPvRefreshing(true); fetchPageviews(true); }} />
+
+        {/* Content + social */}
+        <div className="grid gap-5 xl:grid-cols-3">
+          <Card i={6} className="xl:col-span-2">
+            <CardHeader icon={Newspaper} title="Content" sub={`${stats?.published ?? "—"} published · ${stats?.drafts ?? "—"} drafts & scheduled`} right={
+              <Link href="/admin/articles" className="flex items-center gap-1 text-xs font-semibold text-emerald-700 hover:text-emerald-900">All articles <ChevronRight size={14} /></Link>} />
+            <div className="grid gap-6 p-5 md:grid-cols-[1fr_1.2fr]">
+              <div className="grid grid-cols-2 gap-3">
+                {[["Published", stats?.published, CircleCheck, "text-emerald-600 bg-emerald-50"], ["Drafts", stats?.drafts, FileText, "text-amber-600 bg-amber-50"],
+                  ["Total articles", stats?.total, Newspaper, "text-sky-600 bg-sky-50"], ["All-time views", stats?.views, TrendingUp, "text-violet-600 bg-violet-50"]].map(([l, v, I, c]) => (
+                  <div key={l} className="rounded-xl border border-slate-100 bg-slate-50/60 p-3.5">
+                    <span className={`flex h-8 w-8 items-center justify-center rounded-lg ${c}`}><I size={15} /></span>
+                    <p className="mt-2.5 text-xl font-bold tracking-tight text-slate-900">{loading ? <Skeleton className="h-6 w-12" /> : <CountUp value={v} />}</p>
+                    <p className="text-xs text-slate-500">{l}</p>
                   </div>
-                )
-                : recent.map((a) => <ArticleCard key={a._id} article={a} />)
-              }
-            </div>
-          </section>
-
-          {/* IndexNow banner */}
-          <div className="rounded-2xl border border-green-200 bg-green-50 p-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-green-100">
-                <Zap size={18} className="text-green-700" />
+                ))}
               </div>
               <div>
-                <p className="text-sm font-bold text-green-800">IndexNow Active</p>
-                <p className="text-xs text-green-600 mt-0.5">
-                  Every article published is instantly pinged to Google, Bing &amp; Yandex.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Right — leads + quick actions */}
-        <div className="space-y-5">
-
-          {/* Leads card */}
-          <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-sm">
-            <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
-              <div className="flex items-center gap-2">
-                <Users size={16} className="text-green-700" />
-                <span className="font-bold text-gray-800 text-sm">Customer Leads</span>
-                {leads?.newLeads > 0 && (
-                  <span className="animate-pulse rounded-full bg-green-600 px-2 py-0.5 text-[10px] font-black text-white">
-                    {leads.newLeads} NEW
-                  </span>
+                <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-slate-400">By category</p>
+                {loading ? <Skeleton className="h-32" /> : cats.length === 0 ? <p className="text-sm text-slate-400">No data yet.</p> : (
+                  <ul className="space-y-3.5">
+                    {cats.map((c, idx) => (
+                      <li key={c._id}>
+                        <div className="mb-1.5 flex items-center justify-between text-sm">
+                          <span className="flex items-center gap-2 font-medium text-slate-700"><span className={`h-2 w-2 rounded-full ${catOf(c._id).dot}`} />{catOf(c._id).label}</span>
+                          <span className="text-xs text-slate-500"><b className="font-semibold text-slate-800">{c.count}</b> articles · {(c.totalViews || 0).toLocaleString("en-IN")} views</span>
+                        </div>
+                        <Bar pct={(c.count / catMax) * 100} className={catOf(c._id).bar} delay={0.1 * idx} />
+                      </li>
+                    ))}
+                  </ul>
                 )}
               </div>
-              <Link href="/admin/leads" className="flex items-center gap-1 text-xs font-semibold text-green-700 hover:text-green-900 transition">
-                View all <ArrowRight size={12} />
-              </Link>
             </div>
+          </Card>
+          <SocialCard social={social} i={7} />
+        </div>
 
-            <div className="grid grid-cols-2 divide-x divide-gray-100 border-b border-gray-100">
-              {[
-                { label: "Total",      value: leads?.total,      icon: Users, color: "text-gray-800" },
-                { label: "Cars",       value: leads?.cars,       icon: Car,   color: "text-blue-600" },
-                { label: "Bikes",      value: leads?.bikes,      icon: Bike,  color: "text-orange-500" },
-                { label: "Commercial", value: leads?.commercial, icon: Truck, color: "text-purple-600" },
-              ].map(({ label, value, icon: Icon, color }, i) => (
-                <div key={label} className={`flex flex-col items-center gap-0.5 py-4 ${i >= 2 ? "border-t border-gray-100" : ""}`}>
-                  <Icon size={15} className={color} />
-                  <p className={`text-xl font-black ${color}`}>{value ?? "—"}</p>
-                  <p className="text-[10px] text-gray-400">{label}</p>
+        {/* Recent + featured | Leads */}
+        <div className="grid gap-5 xl:grid-cols-3">
+          <div className="space-y-5 xl:col-span-2">
+            <Card i={8}>
+              <CardHeader icon={Clock} title="Latest articles" tone="slate" right={<Link href="/admin/articles/new" className="flex items-center gap-1 rounded-lg bg-slate-900 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-slate-700"><PenSquare size={12} />Write</Link>} />
+              <ul className="mt-3 divide-y divide-slate-100">
+                {loading ? Array.from({ length: 4 }).map((_, i) => <li key={i} className="px-5 py-3"><Skeleton className="h-14" /></li>)
+                  : recent.length === 0 ? <li className="px-5 py-10 text-center text-sm text-slate-400">No articles yet.</li>
+                  : recent.map((a) => (
+                    <li key={a._id}>
+                      <Link href={`/admin/articles/${a._id}/edit`} className="group flex items-center gap-4 px-5 py-3 transition hover:bg-slate-50/80">
+                        <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded-lg bg-slate-100">
+                          <ArticleImage src={a.image} fallbackSrc={ogFallback(a)} alt={a.imageAlt || a.title} className="h-full w-full object-cover transition duration-500 group-hover:scale-110" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="line-clamp-1 text-sm font-semibold text-slate-800 group-hover:text-emerald-700">{a.title}</p>
+                          <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-400">
+                            <span className={`rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${catOf(a.category).chip}`}>{catOf(a.category).label}</span>
+                            <span className="flex items-center gap-1"><Eye size={11} />{(a.views || 0).toLocaleString("en-IN")}</span>
+                            <span>{fmtDate(a.publishedAt || a.createdAt)}</span>
+                          </div>
+                        </div>
+                        <ArrowUpRight size={16} className="shrink-0 text-slate-300 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-emerald-600" />
+                      </Link>
+                    </li>
+                  ))}
+              </ul>
+            </Card>
+
+            {(loading || featured.length > 0) && (
+              <div className="grid gap-5 sm:grid-cols-3">
+                {loading ? Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-52 rounded-2xl" />) : featured.map((a, idx) => (
+                  <Card key={a._id} i={9 + idx} className="group overflow-hidden">
+                    <Link href={`/admin/articles/${a._id}/edit`} className="block">
+                      <div className="relative h-36 overflow-hidden">
+                        <ArticleImage src={a.image} fallbackSrc={ogFallback(a)} alt={a.imageAlt || a.title} className="h-full w-full object-cover transition duration-700 group-hover:scale-110" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/10 to-transparent" />
+                        <span className="absolute left-3 top-3 flex items-center gap-1 rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-bold text-amber-950 shadow"><Star size={10} fill="currentColor" />Featured</span>
+                        <p className="absolute inset-x-3 bottom-3 line-clamp-2 text-[13px] font-semibold leading-snug text-white">{a.title}</p>
+                      </div>
+                      <div className="flex items-center justify-between px-3 py-2.5 text-xs text-slate-500">
+                        <span className="flex items-center gap-1"><Eye size={12} />{(a.views || 0).toLocaleString("en-IN")} views</span>
+                        <span>{fmtDate(a.publishedAt || a.createdAt)}</span>
+                      </div>
+                    </Link>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-5">
+            <Card i={9}>
+              <CardHeader icon={Sparkles} title="Customer leads" tone="amber" right={
+                <div className="flex items-center gap-2">
+                  {leads?.newLeads > 0 && <span className="flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-bold text-emerald-700"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />{leads.newLeads} new</span>}
+                  <Link href="/admin/leads" className="text-slate-400 hover:text-slate-700" aria-label="All leads"><ArrowUpRight size={17} /></Link>
+                </div>} />
+              <div className="mx-5 mt-4 grid grid-cols-3 gap-2">
+                {[["Cars", leads?.cars, Car, "text-sky-600"], ["Bikes", leads?.bikes, Bike, "text-orange-500"], ["Commercial", leads?.commercial, Truck, "text-violet-600"]].map(([l, v, I, c]) => (
+                  <div key={l} className="rounded-xl bg-slate-50 py-2.5 text-center"><I size={15} className={`mx-auto ${c}`} /><p className="mt-1 text-lg font-bold text-slate-900">{loading ? "—" : <CountUp value={v} />}</p><p className="text-[10px] text-slate-500">{l}</p></div>
+                ))}
+              </div>
+              <ul className="mt-2 divide-y divide-slate-100 px-2 pb-2">
+                {loading ? <li className="p-3"><Skeleton className="h-28" /></li> : leads?.recent?.length === 0 ? <li className="py-8 text-center text-sm text-slate-400">No leads yet.</li>
+                  : leads.recent.map((l) => {
+                    const I = l.vehicleType === "car" ? Car : l.vehicleType === "bike" ? Bike : Truck;
+                    const st = { new: "bg-emerald-50 text-emerald-700", contacted: "bg-amber-50 text-amber-700", converted: "bg-sky-50 text-sky-700" }[l.status] || "bg-slate-100 text-slate-500";
+                    return (
+                      <li key={l._id} className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition hover:bg-slate-50">
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-slate-100 to-slate-200 text-sm font-bold text-slate-600">{(l.name || "?")[0].toUpperCase()}</span>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-[13px] font-semibold text-slate-800">{l.name}</p>
+                          <p className="flex items-center gap-1 truncate text-[11px] text-slate-400"><I size={11} />{l.vehicleName}{l.city ? ` · ${l.city}` : ""}</p>
+                        </div>
+                        <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold capitalize ${st}`}>{l.status}</span>
+                      </li>
+                    );
+                  })}
+              </ul>
+            </Card>
+
+            <Card i={10}>
+              <CardHeader icon={TrendingUp} title="Most read" tone="violet" sub="All-time top articles" />
+              <ol className="mt-3 space-y-1 px-2 pb-3">
+                {loading ? <li className="p-3"><Skeleton className="h-36" /></li> : topArticles.length === 0 ? <li className="py-6 text-center text-sm text-slate-400">No view data yet.</li>
+                  : topArticles.slice(0, 5).map((a, i) => (
+                    <li key={a._id} className="flex items-center gap-3 rounded-xl px-3 py-2 transition hover:bg-slate-50">
+                      <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${i === 0 ? "bg-gradient-to-br from-amber-300 to-amber-500 text-amber-950" : i === 1 ? "bg-slate-200 text-slate-700" : i === 2 ? "bg-orange-100 text-orange-700" : "bg-slate-50 text-slate-400"}`}>{i + 1}</span>
+                      <div className="min-w-0 flex-1"><p className="truncate text-[13px] font-medium text-slate-800">{a.title}</p><p className="text-[11px] text-slate-400">{catOf(a.category).label}</p></div>
+                      <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-violet-600"><Eye size={12} />{(a.views || 0).toLocaleString("en-IN")}</span>
+                    </li>
+                  ))}
+              </ol>
+            </Card>
+          </div>
+        </div>
+
+        {/* Bottom row */}
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+          <Card i={11} className="p-5">
+            <div className="flex items-center justify-between">
+              <p className="flex items-center gap-2 text-[15px] font-bold tracking-tight text-slate-900"><Car size={17} className="text-emerald-600" />Vehicle catalogue</p>
+              <Link href="/admin/vehicles/new" className="rounded-lg bg-emerald-50 p-1.5 text-emerald-700 hover:bg-emerald-100" aria-label="Add vehicle"><Plus size={15} /></Link>
+            </div>
+            <p className="mt-3 text-3xl font-bold tracking-tight text-slate-900">{loading ? "—" : <CountUp value={vehicles?.total} />}</p>
+            <p className="text-xs text-slate-500">{vehicles ? `${vehicles.published} live · ${vehicles.total - vehicles.published} drafts` : ""}</p>
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              {[["Upcoming cars", vehicles?.upcomingCars, "/admin/vehicles?category=upcoming&type=car"], ["Upcoming bikes", vehicles?.upcomingBikes, "/admin/vehicles?category=upcoming&type=bike"],
+                ["Popular cars", vehicles?.popularCars, "/admin/vehicles?category=popular&type=car"], ["Popular bikes", vehicles?.popularBikes, "/admin/vehicles?category=popular&type=bike"]].map(([l, v, h]) => (
+                <Link key={l} href={h} className="rounded-xl border border-slate-100 px-3 py-2 transition hover:border-emerald-200 hover:bg-emerald-50/40">
+                  <p className="text-base font-bold text-slate-900">{v ?? "—"}</p><p className="text-[10px] text-slate-500">{l}</p>
+                </Link>
+              ))}
+            </div>
+          </Card>
+
+          <Card i={12} className="p-5">
+            <p className="flex items-center gap-2 text-[15px] font-bold tracking-tight text-slate-900"><Mail size={17} className="text-violet-600" />New subscribers</p>
+            <ul className="mt-3 space-y-2">
+              {loading ? <Skeleton className="h-36" /> : subscribers?.recent?.length === 0 ? <p className="py-6 text-center text-sm text-slate-400">No subscribers yet.</p>
+                : subscribers.recent.map((s) => (
+                  <li key={s._id} className="flex items-center gap-2.5">
+                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 text-[11px] font-bold text-white">{s.email[0].toUpperCase()}</span>
+                    <p className="min-w-0 flex-1 truncate text-xs text-slate-700">{s.email}</p>
+                    <span className="text-[10px] text-slate-400">{fmtDate(s.createdAt)}</span>
+                  </li>
+                ))}
+            </ul>
+          </Card>
+
+          <Card i={13} className="p-5">
+            <div className="flex items-center justify-between">
+              <p className="flex items-center gap-2 text-[15px] font-bold tracking-tight text-slate-900"><Database size={17} className="text-sky-600" />Storage</p>
+              <button onClick={() => { setStorageRefreshing(true); fetchStorage(true); }} disabled={storageRefreshing} className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-40" aria-label="Refresh storage"><RefreshCw size={14} className={storageRefreshing ? "animate-spin" : ""} /></button>
+            </div>
+            <div className="mt-4 space-y-4">
+              {[["MongoDB Atlas", mongo, mongoUsed, mongoTotal, "#10b981", Database, mongo ? `${(mongo.objects || 0).toLocaleString("en-IN")} documents` : ""],
+                ["ImageKit CDN", ik, ikUsed, ikTotal, "#8b5cf6", ImageIcon, ik ? `${(ik.totalFiles || 0).toLocaleString("en-IN")} files` : ""]].map(([l, ok, used, total, color, I, extra]) => (
+                <div key={l} className="flex items-center gap-3.5">
+                  {storage ? <Ring pct={total ? (used / total) * 100 : 0} color={color} /> : <Skeleton className="h-16 w-16 rounded-full" />}
+                  <div className="min-w-0">
+                    <p className="flex items-center gap-1.5 text-sm font-semibold text-slate-800"><I size={13} style={{ color }} />{l}</p>
+                    {ok ? <><p className="text-xs text-slate-500">{fmtBytes(used)} of {fmtBytes(total)}</p><p className="text-[11px] text-slate-400">{extra}</p></>
+                      : <p className="text-xs text-slate-400">{storage ? "Couldn't load stats" : "Loading…"}</p>}
+                  </div>
                 </div>
               ))}
             </div>
+          </Card>
 
-            <div className="divide-y divide-gray-50 max-h-60 overflow-y-auto">
-              {loading
-                ? Array(3).fill(0).map((_, i) => (
-                  <div key={i} className="animate-pulse flex items-center gap-3 px-4 py-3">
-                    <div className="h-8 w-8 rounded-lg bg-gray-100" />
-                    <div className="flex-1 space-y-1.5">
-                      <div className="h-2.5 w-2/3 rounded bg-gray-100" />
-                      <div className="h-2 w-1/2 rounded bg-gray-100" />
-                    </div>
-                  </div>
-                ))
-                : leads?.recent?.length === 0
-                ? <p className="py-8 text-center text-xs text-gray-400">No leads yet</p>
-                : leads?.recent?.map((lead) => {
-                  const TypeIcon = lead.vehicleType === "car" ? Car : lead.vehicleType === "bike" ? Bike : Truck;
-                  const typeColor = lead.vehicleType === "car"
-                    ? "bg-blue-100 text-blue-600"
-                    : lead.vehicleType === "bike"
-                    ? "bg-orange-100 text-orange-500"
-                    : "bg-purple-100 text-purple-600";
-                  return (
-                    <div key={lead._id} className="flex items-center gap-3 px-4 py-3">
-                      <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${typeColor}`}>
-                        <TypeIcon size={14} />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="truncate text-xs font-bold text-gray-800">{lead.name}</p>
-                        <p className="text-[10px] text-gray-400 truncate">{lead.vehicleName} · {lead.phone}</p>
-                      </div>
-                      <span className={`text-[10px] font-bold capitalize ${
-                        lead.status === "new" ? "text-green-600"
-                        : lead.status === "contacted" ? "text-yellow-600"
-                        : lead.status === "converted" ? "text-emerald-600"
-                        : "text-red-500"
-                      }`}>{lead.status}</span>
-                    </div>
-                  );
-                })
-              }
-            </div>
-          </div>
-
-          {/* Email Subscribers */}
-          <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-sm">
-            <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
-              <div className="flex items-center gap-2">
-                <Mail size={16} className="text-green-700" />
-                <span className="font-bold text-gray-800 text-sm">Email Subscribers</span>
-                {!loading && (
-                  <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-bold text-green-700">
-                    {subscribers?.total ?? 0}
-                  </span>
-                )}
-              </div>
-            </div>
-            <div className="divide-y divide-gray-50 max-h-52 overflow-y-auto">
-              {loading
-                ? Array(3).fill(0).map((_, i) => (
-                  <div key={i} className="animate-pulse flex items-center gap-3 px-4 py-3">
-                    <div className="h-7 w-7 rounded-full bg-gray-100" />
-                    <div className="h-2.5 w-2/3 rounded bg-gray-100" />
-                  </div>
-                ))
-                : subscribers?.recent?.length === 0
-                ? <p className="py-8 text-center text-xs text-gray-400">No subscribers yet</p>
-                : subscribers?.recent?.map((sub) => (
-                  <div key={sub._id} className="flex items-center gap-3 px-4 py-2.5">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green-100 text-xs font-black text-green-700">
-                      {sub.email[0].toUpperCase()}
-                    </div>
-                    <p className="flex-1 truncate text-xs text-gray-700">{sub.email}</p>
-                    <span className="text-[10px] text-gray-400">
-                      {new Date(sub.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
-                    </span>
-                  </div>
-                ))
-              }
-            </div>
-          </div>
-
-          {/* Top Articles by Views */}
-          <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden shadow-sm">
-            <div className="flex items-center gap-2 border-b border-gray-100 px-4 py-3">
-              <BarChart2 size={16} className="text-purple-600" />
-              <span className="font-bold text-gray-800 text-sm">Top Articles by Views</span>
-            </div>
-            <div className="divide-y divide-gray-50">
-              {loading
-                ? Array(5).fill(0).map((_, i) => <div key={i} className="animate-pulse h-10 mx-4 my-2 rounded bg-gray-100" />)
-                : (analytics?.topArticles || []).map((a, i) => (
-                  <div key={a._id} className="flex items-center gap-3 px-4 py-2.5">
-                    <span className="text-xs font-black text-gray-300 w-4 shrink-0">{i + 1}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="truncate text-xs font-semibold text-gray-800">{a.title}</p>
-                      <p className="text-[10px] capitalize text-gray-400">{a.category}</p>
-                    </div>
-                    <div className="flex items-center gap-1 text-xs font-bold text-purple-600 shrink-0">
-                      <Eye size={10} /> {(a.views || 0).toLocaleString("en-IN")}
-                    </div>
-                  </div>
-                ))
-              }
-              {!loading && !analytics?.topArticles?.length && (
-                <p className="py-6 text-center text-xs text-gray-400">No view data yet</p>
-              )}
-            </div>
-          </div>
-
-          {/* Category Breakdown */}
-          {(analytics?.articlesByCategory?.length > 0) && (
-            <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-              <h2 className="mb-3 font-bold text-gray-800 text-sm">Articles by Category</h2>
-              <div className="space-y-2">
-                {analytics.articlesByCategory.map(cat => {
-                  const colors = { cars: "bg-blue-500", bikes: "bg-orange-500", commercial: "bg-purple-500", charging: "bg-teal-500" };
-                  const max = analytics.articlesByCategory[0]?.count || 1;
-                  return (
-                    <div key={cat._id}>
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="font-semibold capitalize text-gray-700">{cat._id}</span>
-                        <span className="text-gray-400">{cat.count} articles · {(cat.totalViews || 0).toLocaleString("en-IN")} views</span>
-                      </div>
-                      <div className="h-2 rounded-full bg-gray-100 overflow-hidden">
-                        <div className={`h-full rounded-full ${colors[cat._id] || "bg-gray-400"} transition-all`}
-                          style={{ width: `${(cat.count / max) * 100}%` }} />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Quick Actions */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-            <h2 className="mb-3 font-bold text-gray-800 text-sm">Quick Actions</h2>
-            <div className="space-y-1.5">
-              {[
-                { href: "/admin/articles/new", label: "Write New Article", icon: Newspaper, color: "text-blue-600",   bg: "bg-blue-50" },
-                { href: "/admin/articles",     label: "Manage Articles",   icon: BarChart2, color: "text-green-700",  bg: "bg-green-50" },
-                { href: "/admin/vehicles/new", label: "Add New Vehicle",   icon: Car,       color: "text-orange-600", bg: "bg-orange-50" },
-                { href: "/admin/vehicles",     label: "Manage Vehicles",   icon: Bike,      color: "text-purple-600", bg: "bg-purple-50" },
-                { href: "/admin/leads",        label: "View All Leads",    icon: Users,     color: "text-yellow-600", bg: "bg-yellow-50" },
-                { href: "/",                   label: "View Live Site",    icon: Eye,       color: "text-teal-600",   bg: "bg-teal-50", external: true },
-              ].map((action) => (
-                <Link key={action.href} href={action.href}
-                  target={action.external ? "_blank" : undefined}
-                  className="flex items-center gap-3 rounded-xl border border-gray-100 px-3 py-2.5 text-sm font-medium text-gray-700 hover:border-gray-200 hover:bg-gray-50 hover:text-gray-900 transition">
-                  <div className={`flex h-7 w-7 items-center justify-center rounded-lg ${action.bg}`}>
-                    <action.icon size={14} className={action.color} />
-                  </div>
-                  {action.label}
+          <Card i={14} className="p-5">
+            <p className="flex items-center gap-2 text-[15px] font-bold tracking-tight text-slate-900"><Rocket size={17} className="text-orange-500" />Quick actions</p>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              {[["/admin/articles/new", "New article", PenSquare, "from-emerald-500 to-teal-500"], ["/admin/blogs/new", "New guide", BookOpen, "from-sky-500 to-indigo-500"],
+                ["/admin/vehicles/new", "Add vehicle", Car, "from-amber-400 to-orange-500"], ["/admin/social-scheduler", "Social post", Send, "from-pink-500 to-rose-500"],
+                ["/admin/leads", "Leads", Users, "from-violet-500 to-fuchsia-500"], ["/", "View site", Globe, "from-slate-600 to-slate-800"]].map(([h, l, I, g]) => (
+                <Link key={h} href={h} target={h === "/" ? "_blank" : undefined} className="group flex flex-col items-start gap-2 rounded-xl border border-slate-100 p-3 transition hover:-translate-y-0.5 hover:border-slate-200 hover:shadow-md">
+                  <span className={`flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br ${g} text-white transition-transform group-hover:scale-110`}><I size={15} /></span>
+                  <span className="text-xs font-semibold text-slate-700">{l}</span>
                 </Link>
               ))}
             </div>
-          </div>
-
-          {/* Storage usage */}
-          <StorageWidget
-            storage={storage}
-            loading={storageLoading}
-            refreshing={storageRefreshing}
-            onRefresh={() => {
-              setStorageRefreshing(true);
-              fetchStorage(true);
-            }}
-          />
-
-          {/* SEO checklist */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-            <h2 className="mb-3 font-bold text-gray-800 text-sm">SEO Checklist</h2>
-            <ul className="space-y-2">
-              {[
-                "Write unique titles (50–60 chars)",
-                "Add meta description (150–160 chars)",
-                "Keywords in first paragraph",
-                "Upload images to ImageKit CDN",
-                "Add relevant tags",
-                "Feature important articles",
-              ].map((tip) => (
-                <li key={tip} className="flex items-start gap-2 text-xs text-gray-500">
-                  <CheckCircle2 size={11} className="mt-0.5 shrink-0 text-green-600" />
-                  {tip}
-                </li>
-              ))}
-            </ul>
-          </div>
+          </Card>
         </div>
+
+        <p className="flex items-center justify-center gap-2 pt-2 text-xs text-slate-400"><Zap size={12} className="text-emerald-500" />IndexNow is on: every published article is pinged to Google, Bing and Yandex instantly.</p>
       </div>
     </div>
   );

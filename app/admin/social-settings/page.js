@@ -253,7 +253,7 @@ export default function SocialSettingsPage() {
   }, []);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
+    <div className="mx-auto max-w-4xl px-4 pb-8 pt-20 lg:pt-8">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-black text-gray-900">Social Media Settings</h1>
