@@ -9,6 +9,7 @@ import {
   Menu, X, ExternalLink, Settings,
   Users, Building2, MapPin, ShieldCheck, Car, LayoutTemplate, MessageSquare, Radio, MessagesSquare, BookOpen, Bell, SearchCheck, UserCircle, Tag, Star, Mail,
   Share2, BarChart3, HardDrive, Database, Image as ImageIcon, Megaphone, Link2,
+  Zap,
 } from "lucide-react";
 import { getPusherClient } from "@/lib/pusherClient";
 
@@ -109,6 +110,7 @@ const ADMIN_NAV = [
   { href: "/admin/banners",         label: "Banners",      icon: LayoutTemplate },
   { href: "/admin/leads",           label: "Leads",        icon: Users },
   { href: "/admin/chatbot-leads",   label: "Chatbot Leads", icon: MessageSquare },
+  { href: "/admin/charging-reports", label: "Charging Reports", icon: Zap },
   { href: "/admin/live-chat",       label: "Live Chat",    icon: Radio, badge: "liveChat" },
   { href: "/admin/reviews",             label: "Reviews",           icon: Star,           badge: "reviews" },
   { href: "/admin/comments",           label: "Comments",          icon: MessagesSquare, badge: "comments" },

@@ -1,143 +1,84 @@
 import Link from "next/link";
-import ChargingStationFinder from "@/components/ChargingStationFinder";
+import { MapPin, Zap, Plus } from "lucide-react";
 import { SITE_URL } from "@/app/layout";
+import ChargingFinder from "@/components/charging/ChargingFinder";
+import { CITY_CENTERS, stationStats } from "@/lib/chargingStations";
+import CITY_DATA from "@/lib/city-tax-data.json";
+
+export const revalidate = 3600;
 
 export const metadata = {
-  title: "EV Charging Stations Near Me – Find Charging Points in India",
-  description: "Find electric vehicle charging stations near you across India. Filter by connector type, network, and availability. Tata Power, Ather Grid, ChargeZone, and more.",
-  keywords: "ev charging station near me india, electric car charging point india, tata power ev charging, fast charging station india",
+  title: "EV Charging Stations Near Me – Map of Charging Points in India",
+  description: "Find EV charging stations near you on an India map. Search by city or your location, filter DC fast chargers, two-wheeler chargers and battery swap, get directions, and report missing stations.",
   alternates: { canonical: `${SITE_URL}/charging-stations` },
   openGraph: {
-    title: "EV Charging Stations Near Me – India",
-    description: "Locate EV charging stations across all Indian cities. Filter by connector type and charging speed.",
-    url: `${SITE_URL}/charging-stations`,
-    type: "website",
+    title: "EV Charging Stations Near Me – India Map",
+    description: "Search EV charging stations across India by city or your location, with directions and fast-charger filters.",
+    url: `${SITE_URL}/charging-stations`, type: "website",
     images: [{ url: `${SITE_URL}/api/og?title=EV Charging Stations India&subtitle=Find chargers near you&tag=map`, width: 1200, height: 630 }],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "EV Charging Stations Near Me – India",
-    images: [`${SITE_URL}/api/og?title=EV Charging Stations India&subtitle=Find chargers near you&tag=map`],
   },
 };
 
-const jsonLd = [
-  {
-    "@context": "https://schema.org",
-    "@type": "WebApplication",
-    name: "EV Charging Station Finder India",
-    applicationCategory: "TravelApplication",
-    operatingSystem: "Web",
-    url: `${SITE_URL}/charging-stations`,
-    description: "Find electric vehicle charging stations near any location in India. Search by city, connector type (CCS2, CHAdeMO, Type 2, AC), and charging network.",
-    offers: { "@type": "Offer", price: "0", priceCurrency: "INR" },
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: [
-      {
-        "@type": "Question",
-        name: "How many EV charging stations are there in India?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "India had over 12,000 public EV charging stations as of 2024, installed by networks like Tata Power EV, ChargeZone, Ather Grid, Statiq, and BPCL. The government targets 46,000 charging stations by 2030 under the National Electric Mobility Mission.",
-        },
-      },
-      {
-        "@type": "Question",
-        name: "Which EV charging networks operate in India?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "Major EV charging networks in India include Tata Power EZ Charge, ChargeZone, Ather Grid, Statiq, Jio-BP Pulse, BPCL EV Recharge, Magenta ChargeGrid, and EESL. Most support the CCS2 (DC fast charging) and Type 2 (AC) connector standards.",
-        },
-      },
-      {
-        "@type": "Question",
-        name: "What connector type do Indian EVs use?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "Most Indian electric cars (Tata, Mahindra, MG, Kia, Hyundai) use the CCS2 connector for DC fast charging and Type 2 for AC charging. Electric two-wheelers (Ola, Ather, TVS) typically use proprietary connectors with adapters for public AC charging.",
-        },
-      },
-      {
-        "@type": "Question",
-        name: "How long does it take to charge an EV in India?",
-        acceptedAnswer: {
-          "@type": "Answer",
-          text: "Charging time depends on the charger type: AC slow charging (3.3–7.2 kW) takes 6–12 hours for a full charge. DC fast chargers (25–100 kW) charge to 80% in 30–60 minutes. Ultra-fast chargers (100–150 kW) can charge to 80% in 20–35 minutes.",
-        },
-      },
-    ],
-  },
-  {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home",              item: SITE_URL },
-      { "@type": "ListItem", position: 2, name: "Charging Stations", item: `${SITE_URL}/charging-stations` },
-    ],
-  },
+const FAQS = [
+  { q: "How do I find an EV charging station near me?", a: "Tap “Near me” and allow location access. The map and list show the closest charging stations with distance, charger type and power, and a Navigate button for directions." },
+  { q: "Can I find chargers for electric scooters and bikes?", a: "Yes. Use the Two-wheeler and Battery swap filters to show stations that support electric two-wheelers or battery swapping." },
+  { q: "A charging station is missing or not working. What can I do?", a: "Use “Add missing station” to send us its location, or “Report problem” on a listed station. Our team checks every report before updating the map." },
+  { q: "Where does the charging station data come from?", a: "Stations come from OpenStreetMap and Open Charge Map, plus reports from EV owners verified by EV Radar. Details can change, so confirm availability with the operator before a long trip." },
 ];
 
-const CHARGING_NETWORKS = [
-  { name: "Tata Power EZ Charge", connectors: "CCS2, AC Type 2", stations: "5,000+", href: "https://www.tatapower-ez.com" },
-  { name: "ChargeZone",           connectors: "CCS2, CHAdeMO",   stations: "3,500+", href: "https://www.chargezone.in" },
-  { name: "Ather Grid",           connectors: "Proprietary, AC", stations: "2,000+", href: "https://www.atherenergy.com" },
-  { name: "Statiq",               connectors: "CCS2, AC Type 2", stations: "2,500+", href: "https://www.statiq.in" },
-  { name: "Jio-BP Pulse",         connectors: "CCS2, AC Type 2", stations: "1,200+", href: "https://www.jio-bp.in" },
-];
+export default async function ChargingStationsPage() {
+  let stats = { total: 0, dc: 0, byCity: {} };
+  try { stats = await stationStats(); } catch { /* render without counts */ }
+  const cities = CITY_DATA.cities;
+  const jsonLd = [
+    { "@context": "https://schema.org", "@type": "WebApplication", name: "EV Charging Station Finder India", url: `${SITE_URL}/charging-stations`, applicationCategory: "TravelApplication", operatingSystem: "Web", offers: { "@type": "Offer", price: "0", priceCurrency: "INR" } },
+    { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: FAQS.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) },
+  ];
 
-const TOP_CITIES = [
-  "Mumbai", "Delhi", "Bangalore", "Hyderabad", "Chennai",
-  "Pune", "Ahmedabad", "Kolkata", "Jaipur", "Lucknow",
-  "Chandigarh", "Bhopal",
-];
-
-export default function ChargingStationsPage() {
   return (
     <>
-      {jsonLd.map((schema, i) => (
-        <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
-      ))}
+      {jsonLd.map((j, i) => <script key={i} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(j) }} />)}
+      <main className="min-h-screen bg-gray-50 pb-16">
+        <section className="bg-gray-950 py-10">
+          <div className="mx-auto max-w-7xl px-4">
+            <h1 className="text-3xl font-black text-white md:text-4xl">EV Charging Stations Near You</h1>
+            <p className="mt-2 max-w-2xl text-gray-400">Find electric car and scooter charging points across India, get directions, and help other EV owners by reporting missing or broken chargers.</p>
+            {stats.total > 0 && (
+              <div className="mt-5 flex flex-wrap gap-3 text-sm">
+                <span className="flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-1.5 font-bold text-white"><MapPin size={14} className="text-green-400" />{stats.total.toLocaleString("en-IN")} stations mapped</span>
+                <span className="flex items-center gap-1.5 rounded-full bg-white/10 px-4 py-1.5 font-bold text-white"><Zap size={14} className="text-green-400" />{stats.dc.toLocaleString("en-IN")} DC fast</span>
+              </div>
+            )}
+          </div>
+        </section>
 
-      {/* Static server-rendered intro for SEO / crawlers */}
-      <div className="bg-white py-10">
-        <div className="mx-auto max-w-7xl px-4">
-          <h1 className="text-3xl font-black text-gray-900 mb-2">EV Charging Stations Near Me – India</h1>
-          <p className="text-gray-500 mb-8 max-w-3xl">
-            Find electric vehicle charging stations across India. Search by city, filter by connector type (CCS2, CHAdeMO, Type 2, AC), and browse all major networks including Tata Power, ChargeZone, Ather Grid, Statiq, and Jio-BP Pulse.
-          </p>
+        <div className="mx-auto max-w-7xl space-y-10 px-4 py-8">
+          <ChargingFinder cities={cities} centers={CITY_CENTERS} initialCity="delhi" />
 
-          {/* Charging Networks */}
-          <section className="mb-10">
-            <h2 className="text-xl font-black text-gray-900 mb-4">Major EV Charging Networks in India</h2>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {CHARGING_NETWORKS.map((n) => (
-                <div key={n.name} className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
-                  <h3 className="font-bold text-gray-900">{n.name}</h3>
-                  <p className="text-sm text-gray-500 mt-1">Connectors: {n.connectors}</p>
-                  <p className="text-sm text-green-700 font-semibold">{n.stations} stations across India</p>
-                </div>
+          <section>
+            <h2 className="mb-4 text-xl font-black text-gray-900">EV charging stations by city</h2>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+              {cities.map((c) => (
+                <Link key={c.slug} href={`/charging-stations/${c.slug}`} className="flex items-center justify-between rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-sm font-semibold text-gray-800 hover:border-green-400 hover:text-green-700">
+                  <span>{c.name}</span>{stats.byCity[c.slug] ? <span className="text-xs text-gray-400">{stats.byCity[c.slug]}</span> : null}
+                </Link>
               ))}
             </div>
           </section>
 
-          {/* Cities */}
-          <section className="mb-10">
-            <h2 className="text-xl font-black text-gray-900 mb-4">Find Charging Stations by City</h2>
-            <div className="flex flex-wrap gap-2">
-              {TOP_CITIES.map((city) => (
-                <span key={city} className="rounded-full border border-green-200 bg-green-50 px-4 py-1.5 text-sm font-semibold text-green-700">
-                  EV Charging in {city}
-                </span>
-              ))}
-            </div>
+          <section className="rounded-2xl border border-gray-200 bg-white p-6">
+            <h2 className="mb-2 text-xl font-black text-gray-900">Frequently asked questions</h2>
+            {FAQS.map((f, i) => (
+              <details key={i} className="border-b border-gray-100 py-3 last:border-0" open={i === 0}>
+                <summary className="cursor-pointer text-sm font-bold text-gray-900">{f.q}</summary>
+                <p className="mt-2 text-sm text-gray-600">{f.a}</p>
+              </details>
+            ))}
+            <p className="mt-4 flex items-center gap-1.5 text-sm text-gray-600"><Plus size={14} className="text-green-600" />Know a station that isn&apos;t listed? Use “Add missing station” above.
+              {" "}Read our <Link href="/ev-charging-guide" className="font-semibold text-green-700 hover:underline">EV charging guide</Link>.</p>
           </section>
         </div>
-      </div>
-
-      <ChargingStationFinder />
+      </main>
     </>
   );
 }

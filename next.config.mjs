@@ -60,16 +60,16 @@ const nextConfig = {
     const csp = [
       "default-src 'self'",
       // Scripts: Next.js hydration needs unsafe-inline; AdSense/GA/SWG need these domains
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://pagead2.googlesyndication.com https://partner.googleadservices.com https://www.googletagmanager.com https://www.google-analytics.com https://news.google.com https://www.google.com https://www.gstatic.com https://apis.google.com https://adservice.google.com https://tpc.googlesyndication.com https://*.adtrafficquality.google",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://pagead2.googlesyndication.com https://partner.googleadservices.com https://www.googletagmanager.com https://www.google-analytics.com https://news.google.com https://www.google.com https://www.gstatic.com https://apis.google.com https://adservice.google.com https://tpc.googlesyndication.com https://*.adtrafficquality.google https://*.mappls.com",
       // Styles: inline styles + Google Fonts + Subscribe with Google stylesheets
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://news.google.com",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://news.google.com https://*.mappls.com",
       // Fonts
-      "font-src 'self' data: https://fonts.gstatic.com",
+      "font-src 'self' data: https://fonts.gstatic.com https://*.mappls.com",
       // Images: allow all HTTPS (vehicle/news images come from many CDNs)
       "img-src 'self' data: blob: https: http:",
       // Fetch/XHR: GA, our own API, AdSense reporting, Subscribe with Google,
       // live chat (Pusher), error reporting (Sentry), charging map, read-aloud translation, location lookup
-      "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://stats.g.doubleclick.net https://www.google.com https://pagead2.googlesyndication.com https://*.adtrafficquality.google https://firestore.googleapis.com https://news.google.com https://*.pusher.com wss://*.pusher.com https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://api.openchargemap.io https://translate.googleapis.com https://nominatim.openstreetmap.org",
+      "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://stats.g.doubleclick.net https://www.google.com https://pagead2.googlesyndication.com https://*.adtrafficquality.google https://firestore.googleapis.com https://news.google.com https://*.pusher.com wss://*.pusher.com https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://api.openchargemap.io https://translate.googleapis.com https://nominatim.openstreetmap.org https://*.mappls.com https://*.mapmyindia.com",
       // Frames: YouTube embeds + AdSense iframes
       "frame-src https://www.youtube.com https://player.vimeo.com https://www.google.com https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://*.adtrafficquality.google https://news.google.com",
       // Media: audio player uses blob URLs

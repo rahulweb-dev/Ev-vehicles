@@ -51,6 +51,7 @@ const STATIC_PAGES = [
   { url: `${SITE_URL}/charging-stations`,             priority: 0.78, freq: "weekly"  },
   { url: `${SITE_URL}/subsidies`,                     priority: 0.78, freq: "weekly"  },
   ...COMPARISONS.map((c) => ({ url: `${SITE_URL}/compare/${c.slug}`, priority: 0.78, freq: "weekly" })),
+  ...CITIES.map((c) => ({ url: `${SITE_URL}/charging-stations/${c.slug}`, priority: 0.75, freq: "weekly" })),
 ];
 
 /*
