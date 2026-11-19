@@ -8,8 +8,9 @@ import {
   LayoutDashboard, Newspaper, LogOut, Menu, X, ExternalLink, Settings, Users, Building2, MapPin, ShieldCheck, Car,
   LayoutTemplate, MessageSquare, Radio, MessagesSquare, BookOpen, Bell, SearchCheck, UserCircle, Tag, Star, Mail,
   Share2, BarChart3, Megaphone, Link2, Zap, CalendarClock, Inbox, Search, ChevronsLeft, ChevronsRight, BellRing,
-  LineChart, Database, Image as ImageIcon, Sparkles,
+  LineChart, Database, Image as ImageIcon, Sparkles, Sun, Moon,
 } from "lucide-react";
+import { useTheme } from "@/components/ThemeProvider";
 import { FaFacebook } from "react-icons/fa6";
 import { getPusherClient } from "@/lib/pusherClient";
 
@@ -119,6 +120,28 @@ function StorageMini() {
   );
 }
 
+function ThemeSwitch({ collapsed }) {
+  const { dark, setTheme } = useTheme();
+  if (collapsed) {
+    return (
+      <button onClick={() => setTheme(!dark)} title={dark ? "Light mode" : "Dark mode"} className="mx-auto mb-2 flex rounded-lg p-2 text-white/50 transition hover:bg-white/10 hover:text-white">
+        {dark ? <Sun size={16} /> : <Moon size={16} />}
+      </button>
+    );
+  }
+  return (
+    <div className="mx-3 mb-2 grid grid-cols-2 gap-1 rounded-xl bg-white/[0.04] p-1 ring-1 ring-white/[0.06]" role="group" aria-label="Theme">
+      {[[false, "Light", Sun], [true, "Dark", Moon]].map(([v, l, I]) => (
+        <button key={l} onClick={() => setTheme(v)} aria-pressed={dark === v}
+          className={`relative flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-xs font-semibold transition ${dark === v ? "text-white" : "text-white/45 hover:text-white/80"}`}>
+          {dark === v && <motion.span layoutId="theme-pill" className="absolute inset-0 rounded-lg bg-white/10 ring-1 ring-white/15" transition={{ type: "spring", stiffness: 450, damping: 35 }} />}
+          <I size={13} className="relative" /><span className="relative">{l}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function NavBody({ groups, pathname, collapsed, counts, user, isAdmin, onNavigate, onLogout, loggingOut, layoutKey }) {
   const [q, setQ] = useState("");
   const filtered = useMemo(() => {
@@ -175,6 +198,7 @@ function NavBody({ groups, pathname, collapsed, counts, user, isAdmin, onNavigat
 
       <div className="border-t border-white/[0.06] pt-3">
         {!collapsed && isAdmin && <StorageMini />}
+        <ThemeSwitch collapsed={collapsed} />
         {user && (
           <div className={`mx-3 mb-3 flex items-center gap-2.5 rounded-xl p-2 ${collapsed ? "justify-center" : "bg-white/[0.04] ring-1 ring-white/[0.06]"}`}>
             <span className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-sky-500 text-sm font-bold text-white">
@@ -198,6 +222,15 @@ function NavBody({ groups, pathname, collapsed, counts, user, isAdmin, onNavigat
         {collapsed && <button onClick={onLogout} title="Log out" className="mx-auto mb-3 flex rounded-lg p-2 text-white/40 hover:bg-rose-500/15 hover:text-rose-300"><LogOut size={16} /></button>}
       </div>
     </>
+  );
+}
+
+function MobileThemeButton() {
+  const { dark, setTheme } = useTheme();
+  return (
+    <button onClick={() => setTheme(!dark)} className="rounded-lg p-2 text-slate-600 hover:bg-slate-100" aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}>
+      {dark ? <Sun size={19} /> : <Moon size={19} />}
+    </button>
   );
 }
 
@@ -255,10 +288,13 @@ export default function AdminSidebar() {
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-400 to-teal-600"><Zap size={16} className="text-white" fill="currentColor" /></span>
           <span className="text-[15px] font-bold tracking-tight text-slate-900">EV Radar <span className="font-medium text-slate-400">Admin</span></span>
         </Link>
+        <div className="flex items-center gap-1">
+        <MobileThemeButton />
         <button onClick={() => setMobileOpen(true)} className="relative rounded-lg p-2 text-slate-600 hover:bg-slate-100" aria-label="Open menu">
           <Menu size={21} />
           {waitingChats + pendingComments > 0 && <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-rose-500" />}
         </button>
+        </div>
       </div>
 
       <AnimatePresence>

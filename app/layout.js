@@ -209,8 +209,10 @@ const websiteJsonLd = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en-IN" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="en-IN" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`} suppressHydrationWarning>
       <head>
+        {/* Apply the saved light/dark theme before first paint (no white flash) */}
+        <script dangerouslySetInnerHTML={{ __html: `try{var t=localStorage.getItem("ev-theme");if(t==="dark"||(!t&&window.matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark")}catch(e){}` }} />
         {/* Hreflang — geo-targets India English */}
         <link rel="alternate" hrefLang="en-IN" href={SITE_URL} />
         <link rel="alternate" hrefLang="x-default" href={SITE_URL} />
