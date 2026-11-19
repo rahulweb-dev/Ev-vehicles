@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/mongodb";
 import { getAuthUser } from "@/lib/auth";
 import SocialPost from "@/lib/models/SocialPost";
-import { publishSocialPost } from "@/lib/social/socialPosts";
+import { publishSocialPost, syncScheduledContent } from "@/lib/social/socialPosts";
 import { getMetaConfig } from "@/lib/social/meta";
 
 export const maxDuration = 60;
@@ -14,6 +14,8 @@ export async function GET(request) {
   await dbConnect();
   if (!(await isAdmin())) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const status = new URL(request.url).searchParams.get("status") || "all";
+  // Show queued posts for scheduled articles straight away (the cron also does this every 15 min)
+  await syncScheduledContent().catch((e) => console.error("[social sync]", e.message));
   const q = status === "all" ? { owner: null } : status === "failed" ? { owner: null, status: { $in: ["failed", "partial"] } } : { owner: null, status };
   const [posts, cfg] = await Promise.all([
     SocialPost.find(q).sort({ scheduledAt: -1, createdAt: -1 }).limit(200).lean(),

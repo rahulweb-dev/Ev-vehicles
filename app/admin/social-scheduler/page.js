@@ -151,12 +151,19 @@ export default function SocialSchedulerPage() {
           {data.posts.map((p) => (
             <div key={p._id} className="flex gap-4 rounded-2xl border border-gray-200 bg-white p-4">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              {p.imageUrl ? <img src={`${p.imageUrl.split("?")[0]}?tr=w-160`} alt="" className="h-20 w-20 shrink-0 rounded-lg object-cover" /> : <div className="h-20 w-20 shrink-0 rounded-lg bg-gray-100" />}
+              {p.igImageUrl || p.fbImageUrl ? (
+                <div className="flex shrink-0 gap-1.5">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  {p.platforms.includes("facebook") && p.fbImageUrl && <a href={p.fbImageUrl} target="_blank" rel="noreferrer" title="Facebook image 1200×630"><img src={p.fbImageUrl} alt="Facebook image" className="h-20 w-[152px] rounded-lg object-cover" /></a>}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  {p.platforms.includes("instagram") && p.igImageUrl && <a href={p.igImageUrl} target="_blank" rel="noreferrer" title="Instagram card 1080×1350"><img src={p.igImageUrl} alt="Instagram card" className="h-20 w-16 rounded-lg object-cover" /></a>}
+                </div>
+              ) : p.imageUrl ? <img src={`${p.imageUrl.split("?")[0]}?tr=w-160`} alt="" className="h-20 w-20 shrink-0 rounded-lg object-cover" /> : <div className="h-20 w-20 shrink-0 rounded-lg bg-gray-100" />}
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2 text-xs">
                   <span className={`rounded-md px-2 py-0.5 font-bold ${STATUS[p.status]?.cls}`}>{STATUS[p.status]?.label}</span>
                   <span className="text-gray-500">{fmt(p.scheduledAt)}</span>
-                  {p.source?.kind !== "manual" && <span className="rounded-md bg-purple-100 px-2 py-0.5 font-bold text-purple-700">Auto: {p.source?.kind}</span>}
+                  {p.source?.kind !== "manual" && <a href={`/${p.source?.kind === "blog" ? "blogs" : "news"}/${p.source?.slug || ""}`} target="_blank" rel="noreferrer" className="rounded-md bg-purple-100 px-2 py-0.5 font-bold text-purple-700">Auto: {p.source?.kind === "blog" ? "buyer's guide" : "article"}{p.status === "scheduled" ? " · posts when it goes live" : ""}</a>}
                 </div>
                 <p className="mt-1 line-clamp-2 whitespace-pre-line text-sm text-gray-800">{p.message || p.igCaption}</p>
                 <div className="mt-2 flex flex-wrap gap-2 text-xs">

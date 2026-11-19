@@ -1,4 +1,4 @@
-﻿import { NextResponse }      from "next/server";
+﻿import { NextResponse, after } from "next/server";
 import { revalidatePath }     from "next/cache";
 import dbConnect              from "@/lib/mongodb";
 import { sanitizeArticleContent } from "@/lib/sanitize";
@@ -138,6 +138,7 @@ export async function POST(request) {
       if (targets.length > 0) {
         publishToSocial(String(article._id), targets).catch(console.error);
       }
+      after(async () => { try { const { autoPostContent } = await import("@/lib/social/socialPosts"); await autoPostContent(article.toObject ? article.toObject() : article, "article"); } catch (e) { console.error("[social auto-post]", e.message); } });
     }
 
     return NextResponse.json({ success: true, article }, { status: 201 });

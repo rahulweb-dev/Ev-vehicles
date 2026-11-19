@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { revalidatePath } from "next/cache";
 import dbConnect from "@/lib/mongodb";
 import Blog from "@/lib/models/Blog";
@@ -44,6 +44,7 @@ export async function PATCH(request, { params }) {
 
     if (isPublishingNow) {
       sendBlogPublishedEmail(blog).catch(console.error);
+      after(async () => { try { const { autoPostContent } = await import("@/lib/social/socialPosts"); await autoPostContent(blog.toObject ? blog.toObject() : blog, "blog"); } catch (e) { console.error("[social auto-post]", e.message); } });
     }
 
     return NextResponse.json({ success: true, blog });
