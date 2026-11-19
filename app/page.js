@@ -29,22 +29,22 @@ const STATS = [
 export const revalidate = 120;
 
 export const metadata = {
-  title: "EV Radar – India's #1 Electric Vehicle News Platform",
+  title: "EV Radar – Electric Vehicle News, Prices & Data for India",
   description:
-    "India's most trusted electric vehicle news platform. Get latest EV news, reviews, prices, and buying guides for electric cars, bikes, scooters, and commercial vehicles in India.",
+    "Independent electric vehicle news and data for India. Get latest EV news, reviews, prices, and buying guides for electric cars, bikes, scooters, and commercial vehicles in India.",
   alternates: { canonical: SITE_URL },
   openGraph: {
-    title: "EV Radar – India's #1 Electric Vehicle News Platform",
+    title: "EV Radar – Electric Vehicle News, Prices & Data for India",
     description: "Latest EV news, launches, reviews and prices for electric cars and bikes in India.",
     url: SITE_URL,
     type: "website",
-    images: [{ url: `${SITE_URL}/api/og?title=EV Radar&subtitle=India's %231 Electric Vehicle News Platform&tag=default&type=page`, width: 1200, height: 630, alt: "EV Radar – India's #1 Electric Vehicle News Platform" }],
+    images: [{ url: `${SITE_URL}/api/og?title=EV Radar&subtitle=Electric vehicle news, prices and data for India&tag=default&type=page`, width: 1200, height: 630, alt: "EV Radar – Electric Vehicle News, Prices & Data for India" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "EV Radar – India's #1 Electric Vehicle News Platform",
+    title: "EV Radar – Electric Vehicle News, Prices & Data for India",
     description: "Latest EV news, launches, reviews and prices for electric cars and bikes in India.",
-    images: [`${SITE_URL}/api/og?title=EV Radar&subtitle=India's %231 Electric Vehicle News Platform&tag=default&type=page`],
+    images: [`${SITE_URL}/api/og?title=EV Radar&subtitle=Electric vehicle news, prices and data for India&tag=default&type=page`],
   },
 };
 
@@ -221,8 +221,8 @@ export default async function Home() {
     "@type": "WebPage",
     "@id": `${SITE_URL}/#webpage`,
     url: SITE_URL,
-    name: "EV Radar – India's #1 Electric Vehicle News Platform",
-    description: "India's most trusted electric vehicle news platform. Get latest EV news, reviews, prices, and buying guides for electric cars, bikes, scooters, and commercial vehicles in India.",
+    name: "EV Radar – Electric Vehicle News, Prices & Data for India",
+    description: "Independent electric vehicle news and data for India. Get latest EV news, reviews, prices, and buying guides for electric cars, bikes, scooters, and commercial vehicles in India.",
     isPartOf: { "@id": `${SITE_URL}/#website` },
     about: { "@type": "Thing", name: "Electric Vehicles India" },
     breadcrumb: { "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Home", item: SITE_URL }] },

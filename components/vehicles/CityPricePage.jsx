@@ -5,7 +5,7 @@ import { ChevronRight, MapPin, CheckCircle, Info, AlertTriangle } from "lucide-r
 import { SITE_URL } from "@/app/layout";
 import LeadForm from "@/components/vehicles/LeadForm";
 import { priceNum, fmtINR } from "@/lib/budgetGuides";
-import { getCity, nearbyCities, onRoadEstimate, REGISTRATION_NOTE, TAX_AS_OF } from "@/lib/cityPricing";
+import { getCity, nearbyCities, onRoadEstimate, REGISTRATION_NOTE, TAX_AS_OF, TOP_CITY_SLUGS } from "@/lib/cityPricing";
 
 const base = (type) => (type === "car" ? "cars" : "bikes");
 const YEAR = 2026;
@@ -40,7 +40,9 @@ export function cityPriceMetadata(vehicle, type, citySlug) {
   return {
     title, description: description.slice(0, 300),
     alternates: { canonical: url },
-    ...(!first && { robots: { index: false, follow: true } }),
+    // Only priced pages in the 12 main cities are indexed; the rest stay useful for visitors but out of search,
+    // so templated city pages don't dominate the site's index (AdSense "low value content").
+    ...((!first || !TOP_CITY_SLUGS.includes(citySlug)) && { robots: { index: false, follow: true } }),
     openGraph: { title, description, url, type: "website", images: [{ url: img, width: 1200, height: 630 }] },
     twitter: { card: "summary_large_image", title, description, images: [img] },
   };

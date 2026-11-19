@@ -32,8 +32,8 @@ const contactJsonLd = {
   email: "contact@evradar.in",
   address: {
     "@type": "PostalAddress",
-    addressLocality: "Mumbai",
-    addressRegion: "Maharashtra",
+    addressLocality: "Hyderabad",
+    addressRegion: "Telangana",
     addressCountry: "IN",
   },
   contactPoint: [
@@ -101,9 +101,9 @@ export default function ContactPage() {
                 },
                 {
                   icon: MapPin,
-                  title: "Office",
-                  detail: "Mumbai, Maharashtra, India",
-                  sub: "Visits by appointment only",
+                  title: "Based in",
+                  detail: "Hyderabad, Telangana, India",
+                  sub: "We work online — please email us",
                 },
                 {
                   icon: Clock,

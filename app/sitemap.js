@@ -1,4 +1,5 @@
-import { CITIES } from "@/lib/cityPricing";
+import { CITIES, TOP_CITY_SLUGS } from "@/lib/cityPricing";
+import { CITY_CENTERS } from "@/lib/chargingStations";
 import { COMPARISONS } from "@/lib/comparisons";
 const SITE_URL = "https://www.evradar.in";
 
@@ -60,7 +61,6 @@ const STATIC_PAGES = [
   { url: `${SITE_URL}/top-selling-evs`,               priority: 0.8,  freq: "monthly" },
   { url: `${SITE_URL}/subsidies`,                     priority: 0.78, freq: "weekly"  },
   ...COMPARISONS.map((c) => ({ url: `${SITE_URL}/compare/${c.slug}`, priority: 0.78, freq: "weekly" })),
-  ...CITIES.map((c) => ({ url: `${SITE_URL}/charging-stations/${c.slug}`, priority: 0.75, freq: "weekly" })),
 ];
 
 /*
@@ -68,7 +68,8 @@ const STATIC_PAGES = [
  * Balanced crawl budget vs. coverage: 12 cities × N cars = N×12 URLs.
  */
 // MUST match the CITIES array in app/cars/[slug]/price-in-[city]/page.js exactly
-const TOP_CITIES = CITIES.map((c) => c.slug); // all cities (lib/city-tax-data.json)
+// Only the 12 main cities — other city pages are noindex (see components/vehicles/CityPricePage.jsx)
+const TOP_CITIES = TOP_CITY_SLUGS;
 
 async function getDbEntries() {
   try {
@@ -173,6 +174,18 @@ async function getDbEntries() {
         }));
       });
 
+    /* ── Charging city pages — only cities with at least 3 stations (others are noindex) ── */
+    let chargingUrls = [];
+    try {
+      const ChargingStation = (await import("@/lib/models/ChargingStation")).default;
+      const counts = await Promise.all(CITIES.map(async (c) => {
+        const ctr = CITY_CENTERS[c.slug];
+        if (!ctr) return 0;
+        return ChargingStation.countDocuments({ status: "active", location: { $geoWithin: { $centerSphere: [[ctr[1], ctr[0]], 30 / 6378.1] } } });
+      }));
+      chargingUrls = CITIES.filter((c, i) => counts[i] >= 3).map((c) => ({ url: `${SITE_URL}/charging-stations/${c.slug}`, changeFrequency: "weekly", priority: 0.75 }));
+    } catch { /* station data unavailable — leave them out */ }
+
     /* ── Blog pages ──────────────────────────────────────────────── */
     const blogUrls = blogs.map(b => ({
       url:             `${SITE_URL}/blogs/${b.slug}`,
@@ -194,7 +207,7 @@ async function getDbEntries() {
     );
 
     return [
-      ...articleUrls, ...vehicleUrls, ...authorUrls, ...tagUrls,
+      ...articleUrls, ...chargingUrls, ...vehicleUrls, ...authorUrls, ...tagUrls,
       ...brandUrls, ...cityPriceUrls, ...blogUrls,
       ...newsPaginatedUrls,
     ];

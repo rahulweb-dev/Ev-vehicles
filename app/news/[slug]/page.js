@@ -125,7 +125,7 @@ export async function generateMetadata({ params }) {
     alternates: { canonical: `${SITE_URL}/news/${article.slug}` },
     other: {
       "news_keywords": article.tags?.join(", ") || "",
-      "article:publisher":      "https://www.facebook.com/EVRadarIndia",
+      "article:publisher":      "https://www.facebook.com/1159338443918875",
       "article:published_time": article.publishedAt ? new Date(article.publishedAt).toISOString() : "",
       "article:modified_time":  article.updatedAt  ? new Date(article.updatedAt).toISOString()  : (article.publishedAt ? new Date(article.publishedAt).toISOString() : ""),
       "article:author":         article.author || "",

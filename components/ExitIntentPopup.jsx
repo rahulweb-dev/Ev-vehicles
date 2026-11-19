@@ -114,7 +114,7 @@ export default function ExitIntentPopup() {
                 <BellRing size={26} className="text-green-600" />
               </div>
               <h3 className="text-lg font-black text-gray-900">You're subscribed!</h3>
-              <p className="mt-1 text-sm text-gray-500">Welcome to India's #1 EV newsletter.</p>
+              <p className="mt-1 text-sm text-gray-500">Welcome to the EV Radar newsletter.</p>
               <button
                 onClick={dismiss}
                 className="mt-5 w-full rounded-xl bg-green-600 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700"

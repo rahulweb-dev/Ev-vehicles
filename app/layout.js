@@ -1,3 +1,4 @@
+import { SOCIAL_PROFILES } from "@/lib/siteProfiles";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
@@ -18,7 +19,7 @@ const ADSENSE_PUBLISHER_ID = process.env.NEXT_PUBLIC_ADSENSE_ID || "ca-pub-XXXXX
 
 export const SITE_URL = "https://www.evradar.in";
 export const SITE_NAME = "EV Radar";
-export const SITE_TAGLINE = "India's #1 Electric Vehicle News & Reviews Platform";
+export const SITE_TAGLINE = "Electric Vehicle News, Prices & Data for India";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -81,18 +82,16 @@ export const metadata = {
         url: `${SITE_URL.replace(/\/$/, "")}/images/og-default.jpg`,
         width: 1200,
         height: 630,
-        alt: `${SITE_NAME} – India's #1 EV News Platform`,
+        alt: `${SITE_NAME} – EV news, prices and data for India`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    site: "@EVRadarIndia",
-    creator: "@EVRadarIndia",
     title: `${SITE_NAME} – ${SITE_TAGLINE}`,
     description:
       "Stay updated with the latest electric vehicle news, reviews, and launches in India.",
-    images: [{ url: `${SITE_URL.replace(/\/$/, "")}/images/og-default.jpg`, alt: `${SITE_NAME} – India's #1 EV News Platform` }],
+    images: [{ url: `${SITE_URL.replace(/\/$/, "")}/images/og-default.jpg`, alt: `${SITE_NAME} – EV news, prices and data for India` }],
   },
   icons: {
     icon: [
@@ -137,7 +136,7 @@ const websiteJsonLd = {
       name: "EV Radar",
       alternateName: ["EV Radar India", "EV News India", "EVRadar", "evradar.in"],
       url: SITE_URL,
-      description: "EV Radar (evradar.in) is India's most trusted electric vehicle news platform publishing daily EV news, in-depth reviews, prices, specifications, and buying guides for electric cars, bikes, scooters, and commercial vehicles in India.",
+      description: "EV Radar (evradar.in) is an independent electric vehicle news site from Hyderabad publishing daily EV news, prices, specifications, sales data and buying guides for electric cars, two-wheelers and commercial vehicles in India.",
       logo: {
         "@type": "ImageObject",
         "@id": `${SITE_URL}/#logo`,
@@ -146,12 +145,7 @@ const websiteJsonLd = {
         height: 60,
         caption: SITE_NAME,
       },
-      sameAs: [
-        "https://twitter.com/EVRadarIndia",
-        "https://www.facebook.com/EVRadarIndia",
-        "https://www.instagram.com/evradarindia",
-        "https://www.youtube.com/@EVRadarIndia",
-      ],
+      sameAs: SOCIAL_PROFILES.map((p) => p.url),
       knowsAbout: [
         "Electric Vehicles India",
         "Electric Cars India",

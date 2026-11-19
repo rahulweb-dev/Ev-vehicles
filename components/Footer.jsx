@@ -88,9 +88,9 @@ export default function Footer() {
             </Link>
 
             <p className="mt-4 text-sm leading-relaxed text-gray-400">
-              India&apos;s most trusted electric vehicle news and information platform. We cover EV launches,
-              reviews, charging infrastructure, government policies, and everything that matters to
-              India&apos;s growing EV community.
+              Independent electric vehicle news and data from Hyderabad. We cover EV launches, prices,
+              sales data, charging and government policy, sourced from official announcements and
+              verified data.
             </p>
 
             <div className="mt-6 space-y-2 text-sm">

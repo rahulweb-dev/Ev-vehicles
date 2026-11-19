@@ -19,12 +19,12 @@ function welcomeHtml(email) {
     <table width="100%" style="max-width:580px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08)">
       <tr><td style="background:linear-gradient(135deg,#16a34a,#15803d);padding:32px;text-align:center">
         <p style="margin:0;font-size:28px;font-weight:900;color:#fff">⚡ EV Radar</p>
-        <p style="margin:8px 0 0;font-size:15px;color:rgba(255,255,255,.85)">India's #1 Electric Vehicle News Platform</p>
+        <p style="margin:8px 0 0;font-size:15px;color:rgba(255,255,255,.85)">Electric vehicle news, prices and data for India</p>
       </td></tr>
       <tr><td style="padding:32px">
         <h1 style="margin:0 0 12px;font-size:22px;font-weight:900;color:#111827">Welcome aboard! 🎉</h1>
         <p style="margin:0 0 16px;font-size:15px;color:#374151;line-height:1.6">
-          You're now subscribed to <strong>EV Radar</strong> — India's most trusted source for electric vehicle news, launches, prices, and expert reviews.
+          You're now subscribed to <strong>EV Radar</strong> — your source for checked electric vehicle news, launches, prices, and expert reviews.
         </p>
         <p style="margin:0 0 24px;font-size:15px;color:#374151;line-height:1.6">
           Here's what you'll get in your inbox every week:

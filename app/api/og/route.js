@@ -43,7 +43,7 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url);
 
   const title    = searchParams.get("title")    || "EV Radar";
-  const subtitle = searchParams.get("subtitle") || "India's #1 Electric Vehicle News Platform";
+  const subtitle = searchParams.get("subtitle") || "Electric vehicle news, prices and data for India";
   const image    = searchParams.get("image")    || "";
   const tag      = searchParams.get("tag")      || "";
   const type     = searchParams.get("type")     || "article";
@@ -212,7 +212,7 @@ export async function GET(request) {
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#4ade80" }} />
               <span style={{ color: "#4ade80", fontSize: "18px", fontWeight: 600 }}>evradar.in</span>
-              <span style={{ color: "#64748b", fontSize: "16px", marginLeft: "8px" }}>India&apos;s #1 EV News Platform</span>
+              <span style={{ color: "#64748b", fontSize: "16px", marginLeft: "8px" }}>EV news, prices &amp; data</span>
             </div>
           </div>
 

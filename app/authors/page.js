@@ -8,7 +8,7 @@ export const revalidate = 3600;
 
 export const metadata = {
   title: `Our Authors & EV Journalists`,
-  description: `Meet the expert EV journalists and automotive writers behind ${SITE_NAME} — India's #1 electric vehicle news platform.`,
+  description: `Meet the writers and editors behind ${SITE_NAME} — an independent electric vehicle news site for India.`,
   alternates: { canonical: `${SITE_URL}/authors` },
   openGraph: {
     title: `EV Journalists & Authors | ${SITE_NAME}`,

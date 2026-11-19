@@ -3,11 +3,11 @@ import { SITE_URL } from "../layout";
 
 export const metadata = {
   title: "Sitemap – All Pages & Categories",
-  description: "Complete sitemap of EV Radar — news, electric cars, bikes, guides, tools and more. Browse all sections of India's #1 EV platform.",
+  description: "Complete sitemap of EV Radar — news, electric cars, bikes, guides, tools and more. Browse all sections of EV Radar.",
   alternates: { canonical: `${SITE_URL}/sitemap-page` },
   openGraph: {
     title: "Sitemap – EV Radar",
-    description: "Browse all sections of India's #1 EV platform.",
+    description: "Browse all sections of EV Radar.",
     url: `${SITE_URL}/sitemap-page`,
     type: "website",
   },

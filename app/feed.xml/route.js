@@ -61,7 +61,7 @@ export async function GET() {
   xmlns:content="http://purl.org/rss/modules/content/"
   xmlns:media="http://search.yahoo.com/mrss/">
   <channel>
-    <title>${SITE_NAME} – India's #1 Electric Vehicle News</title>
+    <title>${SITE_NAME} – Electric Vehicle News for India</title>
     <link>${SITE_URL}</link>
     <description>Latest electric vehicle news, reviews, prices and launches in India.</description>
     <language>en-in</language>

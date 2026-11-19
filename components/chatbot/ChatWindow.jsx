@@ -39,7 +39,7 @@ const FLOW = {
   welcome: {
     bot: [
       "👋 Hello! Welcome to **EVRadar India**",
-      "India's #1 Electric Vehicle Platform 🚗⚡\n\nPlease select an option below:",
+      "Your guide to electric vehicles in India 🚗⚡\n\nPlease select an option below:",
     ],
     options: [
       { label: "🚗 Buy Electric Car",     next: "buy_car" },

@@ -21,6 +21,10 @@ const nextConfig = {
   },
   async redirects() {
     return [
+      // Duplicate news stories merged into the better version (Nov 2026)
+      { source: "/news/tesla-begins-delivering-model-y-l-in-india-6-seater-electric-suv-offers-681-km-range", destination: "/news/tesla-begins-model-yl-deliveries-in-india-expands-presence-in-premium-ev-segment", permanent: true },
+      { source: "/news/india-ev-sales-30-million-units-by-2032-report", destination: "/news/india-ev-sales-30-million-units-by-2032", permanent: true },
+      { source: "/news/tata-sierra-ev-launch-price-range-features-india-2026", destination: "/news/tata-sierra-ev-launched-in-india-at-1879-lakh-up-to-665km-range-adas-awd-option", permanent: true },
       // Redirect non-www to www (permanent 301)
       {
         source: "/:path*",

@@ -384,7 +384,7 @@ export default function Navbar() {
                     </Link>
                   </div>
                 ) : (
-                  <span className="text-[11px] text-gray-500">India&apos;s #1 Electric Vehicle News Platform</span>
+                  <span className="text-[11px] text-gray-500">EV news, prices &amp; data for India</span>
                 )}
               </div>
             </div>
@@ -413,7 +413,7 @@ export default function Navbar() {
             <Link href="/" className="shrink-0">
               <Image
                 src="/images/logo.png"
-                alt="EVRadar — India's #1 EV News"
+                alt="EV Radar — EV news, prices and data for India"
                 width={118}
                 height={32}
                 className="h-8 w-auto object-contain"
@@ -510,7 +510,7 @@ export default function Navbar() {
 
             <div className="mt-4 flex items-center gap-2">
               <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
-              <p className="text-[11px] text-gray-400">India&apos;s #1 Electric Vehicle Platform</p>
+              <p className="text-[11px] text-gray-400">EV news, prices &amp; data for India</p>
             </div>
           </div>
         </div>

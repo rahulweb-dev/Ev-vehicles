@@ -18,7 +18,7 @@ function hashQuery(q) {
 
 /* ─── Build system prompt with DB context ──────────────────────── */
 function buildSystemPrompt(context) {
-  return `You are EVRadar AI, India's premier electric vehicle assistant on EVRadar.in — India's #1 EV news platform.
+  return `You are EVRadar AI, India's premier electric vehicle assistant on EVRadar.in — an independent EV news site for India.
 
 You help users with:
 • EV recommendations (cars, bikes, scooters) based on budget and needs
